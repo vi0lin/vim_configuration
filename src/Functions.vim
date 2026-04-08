@@ -4,15 +4,16 @@ if !exists("g:vim_advantages_got_sourced")
 function Profile(...)
   let i = 0
   let arg = a:000[i]
-  if arg ==# 'start'
+  if arg ==# 'on'
     profile start /tmp/profile.log
-    profile! func !
-    profile! file !
-  elseif arg ==# 'stop'
+    profile! func *
+    profile! file *
+  elseif arg ==# 'off'
     profile pause
-    qa!
   elseif arg ==# 'show'
     e /tmp/profile.log
+  elseif arg ==# 'end'
+    qa!
   endif
 endfunction
 command! -range -nargs=* Profile <line1>,<line2>:call Profile(<q-args>)
@@ -479,8 +480,8 @@ func! PutCommand(nr=0)
   put=x
 endfun
 
-function! GrepSplit(term)
-  NEW | exec '%!grep '..a:term | exec '%!sort | uniq'
+function! GrepSplit(args)
+  NEW | exec '%!grep "'..a:args..'"' | exec '%!sort | uniq'
 endfunction
 
 func! Key2Notation(key) abort
@@ -2686,14 +2687,22 @@ function! OpenFile_callback(id, code, register)
   endif
 endfunction
 
+function IsPopup(winid)
+  " echo popup_getpos(win_getid()) != {}
+  " echo popup_getpos(winid) != {}
+  return !empty(popup_getpos(a:winid))
+endfunction
+
 function! MakeDirCurrentCWD()
-  let [n, y, x, n, n]=getcurpos()
-  " let w:cwd=expand("%:p:h")
-  " let w:pointer=expand('%')
-  call CD(expand("%:p:h"))
-  call SetPointer(expand('%:p'))
-  " call SetProject(expand("%:p:h"))
-  call cursor(y, x)
+  " if !IsPopup(win_getid())
+    let [n, y, x, n, n]=getcurpos()
+    " let w:cwd=expand("%:p:h")
+    " let w:pointer=expand('%')
+    call CD(expand("%:p:h"))
+    call SetPointer(expand('%:p'))
+    " call SetProject(expand("%:p:h"))
+    call cursor(y, x)
+  " endif
 endfunction
 
 function! MakeDirCurrent(path)
@@ -2781,8 +2790,17 @@ endfunction
 
 function! Files(path)
   " echo a:path
-  exec ":Files" a:path
+  " exec ":Files" a:path
   " call Redraw()
+  " call fzf#run({'dir': a:path})
+  " call fzf#run({'dir': a:path, 'window': { 'width': 0.9, 'height': 0.6 } })
+  " call fzf#run({'dir': '/', 'window': { 'width': 0.9, 'height': 0.6 } })
+  call fzf#run(fzf#wrap('', { 'dir': a:path }, 0 ))
+  " let opts = {'dir': '/'}
+  " let window_opts = fzf#wrap('')
+  " let opts['window'] = window_opts['window']
+  " call fzf#run(opts)
+  " call fzf#run({'dir': a:path, 'source': 'find .', 'sink': 'e', 'window': {'width':0.9, 'height': 0.6}})
 endfunction
 
 function! CommandLineFiles(path)
@@ -2907,6 +2925,8 @@ function! GitName_Statusline()
 endfunction
 
 function! SetProject(dir)
+  echo "TODO Async Backgrounded Job"
+  return
   call system("curl http://localhost:8000/SetProject?project="..a:dir)
 endfunction
 
@@ -2916,7 +2936,7 @@ function! FindGit(path)
     let dir='/'..join(b[:len(b)-i], '/')
     let git=dir..'/.git'
     if isdirectory(git)
-      call SetProject(dir)
+      " call SetProject(dir)
       return dir
     elseif filereadable(git)
       call SetProject(dir)
@@ -2925,7 +2945,7 @@ function! FindGit(path)
   endfor
   let dir = '/'
   if isdirectory(dir..'/.git')
-    call SetProject(dir)
+    " call SetProject(dir)
     return dir
   endif
   return -1
@@ -2938,6 +2958,13 @@ function! CWD_Statusline()
   else
     return w:cwd
   endif
+endfunction
+
+function! GETCWD()
+  if exists("w:cwd")
+    return w:cwd
+  endif
+  return ''
 endfunction
 
 function! CWD()
@@ -2964,9 +2991,9 @@ endfunction
 
 function! CD(path)
   if isdirectory(a:path)
-    silent exec "cd ".a:path
+    silent call execute("cd ".a:path)
   else
-    silent exec "cd ".GetParentDir(a:path)
+    silent call execute("cd ".GetParentDir(a:path))
   endif
   let w:cwd=getcwd()
   let w:git=FindGit(w:cwd)
@@ -2988,7 +3015,7 @@ endfunction
 
 function! REFRESH_CWD()
   try
-    silent exec "cd ".CWD()
+    silent call execute("cd ".CWD())
   catch
   endtry
 endfunction
@@ -4432,10 +4459,10 @@ function! BufferSetup()
         let g:buffer_vars[bufname()]={}
     endif
     let b:isGitRepo=system("echo -n `git rev-parse --is-inside-work-tree 2>/dev/null || echo -n false`")
-    let b:lastMasterBranch=system("if $isGitRepo; then echo -n `git log master --oneline | head -n 0 | awk '{print $1}'`; else echo -n '...'; fi")
-    let b:branch=system("if $isGitRepo; then echo -n `git rev-parse --abbrev-ref HEAD`; else echo -n 'not a git repo'; fi")
-    let b:commitstatus=system("echo -n 'got commited (to be done)'")
-    let b:datetime=system("echo -n `date`")
+    " let b:lastMasterBranch=system("if $isGitRepo; then echo -n `git log master --oneline | head -n 0 | awk '{print $1}'`; else echo -n '...'; fi")
+    " let b:branch=system("if $isGitRepo; then echo -n `git rev-parse --abbrev-ref HEAD`; else echo -n 'not a git repo'; fi")
+    " let b:commitstatus=system("echo -n 'got commited (to be done)'")
+    " let b:datetime=system("echo -n `date`")
   endif
 endfunction
 
@@ -4491,50 +4518,37 @@ function! BufWinEnter()
   " call CD(expand('%:p:h'))
   " call InitLineState()
   " echo "BufReadPost"
-  call TabBuffers('bufnew')
+endfunction
+
+function! BufEnter()
 endfunction
 
 function! BufNew()
-  call MakeDirCurrentCWD()
+  " call MakeDirCurrentCWD()
   " if exists("g:lastmain_repo")
   "   call CD(g:lastmain_repo)
   " endif
-  call BufferSetup()
+  " call BufferSetup()
+  " call TabBuffers('bufenter')
 endfunction
 
 function TabBuffers(method)
-  if !exists('t:buffers')
-    let t:buffers=[]
-  endif
   " let buffers=gettabvar(tabpagenr(), 'buffers')
-  if a:method == 'bufnew'
-    if index(t:buffers, bufnr()) == -1
-      if buflisted(bufnr())
-        \ && getbufvar(bufnr(), '&buftype') !=# 'quickfix'
-        \ && getbufvar(bufnr(), '&buftype') !=# 'nofile'
-        \ && getbufvar(bufnr(), '&buftype') !=# 'terminal'
-        \ && getbufvar(bufnr(), '&buftype') !=# 'help'
-          call extend(t:buffers, [bufnr()])
-      endif
-    endif
-    " call settabvar(tabpagenr(), 't:buffers', buffers)
-  elseif a:method == 'bufdelete'
-    if index(t:buffers, g:last_buffer) > -1
-      let buffer=filter(t:buffers, 'v:val!='..g:last_buffer)
-      let t:buffer=buffer
-    endif
-    " call settabvar(tabpagenr(), 't:buffers', filtered)
-  elseif a:method == 'init'
+  let method=a:method
+  if method == 'init'
     " delcommand Bd
     " if exists('*Bd') " Function
     " if exists('g:Bd') " Variable
     if !exists('#TabBuffers') " Autocmd group
-      " echo exists("#TabBuffers")
+    " echo exists("#TabBuffers")
     " if exists(':Bd') " Mapping
     " if exists(':Bd') == 0 " Command
       " augroup! TabBuffers
       augroup TabBuffers
+        autocmd! BufAdd * :call TabBuffers_Add(str2nr(expand('<abuf>')))
         autocmd! BufEnter * let g:last_buffer=bufnr()
+        autocmd! BufEnter * call TabBuffers_Add(bufnr())
+        autocmd! BufDelete * call TabBuffers_Delete(str2nr(expand('<abuf>')))
       augroup END
       " augroup! TabBuffers
       " command! -bang -complete=buffer -nargs=? Bd
@@ -4543,20 +4557,20 @@ function TabBuffers(method)
       "   \ execute "bdelete".(<q-bang>?"!" : "") <q-args>
       "   " \ echom "Deleted buffer #". bn . " (" . name . ")"
     endif
-  elseif a:method == 'merge'
+  elseif method == 'merge'
     for i in range(0,winnr('$')+1)
       if index(t:buffers, bufnr()) == -1
         call extend(t:buffers, [winbufnr(i)])
       endif
     endfor
     only
-  elseif a:method == 'next'
+  elseif method == 'next'
     let idx=index(t:buffers, bufnr())
     let len=len(t:buffers)
     let next=Mod(idx+1, len-1)
     echo idx+1 len next
     exec "b" t:buffers[next]
-  elseif a:method == 'prev'
+  elseif method == 'prev'
     let idx=index(t:buffers, bufnr())
     let len=len(t:buffers)
     let prev=Mod(idx-1, len-1)
@@ -4566,12 +4580,39 @@ function TabBuffers(method)
   " call settabvar(tabpagenr(), 'buffers', uniq(sort(buffers)))
   " call settabvar(tabpagenr(), 'buffers', buffers)
 endfunction
+function! TabBuffers_Add(bufnr)
+  if !exists('t:buffers')
+    let t:buffers=[]
+  endif
+  "" if method == 'bufenter'
+  ""   " echo bufnr
+  ""   " echo t:buffers
+  ""   call TabBuffers_Add(bufnr())
+  ""   " call settabvar(tabpagenr(), 't:buffers', buffers)
+  if index(t:buffers, a:bufnr) == -1
+    " if buflisted(a:bufnr)
+    "   \ && getbufvar(a:bufnr, '&buftype') !=# 'quickfix'
+    if getbufvar(a:bufnr, '&buftype') !=# 'nofile'
+    "   \ && getbufvar(a:bufnr, '&buftype') !=# 'terminal'
+    "   \ && getbufvar(a:bufnr, '&buftype') !=# 'help'
+      " if filereadable(FullPath(a:bufnr))
+        call extend(t:buffers, [a:bufnr])
+      " endif
+    " endif
+    endif
+  endif
+endfunction
+function! TabBuffers_Delete(bufnr)
+  if index(t:buffers, a:bufnr) > -1
+    let buffers=filter(t:buffers, 'v:val!='..a:bufnr)
+    let t:buffers=buffers
+  endif
+endfunction
 call TabBuffers('init')
 
 function BufDelete()
   " let nr = (bufnr('#') == -1 ? bufnr('%') : bufnr('#'))
   " call input(nr.." delete")
-  call TabBuffers('bufdelete')
 endfunction
 
 function BufWipeout()
@@ -5386,6 +5427,9 @@ endfunction
 
 " StaticWin --title Information --new --top --foremost
 
+function FullPath(bufnr)
+  return fnamemodify(bufname(b), ':p')
+endfunction
 " Custom fzf command with your own list
 function FullPaths(buffers)
   let pack=[]
@@ -5401,13 +5445,21 @@ let s:timer_id = -1
 let s:file_list = []
 " Dateiliste einmalig befüllen (alle geladenen Buffer)
 function! s:RefreshFileList() abort
-    let s:file_list = []
-    " let s:file_list=FullPaths(t:buffers)
-    for buf in getbufinfo({'buflisted': 1})
-        if buf.name != ''
-            call add(s:file_list, buf.name)
-        endif
-    endfor
+  let s:file_list = []
+  let s:file_bufnrs = []
+  " NewMap map <F1> :echo s:file_bufnrs<cr>
+  " let s:file_list=FullPaths(t:buffers)
+  for buf in getbufinfo({'buflisted': 1})
+    if index(t:buffers, buf.bufnr) > -1
+      if buf.name != ''
+          " call add(s:file_list, buf.name)
+          " call add(s:file_list, fnamemodify(buf.name, ':p'))
+          " call add(s:file_list, fnamemodify(buf.name, ':p'))
+          call add(s:file_list, fnamemodify(buf.name, ':p'))
+          call add(s:file_bufnrs, buf.bufnr)
+      endif
+    endif
+  endfor
 endfunction
 " Popup schließen (Timer-Callback)
 function! s:ClosePopup(timer_id) abort
@@ -5425,11 +5477,13 @@ function! s:ShowPopup() abort
         call popup_close(s:popup_id)
     endif
     let current_file = expand('%:p')
+    echo current_file
     let lines = []
     let highlight_line = 1
     for i in range(len(s:file_list))
         " Zeige relativen Pfad statt nur Dateiname
-        let fname = fnamemodify(s:file_list[i], ':~:.')
+        " let fname = fnamemodify(s:file_list[i], ':~:.')
+        let fname = s:file_list[i]
         let prefix = '  '
         if s:file_list[i] ==# current_file
             let prefix = '▶ '
@@ -5450,7 +5504,7 @@ function! s:ShowPopup() abort
         \ 'minheight': min([len(s:file_list), max_h]),
         \ 'maxheight': max_h,
         \ 'border':    [1, 1, 1, 1],
-        \ 'title':     ' Buffers (' . len(s:file_list) . ') ' . CWD() . ' ',
+        \ 'title':     ' Buffers (' . len(s:file_list) . ') ' . GETCWD() . ' ',
         \ 'padding':   [0, 1, 0, 1],
         \ 'zindex':    50,
         \ 'mapping':   0,
@@ -5473,8 +5527,22 @@ function! s:NextBuffer() abort
     if empty(s:file_list) | return | endif
     let current = expand('%:p')
     let idx = index(s:file_list, current)
-    let next_idx = (idx + 1) % len(s:file_list)
-    execute 'buffer ' . fnameescape(s:file_list[next_idx])
+    " let next_idx = (idx + 1) % len(s:file_list)
+    let next_idx = Mod(idx + 1, len(s:file_list))
+    " echo idx next_idx
+    try
+      " execute 'silent buffer ' . fnameescape(s:file_list[next_idx])
+      " call execute('silent buffer ' . s:file_list[next_idx])
+      " let next=s:file_list[next_idx]
+      " call execute('silent buffer ' . next)
+      " exec "badd " . next
+      " execute 'buffer ' . t:buffers[next_idx]
+      " silent call bufload(s:file_bufnrs[next_idx])
+      noautocmd execute 'buffer' s:file_bufnrs[next_idx]
+      " execute 'e ' . t:buffers[next_idx]
+    catch
+      echo "execute 'buffer ' . fnameescape(s:file_list[next_idx])"
+    endtry
     call s:ShowPopup()
 endfunction
 " Zum vorherigen Buffer springen
@@ -5483,13 +5551,82 @@ function! s:PrevBuffer() abort
     if empty(s:file_list) | return | endif
     let current = expand('%:p')
     let idx = index(s:file_list, current)
-    let prev_idx = (idx - 1 + len(s:file_list)) % len(s:file_list)
-    execute 'buffer ' . fnameescape(s:file_list[prev_idx])
+    " let prev_idx = (idx - 1 + len(s:file_list)) % len(s:file_list)
+    let prev_idx = Mod(idx - 1 + len(s:file_list), len(s:file_list))
+    try
+      " execute 'silent buffer ' . fnameescape(s:file_list[prev_idx])
+      " let prev=s:file_list[prev_idx]
+      " exec "badd " . next
+      " call execute('silent buffer ' . prev)
+      " silent call bufload(s:file_bufnrs[prev_idx])
+      noautocmd execute 'buffer' s:file_bufnrs[prev_idx]
+      " execute 'buffer ' . t:buffers[prev_idx]
+      " execute 'e ' . t:buffers[prev_idx]
+    catch
+      echo "execute 'buffer ' . fnameescape(s:file_list[prev_idx])"
+    endtry
     call s:ShowPopup()
 endfunction
+
 " Keymaps
-nnoremap <Tab>   :call <SID>NextBuffer()<CR>
-nnoremap <S-Tab> :call <SID>PrevBuffer()<CR>
+map <F1>   :call <SID>NextBuffer()<CR>
+map <S-F1> :call <SID>PrevBuffer()<CR>
+tmap <F1>   <C-\><C-o>:call <SID>NextBuffer()<CR>
+tmap <S-F1> <C-\><C-o>:call <SID>PrevBuffer()<CR>
+map <Tab>   :call <SID>NextBuffer()<CR>
+map <S-Tab> :call <SID>PrevBuffer()<CR>
+
+" map <F2> :echo t:buffers<cr>
+" map <F3> :echo FullPaths(t:buffers)<cr>
+
+" function! ShowPendingKeys(keys)
+"   let lines = []
+"   " Get all mappings that start with the pressed prefix
+"   for mode in ['n', 'v', 'x']
+"     for map in maplist()
+"       if map.mode ==# mode && stridx(map.lhs, a:keys) == 0
+"         call add(lines, map.lhs . '  →  ' . map.rhs)
+"       endif
+"     endfor
+"   endfor
+"   if empty(lines)
+"     return
+"   endif
+"   let winid = popup_create(lines, {
+"     \ 'pos': 'botleft',
+"     \ 'line': &lines - &cmdheight - 1,
+"     \ 'col': 1,
+"     \ 'padding': [1, 2, 1, 2],
+"     \ 'border': [1, 1, 1, 1],
+"     \ 'time': 3000,
+"     \ })
+" endfunction
+" nnoremap <leader> <Nop>
+" " Show popup when leader is pressed, before the chain completes
+" nnoremap <expr> <leader> ShowPendingKeysAndPassthrough('<leader>')
+" function! ShowPendingKeysAndPassthrough(keys)
+"   call ShowPendingKeys(a:keys)
+"   return a:keys  " still pass the key through so chaining works
+" endfunction
+" let g:which_key_map = {
+"   \ '<leader>f': 'find files',
+"   \ '<leader>g': 'git',
+"   \ '<leader>b': 'buffers',
+"   \ }
+" function! WhichKey(prefix)
+"   let lines = []
+"   for [key, desc] in items(g:which_key_map)
+"     if stridx(key, a:prefix) == 0
+"       let short = substitute(key, '^' . a:prefix, '', '')
+"       call add(lines, short . '  →  ' . desc)
+"     endif
+"   endfor
+"   call popup_create(lines, {'pos': 'botleft', 'line': &lines - 2, 'col': 1,
+"     \ 'padding': [1,2,1,2], 'border': [1,1,1,1], 'time': 5000})
+" endfunction
+" nnoremap <expr> <leader> WhichKey('<leader>') .. ''
+" " Plug 'liuchengxu/vim-which-key'
+" " nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
 
 endif
 

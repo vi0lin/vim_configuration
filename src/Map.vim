@@ -398,12 +398,15 @@ NewMap nnoremap <leader>dd :call Rewindworkdir()<cr>
 "" nnoremap <C-A-->            :FindInFileFZFSystem<CR>
 "" " nnoremap <C-S-p>            :FindInFileFZFRepo<CR>
 
-NewMap map <leader>p                                         :call Files(Folder_Up(1))<cr>
-NewMap map <leader><leader>p                                 :call Files(Folder_Up(2))<cr>
-NewMap map <leader><leader><leader>p                         :call Files(Folder_Up(3))<cr>
-NewMap map <leader><leader><leader><leader>p                 :call Files(Folder_Up(4))<cr>
-NewMap map <leader><leader><leader><leader><leader>p         :call Files(Folder_Up(5))<cr>
-NewMap map <leader><leader><leader><leader><leader><leader>p :call Files(Folder_Up(6))<cr>
+NewMap map <leader>p                                         :call Files(Folder_Up(0))<cr>
+NewMap map <leader><leader>p                                 :call Files(Folder_Up(1))<cr>
+NewMap map <leader><leader><leader>p                         :call Files(Folder_Up(2))<cr>
+NewMap map <leader><leader><leader><leader>p                 :call Files(Folder_Up(3))<cr>
+NewMap map <leader><leader><leader><leader><leader>p         :call Files(Folder_Up(4))<cr>
+NewMap map <leader><leader><leader><leader><leader><leader>p :call Files(Folder_Up(5))<cr>
+
+NewMap map <C-b> :Buffers<cr>
+
 
 NewMap map <leader>g                                         :call RgDir(Folder_Up(0))<cr>
 NewMap map <leader><leader>g                                 :call RgDir(Folder_Up(1))<cr>
@@ -657,8 +660,8 @@ endfunction
 " j0
 " q
 
-NewMap map <C-x> :call Assign()<cr>
-NewMap map <leader><C-x> :call Deassign()<cr>
+" NewMap map <C-x> :call Assign()<cr>
+" NewMap map <leader><C-x> :call Deassign()<cr>
 
 " NewMap map ,p :call PutKey()<cr>
 

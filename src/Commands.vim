@@ -29,7 +29,7 @@ command! -range -nargs=+ NewCommand call NewCommand(<q-args>)
 
 " Commands.vim
 NewCommand command! -bar -nargs=* PutCommand :call PutCommand(<q-args>)
-NewCommand command! -bar -nargs=? GrepSplit :call GrepSplit(<q-args>)
+NewCommand command! -bar -nargs=+ GrepSplit :call GrepSplit(<q-args>)
 NewCommand command! -range -nargs=+ NewAssignment call NewAssignment(<f-args>)
 " NewCommand FavoriteFile :call FavoriteFile()<CR>
 " NewAssignment FavoriteFile map <leader><leader>f
