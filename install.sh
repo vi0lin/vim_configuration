@@ -15,7 +15,7 @@ debug() {
   fi
 }
 
-signature="\" vim-advantage installation 2866039580"
+signature="\" vim_configuration installation 2866039580"
 sig_b=$signature" Begin"
 sig_e=$signature" End"
 debug sig_b $sig_b
@@ -63,7 +63,7 @@ update_signature() {
     # echo $stdin | sed -E 's/(\d*) (.*)/\0 == \t\1-->\t\2/'
   done
   # echo "${files_with_signature[@]}"
-  # echo "$@" | xargs -I {} grep vim-advantages {}
+  # echo "$@" | xargs -I {} grep vim_configuration {}
   # grep "$signature" "{}"
   # grep -rlZ "test" $files
 }
@@ -222,7 +222,7 @@ install() {
 
   debug ShortOsType: $os
 
-  echo -n "Installing Vim-Advantages"
+  echo -n "Installing vim_configuration"
   case  "$os" in
     "lin") echo " on linux" ;;
     "mac") echo " on macintosh";;
@@ -271,10 +271,10 @@ install() {
     echo "Implement Check For Updates"
   fi
 
-  echo "Installing Vim-Advantages (with plug.vim)"
+  echo "Installing vim_configuration (with plug.vim)"
 
-  # check if vim-advantages got sourced
-  vimgather got_sourced "try | if exists('g:vim_advantages_got_sourced') | echo g:vim_advantages_got_sourced | endif | endtry"
+  # check if vim_configuration got sourced
+  vimgather got_sourced "try | if exists('g:vim_configuration_got_sourced') | echo g:vim_configuration_got_sourced | endif | endtry"
 
   # debug "Got Sourced:" $got_sourced
 
@@ -284,15 +284,15 @@ install() {
 
   # echo "$got_sourced" | xxd -b
 
-  $vimbinary -es -c "source ${plugins}plug.vim | call plug#begin() | Plug 'vi0lin/vim-advantages' | call plug#end() | PlugInstall | quitall"
+  $vimbinary -es -c "source ${plugins}plug.vim | call plug#begin() | Plug 'vi0lin/vim_configuration' | call plug#end() | PlugInstall | quitall"
 
-  # [[ $got_sourced ]] && ( echo "Vim Advantages Got Sourced!" ) || ( echo "Vim Advantages Not Loaded"; )
+  # [[ $got_sourced ]] && ( echo "vim_configuration Got Sourced!" ) || ( echo "vim_configuration Not Loaded"; )
   vimgather scriptnames "echo execute('scriptnames')->split(\"\\n\")->map({_,v -> v->substitute('^\s*\d\+:\s*','','')})->join(\"\n\")"
 
-  # fallback with find / -name vim-advantages.vim
-  source_command="source ${vim_folder}/plugged/vim-advantages/plugin/vim-advantages.vim"
+  # fallback with find / -name vim_configuration.vim
+  source_command="source ${vim_folder}/plugged/vim_configuration/plugin/vim_configuration.vim"
   for scriptname in ${scriptnames[@]}; do
-    if [[ $scriptname == *"vim-advantages.vim" ]]; then
+    if [[ $scriptname == *"vim_configuration.vim" ]]; then
       source_command="source ${scriptname}"
       break
     fi
@@ -302,11 +302,11 @@ install() {
 
   check_signature $existing
 
-  vimgather got_sourced "try | if exists('g:vim_advantages_got_sourced') | echo g:vim_advantages_got_sourced | endif | endtry"
+  vimgather got_sourced "try | if exists('g:vim_configuration_got_sourced') | echo g:vim_configuration_got_sourced | endif | endtry"
 
   debug "Got Sourced:" $got_sourced
 
-  [[ $got_sourced ]] && ( echo "Vim Advantages Got Sourced!" ) || ( echo "Vim Advantages Not Loaded"; )
+  [[ $got_sourced ]] && ( echo "vim_configuration Got Sourced!" ) || ( echo "vim_configuration Not Loaded"; )
 
 }
 
