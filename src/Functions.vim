@@ -5,14 +5,14 @@ function Profile(...)
   let i = 0
   let arg = a:000[i]
   if arg ==# 'start'
-    profile start profile.log
+    profile start /tmp/profile.log
     profile! func !
     profile! file !
   elseif arg ==# 'stop'
     profile pause
     qa!
   elseif arg ==# 'show'
-    e ./profile.log
+    e /tmp/profile.log
   endif
 endfunction
 command! -range -nargs=* Profile <line1>,<line2>:call Profile(<q-args>)
