@@ -5266,7 +5266,7 @@ function! LayoutVim()
     \ g:vim_advantages."/../install.sh",
     \ g:vim_advantages."/../.gitignore",
     \ g:vim_advantages."/../plugin/vim_configuration.vim",
-    \ g:vim_advantages."/../readme.md",
+    \ g:vim_advantages."/../README.md",
     \ g:vim_advantages."/Autocommands.vim",
     \ g:vim_advantages."/Functions.vim9",
     \ g:vim_advantages."/Statusline.vim",
