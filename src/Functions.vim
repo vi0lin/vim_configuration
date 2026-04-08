@@ -1,6 +1,22 @@
 " Avoid cdo prompt for overwiting files
 if !exists("g:vim_advantages_got_sourced")
 
+function Profile(...)
+  let i = 0
+  let arg = a:000[i]
+  if arg ==# 'start'
+    profile start profile.log
+    profile! func !
+    profile! file !
+  elseif arg ==# 'stop'
+    profile pause
+    qa!
+  elseif arg ==# 'show'
+    e ./profile.log
+  endif
+endfunction
+command! -range -nargs=* Profile <line1>,<line2>:call Profile(<q-args>)
+
 " function Arguments()
 "   echo argv()
 "   echo argc()
@@ -88,7 +104,7 @@ endfunction
 " <leader><leader> shows path, where you located for g or p
 " Push <C-g>/g <C-p>/p
 " Kommentare Als Vimscript ausführen / In Dateien ausfindig machen
-" Projektweise Und Fallback .vim-advantages mit Definierten Commands und
+" Projektweise Und Fallback .vim_configuration mit Definierten Commands und
 " Befehlssätzen
 " Verschiedene Dateiformate haben verschiedene Kommentare
 " Auto Intending Korrigieren
@@ -365,7 +381,7 @@ endfunction
 
 let g:hostinfo="host@your-ip"
 function Download_Unreleased()
-  let rem="/home/user/.vim/plugged/vim-advantages/src/"
+  let rem="/home/user/.vim/plugged/vim_configuration/src/"
   let loc=rem
   fun! SshD(file) closure
     let c = '!ssh '..g:hostinfo..' "cat '..rem..a:file..'" > '..loc..a:file
@@ -1574,7 +1590,7 @@ function! EnsureEnvironment()
     echo 'Dear User,'
     echo ' '
     echo '   This Will Install All Nessecary Files'
-    echo '   bash | wget https://github.com/vim-advantages/vim-advantage.sh'
+    echo '   bash | wget https://github.com/vim_configuration/vim_configuration.sh'
     echo ' '
     echo 'Your Sincerely'
     echo 'Author'
@@ -1597,17 +1613,17 @@ function! SetEnvironment(user_dir='~', main_repo='', source_dir='', bashrc='~/.b
   let g:bashrc = a:bashrc
   let g:bashrc_source = "source ".g:bashrc
   let g:vimrc = "~/.vimrc"
-  " let g:vim = "~/.vim/plugged/vim-advantages"
+  " let g:vim = "~/.vim/plugged/vim_configuration"
   let g:vim = $VIMRUNTIME
-  let g:vim_advantages = split(&runtimepath, ",")[0]..'/plugged/vim-advantages/autoload/vim-advantages'
+  let g:vim_advantages = split(&runtimepath, ",")[0]..'/plugged/vim_configuration/autoload/vim_configuration'
   let g:b_environment_set=1
 endfunction
 " call EnsureEnvironment()
 call SetEnvironment()
 let runtimepath=split(&runtimepath, ",")[0]
-let g:vim_advantages=runtimepath..'/plugged/vim-advantages/autoload/vim-advantages'
-let g:vim_advantages=runtimepath..'/plugged/vim-advantages/src'
-let g:vim_advantages=runtimepath..'/plugged/vim-advantages/src'
+let g:vim_advantages=runtimepath..'/plugged/vim_configuration/autoload/vim_configuration'
+let g:vim_advantages=runtimepath..'/plugged/vim_configuration/src'
+let g:vim_advantages=runtimepath..'/plugged/vim_configuration/src'
 let mapleader=","
 exec 'source '.g:vim_advantages.'/Commands.vim'
 exec 'source '.g:vim_advantages.'/Utilize.vim'
@@ -4490,17 +4506,24 @@ function TabBuffers(method)
   if !exists('t:buffers')
     let t:buffers=[]
   endif
-  let buffers=gettabvar(tabpagenr(), 'buffers')
+  " let buffers=gettabvar(tabpagenr(), 'buffers')
   if a:method == 'bufnew'
-    if index(buffers, bufnr()) == -1
-      call extend(buffers, [bufnr()])
+    if index(t:buffers, bufnr()) == -1
+      if buflisted(bufnr())
+        \ && getbufvar(bufnr(), '&buftype') !=# 'quickfix'
+        \ && getbufvar(bufnr(), '&buftype') !=# 'nofile'
+        \ && getbufvar(bufnr(), '&buftype') !=# 'terminal'
+        \ && getbufvar(bufnr(), '&buftype') !=# 'help'
+          call extend(t:buffers, [bufnr()])
+      endif
     endif
-    " call settabvar(tabpagenr(), 'buffers', buffers)
+    " call settabvar(tabpagenr(), 't:buffers', buffers)
   elseif a:method == 'bufdelete'
-    if index(buffers, g:last_buffer) > -1
-      let buffer=filter(buffers, 'v:val!='..g:last_buffer)
+    if index(t:buffers, g:last_buffer) > -1
+      let buffer=filter(t:buffers, 'v:val!='..g:last_buffer)
+      let t:buffer=buffer
     endif
-    " call settabvar(tabpagenr(), 'buffers', filtered)
+    " call settabvar(tabpagenr(), 't:buffers', filtered)
   elseif a:method == 'init'
     " delcommand Bd
     " if exists('*Bd') " Function
@@ -4522,8 +4545,8 @@ function TabBuffers(method)
     endif
   elseif a:method == 'merge'
     for i in range(0,winnr('$')+1)
-      if index(buffers, bufnr()) == -1
-        call extend(buffers, [winbufnr(i)])
+      if index(t:buffers, bufnr()) == -1
+        call extend(t:buffers, [winbufnr(i)])
       endif
     endfor
     only
@@ -4541,7 +4564,7 @@ function TabBuffers(method)
     exec "b" t:buffers[prev]
   endif
   " call settabvar(tabpagenr(), 'buffers', uniq(sort(buffers)))
-  call settabvar(tabpagenr(), 'buffers', buffers)
+  " call settabvar(tabpagenr(), 'buffers', buffers)
 endfunction
 call TabBuffers('init')
 
@@ -4987,7 +5010,7 @@ function InitPlug()
     " Plug 'mattn/vim-lsp-settings'
     " Plug 'prabirshrestha/asyncomplete.vim'
     " Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    Plug 'vi0lin/vim-advantages'
+    Plug 'vi0lin/vim_configuration'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
   call plug#end()
@@ -5242,7 +5265,7 @@ function! LayoutVim()
     \ g:vim_advantages."/Commands.vim",
     \ g:vim_advantages."/../install.sh",
     \ g:vim_advantages."/../.gitignore",
-    \ g:vim_advantages."/../plugin/vim-advantages.vim",
+    \ g:vim_advantages."/../plugin/vim_configuration.vim",
     \ g:vim_advantages."/../readme.md",
     \ g:vim_advantages."/Autocommands.vim",
     \ g:vim_advantages."/Functions.vim9",
@@ -5254,7 +5277,14 @@ function! LayoutVim()
   " call extend(t:buffers, layout)
   " args **/*.py | args! **/*.py
   " exec "args".join(layout, ' ')
+  " exec "args!".join(layout, ' ')
+  " set eventignore=BufRead,FileType
+  " args **/*.*
+  " set eventignore=
+  " rg --vimgrep pattern -> :cfdo edit
+  " fzf.vim or telescope
   exec "argadd".join(layout, ' ')
+  " exec "badd " . join(layout, ' ')
   exec "b"layout[0]
 endfunction
 
@@ -5291,14 +5321,14 @@ endfunction
 "     \ [ g:vim_advantages."/Commands.vim", "v"],
 "     \ [ g:vim_advantages."/../install.sh", "v"],
 "     \ [ g:vim_advantages."/../.gitignore", "v"],
-"     \ [ g:vim_advantages."/../plugin/vim-advantages.vim", "v"],
+"     \ [ g:vim_advantages."/../plugin/vim_configuration.vim", "v"],
 "     \ [ g:vim_advantages."/../readme.md", "v"],
 "     \ [ g:vim_advantages."/Autocommands.vim", "J"],
 "     \ [ g:vim_advantages."/Functions.vim9", "v"],
 "     \ [ g:vim_advantages."/Statusline.vim", "v"],
 "     \]
 "     " \ [ g:bashrc, "v", "G"],
-"     " \ [ "/usr/local/share/vim/vim91/plugin/vim-advantages.vim", "v"],
+"     " \ [ "/usr/local/share/vim/vim91/plugin/vim_configuration.vim", "v"],
 "     " \ [ g:source_dir.."/notes.md", "s"],
 "   call _buildLayout(layout)
 "   exe 1 .. "wincmd w"
@@ -5355,6 +5385,111 @@ function! DebugReplacements()
 endfunction
 
 " StaticWin --title Information --new --top --foremost
+
+" Custom fzf command with your own list
+function FullPaths(buffers)
+  let pack=[]
+  for b in a:buffers
+    " echo bufname(42)
+    call extend(pack, [ fnamemodify(bufname(b), ':p') ])
+  endfor
+  return pack
+endfunction
+
+let s:popup_id = -1
+let s:timer_id = -1
+let s:file_list = []
+" Dateiliste einmalig befüllen (alle geladenen Buffer)
+function! s:RefreshFileList() abort
+    let s:file_list = []
+    " let s:file_list=FullPaths(t:buffers)
+    for buf in getbufinfo({'buflisted': 1})
+        if buf.name != ''
+            call add(s:file_list, buf.name)
+        endif
+    endfor
+endfunction
+" Popup schließen (Timer-Callback)
+function! s:ClosePopup(timer_id) abort
+    if s:popup_id != -1 && !empty(popup_getpos(s:popup_id))
+        call popup_close(s:popup_id)
+    endif
+    let s:popup_id = -1
+    let s:timer_id = -1
+endfunction
+function! s:ShowPopup() abort
+    if s:timer_id != -1
+        call timer_stop(s:timer_id)
+    endif
+    if s:popup_id != -1 && !empty(popup_getpos(s:popup_id))
+        call popup_close(s:popup_id)
+    endif
+    let current_file = expand('%:p')
+    let lines = []
+    let highlight_line = 1
+    for i in range(len(s:file_list))
+        " Zeige relativen Pfad statt nur Dateiname
+        let fname = fnamemodify(s:file_list[i], ':~:.')
+        let prefix = '  '
+        if s:file_list[i] ==# current_file
+            let prefix = '▶ '
+            let highlight_line = i + 1
+        endif
+        call add(lines, prefix . fname)
+    endfor
+    " Längste Zeile für minwidth berechnen
+    let max_len = max(map(copy(lines), 'strwidth(v:val)'))
+    " Verfügbare Höhe: fast gesamter Bildschirm
+    let max_h = &lines - 4
+    let s:popup_id = popup_create(lines, {
+        \ 'pos':       'topright',
+        \ 'line':      2,
+        \ 'col':       &columns - 2,
+        \ 'minwidth':  max_len + 2,
+        \ 'maxwidth':  &columns - 4,
+        \ 'minheight': min([len(s:file_list), max_h]),
+        \ 'maxheight': max_h,
+        \ 'border':    [1, 1, 1, 1],
+        \ 'title':     ' Buffers (' . len(s:file_list) . ') ' . CWD() . ' ',
+        \ 'padding':   [0, 1, 0, 1],
+        \ 'zindex':    50,
+        \ 'mapping':   0,
+        \ 'focusable': 0,
+        \ 'scrollbar': 1,
+        \ })
+    " Aktive Zeile hervorheben
+    call win_execute(s:popup_id, 'syntax match PopupCurrent /^▶.*/')
+    call win_execute(s:popup_id,
+        \ 'highlight PopupCurrent ctermfg=Yellow guifg=#FFD700 gui=bold cterm=bold')
+    " Aktive Zeile in die Mitte scrollen
+    let scroll_to = max([1, highlight_line - (max_h / 2)])
+    call popup_setoptions(s:popup_id, {'firstline': scroll_to})
+    " Auto-Close nach 2,5 Sekunden
+    let s:timer_id = timer_start(2500, function('s:ClosePopup'))
+endfunction
+" Zum nächsten Buffer springen
+function! s:NextBuffer() abort
+    call s:RefreshFileList()
+    if empty(s:file_list) | return | endif
+    let current = expand('%:p')
+    let idx = index(s:file_list, current)
+    let next_idx = (idx + 1) % len(s:file_list)
+    execute 'buffer ' . fnameescape(s:file_list[next_idx])
+    call s:ShowPopup()
+endfunction
+" Zum vorherigen Buffer springen
+function! s:PrevBuffer() abort
+    call s:RefreshFileList()
+    if empty(s:file_list) | return | endif
+    let current = expand('%:p')
+    let idx = index(s:file_list, current)
+    let prev_idx = (idx - 1 + len(s:file_list)) % len(s:file_list)
+    execute 'buffer ' . fnameescape(s:file_list[prev_idx])
+    call s:ShowPopup()
+endfunction
+" Keymaps
+nnoremap <Tab>   :call <SID>NextBuffer()<CR>
+nnoremap <S-Tab> :call <SID>PrevBuffer()<CR>
 
 endif
 
