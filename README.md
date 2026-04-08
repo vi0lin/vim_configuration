@@ -1,4 +1,4 @@
-# Vim-Advantages
+# vim_configuration
 
 > [!WARNING]
 > I do not reccomend using this project, as basic shortcuts and semantics change during development. The readme is incomplete. Parameters are missing, and many functions and to-dos are not synchronized.
@@ -11,16 +11,16 @@
 
 #### Linux
 ```
-wget -qO- https://raw.githubusercontent.com/vi0lin/vim-advantages/refs/heads/main/install.sh | bash -s -- debug
+wget -qO- https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh | bash -s -- debug
 ```
 
 #### Windows
 ```
-curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim-advantages/refs/heads/main/install.sh
+curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh
 "C:\Program Files\Git\bin\bash.exe" .\install.sh
 ```
 ```
-curl -o install.sh -sSfL https://raw.githubusercontent.com/vi0lin/vim-advantages/refs/heads/main/install.sh wsl --install
+curl -o install.sh -sSfL https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh wsl --install
 wsl bash install.sh
 del install.sh
 ```
@@ -28,7 +28,7 @@ del install.sh
 #### Vim Plug
 ```
 call plug#begin()
-  Plug 'vi0lin/vim-advantages'
+  Plug 'vi0lin/vim_configuration'
 call plug#end()
 :PlugInstall
 ```
@@ -72,7 +72,7 @@ call plug#end()
   <tbody>
     <tr>
       <td>
-        vim-advantages
+        vim_configuration
       </td>
       <td>
         Main
@@ -394,7 +394,7 @@ call plug#end()
       </td>
     </tr>
     <tr>
-      <td colspan=3>The Execution Keymappings will be stored in a .vim-advantages file in the vim-advantages installation dir. So every file buffer preserves its own exeuction scripts. Wherether installing on a remote machine, run local, build, debug, setting up, installing and running services, remote or locally - it all will be effortless and comfortable quickly accessible on keypress, well documented easy adaptable.
+      <td colspan=3>The Execution Keymappings will be stored in a .vim_configuration file in the vim_configuration installation dir. So every file buffer preserves its own exeuction scripts. Wherether installing on a remote machine, run local, build, debug, setting up, installing and running services, remote or locally - it all will be effortless and comfortable quickly accessible on keypress, well documented easy adaptable.
       </td>
     </tr>
     <tr>
@@ -711,7 +711,7 @@ Define Own Autocomplete
 - [ ] fix statusline, when no git name was found
 - [ ] fix colors / statusline
 - [ ] neovim migration / console / popup / compiler / lsp clangd
-- [ ] ,dp define project ($current_project) (.vim-advantages in cwd)
+- [ ] ,dp define project ($current_project) (.vim_configuration in cwd)
 - [ ]   ,p set CWD to go to project
 - [ ]   ,i add -i include $var
 - [ ]   ,l add -l lib $var
@@ -722,7 +722,7 @@ Define Own Autocomplete
 - [ ] programmable buttons
 - [ ] save this in .vim-advantage of $current_project
 - [ ]   ,f1 / fzf trough commands / ,t enables tabwide / ,b enables bufferwise / vim commands are also selectable 
-- [ ]   creates a .vim-advantages file in the dir / that gets read
+- [ ]   creates a .vim_configuration file in the dir / that gets read
 - [ ]     saves the commands that are defined bufferwise/filewise/cwdwise/tabwise/global / i dont know
 - [ ]       they have a priority value which decides which of them are going to be executed first, when there are multiple commands on a key
 - [ ]       f1 f1 twice, will fire the second command.
@@ -733,12 +733,12 @@ Define Own Autocomplete
 - [ ]     f1 when no command is assigned, you can choose one with fzf
 - [ ]     commands are are globally stored / somewhere in .vim-commands for now
 - [ ]     are bash snippets differently saved? Or do they count as commands
-- [ ]     bash snippets are saved in the working directory of the current opened file in .vim-advantages json "filename": [ "compile1": "gcc $var -o program program.c", "compile2": "gcc $var -o program program.c" ]
+- [ ]     bash snippets are saved in the working directory of the current opened file in .vim_configuration json "filename": [ "compile1": "gcc $var -o program program.c", "compile2": "gcc $var -o program program.c" ]
 - [ ]     bash snippets are easily extendable
 - [ ]   ,f1 new - lets you define a bash comand 
 - [ ]   ,f1 bash - lets you execute well in a bash terminal
 - [ ]   ,f1 repeat - repeats last command
-- [ ]   ,f1 gather console - gets the last command from the console, and saves it in .vim-advantages for selection
+- [ ]   ,f1 gather console - gets the last command from the console, and saves it in .vim_configuration for selection
 - [ ]   ,f1 [hjkl] define target term (left right above below)
 - [ ]   [f1-f12] executes and save the executed keystroke
 - [ ]            display last executed keystroke in statusline
@@ -746,9 +746,9 @@ Define Own Autocomplete
 - [ ]   ,,t highlights the target term
 - [ ]   ,w -Wno-all
 - [ ]   (how to deal with target terminal and copen lopen quicklist)
-- [ ]   ,,e[f1-f12] edits the command, saves it into .vim-advantages
-- [ ]   ,,c[f1-f12] ,,<C-[f1-f12]> creates a copy of the previous command in .vim-advantages
-- [ ]   ,,d[f1-f12] deletes the command from .vim-advantages
+- [ ]   ,,e[f1-f12] edits the command, saves it into .vim_configuration
+- [ ]   ,,c[f1-f12] ,,<C-[f1-f12]> creates a copy of the previous command in .vim_configuration
+- [ ]   ,,d[f1-f12] deletes the command from .vim_configuration
 - [ ]     bash snippet, vim command, whatever
 - [ ]   [,][,][,][CSA]f1 Some commands are modifyable with Ctrl Shift Alt
 - [ ]     For example when defined (,f1 bash) / f1 repeats [standard config] / s-f1 executes vs / c-f1 repeats and c-c terminates / c-s-f1 executes vs and c-c terminates
@@ -805,22 +805,22 @@ EMACS SEEMS TO BE ERROR PRONE
 
 
 <!--
-You Can Choose Installing vim-advantages Using 1. or 2.
+You Can Choose Installing vim_configuration Using 1. or 2.
 ## 1. Install This Project
 Executing This Shellscript, Anywhere In Your Terminal. It will automatically install Plug.vim in your vim installation and automatically execute step #2
 ### Unix
 ```
-sh | wget github.com/vi0lin/vim-advantages/blob/main/install.sh && rm ./install.sh
+sh | wget github.com/vi0lin/vim_configuration/blob/main/install.sh && rm ./install.sh
 ```
 ### Windows
 #### bash
 ```
-curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim-advantages/refs/heads/main/install.sh
+curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh
 "C:\Program Files\Git\bin\bash.exe" .\install.sh
 ```
 #### wsl
 ```
-curl -o install.sh https://github.com/vi0lin/vim-advantages/refs/heads/main/install.sh
+curl -o install.sh https://github.com/vi0lin/vim_configuration/refs/heads/main/install.sh
 wsl --install
 wsl bash install.sh
 del install.sh
@@ -830,7 +830,7 @@ del install.sh
 This Needs To Be Integrated In Some Vim Source File Of Your Local Vim Installation
 ```
 call plug#begin()
-  Plug 'vi0lin/vim-advantages'
+  Plug 'vi0lin/vim_configuration'
 call plug#end()
 
 :PlugInstall
