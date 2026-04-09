@@ -5457,6 +5457,11 @@ function FullPaths(buffers)
   return pack
 endfunction
 
+" [!TODO]
+" Add A FZF Functionality, That Behaves The Same, But Extends Searching From A
+" Directory Or A List Of Files
+" Make The FZF Window Visibile Trough Passing Globs Or List Of Files Or A Path
+" Make It Possibile To Change Between The Normal And The FZF Popup
 let s:popup_id = -1
 let s:timer_id = -1
 let s:file_list = []
