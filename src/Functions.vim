@@ -2804,6 +2804,8 @@ endfunction
 function! Files(path)
   " echo a:path
   " exec ":Files" a:path
+  " exec "Files" a:path..'/'
+  call fzf#vim#files(a:path)
   " call Redraw()
   " call fzf#run({'dir': a:path})
   " call fzf#run({'dir': a:path, 'window': { 'width': 0.9, 'height': 0.6 } })
