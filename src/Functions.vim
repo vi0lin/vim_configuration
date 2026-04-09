@@ -1205,6 +1205,7 @@ endfunction
 
 command! -range -nargs=? Push <line1>,<line2>:call Push(<q-args>)
 function! Push(commitmessage='')
+  GitStatus
   GitAdd
   GitStatus
   " call system("read")
@@ -1215,6 +1216,7 @@ endfunction
 
 command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(commitmessage='')
+  GitStatus
   StashPush
   !git pull origin main --no-rebase
   StashPop
@@ -1222,6 +1224,7 @@ endfunction
 
 command! -range -nargs=? Stash <line1>,<line2>:call Stash(<q-args>)
 function! Stash(commitmessage='')
+  GitStatus
   let opts = #{
         \ verbose: 0,
         \ output: '',
@@ -1245,18 +1248,20 @@ endfunction
 
 command! -range -nargs=? StashPush <line1>,<line2>:call StashPush(<q-args>)
 function! StashPush(commitmessage='')
+  GitStatus
   !git stash push
 endfunction
 
 command! -range -nargs=? StashPop <line1>,<line2>:call StashPop(<q-args>)
 function! StashPop(commitmessage='')
+  GitStatus
   !git stash pop
 endfunction
 
 command! -range -nargs=? PushRepo <line1>,<line2>:call PushRepo(<args>)
 function! PushRepo(commitmessage='')
-  GitAddRepo
   GitStatus
+  GitAddRepo
   call GitCommit(a:commitmessage)
   GithubPush
 endfunction
@@ -1302,8 +1307,8 @@ endfunction
 
 command! -range -nargs=* PushCWD <line1>,<line2>:call PushCWD(<q-args>)
 function! PushCWD(commitmessage='')
-  GitAddCWD
   GitStatus
+  GitAddCWD
   call GitCommit(a:commitmessage)
   GithubPush
 endfunction
@@ -1349,6 +1354,7 @@ endfunction
 command! -range -nargs=0 GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
+  GitStatus
   let cmd = #{text: '--text', pager: '', cached: '', file: '%'}
   let i = 0
   while i < len(a:000)
