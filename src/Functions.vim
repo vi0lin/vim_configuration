@@ -148,15 +148,15 @@ function StaticWin(...) range
     \ top:0,
     \ bottom:0,
     \ foremost:0,
-    \ anelkos: []
+    \ staticWins: []
   \ }
-  if !exists('t:anelko')
-    let anelko_default=#{
+  if !exists('t:staticWin')
+    let staticWin_default=#{
       \ visibile_all: 1,
-      \ anelkos: [],
+      \ staticWins: [],
       \ target: {}
       \ }
-    call settabvar(tabpagenr(), 'anelko', anelko_default)
+    call settabvar(tabpagenr(), 'staticWin', staticWin_default)
   endif
   let i = 0
   while i < len(a:000)
@@ -173,7 +173,7 @@ function StaticWin(...) range
         \ buffer: -1,
         \ visibile: 1
         \ }
-      call extend(t:anelko.anelkos, [new])
+      call extend(t:staticWin.staticWins, [new])
       let j = 0
       while j < len(a:000)
         let arg2 = a:000[j]
@@ -204,7 +204,7 @@ function StaticWin(...) range
       function! _init(new)
         autocmd! WinResized	* StaticWin --win-resized
         let b:focusable=0
-        let b:anelko=a:new
+        let b:staticWin=a:new
         " setlocal nobuflisted buftype=nofile
         " setlocal nobuflisted
         " setlocal laststatus=0
@@ -254,7 +254,7 @@ function StaticWin(...) range
       let i += 1
       function! FindTarget(title)
         for b in tabpagebuflist(tabpagenr())
-          let tmp=getbufvar(b, 'anelko')
+          let tmp=getbufvar(b, 'staticWin')
           if !empty(tmp) && tmp.title==a:title
             return b
           endif
@@ -266,13 +266,13 @@ function StaticWin(...) range
         let arg = a:000[i]
         if arg ==# '-t' || arg ==# '--toggle'
         elseif arg ==# '-v' || arg ==# '--visibile' || arg ==# '--show' || arg ==# '--on'
-          " call settabvar(tabpagenr(), 'anelko_visibile', 1)
-          " let t:anelko.visibile=1
+          " call settabvar(tabpagenr(), 'staticWin_visibile', 1)
+          " let t:staticWin.visibile=1
           let win=bufwinnr(bufnr)
           exec win.'hide'
         elseif arg ==# '-i' || arg ==# '--invisibile' || arg ==# '--hide' || arg ==# '--off'
-          " call settabvar(tabpagenr(), 'anelko_visibile', 0)
-          let t:anelko.visibile=0
+          " call settabvar(tabpagenr(), 'staticWin_visibile', 0)
+          let t:staticWin.visibile=0
         elseif arg ==# '--text'
           let i += 1
           let text=join(a:000[i:], ' ')
@@ -283,7 +283,7 @@ function StaticWin(...) range
           if bufnr > 0
             let win=bufwinnr(bufnr)
             exec win.."windo hide"
-            " call setbufline(buf_anelko.target.bufnr, 1, text)
+            " call setbufline(buf_staticWin.target.bufnr, 1, text)
           endif
         elseif arg ==# '--deal-focus'
           if exists('b:focusable') && b:focusable==0
@@ -293,18 +293,18 @@ function StaticWin(...) range
         let i += 1
       endwhile
     elseif arg ==# '--win-resized'
-      if exists('b:anelko')
-        exec "Height "..b:anelko.height
-        exec "Width "..b:anelko.width
+      if exists('b:staticWin')
+        exec "Height "..b:staticWin.height
+        exec "Width "..b:staticWin.width
       endif
     elseif arg ==# '--toggle-all'
-      " call settabvar(tabpagenr(), 'anelko_visibile', !gettabvar(tabpagenr(), 'anelko_visibile'))
-      let t:anelko.visibile_all=!t:anelko.visibile_all
+      " call settabvar(tabpagenr(), 'staticWin_visibile', !gettabvar(tabpagenr(), 'staticWin_visibile'))
+      let t:staticWin.visibile_all=!t:staticWin.visibile_all
     endif
   endwhile
-  " echo t:anelko.target
+  " echo t:staticWin.target
   " echo opts
-  " echo t:anelko
+  " echo t:staticWin
   call cursor(cursorpos[1], cursorpos[2])
 endfunction
 command! -range -nargs=* StaticWin <line1>,<line2>:call StaticWin(<f-args>)
@@ -3337,9 +3337,12 @@ function! Open(direction, type="buffer", mode="copy", file="")
   if terminal
     let arg = "terminal"
     let file=g:term
+    " let post="setlocal nobuflisted buftype=nofile | setlocal nobuflisted"
   elseif buffer && exists("file") && file != ""
     let file = a:file
     let file=GetCwordIfReadableFile()
+    " todo
+    " when file exists in buffers, then execute "buffer ".#, else execute "e ".file
     let arg="e ".file
   elseif buffer
     let arg="enew"
@@ -4505,22 +4508,28 @@ endfunction
 function! UpdateAutoCMD()
 endfunction
 
-function! BufReadPost()
-endfunction
+" function! BufReadPost()
+"   call MakeDirCurrentCWD()
+" endfunction
 
 function! BufReadPre()
   " call MakeDirCurrentCWD()
 endfunction
 
+function! BufAdd()
+  " call MakeDirCurrentCWD()
+endfunction
+
 function! BufWinEnter()
-  call MakeDirCurrentCWD()
   " call REFRESH_CWD()
   " call CD(expand('%:p:h'))
   " call InitLineState()
   " echo "BufReadPost"
+  " call MakeDirCurrentCWD()
 endfunction
 
 function! BufEnter()
+  " call MakeDirCurrentCWD()
 endfunction
 
 function! BufNew()
@@ -4674,6 +4683,7 @@ function! TabClose()
 endfunction
 
 function! WinEnter()
+  " call MakeDirCurrentCWD()
   " StaticWin --deal-focus
   " StaticWin get Information --text expand('%')
   " if getbufvar(bufnr(), '&buftype') == 'terminal'
@@ -5538,7 +5548,8 @@ function! s:NextBuffer() abort
       " exec "badd " . next
       " execute 'buffer ' . t:buffers[next_idx]
       " silent call bufload(s:file_bufnrs[next_idx])
-      noautocmd execute 'buffer' s:file_bufnrs[next_idx]
+      silent noautocmd execute 'buffer' s:file_bufnrs[next_idx]
+      call MakeDirCurrentCWD()
       " execute 'e ' . t:buffers[next_idx]
     catch
       echo "execute 'buffer ' . fnameescape(s:file_list[next_idx])"
@@ -5559,7 +5570,8 @@ function! s:PrevBuffer() abort
       " exec "badd " . next
       " call execute('silent buffer ' . prev)
       " silent call bufload(s:file_bufnrs[prev_idx])
-      noautocmd execute 'buffer' s:file_bufnrs[prev_idx]
+      silent noautocmd execute 'buffer' s:file_bufnrs[prev_idx]
+      call MakeDirCurrentCWD()
       " execute 'buffer ' . t:buffers[prev_idx]
       " execute 'e ' . t:buffers[prev_idx]
     catch
@@ -5627,6 +5639,79 @@ map <S-Tab> :call <SID>PrevBuffer()<CR>
 " nnoremap <expr> <leader> WhichKey('<leader>') .. ''
 " " Plug 'liuchengxu/vim-which-key'
 " " nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
+
+
+" local function s:smart_wincmd(direction)
+"   local start_win = vim.api.nvim_get_current_win()
+"   while true do
+"     vim.cmd("wincmd " .. direction)
+"     local current_win = vim.api.nvim_get_current_win()
+"     " No valid window found in that direction, stay put
+"     if current_win == start_win then
+"       break
+"     end
+"     local bufnr = vim.api.nvim_win_get_buf(0)
+"     local ft = vim.bo[bufnr].filetype
+"     " If this window is NOT skippable, land here
+"     if ft ~= "NvimTree" and vim.bo[bufnr].buftype ~= "nofile" then
+"       break
+"     end
+"     " Otherwise loop and keep moving
+"   end
+" end
+
+function SmartWincmd(direction)
+  let start_win = win_getid()
+  let i = 1
+  let traceroute=[]
+  while 1
+    let w=winnr(i..a:direction)
+    let x=winnr(i-1..a:direction)
+    let choice=1
+    if choice==0 " traceroute without the first winnr or (current, if its last)
+      if (i > 1 &&  w == x ) | break | endif
+      call add(traceroute, w)
+      if w == winnr() | break | endif
+    elseif choice==1 " complete traceroute
+      if i == 1
+        call add(traceroute, winnr())
+      endif
+      if w == winnr() || (i > 1 &&  w == x ) | break | endif
+      call add(traceroute, w)
+    " elseif choice==2 " traceroute without the first winnr without current
+    "   if w == winnr() || (i > 1 &&  w == x ) | break | endif
+    "   " if there are more than one elements, echo (current) winnr() - if you
+    "   " want the whole chain
+    "   echo w
+    endif
+    let i += 1
+  endwhile
+  for w in traceroute[1:]
+    let b=winbufnr(w)
+    let staticWin=getbufvar(b, 'staticWin')
+    if !empty(staticWin)
+      continue
+    endif
+    " call win_gotoid(w)
+    execute w.'wincmd w'
+    break
+  endfor
+    " var current_win = win_getid()
+    " if current_win == start_win
+    "   break
+    " endif
+    " var bufnr = winbufnr(0)
+    " var ft = getbufvar(bufnr, '&filetype')
+    " var buftype = getbufvar(bufnr, '&buftype')
+    " if ft != 'NvimTree' && buftype != 'nofile'
+    "   break
+    " endif
+  " echo traceroute
+endfunction
+nnoremap <C-h> :call SmartWincmd('h')<CR>
+nnoremap <C-j> :call SmartWincmd('j')<CR>
+nnoremap <C-k> :call SmartWincmd('k')<CR>
+nnoremap <C-l> :call SmartWincmd('l')<CR>
 
 endif
 

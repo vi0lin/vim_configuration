@@ -1,13 +1,13 @@
 if !exists("g:vim_advantages_got_sourced")
 
-import autoload "./Functions.vim9" as F
+" import autoload "./Functions.vim9" as F
 if !exists("g:autocommands_set") || g:autocommands_set==0
+  let g:autocommands_set=1
   " VimInstance.Print("test")
   " importing vim9 does not autoname the import
   " exec "source ".g:vim."/src/Functions.vim9"
   " call F.VimInstance.Print("test")
   " finish
-  let g:autocommands_set=1
   autocmd! BufWritePost *$vim/src/*.vim :call SourceVim()
   autocmd! WinLeave * :call ClearTermOnWinLeave(expand('<abuf>'))
   autocmd! VimEnter * :call VimEnter()
@@ -15,14 +15,17 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! TabNew * :call TabNew()
   autocmd! WinEnter * :call WinEnter()
   autocmd! WinLeave * :call WinLeave()
-  autocmd! BufNew * :call BufNew()
+  " autocmd! BufNew * :call BufNew()
   " autocmd! BufAdd * :call BufAdd()
   " autocmd! BufEnter * :call BufEnter()
   autocmd! BufDelete * :call BufDelete()
   autocmd! BufWipeout * :call BufWipeout()
   autocmd! BufLeave * :call BufLeave()
-  " autocmd! BufWinEnter * :call BufWinEnter()
+  autocmd! BufWinEnter * :call BufWinEnter()
+  autocmd! BufEnter * :call BufEnter()
   autocmd! BufEnter * :call Statusline()
+
+  autocmd! BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD()
 
   "" autocmd! TabNew * :call F.TabNew()
   "" autocmd! WinNew * :call F.WinNew()
