@@ -2023,6 +2023,7 @@ function! JumpFile(path)
       exec "e "..unreadable
       return
   endif
+  call MakeDirCurrentCWD()
 endfunction
 
 function! JumpProject()
@@ -2690,11 +2691,17 @@ endfunction
 function IsPopup(winid)
   " echo popup_getpos(win_getid()) != {}
   " echo popup_getpos(winid) != {}
-  return !empty(popup_getpos(a:winid))
+  let x={}
+  try
+    silent let x=popup_getpos(a:winid)
+  catch
+    echo ""
+  endtry
+  return !empty(x)
 endfunction
 
 function! MakeDirCurrentCWD()
-  " if !IsPopup(win_getid())
+  if !IsPopup(win_getid())
     let [n, y, x, n, n]=getcurpos()
     " let w:cwd=expand("%:p:h")
     " let w:pointer=expand('%')
@@ -2702,7 +2709,7 @@ function! MakeDirCurrentCWD()
     call SetPointer(expand('%:p'))
     " call SetProject(expand("%:p:h"))
     call cursor(y, x)
-  " endif
+  endif
 endfunction
 
 function! MakeDirCurrent(path)
@@ -2808,7 +2815,7 @@ function! CommandLineFiles(path)
   " exec ":Files" a:path
   " call Redraw()
   call JumpFile(a:path..'/')
-  call MakeDirCurrent(a:path..'/')
+  " call MakeDirCurrent(a:path..'/')
 endfunction
 
 function! Redraw()
@@ -2970,6 +2977,8 @@ endfunction
 function! CWD()
   if !exists("w:cwd")
     call MakeDirCurrentCWD()
+    " redir=>w:cwd | pwd | redir END
+    " let w:cwd=substitute(w:cwd, '\n', "", 'g')
   endif
   return w:cwd
 endfunction
@@ -3163,13 +3172,11 @@ endfunction
 function! OpenFileCommandLineSameDir()
   " call JumpFile(CWD())
   call JumpFile(ABSOLUTE_DIR()..'/')
-  call MakeDirCurrentCWD()
 endfunction
 
 function! OpenFileCommandLineCWD()
   " call JumpFile(CWD())
   call JumpFile(CWD()..'/')
-  call MakeDirCurrentCWD()
 endfunction
 
 function! OpenFileCommandLineSystem()
@@ -4509,15 +4516,12 @@ function! UpdateAutoCMD()
 endfunction
 
 " function! BufReadPost()
-"   call MakeDirCurrentCWD()
 " endfunction
 
 function! BufReadPre()
-  " call MakeDirCurrentCWD()
 endfunction
 
 function! BufAdd()
-  " call MakeDirCurrentCWD()
 endfunction
 
 function! BufWinEnter()
@@ -4525,15 +4529,12 @@ function! BufWinEnter()
   " call CD(expand('%:p:h'))
   " call InitLineState()
   " echo "BufReadPost"
-  " call MakeDirCurrentCWD()
 endfunction
 
 function! BufEnter()
-  " call MakeDirCurrentCWD()
 endfunction
 
 function! BufNew()
-  " call MakeDirCurrentCWD()
   " if exists("g:lastmain_repo")
   "   call CD(g:lastmain_repo)
   " endif
@@ -4683,7 +4684,6 @@ function! TabClose()
 endfunction
 
 function! WinEnter()
-  " call MakeDirCurrentCWD()
   " StaticWin --deal-focus
   " StaticWin get Information --text expand('%')
   " if getbufvar(bufnr(), '&buftype') == 'terminal'
@@ -4696,7 +4696,7 @@ function! WinEnter()
   call Statusline()
   call SetLineState(g:linestate)
   " exec "cd "..CWD()
-  call REFRESH_CWD()
+  " call REFRESH_CWD()
   " Simpliest solution for now.
   " Visual Selection gets losts
   call InsertIfTerminal()
@@ -5336,7 +5336,7 @@ function! LayoutVim()
   " fzf.vim or telescope
   exec "argadd".join(layout, ' ')
   " exec "badd " . join(layout, ' ')
-  exec "b"layout[0]
+  silent exec "b"layout[0]
 endfunction
 
 function! IsBuffersAreEmpty()
@@ -5416,7 +5416,6 @@ function! OpenFileUnderCursor()
   " let w:cwd=getcwd()
   " call CD(expand('%:p'))
   " call SetPointer(expand('%:p'))
-  call MakeDirCurrentCWD()
 endfunction
 
 function! DebugReplacements()

@@ -25,7 +25,9 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! BufEnter * :call BufEnter()
   autocmd! BufEnter * :call Statusline()
 
-  autocmd! BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD()
+  " [!IMPORTANT]
+  " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders
+  autocmd! BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD()
 
   "" autocmd! TabNew * :call F.TabNew()
   "" autocmd! WinNew * :call F.WinNew()
