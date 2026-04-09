@@ -1309,7 +1309,6 @@ command! -range -nargs=* PushCWD <line1>,<line2>:call PushCWD(<q-args>)
 function! PushCWD(commitmessage='')
   GitStatus
   GitAddCWD
-  GitStatus
   call GitCommit(a:commitmessage)
   GitStatus
   GithubPush
@@ -1356,7 +1355,6 @@ endfunction
 command! -range -nargs=0 GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
-  GitStatus
   let cmd = #{text: '--text', pager: '', cached: '', file: '%'}
   let i = 0
   while i < len(a:000)
