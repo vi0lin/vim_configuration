@@ -1309,7 +1309,9 @@ command! -range -nargs=* PushCWD <line1>,<line2>:call PushCWD(<q-args>)
 function! PushCWD(commitmessage='')
   GitStatus
   GitAddCWD
+  GitStatus
   call GitCommit(a:commitmessage)
+  GitStatus
   GithubPush
 endfunction
 
