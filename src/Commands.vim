@@ -82,7 +82,7 @@ NewCommand command -range -nargs=+ UAmap :call UAmap(<f-args>)
 NewCommand command -range -nargs=* LineUp :call LineUp(<f-args>)
 
 NewCommand command -range -nargs=0 LayoutVim <line1>,<line2>call LayoutVim()
-NewCommand command -range -nargs=0 LayoutBash <line1>,<line2>call Layout_Bash()
+NewCommand command -range -nargs=0 LayoutBash <line1>,<line2>call LayoutBash()
 
 NewCommand command -range -nargs=0 BASH <line1>,<line2>call BASH()
 NewCommand command -range -nargs=0 Bash <line1>,<line2>call Bash()
@@ -186,7 +186,9 @@ NewCommand command! -nargs=1 Grep exec 'silent grep! -nR -- "<args>" .' | copen 
 NewCommand command! -nargs=0 PyCopen exec 'silent make' | copen | redraw!
 NewCommand command! -nargs=0 Run exec w:runprg.' \| copen \| redraw!'
 
-command! -range -bar -nargs=* RECP :call __push_txt(<f-args>)
+NewCommand command! -range -bar -nargs=* RECP :call __push_txt(<f-args>)
 
 NewCommand command! -nargs=0 Merge call TabBuffers('merge')
+
+NewCommand command! -nargs=+ -complete=command Confirm if confirm('Execute "'..expandcmd(<q-args>)..'"?', "&Yes\n&No") == 1 | execute <q-args> | endif
 endif

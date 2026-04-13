@@ -29,6 +29,9 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders
   autocmd! BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD()
 
+  " Bad Fix
+  " autocmd VimEnter * messages clear | redraw!
+
   "" autocmd! TabNew * :call F.TabNew()
   "" autocmd! WinNew * :call F.WinNew()
 

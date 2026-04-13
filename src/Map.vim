@@ -63,30 +63,45 @@ let mapping={
 " cmap <F10> <C-R>O
 " cmap <F11> <C-R>P
 
-NewMap noremap <leader>q :q<CR>
+" NewMap noremap <leader>q :q<CR>
 NewMap noremap <M-q> :q<CR>
 NewMap tnoremap <M-q> <c-\><c-n>:q<CR>
 
-" NewMap vnoremap <A-C-h> :<C-u>call SendCommandToTerm("h")<cr>
-" NewMap vnoremap <A-C-j> :<C-u>call SendCommandToTerm("j")<cr>
-" NewMap vnoremap <A-C-k> :<C-u>call SendCommandToTerm("k")<cr>
-" NewMap vnoremap <A-C-l> :<C-u>call SendCommandToTerm("l")<cr>
-" NewMap nnoremap <A-C-h> :call SendCommandToTerm("h")<cr>
-" NewMap nnoremap <A-C-j> :call SendCommandToTerm("j")<cr>
-" NewMap nnoremap <A-C-k> :call SendCommandToTerm("k")<cr>
-" NewMap nnoremap <A-C-l> :call SendCommandToTerm("l")<cr>
-" NewMap inoremap <A-C-h> <C-o>:call SendCommandToTerm("h")<cr>
-" NewMap inoremap <A-C-j> <C-o>:call SendCommandToTerm("j")<cr>
-" NewMap inoremap <A-C-k> <C-o>:call SendCommandToTerm("k")<cr>
-" NewMap inoremap <A-C-l> <C-o>:call SendCommandToTerm("l")<cr>
-" NewMap cnoremap <A-C-h> :call SendCommandToTerm("h", 1)<cr>
-" NewMap cnoremap <A-C-j> :call SendCommandToTerm("j", 1)<cr>
-" NewMap cnoremap <A-C-k> :call SendCommandToTerm("k", 1)<cr>
-" NewMap cnoremap <A-C-l> :call SendCommandToTerm("l", 1)<cr>
-" NewMap tnoremap <A-C-h> <C-\><C-n>:call SendCommandToTerm("h")<cr>
-" NewMap tnoremap <A-C-j> <C-\><C-n>:call SendCommandToTerm("j")<cr>
-" NewMap tnoremap <A-C-k> <C-\><C-n>:call SendCommandToTerm("k")<cr>
-" NewMap tnoremap <A-C-l> <C-\><C-n>:call SendCommandToTerm("l")<cr>
+function Inc(...)
+  let args=a:000
+  let asc=args[0]
+  let group=args[1]
+  let columns=args[2:]
+  echo asc group
+  " norm <C-a>
+endfunction
+command -range -nargs=* Inc :call Inc(<f-args>)
+
+" x=468.40
+" y=20
+" x-y
+" print("TEST!")
+
+NewMap vnoremap <F5> :<C-u>call SendCommandToTerm("h")<cr>
+NewMap vnoremap <F6> :<C-u>call SendCommandToTerm("j")<cr>
+NewMap vnoremap <F7> :<C-u>call SendCommandToTerm("k")<cr>
+NewMap vnoremap <F8> :<C-u>call SendCommandToTerm("l")<cr>
+NewMap nnoremap <F5> :call SendCommandToTerm("h")<cr>
+NewMap nnoremap <F6> :call SendCommandToTerm("j")<cr>
+NewMap nnoremap <F7> :call SendCommandToTerm("k")<cr>
+NewMap nnoremap <F8> :call SendCommandToTerm("l")<cr>
+NewMap inoremap <F5> <C-o>:call SendCommandToTerm("h")<cr>
+NewMap inoremap <F6> <C-o>:call SendCommandToTerm("j")<cr>
+NewMap inoremap <F7> <C-o>:call SendCommandToTerm("k")<cr>
+NewMap inoremap <F8> <C-o>:call SendCommandToTerm("l")<cr>
+NewMap cnoremap <F5> :call SendCommandToTerm("h", 1)<cr>
+NewMap cnoremap <F6> :call SendCommandToTerm("j", 1)<cr>
+NewMap cnoremap <F7> :call SendCommandToTerm("k", 1)<cr>
+NewMap cnoremap <F8> :call SendCommandToTerm("l", 1)<cr>
+NewMap tnoremap <F5> <C-\><C-n>:call SendCommandToTerm("h")<cr>
+NewMap tnoremap <F6> <C-\><C-n>:call SendCommandToTerm("j")<cr>
+NewMap tnoremap <F7> <C-\><C-n>:call SendCommandToTerm("k")<cr>
+NewMap tnoremap <F8> <C-\><C-n>:call SendCommandToTerm("l")<cr>
 
 " map <F5> :call RedoCommandToTerm("h")<cr>
 " map <F6> :call RedoCommandToTerm("j")<cr>
@@ -190,8 +205,10 @@ NewMap Amap <A-Right>      :call Open("L", "buffer", "new")<cr>
 " Amap <A-<C-S-k>> :call Open("K", "buffer", "copy")<cr>
 " Amap <A-<C-S-l>> :call Open("L", "buffer", "copy")<cr>
 
-NewMap Amap <leader>q :q!<CR>
-NewMap Amap <C-q> :bd!<CR>
+" NewMap Amap <leader>q :q!<CR>
+NewMap Amap <C-q> :hide<CR>
+NewMap Amap <C-S-q> :bd!<CR>
+NewMap Amap <C-S-q> :q!<CR>
 NewMap Amap <C-A-q> :qa!<CR>
 NewMap Amap <A-q> :call TabClose()<cr>
 NewMap Amap <leader><leader>r :redraw!<cr>
@@ -265,6 +282,10 @@ NewMap vmap <C-l> <C-w>l
 NewMap vmap <C-h> <C-w>h
 NewMap vmap <C-k> <C-w>k
 NewMap vmap <C-j> <C-w>j
+NewMap nnoremap <silent> <C-h> :call SmartWincmd('h')<CR>
+NewMap nnoremap <silent> <C-j> :call SmartWincmd('j')<CR>
+NewMap nnoremap <silent> <C-k> :call SmartWincmd('k')<CR>
+NewMap nnoremap <silent> <C-l> :call SmartWincmd('l')<CR>
 NewMap vmap <BS> :call backspace()<CR>
 NewMap vmap & :&<CR>
 NewMap vmap <leader>F :echo VS()<cr>
@@ -818,11 +839,37 @@ NewMap map <leader>aa :RECP --reg *<cr>
 NewMap map <leader>an :RECP --reg "<cr>
 NewMap map <leader>ab :RECP<cr>
 
-NewMap map <leader>m :call TabBuffers('merge')<cr>
-NewMap map <Tab> :call TabBuffers('next')<cr>
-NewMap map <S-Tab> :call TabBuffers('prev')<cr>
+" NewMap map <leader>m :call TabBuffers('merge')<cr>
+" NewMap map <F1> :call TabBuffers('next')<cr>
+" NewMap map <S-F1> :call TabBuffers('prev')<cr>
 
 NewMap map <C-Tab> :tabn<cr>
 NewMap map <C-S-Tab> :tabp<cr>
+
+NewMap noremap <leader>qd :Diff --all<cr>
+NewMap noremap <leader>qr :PushCWD  
+NewMap noremap <leader>qv :Pull
+NewMap noremap <leader>qs :Status<CR>
+NewMap noremap <leader>qu :StashPush<CR>
+NewMap noremap <leader>qo :StashPop<CR>
+
+" Variants / Extending Command Line Experience
+NewMap noremap <expr> ,,vg1 :echo "vimgrep term **/*.ext" \| :call feedkeys(':vimgrep ')
+NewMap noremap ,,vg2 :call input("vimgrep term **/*.ext\n") \| call feedkeys(':')
+NewMap noremap ,,vg3 :echo "vimgrep term **/*.ext"<cr> \| :call feedkeys(':')<cr>
+NewMap noremap ,,vg4 <expr> <leader><leader>vg call echo("tset") | call feedkeys(':')
+NewMap noremap ,,vg5 :execute input("hint\n:")<cr>
+NewMap noremap ,,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
+NewMap noremap ,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
+NewMap noremap ,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
+NewMap noremap ,,,,f :C test abc def geh "OKAY DU?"<cr>
+
+NewMap map ,vg :copen<cr>:vimgrep  **/*[D[D[D[D[D
+NewMap map ,vo :copen<cr>
+
+NewMap map [D :cclose<cr>
+NewMap map [C :copen<cr>
+NewMap map [A :cprev<cr>
+NewMap map [B :cnext<cr>
 
 endif

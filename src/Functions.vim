@@ -1,7 +1,7 @@
 " Avoid cdo prompt for overwiting files
 if !exists("g:vim_advantages_got_sourced")
 
-function Profile(...)
+function! Profile(...)
   let i = 0
   let arg = a:000[i]
   if arg ==# 'on'
@@ -18,20 +18,20 @@ function Profile(...)
 endfunction
 command! -range -nargs=* Profile <line1>,<line2>:call Profile(<q-args>)
 
-" function Arguments()
+" function! Arguments()
 "   echo argv()
 "   echo argc()
 "   echo argv(i)
 "   echo argv(-1)
 " endfunction
 
-function Vim_Advantages_Path()
+function! Vim_Advantages_Path()
   return split(&runtimepath, ",")[1]
 endfunction
 
 set hidden
-
-set hidden
+" set shortmess+=FIcs
+" set shortmess=FIcs
 set wildmenu
 set wildmode=longest:full,full
 set wildignore+=*/.git/*,*/node_modules/*,*/dist/*,*.o,*.pyc
@@ -55,12 +55,12 @@ endfunction
 
 " jump to same intendation level up/down
 
-function FindGitReposSystem()
+function! FindGitReposSystem()
   !find / -name .git -type d 2>/dev/null
   " Populate A FZF Function, Choosing A Repo
 endfunction
 
-function __words()
+function! __words()
   let c = 0
   redir => output
     " silent %s/[aeiou]//gn
@@ -70,7 +70,7 @@ function __words()
   echo c . " words found"
 endfunction
 
-function __vowels()
+function! __vowels()
   let c = 0
   redir => output
     silent %s/[aeiou]//gn
@@ -79,7 +79,7 @@ function __vowels()
   echo c . " vowels found"
 endfunction
 
-" function ClipboardToUploader()
+" function! ClipboardToUploader()
 " FZF wieder zum laufen bringen.
 " unterste zeile - c++ for example whole file word count | whole file double line count
 " Kommentare aus VS() substituieren
@@ -129,7 +129,7 @@ endfunction
   " let &t_TE = "\<Esc>[>4;m"
 " endif
 
-function __put_txt(lines)
+function! __put_txt(lines)
 endfunction
 
 " put=execute('registers')
@@ -139,7 +139,7 @@ endfunction
 " :put!    inserts above
 "	if get(Part1, 'name') == get(Part2, 'name')
 
-function StaticWin(...) range
+function! StaticWin(...) range
   let cursorpos=getcurpos()
   let opts = #{
     \ new: 0,
@@ -309,7 +309,7 @@ function StaticWin(...) range
 endfunction
 command! -range -nargs=* StaticWin <line1>,<line2>:call StaticWin(<f-args>)
 
-function __push_txt(...) range
+function! __push_txt(...) range
   let i = 0
   let data=VS()
   while i < len(a:000)
@@ -343,13 +343,13 @@ endfunction
 " NewMap map <leader>an :RECP --reg "<cr>
 " NewMap map <leader>ab :RECP<cr>
 
-function Re()
+function! Re()
   if exists('g:vim_advantages_got_sourced')
     unlet g:vim_advantages_got_sourced
   endif
 endfunction
 
-function ReEnd()
+function! ReEnd()
   let g:vim_advantages_got_sourced='true'
 endfunction
 
@@ -381,7 +381,7 @@ function! JumpToNextFile(dir) abort
 endfunction
 
 let g:hostinfo="host@your-ip"
-function Download_Unreleased()
+function! Download_Unreleased()
   let rem="/home/user/.vim/plugged/vim_configuration/src/"
   let loc=rem
   fun! SshD(file) closure
@@ -570,7 +570,7 @@ function! Folder_System()
   return g:system_folders
 endfunction
 
-function RgDir(args)
+function! RgDir(args)
   call fzf#vim#grep('rg --column --line-number --color=always --smart-case --files '.shellescape(split(a:args)[0]))
 endfunction
 command! -bang -nargs=* -complete=dir RgDir :call RgDir(<q-args>)
@@ -1005,13 +1005,13 @@ function! SelectCommand(keymap, info='')
   elseif a:keymap=~#"F[5678]"
     echo "win"
   endif
-  " function SelectCommand()
+  " function! SelectCommand()
   "   let Callback=function('OpenFile_callback', ["window"])
   "   call FZFPopup("Open file: ", "file", CWD(), Callback)
   " endfunction
 endfunction
 
-" function ConfigureExecute(keymap, shift=0, control=0, alt=0)
+" function! ConfigureExecute(keymap, shift=0, control=0, alt=0)
 "   let vs=VS()
 "   " echo a:shift a:control
 "   " a:alt
@@ -1355,6 +1355,7 @@ endfunction
 command! -range -nargs=0 GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
+  GitStatus
   let cmd = #{text: '--text', pager: '', cached: '', file: '%'}
   let i = 0
   while i < len(a:000)
@@ -1420,7 +1421,7 @@ function! GitAddRepo()
 endfunction
 
 command! -range -nargs=0 GitRemoveCached <line1>,<line2>:call GitRemovemCached()
-function GitRemoveCached()
+function! GitRemoveCached()
   !git rm -r --cached .
 endfunction
 
@@ -1450,7 +1451,7 @@ function! GitStatus()
   !clear && git status
 endfunction
 
-function GithubIntegrateProject(repo)
+function! GithubIntegrateProject(repo)
   " check if current folder has .git files
   let tmp_folder="folder_tmp"
   if !isdirectory(tmp_folder)
@@ -1636,7 +1637,7 @@ exec 'source '.g:vim_advantages.'/Commands.vim'
 exec 'source '.g:vim_advantages.'/Utilize.vim'
 exec 'source '.g:vim_advantages.'/Map.vim'
 let unreleased=g:vim_advantages.'/Functions.vim.unreleased'
-function SourceIfFileExists(file)
+function! SourceIfFileExists(file)
   if filereadable(a:file)
     exec "source "..a:file
   endif
@@ -1723,7 +1724,7 @@ set tabpagemax=50
 " inoremap <S-Tab> <C-d>
 " set whichwrap+=<,>,[,]
 
-" function s:disable_statusline(bn)
+" function! s:disable_statusline(bn)
 "   if a:bn == bufname('%')
 "     set laststatus=1
 "   else
@@ -1834,6 +1835,14 @@ set laststatus=2
 set dir=~/tmp
 set textwidth=0
 " set completeopt=menu,preview
+"
+function! StripComments()
+  " Alt A Alt D
+	" :echo searchpair('\<if\>', '\<el\%[seif]\>', '\<en\%[dif]\>', 'W',
+	"		\ 'getline(".") =~ "^\\s*\""')
+	" :echo searchpair('{', '', '}', 'bW')
+  " comments
+endfunction
 
 " Visual Selection
 
@@ -2535,6 +2544,61 @@ endfunction
 "   return ['A', 'B', 'C']
 " endfunction
 
+" function CommandBuilderCommandLine(name, ...)
+"   " let name = a:000[0]
+"   " echo <q-args>
+"   " let args = a:000[1:-2]
+"   " let prompt = a:000[-1]
+"   " echo name args prompt
+"   " echo a:name
+"   " echo a:000
+" endfunction
+" command! -nargs=* C :call CommandBuilderCommandLine(<q-args>)
+" todo
+" -complete=customlist,MyCmdComplete
+"  vim getopts how to parse quoted strings in getopts of a function
+
+function! ParseArgs(argstr)
+  let args = []
+  let current = ''
+  let in_quote = 0
+  let quote_char = ''
+  for char in split(a:argstr, '\zs')
+    if in_quote
+      if char == quote_char
+        let in_quote = 0
+      else
+        let current .= char
+      endif
+    elseif char == '"' || char == "'"
+      let in_quote = 1
+      let quote_char = char
+    elseif char == ' '
+      if current != ''
+        call add(args, current)
+        let current = ''
+      endif
+    else
+      let current .= char
+    endif
+  endfor
+  if current != ''
+    call add(args, current)
+  endif
+  return args
+endfunction
+
+if !exists("g:commandbuilder") | let g:commandbuilder={} | endif
+function s:commandbuilder(qargs)
+  let args=ParseArgs(a:qargs)
+  for arg in args[1:-1]
+    let value = input('')
+    call add(g:commandbuilder[args[0]], { arg: value })
+  endfor
+  " echo expand('<q-args>')
+endfunction
+" command! -nargs=* C :call s:vimgrep(<q-args>)
+
 function! s:stepFile(step)
   let path=expand('%:h')
   let l=systemlist('find '.path.' -maxdepth 1 -type f')
@@ -2694,14 +2758,13 @@ function! OpenFile_callback(id, code, register)
   endif
 endfunction
 
-function IsPopup(winid)
+function! IsPopup(winid)
   " echo popup_getpos(win_getid()) != {}
   " echo popup_getpos(winid) != {}
   let x={}
   try
     silent let x=popup_getpos(a:winid)
   catch
-    echo ""
   endtry
   return !empty(x)
 endfunction
@@ -2711,8 +2774,10 @@ function! MakeDirCurrentCWD()
     let [n, y, x, n, n]=getcurpos()
     " let w:cwd=expand("%:p:h")
     " let w:pointer=expand('%')
-    call CD(expand("%:p:h"))
-    call SetPointer(expand('%:p'))
+    let p1=expand("%:p:h")
+    let p2=expand('%:p')
+    call CD(p1)
+    call SetPointer(p2)
     " call SetProject(expand("%:p:h"))
     call cursor(y, x)
   endif
@@ -3008,9 +3073,11 @@ endfunction
 
 function! CD(path)
   if isdirectory(a:path)
-    silent call execute("cd ".a:path)
+    call execute("cd ".a:path)
+    " execute "cd ".a:path
   else
-    silent call execute("cd ".GetParentDir(a:path))
+    call execute("cd ".GetParentDir(a:path))
+    " execute "cd ".GetParentDir(a:path)
   endif
   let w:cwd=getcwd()
   let w:git=FindGit(w:cwd)
@@ -3032,7 +3099,7 @@ endfunction
 
 function! REFRESH_CWD()
   try
-    silent call execute("cd ".CWD())
+    call execute("cd ".CWD())
   catch
   endtry
 endfunction
@@ -3693,7 +3760,7 @@ endfunction
 
 function! SendCommandToTerm(direction) range
   " Bug (VS in normalmode sometimes results in the last selected line)
-  let vs=VS()
+  let vs=StripComments(VS())
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, vs)
 endfunction
@@ -4661,19 +4728,19 @@ function! TermLeave()
 endfunction
 
 function! VimEnter()
-  " if &buftype == 'terminal'
-  "   set wrap
-  " elseif &buftype == 'buffer'
-  "   set nowrap
-  " endif
-  call InitLineState()
-  " call system("bash", g:bashset_restore)
-  call Statusline()
-  " call SetProject(getcwd())
-  " call Layout_Vim()
-  " redraw!
-  call AutoInstallPlug()
-  call InitPlug()
+  "" " if &buftype == 'terminal'
+  "" "   set wrap
+  "" " elseif &buftype == 'buffer'
+  "" "   set nowrap
+  "" " endif
+  "" call InitLineState()
+  "" " call system("bash", g:bashset_restore)
+  "" call Statusline()
+  "" " call SetProject(getcwd())
+  "" " call Layout_Vim()
+  "" " redraw!
+  "" call AutoInstallPlug()
+  "" call InitPlug()
 endfunction
 
 function! BufEnter()
@@ -4692,30 +4759,30 @@ function! TabClose()
 endfunction
 
 function! WinEnter()
-  " StaticWin --deal-focus
-  " StaticWin get Information --text expand('%')
-  " if getbufvar(bufnr(), '&buftype') == 'terminal'
-  " if win_gettype(winnr()) == ""
-  "     endif
-  " exec "set tags="..CWD().."/tags"
-  " echo "set tags="..CWD().."/tags"
-  " if HasState()
-  " endif
-  call Statusline()
-  call SetLineState(g:linestate)
-  " exec "cd "..CWD()
-  " call REFRESH_CWD()
-  " Simpliest solution for now.
-  " Visual Selection gets losts
-  call InsertIfTerminal()
-  " if BufIsTerminal()
-  "   startinsert
-  " endif
-  " call InitLineState()
-  " let parent=CWD()
-  " if isdirectory(parent)
-  "   exec "cd "..parent
-  " endif
+  "" " StaticWin --deal-focus
+  "" " StaticWin get Information --text expand('%')
+  "" " if getbufvar(bufnr(), '&buftype') == 'terminal'
+  "" " if win_gettype(winnr()) == ""
+  "" "     endif
+  "" " exec "set tags="..CWD().."/tags"
+  "" " echo "set tags="..CWD().."/tags"
+  "" " if HasState()
+  "" " endif
+  "" call Statusline()
+  "" call SetLineState(g:linestate)
+  "" " exec "cd "..CWD()
+  "" " call REFRESH_CWD()
+  "" " Simpliest solution for now.
+  "" " Visual Selection gets losts
+  "" call InsertIfTerminal()
+  "" " if BufIsTerminal()
+  "" "   startinsert
+  "" " endif
+  "" " call InitLineState()
+  "" " let parent=CWD()
+  "" " if isdirectory(parent)
+  "" "   exec "cd "..parent
+  "" " endif
 endfunction
 
 function! WinLeave()
@@ -5307,13 +5374,15 @@ endfunction
 "   exe 1 .. "wincmd w"
 " endfunction
 
-function! Layout_Bash()
+function! LayoutBash()
   call _tabnew_if_not_empty_buffer()
   let layout=[
     \ g:bashrc,
     \ g:bashrc..'.unreleased',
     \ g:vimrc,
     \]
+  exec "argadd".join(layout, ' ')
+  silent exec "b"layout[0]
 endfunction
 
 function! LayoutVim()
@@ -5344,7 +5413,7 @@ function! LayoutVim()
   " fzf.vim or telescope
   exec "argadd".join(layout, ' ')
   " exec "badd " . join(layout, ' ')
-  silent exec "b"layout[0]
+  exec "b"layout[0]
 endfunction
 
 function! IsBuffersAreEmpty()
@@ -5720,10 +5789,6 @@ function SmartWincmd(direction)
     " endif
   " echo traceroute
 endfunction
-nnoremap <C-h> :call SmartWincmd('h')<CR>
-nnoremap <C-j> :call SmartWincmd('j')<CR>
-nnoremap <C-k> :call SmartWincmd('k')<CR>
-nnoremap <C-l> :call SmartWincmd('l')<CR>
 
 endif
 
