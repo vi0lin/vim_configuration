@@ -1835,13 +1835,14 @@ set laststatus=2
 set dir=~/tmp
 set textwidth=0
 " set completeopt=menu,preview
-"
-function! StripComments()
+
+function! StripComments(input)
   " Alt A Alt D
 	" :echo searchpair('\<if\>', '\<el\%[seif]\>', '\<en\%[dif]\>', 'W',
 	"		\ 'getline(".") =~ "^\\s*\""')
 	" :echo searchpair('{', '', '}', 'bW')
   " comments
+  return a:input
 endfunction
 
 " Visual Selection
