@@ -68,19 +68,10 @@ NewMap noremap <M-q> :q<CR>
 NewMap tnoremap <M-q> <c-\><c-n>:q<CR>
 
 function Inc(...)
-  " put=[a:000]
-  " return
-  let args={
+  return GetOpts(a:000, {
     \ 'group|g': 0,
     \ 'NewLines|N': '*'
-    \ }
-  return GetOpts(a:000, args)
-  " let args=a:000
-  " let asc=args[0]
-  " let group=args[1]
-  " let columns=args[2:]
-  " echo asc group
-  " " norm <C-a>
+    \ })
 endfunction
 command -range -nargs=* Inc :call Inc(<f-args>)
 Inc -N a1 a1 -N a1 1: a1 a1: --group
