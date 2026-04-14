@@ -71,8 +71,8 @@ function Inc(...)
   " put=[a:000]
   " return
   let args={
-    \ 'groups': 0,
-    \ 'NewLines': '*'
+    \ 'group|g': 0,
+    \ 'NewLines|N': '*'
     \ }
   return GetOpts(a:000, args)
   " let args=a:000

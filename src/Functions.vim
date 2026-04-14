@@ -2559,38 +2559,39 @@ endfunction
 " -complete=customlist,MyCmdComplete
 "  vim getopts how to parse quoted strings in getopts of a function
 
-
 function! GetOpts(args, structure)
   let args=a:args
-  let args = ['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
   let structure=a:structure
-  let keys=keys(a:structure)
-  let values=values(a:structure)
-  let itesm=items(a:structure)
-
+  let keys=keys(structure)
+  let values=values(structure)
+  let items=items(structure)
   let i = 0
   while i < len(args)
     let isMain=args[i][0:1] =~ '\v^-{1,2}'
     let isSub=!isMain
-    " echo args[i]
-    echo args[i] isMain
-    " echo args[i] args[i][1:2] ==# '^-\{0,1}'
+    let name=''
+    if isMain
+      echo "isMain: " .. args[i]
+      let name = substitute(args[i], '-\+', '', '')
+      " echo { 'arg': args[i], 'isMain': isMain, 'isSub': isSub, 'name': name }
+      let found_keys=[]
+      for k in keys
+        let found_key=(name =~ '\v('..k..')$')
+        if found_key
+          call add(found_keys, k)
+        endif
+      endfor
+      let ensure_found_key=(isMain && len(found_key)>0)
+      if ensure_found_key
+        let dump = string(found_keys)
+        echo "found_keys:" dump
+      endif
+    elseif isSub
+      echo "isSub: " .. args[i]
+      echo found_keys
+    endif
     let i += 1
-    " let arg = a:000[i]
-    " if arg ==# '-a' || arg ==# '--all'
-    "   let cmd.file=''
-    " elseif arg ==# '-t' || arg ==# '--text'
-    "   let cmd.text='--text'
-    " elseif arg ==# '-n' || arg ==# '--no-text'
-    "   let cmd.text=''
-    " elseif arg ==# '-p' || arg ==# '--no-pager'
-    "   let cmd.pager=''
-    " elseif arg ==# '-c' || arg ==# '--cached'
-    "   let cmd.cached='--cached'
-    " endif
-    " let i += 1
   endwhile
-
   return
 endfunction
 
