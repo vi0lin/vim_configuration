@@ -2560,8 +2560,14 @@ endfunction
 "  vim getopts how to parse quoted strings in getopts of a function
 
 function! GetOpts(args, structure)
+  let opts={}
   let args=a:args
+  let args=['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
   let structure=a:structure
+  let structure={
+        \ 'group': [ 'group|g', 0],
+        \ 'newlines': ['NewLines|N', '*' ]
+        \ }
   let keys=keys(structure)
   let values=values(structure)
   let items=items(structure)
@@ -2573,10 +2579,11 @@ function! GetOpts(args, structure)
     if isMain
       echo "isMain: " .. args[i]
       let name = substitute(args[i], '-\+', '', '')
+      let opts[name] = 'undefined'
       " echo { 'arg': args[i], 'isMain': isMain, 'isSub': isSub, 'name': name }
       let found_keys=[]
-      for k in keys
-        let found_key=(name =~ '\v('..k..')$')
+      for k in values
+        let found_key=(name =~ '\v('..k[0]..')$')
         if found_key
           call add(found_keys, k)
         endif
@@ -2586,13 +2593,34 @@ function! GetOpts(args, structure)
         let dump = string(found_keys)
         echo "found_keys:" dump
       endif
+      for f in found_keys
+        let c=f[1]
+        echo c
+        if c=="*"
+          echo '*'
+        elseif c=="?"
+          echo '?'
+        elseif c=="+"
+          echo '+'
+        elseif c==0
+          echo '0'
+        elseif c==1
+          echo '1'
+        elseif c=~".*:.*"
+          echo ':'
+        endif
+        " <--- add a key
+        " skipping logic
+      endfor
     elseif isSub
       echo "isSub: " .. args[i]
       echo found_keys
+      " <--- add values to last found keys
+      " skipping logic
     endif
     let i += 1
   endwhile
-  return
+  return opts
 endfunction
 
 function! ParseArgs(argstr)
