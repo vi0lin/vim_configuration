@@ -2562,74 +2562,116 @@ endfunction
 function! GetOpts(args, structure)
   let opts={}
   let args=a:args
-  let args=['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
   let structure=a:structure
-  let structure=[
-    \ [ 'group', 'group|g', 0],
-    \ [ 'newlines', 'NewLines|N', '*' ]
-    \ ]
+  " let args=['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
+  " let structure=[
+  "   \ [ 'group', 'group|g', 0],
+  "   \ [ 'newlines', 'NewLines|N', '*' ]
+  "   \ ]
+  echo string(args)
+  let ensure_found_key=0
+  let startsWithDash=0
+  let found_keys=[]
+  let name=""
+  let varname=""
+  let condition=""
+  let cardinality=""
   " let keys=keys(structure)
   " let values=values(structure)
   let items=items(structure)
-  let i = 0
   echo "Structure: " . string(structure)
-  while i < len(args)
-    let name=''
+  function! _isMain(arg) closure
+    let arg=a:arg
     let found_keys=[]
-    let name = substitute(args[i], '-\+', '', '')
     for k in structure
       let found_key=(name =~ '\v('..k[1]..')$')
       if found_key
         call add(found_keys, k)
       endif
     endfor
-    let startsWithDash=(args[i][0:1] =~ '\v^-{1,2}')
+    let startsWithDash=(a:arg[0:1] =~ '\v^-{1,2}')
     let ensure_found_key=(startsWithDash && len(found_key)>0)
-    let isMain=(startsWithDash && ensure_found_key)
+    return (startsWithDash && ensure_found_key)
+  endfunction
+  let i = 0
+  while i < len(args)
+    let name = substitute(args[i], '-\+', '', '')
+    let isMain=_isMain(args[i])
     let isArg=!isMain
-    if isMain && ensure_found_key
-      echo "isMain: " .. args[i]
+    if isMain
+      " echo "isMain: " .. args[i]
       if ensure_found_key
         let dump = string(found_keys)
-        echo "found_keys:" dump
+        " echo "found_keys:" dump
       endif
       for f in found_keys
         let varname=f[0]
         let condition=f[1]
         let cardinality=f[2]
-        let opts[varname]=[]
-        let i = 0
+        " if cardinality=~'\d' || cardinality=="*" || cardinality=="+" || cardinality=="=" || cardinality=="?" || cardinality =~ '{\(\d*\):\(\d*\)}' | endif
+        let opts[varname]=[[]]
       endfor
+      echo "\nMain:" args[i] cardinality
     elseif isArg
-      echo "isArg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
+      " echo "Arg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
       if cardinality=~'\d'
+        echo "\d"
         " specified number of arguments
         let pack=[]
-        while i < cardinality
-          call add(pack, args[i+j])
+        let start_i=i
+        while i < start_i+cardinality
+          call add(pack, args[i])
           let i += 1
         endwhile
         echo string(pack)
-        call add(opts[varname], pack)
+        call extend(opts[varname], [ pack ] )
       elseif cardinality=="*"
+        echo "*"
         " 0 or more as many as possibile
+        let pack=[]
+        while i<len(args)
+          call add(pack, args[i])
+          if _isMain(args[i+1]) | break | endif
+          let i += 1
+        endwhile
+        if len(pack[0]) == 0
+          let opts[varname] = 1
+        endif
+        echo string(pack)
+        call extend(opts[varname], [ pack ] )
       elseif cardinality=="+"
         " 1 or more as many as possibile
-      elseif cardinality=="="
+        let pack=[]
+        if i<len(args) && !_isMain(args[i+1])
+          echo string(condition) . "requres at least one argument"
+        endif
+        while i<len(args)
+          call add(pack, args[i])
+          if _isMain(args[i+1]) | break | endif
+          let i =+ 1
+        endwhile
+        call extend(opts[varname], [ pack ] )
+      elseif cardinality=="=" || cardinality=="?"
         " 0 or 1 as many as possibile
-      elseif cardinality=="?"
-        " 0 or 1 as many as possibile
-        let opts[name] = []
+        if !_isMain(args[i+1])
+          call add(opts[varname], args[i])
+        endif
+        if len(pack[0]) == 0
+          let opts[varname] = 1
+        endif
       elseif cardinality =~ '{\(\d*\):\(\d*\)}'
         let x=matchlist(cardinality, '{\(\d*\):\(\d*\)}')
-        echo x
+        if len(pack[0]) == 0
+          let opts[varname] = 1
+        endif
+        " todo
       endif
-      " echo found_keys
       " <--- add values to last found keys
       " skipping logic
     endif
     let i += 1
   endwhile
+  echo "\n"
   return opts
 endfunction
 
