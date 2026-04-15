@@ -2564,57 +2564,67 @@ function! GetOpts(args, structure)
   let args=a:args
   let args=['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
   let structure=a:structure
-  let structure={
-        \ 'group': [ 'group|g', 0],
-        \ 'newlines': ['NewLines|N', '*' ]
-        \ }
-  let keys=keys(structure)
-  let values=values(structure)
+  let structure=[
+    \ [ 'group', 'group|g', 0],
+    \ [ 'newlines', 'NewLines|N', '*' ]
+    \ ]
+  " let keys=keys(structure)
+  " let values=values(structure)
   let items=items(structure)
   let i = 0
+  echo "Structure: " . string(structure)
   while i < len(args)
-    let isMain=args[i][0:1] =~ '\v^-{1,2}'
-    let isSub=!isMain
     let name=''
-    if isMain
+    let found_keys=[]
+    let name = substitute(args[i], '-\+', '', '')
+    for k in structure
+      let found_key=(name =~ '\v('..k[1]..')$')
+      if found_key
+        call add(found_keys, k)
+      endif
+    endfor
+    let startsWithDash=(args[i][0:1] =~ '\v^-{1,2}')
+    let ensure_found_key=(startsWithDash && len(found_key)>0)
+    let isMain=(startsWithDash && ensure_found_key)
+    let isArg=!isMain
+    if isMain && ensure_found_key
       echo "isMain: " .. args[i]
-      let name = substitute(args[i], '-\+', '', '')
-      let opts[name] = 'undefined'
-      " echo { 'arg': args[i], 'isMain': isMain, 'isSub': isSub, 'name': name }
-      let found_keys=[]
-      for k in values
-        let found_key=(name =~ '\v('..k[0]..')$')
-        if found_key
-          call add(found_keys, k)
-        endif
-      endfor
-      let ensure_found_key=(isMain && len(found_key)>0)
       if ensure_found_key
         let dump = string(found_keys)
         echo "found_keys:" dump
       endif
       for f in found_keys
-        let c=f[1]
-        echo c
-        if c=="*"
-          echo '*'
-        elseif c=="?"
-          echo '?'
-        elseif c=="+"
-          echo '+'
-        elseif c==0
-          echo '0'
-        elseif c==1
-          echo '1'
-        elseif c=~".*:.*"
-          echo ':'
-        endif
-        " <--- add a key
-        " skipping logic
+        let varname=f[0]
+        let condition=f[1]
+        let cardinality=f[2]
+        let opts[varname]=[]
+        let i = 0
       endfor
-    elseif isSub
-      echo "isSub: " .. args[i]
-      echo found_keys
+    elseif isArg
+      echo "isArg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
+      if cardinality=~'\d'
+        " specified number of arguments
+        let pack=[]
+        while i < cardinality
+          call add(pack, args[i+j])
+          let i += 1
+        endwhile
+        echo string(pack)
+        call add(opts[varname], pack)
+      elseif cardinality=="*"
+        " 0 or more as many as possibile
+      elseif cardinality=="+"
+        " 1 or more as many as possibile
+      elseif cardinality=="="
+        " 0 or 1 as many as possibile
+      elseif cardinality=="?"
+        " 0 or 1 as many as possibile
+        let opts[name] = []
+      elseif cardinality =~ '{\(\d*\):\(\d*\)}'
+        let x=matchlist(cardinality, '{\(\d*\):\(\d*\)}')
+        echo x
+      endif
+      " echo found_keys
       " <--- add values to last found keys
       " skipping logic
     endif

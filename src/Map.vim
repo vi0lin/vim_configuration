@@ -70,10 +70,11 @@ NewMap tnoremap <M-q> <c-\><c-n>:q<CR>
 function Inc(...)
   " put=[a:000]
   " return
-  let opts=GetOpts(a:000, {
-    \ 'group': [ 'group|g', 0],
-    \ 'newlines': ['NewLines|N', '*' ]
-    \ })
+  " name, regex, cardinality
+  let opts=GetOpts(a:000, [
+    \ [ 'group', 'group|g', 0],
+    \ [ 'newlines', 'NewLines|N', '*' ]
+    \ ])
   echo opts
   " echo opts.group
   " echo opts.newlines
