@@ -79,6 +79,7 @@ function Inc(...)
   " if opts.group | echo "group flag set" | endif
   " if opts.test | echo "test flag set" | endif
   " echo opts.newlines
+  " put=opts
 endfunction
 command -range -nargs=* Inc :call Inc(<f-args>)
 " Inc -N a1 a1 -N a1 1: a1 a1: --group -t
