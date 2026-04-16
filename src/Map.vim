@@ -73,14 +73,15 @@ function Inc(...)
   " name, regex, cardinality
   let opts=GetOpts(a:000, [
     \ [ 'group', 'group|g', 0],
-    \ [ 'newlines', 'NewLines|N', '*' ]
+    \ [ 'newlines', 'NewLines|N', '*' ],
+    \ [ 'test', 'test|t', '0' ]
     \ ])
   echo opts
   " echo opts.group
   " echo opts.newlines
 endfunction
 command -range -nargs=* Inc :call Inc(<f-args>)
-Inc -N a1 a1 -N a1 1: a1 a1: --group
+Inc -N a1 a1 -N a1 1: a1 a1: --group -t
 
 " x=468.40
 " y=20
