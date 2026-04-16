@@ -2580,6 +2580,14 @@ function! GetOpts(args, structure)
   " let values=values(structure)
   let items=items(structure)
   echo "Structure: " . string(structure)
+  function! _Default(arg) closure
+    for s in structure
+      if s[2]==0
+        let opts[s[0]]=0
+      endif
+    endfor
+  endfunction
+  call _Default(args)
   function! _isMain(arg) closure
     let arg=a:arg
     let found_keys=[]
@@ -2593,7 +2601,28 @@ function! GetOpts(args, structure)
     let ensure_found_key=(startsWithDash && len(found_key)>0)
     return (startsWithDash && ensure_found_key)
   endfunction
+  let argtypes=[] " [1,0,0,1,0,0,0,0,1]
+  let mainargcount=[] " [1, 4, 0]
+  function! Specs(args) closure
+    let args=a:args
+    let arg_idx = 0
+    let mainarg=-1
+    for arg_idx in range(0,len(args)-1)
+      let _ismain=_isMain(args[arg_idx])
+      call add(argtypes,_ismain)
+      if _ismain
+        let mainarg+=1
+        call add(mainargcount,0)
+      else
+        let mainargcount[mainarg]+=1
+      endif
+    endfor
+  endfunction
+  call Specs(args)
+  " echo string(argtypes) string(mainargcount)
   let i = 0
+  let i_main=0
+  let i_arg=0
   while i < len(args)
     let name = substitute(args[i], '-\+', '', '')
     let isMain=_isMain(args[i])
@@ -2609,9 +2638,13 @@ function! GetOpts(args, structure)
         let condition=f[1]
         let cardinality=f[2]
         " if cardinality=~'\d' || cardinality=="*" || cardinality=="+" || cardinality=="=" || cardinality=="?" || cardinality =~ '{\(\d*\):\(\d*\)}' | endif
-        let opts[varname]=[[]]
+        if mainargcount[i_main]==0
+          let opts[varname]=1
+        endif
       endfor
       echo "\nMain:" args[i] cardinality
+      let i_arg=0
+      let i_main+=1
     elseif isArg
       " echo "Arg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
       if cardinality=~'\d'
@@ -2623,22 +2656,27 @@ function! GetOpts(args, structure)
           call add(pack, args[i])
           let i += 1
         endwhile
-        echo string(pack)
-        call extend(opts[varname], [ pack ] )
+        echo string(pack).." adding to opts[\""..varname.."\"]"
+        call add(opts[varname], pack)
+        echo opts["newlines"]
       elseif cardinality=="*"
         echo "*"
         " 0 or more as many as possibile
         let pack=[]
         while i<len(args)
-          call add(pack, args[i])
-          if _isMain(args[i+1]) | break | endif
+          call add(pack, args[i] )
+          if i+1<len(args) && _isMain(args[i+1]) | break | endif
           let i += 1
         endwhile
         if len(pack[0]) == 0
           let opts[varname] = 1
         endif
-        echo string(pack)
-        call extend(opts[varname], [ pack ] )
+        if empty(opts[varname])
+          let opts[varname]=[]
+        endif
+        echo string(pack).." adding to opts[\""..varname.."\"]"
+        call add(opts[varname], pack)
+        echo opts["newlines"]
       elseif cardinality=="+"
         " 1 or more as many as possibile
         let pack=[]
@@ -2650,11 +2688,11 @@ function! GetOpts(args, structure)
           if _isMain(args[i+1]) | break | endif
           let i =+ 1
         endwhile
-        call extend(opts[varname], [ pack ] )
+        call add(opts[varname], pack)
       elseif cardinality=="=" || cardinality=="?"
         " 0 or 1 as many as possibile
         if !_isMain(args[i+1])
-          call add(opts[varname], args[i])
+          call add(opts[varname], [ args[i] ])
         endif
         if len(pack[0]) == 0
           let opts[varname] = 1
@@ -2668,6 +2706,7 @@ function! GetOpts(args, structure)
       endif
       " <--- add values to last found keys
       " skipping logic
+      let i_arg+=1
     endif
     let i += 1
   endwhile
