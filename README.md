@@ -79,6 +79,10 @@ endfunction
 command -range -nargs=* Inc :call Inc(<f-args>)
 Inc -N a1 a1 -N a1 1: a1 a1: --group -t
 ```
+```
+put=opts
+{'group': 1, 'test': 1, 'newlines': [['a1', 'a1'], ['a1', '1:', 'a1', 'a1:']]}
+```
 
 ## Statusline
 <table>
