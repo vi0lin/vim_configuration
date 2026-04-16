@@ -67,17 +67,17 @@ let mapping={
 NewMap noremap <M-q> :q<CR>
 NewMap tnoremap <M-q> <c-\><c-n>:q<CR>
 
+
 function Inc(...)
   " put=[a:000]
   " return
-  " name, regex, cardinality
   let opts=GetOpts(a:000, [
     \ [ 'group', 'group|g', 0],
     \ [ 'newlines', 'NewLines|N', '*' ],
     \ [ 'test', 'test|t', '0' ]
     \ ])
-  echo opts
-  " echo opts.group
+  " if opts.group | echo "group flag set" | endif
+  " if opts.test | echo "test flag set" | endif
   " echo opts.newlines
 endfunction
 command -range -nargs=* Inc :call Inc(<f-args>)

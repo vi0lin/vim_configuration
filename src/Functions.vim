@@ -2711,6 +2711,9 @@ function! GetOpts(args, structure)
     let i += 1
   endwhile
   " echo "\n"
+  " default argument variable, when extending cardinality
+  " automatically array or variable
+  " further testing
   return opts
 endfunction
 

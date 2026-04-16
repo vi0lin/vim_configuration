@@ -61,6 +61,23 @@ call plug#end()
   </tbody>
 </table>
 -->
+## GetOpts
+```
+function Inc(...)
+  " put=[a:000]
+  " return
+  let opts=GetOpts(a:000, [
+    \ [ 'group', 'group|g', 0],
+    \ [ 'newlines', 'NewLines|N', '*' ],
+    \ [ 'test', 'test|t', '0' ]
+    \ ])
+  if opts.group | echo "group flag set" | endif
+  if opts.test | echo "test flag set" | endif
+  echo opts.newlines
+endfunction
+command -range -nargs=* Inc :call Inc(<f-args>)
+Inc -N a1 a1 -N a1 1: a1 a1: --group -t
+```
 
 ## Statusline
 <table>
