@@ -61,6 +61,7 @@ call plug#end()
   </tbody>
 </table>
 -->
+
 ## GetOpts
 ```
 function Inc(...)
