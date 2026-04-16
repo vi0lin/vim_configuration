@@ -2568,7 +2568,7 @@ function! GetOpts(args, structure)
   "   \ [ 'group', 'group|g', 0],
   "   \ [ 'newlines', 'NewLines|N', '*' ]
   "   \ ]
-  echo string(args)
+  " echo string(args)
   let ensure_found_key=0
   let startsWithDash=0
   let found_keys=[]
@@ -2579,7 +2579,7 @@ function! GetOpts(args, structure)
   " let keys=keys(structure)
   " let values=values(structure)
   let items=items(structure)
-  echo "Structure: " . string(structure)
+  " echo "Structure: " . string(structure)
   function! _Default(arg) closure
     for s in structure
       if s[2]==0
@@ -2642,13 +2642,13 @@ function! GetOpts(args, structure)
           let opts[varname]=1
         endif
       endfor
-      echo "\nMain:" args[i] cardinality
+      " echo "\nMain:" args[i] cardinality
       let i_arg=0
       let i_main+=1
     elseif isArg
       " echo "Arg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
       if cardinality=~'\d'
-        echo "\d"
+        " echo "\d"
         " specified number of arguments
         let pack=[]
         let start_i=i
@@ -2656,11 +2656,11 @@ function! GetOpts(args, structure)
           call add(pack, args[i])
           let i += 1
         endwhile
-        echo string(pack).." adding to opts[\""..varname.."\"]"
+        " echo string(pack).." adding to opts[\""..varname.."\"]"
         call add(opts[varname], pack)
-        echo opts["newlines"]
+        " echo opts["newlines"]
       elseif cardinality=="*"
-        echo "*"
+        " echo "*"
         " 0 or more as many as possibile
         let pack=[]
         while i<len(args)
@@ -2674,14 +2674,14 @@ function! GetOpts(args, structure)
         if empty(opts[varname])
           let opts[varname]=[]
         endif
-        echo string(pack).." adding to opts[\""..varname.."\"]"
+        " echo string(pack).." adding to opts[\""..varname.."\"]"
         call add(opts[varname], pack)
-        echo opts["newlines"]
+        " echo opts["newlines"]
       elseif cardinality=="+"
         " 1 or more as many as possibile
         let pack=[]
         if i<len(args) && !_isMain(args[i+1])
-          echo string(condition) . "requres at least one argument"
+          " echo string(condition) . "requres at least one argument"
         endif
         while i<len(args)
           call add(pack, args[i])
@@ -2710,7 +2710,7 @@ function! GetOpts(args, structure)
     endif
     let i += 1
   endwhile
-  echo "\n"
+  " echo "\n"
   return opts
 endfunction
 
