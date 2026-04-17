@@ -302,7 +302,7 @@ NewMap vmap <leader>u :!uniq<CR>
 NewMap vmap <M-v> :call VPaste("Visual")<CR>
 NewMap vmap <M-c> :call VCopy("Visual")<CR>
 NewMap vmap <M-x> :call VCut("Visual")<CR>
-NewMap vmap <c-c> "*y
+" NewMap vmap <c-c> "*y
 NewMap tmap <c-o> <c-\><c-n><c-o>
 NewMap imap <C-l> <C-w>li
 NewMap imap <C-h> <C-w>hi
