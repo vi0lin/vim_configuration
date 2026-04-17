@@ -3034,7 +3034,7 @@ function! Files(path)
   " call fzf#run({'dir': a:path})
   " call fzf#run({'dir': a:path, 'window': { 'width': 0.9, 'height': 0.6 } })
   " call fzf#run({'dir': '/', 'window': { 'width': 0.9, 'height': 0.6 } })
-  call fzf#run(fzf#wrap('', { 'dir': a:path }, 0 ))
+  " call fzf#run(fzf#wrap('', { 'dir': a:path }, 0 ))
   " let opts = {'dir': '/'}
   " let window_opts = fzf#wrap('')
   " let opts['window'] = window_opts['window']
@@ -3208,6 +3208,8 @@ endfunction
 
 function! CWD()
   if !exists("w:cwd")
+    " let w:cwd=expand('%:p:h')
+    " call SetPointer('%:p')
     call MakeDirCurrentCWD()
     " redir=>w:cwd | pwd | redir END
     " let w:cwd=substitute(w:cwd, '\n', "", 'g')
@@ -3311,6 +3313,8 @@ function! ToggleShortenPath()
 endfunction
 
 function! PathCharwise_All(path, except=0, prependSlash=v:false, appendSlash=v:false)
+  " let currentDir="test"..split(expand('%:p:h'), '/')[-1]
+  " echo currentDir
   let except=a:except
   if filereadable(a:path)
     let except=a:except
@@ -3320,8 +3324,10 @@ function! PathCharwise_All(path, except=0, prependSlash=v:false, appendSlash=v:f
   endif
   if except==-1
     if a:appendSlash
+      " return currentDir . a:path..'/'
       return a:path..'/'
     else
+      " return currentDir . a:path
       return a:path
     endif
   endif
@@ -3345,6 +3351,7 @@ function! PathCharwise_All(path, except=0, prependSlash=v:false, appendSlash=v:f
       let out.='/'
     endif
   endfor
+  " return currentDir . out
   return out
 endfunction
 
@@ -4899,7 +4906,7 @@ function! VimEnter()
   "" " call Layout_Vim()
   "" " redraw!
   "" call AutoInstallPlug()
-  "" call InitPlug()
+  call InitPlug()
 endfunction
 
 function! BufEnter()
@@ -5821,12 +5828,12 @@ function! s:PrevBuffer() abort
 endfunction
 
 " Keymaps
-map <F1>   :call <SID>NextBuffer()<CR>
-map <S-F1> :call <SID>PrevBuffer()<CR>
-tmap <F1>   <C-\><C-o>:call <SID>NextBuffer()<CR>
-tmap <S-F1> <C-\><C-o>:call <SID>PrevBuffer()<CR>
-map <Tab>   :call <SID>NextBuffer()<CR>
-map <S-Tab> :call <SID>PrevBuffer()<CR>
+noremap <F1>   :call <SID>NextBuffer()<CR>
+noremap <S-F1> :call <SID>PrevBuffer()<CR>
+tnoremap <F1>   <C-\><C-o>:call <SID>NextBuffer()<CR>
+tnoremap <S-F1> <C-\><C-o>:call <SID>PrevBuffer()<CR>
+noremap <Tab>   :call <SID>NextBuffer()<CR>
+noremap <S-Tab> :call <SID>PrevBuffer()<CR>
 
 " map <F2> :echo t:buffers<cr>
 " map <F3> :echo FullPaths(t:buffers)<cr>
@@ -5879,7 +5886,6 @@ map <S-Tab> :call <SID>PrevBuffer()<CR>
 " nnoremap <expr> <leader> WhichKey('<leader>') .. ''
 " " Plug 'liuchengxu/vim-which-key'
 " " nnoremap <silent> <leader> :WhichKey '<Space>'<CR>
-
 
 " local function s:smart_wincmd(direction)
 "   local start_win = vim.api.nvim_get_current_win()
@@ -5946,7 +5952,7 @@ function SmartWincmd(direction)
     " if ft != 'NvimTree' && buftype != 'nofile'
     "   break
     " endif
-  " echo traceroute
+" echo traceroute
 endfunction
 
 endif

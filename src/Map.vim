@@ -67,7 +67,6 @@ let mapping={
 NewMap noremap <M-q> :q<CR>
 NewMap tnoremap <M-q> <c-\><c-n>:q<CR>
 
-
 function Inc(...)
   " put=[a:000]
   " return
@@ -864,7 +863,7 @@ NewMap noremap <leader>qo :StashPop<CR>
 NewMap noremap <expr> ,,vg1 :echo "vimgrep term **/*.ext" \| :call feedkeys(':vimgrep ')
 NewMap noremap ,,vg2 :call input("vimgrep term **/*.ext\n") \| call feedkeys(':')
 NewMap noremap ,,vg3 :echo "vimgrep term **/*.ext"<cr> \| :call feedkeys(':')<cr>
-NewMap noremap ,,vg4 <expr> <leader><leader>vg call echo("tset") | call feedkeys(':')
+NewMap noremap ,,vg4 <expr> <leader><leader>vg call echo("tset") \| call feedkeys(':')
 NewMap noremap ,,vg5 :execute input("hint\n:")<cr>
 NewMap noremap ,,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
 NewMap noremap ,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
