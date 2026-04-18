@@ -1,6 +1,273 @@
 " Avoid cdo prompt for overwiting files
 if !exists("g:vim_advantages_got_sourced")
 
+function! GetOpts(args, structure)
+  " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
+  let opts={'args':[]}
+  let args=a:args
+  let structure=a:structure
+  " if filter(a:structure, 'v:val=="args"')>-1
+  "   echo 'error - args is a default variable'
+  "   return
+  " endif
+  " let args=['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
+  " let structure=[
+  "   \ [ 'group', 'group|g', 0],
+  "   \ [ 'newlines', 'NewLines|N', '*' ]
+  "   \ ]
+  " echo string(args)
+  let ensure_found_key=0
+  let startsWithDash=0
+  let found_keys=[]
+  let name=""
+  let varname=""
+  let condition=""
+  let cardinality=-1
+  " let keys=keys(structure)
+  " let values=values(structure)
+  let items=items(structure)
+  " echo "Structure: " . string(structure)
+  function! _Default(arg) closure
+    for s in structure
+      if s[2]==0
+        let opts[s[0]]=0
+      endif
+    endfor
+  endfunction
+  call _Default(args)
+  function! _isMain(arg) closure
+    let arg=a:arg
+    let found_keys=[]
+    for k in structure
+      " echo name '=~' k[1]
+      let found_key=(name =~ '\v^('..k[1]..')$')
+      if found_key
+        call add(found_keys, k)
+      endif
+    endfor
+    let startsWithDash=(a:arg[0:1] =~ '\v^-{1,2}')
+    let ensure_found_key=(startsWithDash && len(found_key)>0)
+    return (startsWithDash && ensure_found_key)
+  endfunction
+  function! _isMain2(arg, structure, name)
+    let arg=a:arg
+    let found_key=-1
+    let found_keys=[]
+    for k in a:structure
+      " echo a:name '=~' '\v^('..k[1]..')$'
+      let found_key=(a:name =~ '\v^('..k[1]..')$')
+      if found_key
+        call add(found_keys, k)
+      endif
+    endfor
+    " echo found_keys
+    let startsWithDash=(a:arg[0:1] =~ '\v^-{1,2}')
+    let ensure_found_key=(startsWithDash && len(found_key)>0)
+    return (startsWithDash && ensure_found_key)
+  endfunction
+  let argtypes=[] " [1,0,0,1,0,0,0,0,1]
+  let mainargcount=[] " [1, 4, 0]
+  function! Specs(args) closure
+    let args=a:args
+    let arg_idx = 0
+    let mainarg=0
+    for arg_idx in range(0,len(args)-1)
+      let _ismain=_isMain2(args[arg_idx], structure, name)
+      call add(argtypes,_ismain)
+      " todo if cardinality extended || default argument
+      if _ismain
+        if len(mainargcount) > 0
+          let mainarg+=1
+        endif
+        call add(mainargcount,0)
+      else
+        if len(mainargcount)==0
+          call add(mainargcount,0)
+        endif
+        let mainargcount[mainarg]+=1
+      endif
+    endfor
+  endfunction
+  call Specs(args)
+  " echo string(argtypes) string(mainargcount)
+  let i = 0
+  let i_main=0
+  let i_arg=0
+  let isDefault=0
+  while i < len(args)
+    " echo args[i]
+    let name = substitute(args[i], '-\+', '', '')
+    let isMain=_isMain(args[i])
+    let isArg=!isMain
+    if (i == 0 && isArg) || isDefault
+      let isDefault=1
+      while i < len(args)
+        call add(opts["args"], args[i] )
+        " if i+1 < len(args) && _isMain(args[i+1]) | break | endif
+        let i += 1
+      endwhile
+    elseif isMain
+      " echo "isMain: " .. args[i]
+      if ensure_found_key
+        " let dump = string(found_keys)
+        " echo "found_keys:" dump
+      endif
+      for f in found_keys
+        let varname=f[0]
+        let condition=f[1]
+        let cardinality=f[2]
+
+        " if cardinality=~'\d' || cardinality=="*" || cardinality=="+" || cardinality=="=" || cardinality=="?" || cardinality =~ '{\(\d*\):\(\d*\)}' | endif
+        if cardinality == 0
+          " if mainargcount[i_main]==0
+          " echo "setting 1" varname
+          let opts[varname]=1
+          if i+1<len(args) && !_isMain2(args[i+1], structure, name)
+            let isDefault=1
+            let cardinality=-1
+          endif
+        endif
+      endfor
+      " echo "\nMain:" args[i] cardinality
+      let i_arg=0
+      let i_main+=1
+    elseif isArg
+      " echo "Arg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
+      if cardinality==0
+        " echo "setting 2" varname
+        let opts[varname] = 1
+        if i+1<len(args) && !_isMain2(args[i+1], structure, name)
+          let isDefault=1
+        endif
+        " let cardinality=-1
+      elseif cardinality=~'\d'
+        " echo cardinality
+        " specified number of arguments
+        let pack=[]
+        let start_i=i
+        while i < start_i+cardinality
+          call add(pack, args[i])
+          let i += 1
+        endwhile
+        " echo "setting 3" varname
+        call add(opts[varname], pack)
+        " len(pack) == 0 || 
+
+        if i<len(args) && !_isMain2(args[i], structure, name)
+          let isDefault=1
+        endif
+        " echo string(pack).." adding to opts[\""..varname.."\"]"
+        " echo args
+        " echo opts['args']
+        " echo args[i]
+        " <--- add values to last found keys
+        " skipping logic
+        let cardinality=-1
+      elseif cardinality=="*"
+        " echo "*"
+        " 0 or more as many as possibile
+        let pack=[]
+        while i<len(args)
+          if args[i]=="--"
+            let isDefault=1
+            break
+          else
+            call add(pack, args[i] )
+            if i+1<len(args) && _isMain2(args[i+1], structure, name) | break | endif
+          endif
+          let i += 1
+        endwhile
+        if len(pack) == 0
+          " echo "setting 4" varname
+          let opts[varname] = 1
+        endif
+        if empty(opts[varname])
+          " echo "setting 5" varname
+          let opts[varname]=[]
+        endif
+        " echo string(pack).." adding to opts[\""..varname.."\"]"
+        "
+        " echo "setting 6" varname
+        call add(opts[varname], pack)
+        " echo opts["newlines"]
+        let cardinality=-1
+      elseif cardinality=="+"
+        " 1 or more as many as possibile
+        let pack=[]
+        while i<len(args)
+          if args[i]=="--"
+            let isDefault=1
+            break
+          else
+            call add(pack, args[i])
+            if i+1<len(args) && _isMain2(args[i+1], structure, name) | break | endif
+          endif
+          let i =+ 1
+        endwhile
+        " echo "setting 7" varname
+        call add(opts[varname], pack)
+        let cardinality=-1
+      elseif cardinality=="=" || cardinality=="?"
+        " 0 or 1 as many as possibile
+        if !_isMain2(args[i+1], structure, name)
+          " echo "setting 8" varname
+          call add(opts[varname], [ args[i] ])
+        endif
+        if len(pack[0]) == 0
+          " echo "setting 8" varname
+          let opts[varname] = 1
+        endif
+        let cardinality=-1
+      elseif cardinality =~ '{\(\d*\):\(\d*\)}'
+        let x=matchlist(cardinality, '{\(\d*\):\(\d*\)}')
+        if len(pack[0]) == 0
+          " echo "setting 9" varname
+          let opts[varname] = 1
+        endif
+        " todo
+        let cardinality=-1
+      endif
+      let i_arg+=1
+    endif
+    let i += 1
+  endwhile
+  " echo "\n"
+  " default argument variable, when extending cardinality
+  " automatically array or variable
+  " further testing
+  return opts
+endfunction
+
+function! ParseArgs(argstr)
+  let args = []
+  let current = ''
+  let in_quote = 0
+  let quote_char = ''
+  for char in split(a:argstr, '\zs')
+    if in_quote
+      if char == quote_char
+        let in_quote = 0
+      else
+        let current .= char
+      endif
+    elseif char == '"' || char == "'"
+      let in_quote = 1
+      let quote_char = char
+    elseif char == ' '
+      if current != ''
+        call add(args, current)
+        let current = ''
+      endif
+    else
+      let current .= char
+    endif
+  endfor
+  if current != ''
+    call add(args, current)
+  endif
+  return args
+endfunction
+
 function! Profile(...)
   let i = 0
   let arg = a:000[i]
@@ -2558,194 +2825,6 @@ endfunction
 " todo
 " -complete=customlist,MyCmdComplete
 "  vim getopts how to parse quoted strings in getopts of a function
-
-function! GetOpts(args, structure)
-  let opts={}
-  let args=a:args
-  let structure=a:structure
-  " let args=['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
-  " let structure=[
-  "   \ [ 'group', 'group|g', 0],
-  "   \ [ 'newlines', 'NewLines|N', '*' ]
-  "   \ ]
-  " echo string(args)
-  let ensure_found_key=0
-  let startsWithDash=0
-  let found_keys=[]
-  let name=""
-  let varname=""
-  let condition=""
-  let cardinality=""
-  " let keys=keys(structure)
-  " let values=values(structure)
-  let items=items(structure)
-  " echo "Structure: " . string(structure)
-  function! _Default(arg) closure
-    for s in structure
-      if s[2]==0
-        let opts[s[0]]=0
-      endif
-    endfor
-  endfunction
-  call _Default(args)
-  function! _isMain(arg) closure
-    let arg=a:arg
-    let found_keys=[]
-    for k in structure
-      let found_key=(name =~ '\v('..k[1]..')$')
-      if found_key
-        call add(found_keys, k)
-      endif
-    endfor
-    let startsWithDash=(a:arg[0:1] =~ '\v^-{1,2}')
-    let ensure_found_key=(startsWithDash && len(found_key)>0)
-    return (startsWithDash && ensure_found_key)
-  endfunction
-  let argtypes=[] " [1,0,0,1,0,0,0,0,1]
-  let mainargcount=[] " [1, 4, 0]
-  function! Specs(args) closure
-    let args=a:args
-    let arg_idx = 0
-    let mainarg=-1
-    for arg_idx in range(0,len(args)-1)
-      let _ismain=_isMain(args[arg_idx])
-      call add(argtypes,_ismain)
-      if _ismain
-        let mainarg+=1
-        call add(mainargcount,0)
-      else
-        let mainargcount[mainarg]+=1
-      endif
-    endfor
-  endfunction
-  call Specs(args)
-  " echo string(argtypes) string(mainargcount)
-  let i = 0
-  let i_main=0
-  let i_arg=0
-  while i < len(args)
-    let name = substitute(args[i], '-\+', '', '')
-    let isMain=_isMain(args[i])
-    let isArg=!isMain
-    if isMain
-      " echo "isMain: " .. args[i]
-      if ensure_found_key
-        let dump = string(found_keys)
-        " echo "found_keys:" dump
-      endif
-      for f in found_keys
-        let varname=f[0]
-        let condition=f[1]
-        let cardinality=f[2]
-        " if cardinality=~'\d' || cardinality=="*" || cardinality=="+" || cardinality=="=" || cardinality=="?" || cardinality =~ '{\(\d*\):\(\d*\)}' | endif
-        if mainargcount[i_main]==0
-          let opts[varname]=1
-        endif
-      endfor
-      " echo "\nMain:" args[i] cardinality
-      let i_arg=0
-      let i_main+=1
-    elseif isArg
-      " echo "Arg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
-      if cardinality=~'\d'
-        " echo "\d"
-        " specified number of arguments
-        let pack=[]
-        let start_i=i
-        while i < start_i+cardinality
-          call add(pack, args[i])
-          let i += 1
-        endwhile
-        " echo string(pack).." adding to opts[\""..varname.."\"]"
-        call add(opts[varname], pack)
-        " echo opts["newlines"]
-      elseif cardinality=="*"
-        " echo "*"
-        " 0 or more as many as possibile
-        let pack=[]
-        while i<len(args)
-          call add(pack, args[i] )
-          if i+1<len(args) && _isMain(args[i+1]) | break | endif
-          let i += 1
-        endwhile
-        if len(pack[0]) == 0
-          let opts[varname] = 1
-        endif
-        if empty(opts[varname])
-          let opts[varname]=[]
-        endif
-        " echo string(pack).." adding to opts[\""..varname.."\"]"
-        call add(opts[varname], pack)
-        " echo opts["newlines"]
-      elseif cardinality=="+"
-        " 1 or more as many as possibile
-        let pack=[]
-        if i<len(args) && !_isMain(args[i+1])
-          " echo string(condition) . "requres at least one argument"
-        endif
-        while i<len(args)
-          call add(pack, args[i])
-          if _isMain(args[i+1]) | break | endif
-          let i =+ 1
-        endwhile
-        call add(opts[varname], pack)
-      elseif cardinality=="=" || cardinality=="?"
-        " 0 or 1 as many as possibile
-        if !_isMain(args[i+1])
-          call add(opts[varname], [ args[i] ])
-        endif
-        if len(pack[0]) == 0
-          let opts[varname] = 1
-        endif
-      elseif cardinality =~ '{\(\d*\):\(\d*\)}'
-        let x=matchlist(cardinality, '{\(\d*\):\(\d*\)}')
-        if len(pack[0]) == 0
-          let opts[varname] = 1
-        endif
-        " todo
-      endif
-      " <--- add values to last found keys
-      " skipping logic
-      let i_arg+=1
-    endif
-    let i += 1
-  endwhile
-  " echo "\n"
-  " default argument variable, when extending cardinality
-  " automatically array or variable
-  " further testing
-  return opts
-endfunction
-
-function! ParseArgs(argstr)
-  let args = []
-  let current = ''
-  let in_quote = 0
-  let quote_char = ''
-  for char in split(a:argstr, '\zs')
-    if in_quote
-      if char == quote_char
-        let in_quote = 0
-      else
-        let current .= char
-      endif
-    elseif char == '"' || char == "'"
-      let in_quote = 1
-      let quote_char = char
-    elseif char == ' '
-      if current != ''
-        call add(args, current)
-        let current = ''
-      endif
-    else
-      let current .= char
-    endif
-  endfor
-  if current != ''
-    call add(args, current)
-  endif
-  return args
-endfunction
 
 if !exists("g:commandbuilder") | let g:commandbuilder={} | endif
 function s:commandbuilder(qargs)
