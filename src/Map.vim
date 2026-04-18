@@ -98,35 +98,40 @@ function! NewMap(...)
     exec join(parts, ' ')
   endfunction
   command! -nargs=* Exec :call Exec(<f-args>)
-  if opts.map
-    call Exec(noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.normal
-    call Exec("n"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.visual
-    call Exec("v"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.command
-    call Exec("c"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.insert
-    call Exec("i"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.terminal
-    call Exec("t"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.x
-    call Exec("x"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.s
-    call Exec("s"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.o
-    call Exec("o"..noremap.."map", silent, join(opts.args, ' '))
-  endif
-  if opts.l
-    call Exec("l"..noremap.."map", silent, join(opts.args, ' '))
+  " temporarily
+  if opts.all
+    call Exec("Amap", silent, join(opts.args, ' '))
+  else
+    if opts.map
+      call Exec(noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.normal
+      call Exec("n"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.visual
+      call Exec("v"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.command
+      call Exec("c"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.insert
+      call Exec("i"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.terminal
+      call Exec("t"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.x
+      call Exec("x"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.s
+      call Exec("s"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.o
+      call Exec("o"..noremap.."map", silent, join(opts.args, ' '))
+    endif
+    if opts.l
+      call Exec("l"..noremap.."map", silent, join(opts.args, ' '))
+    endif
   endif
     " let opts=GetOpts(n.args, s:newmap_optschema)
     " echo opts.map opts.silent n.args[0] opts.command
