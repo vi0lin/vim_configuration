@@ -20,6 +20,7 @@ endfunction
 " Occurs For That Function - This Reduces Calling The Very Often Computed Searching Algorithms
 " 0.05 - 0.5
 " 2. Work Trough Specs More Precisely Instead Of Occasionally Decisiontaking
+
 function! GetOpts(args, structure)
   " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
   let opts={'args':[]}
@@ -63,7 +64,6 @@ function! GetOpts(args, structure)
     """ if len(found_keys)>0
     """   let found_key=found_keys[0]
     """ endif
-
 		" let l = filter(copy(mylist), 'v:val =~ "KEEP"')
     "" let found_keys=filter(copy(structure), 's:MatchesOneOfPatterns(v:val[1], name)')
     "" if len(found_keys)>0
@@ -273,6 +273,12 @@ function! GetOpts(args, structure)
   " default argument variable, when extending cardinality
   " automatically array or variable
   " further testing
+  if len(opts.args) == 1
+    let opts.args=join(opts.args,'')
+    if opts.args=~'\d'
+      let opts.args=str2nr(opts.args)
+    endif
+  endif
   return opts
 endfunction
 

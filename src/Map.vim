@@ -49,8 +49,41 @@ function NewMapKeyCheckAll(...)
   " endwhile
 endfunction
 
+function FunctionName(...)
+  let schema= []
+  let opts=GetOpts(a:000, schema)
+  " echo opts
+  if opts.args==0
+    " echo substitute(expand('<sfile>'), '.*\.\.|\s', '', '')
+    return substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1',  '')
+    " let x="function SFN[2]..FunctionName"
+  elseif opts.args==1
+    return substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1' , '')
+    " return expand('<file>')
+    " function! GetCurrentFunctionName()
+    "   let line = getline(search('^[[:alpha:]$_]', 'bcnW'))
+    "   return matchstr(line, '\w\+')
+    " endfunction
+  elseif opts.args==2
+    " returnhl argsMsg
+    return getline(search('^[^ \t#/]\\{2}.*[^:]\s*$', 'bWn'))
+    " returnhl None
+  elseif opts.args==3
+    return getline(search('^[[:alpha:]$_]', 'bcnW'))
+  elseif opts.args==4
+    return substitute(getline(search('^[[:alpha:]$_]', 'bcnW')), '', '', '')
+  elseif opts.args==5
+    " put expand('<sfile>')
+    let x = expand('<sfile>')
+    return substitute(x, '.*\s\(.*\)\[\d\].*', '\1', '')
+  endif
+endfunction
+command! -range -nargs=* FunctionName call FunctionName(<f-args>)
+" NewMap -n -no <f1> :FunctionName 3<CR>:FunctionName 1<cr>
+
 let s:newmaps=[]
 function! NewMap(...)
+  let functionName = FunctionName(5)
   " echo a:000
   " :call F.Map.new(name, map)
   " try
@@ -1058,10 +1091,10 @@ NewMap -map [A :cprev<cr>
 NewMap -map [B :cnext<cr>
 
 " Keymaps
-NewMap -no <F1> :call <SID>NextBuffer()<CR>
-NewMap -no <S-F1> :call <SID>PrevBuffer()<CR>
-NewMap -t -no <F1> <C-\><C-o>:call <SID>NextBuffer()<CR>
-NewMap -t -no <S-F1> <C-\><C-o>:call <SID>PrevBuffer()<CR>
+" NewMap -no <F1> :call <SID>NextBuffer()<CR>
+" NewMap -no <S-F1> :call <SID>PrevBuffer()<CR>
+" NewMap -t -no <F1> <C-\><C-o>:call <SID>NextBuffer()<CR>
+" NewMap -t -no <S-F1> <C-\><C-o>:call <SID>PrevBuffer()<CR>
 nnoremap <C-i> <C-i>
 NewMap -no <Tab> :call <SID>NextBuffer()<CR>
 NewMap -no <S-Tab> :call <SID>PrevBuffer()<CR>
