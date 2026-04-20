@@ -1,6 +1,25 @@
 " Avoid cdo prompt for overwiting files
 if !exists("g:vim_advantages_got_sourced")
 
+function! s:MatchesOneOfPatterns(pattern_string, term) abort
+  let patterns = split(a:pattern_string, '|', 1)
+  for p in patterns
+    if a:term =~# '^' . p . '$'
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
+
+" Optimizing
+" 1. Store Matches (That Matches A Structure Element) Per Function, Create A
+" [ [ "NewMap", "-T"] ['test', 'test|t', 0] ]
+" Matrix, Serving As Lookup Table.
+" Consider Looping The Structure Only, If A New Parameter Does Not Exist In The Lookup Matrix
+" (Consider Also Storing Non Existent Arguments In A Negative Lookup Matrix? To Avoid Searching A False Parameter Often)
+" Occurs For That Function - This Reduces Calling The Very Often Computed Searching Algorithms
+" 0.05 - 0.5
+" 2. Work Trough Specs More Precisely Instead Of Occasionally Decisiontaking
 function! GetOpts(args, structure)
   " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
   let opts={'args':[]}
@@ -37,7 +56,19 @@ function! GetOpts(args, structure)
   call _Default(args)
   function! _isMain(arg) closure
     let arg=a:arg
-    let found_keys=[]
+    " '\v^("..v:val[1]..")$'
+    " echo '\v('..structure[0][1]..')'
+    " echo structure[0][1]=~'g'
+    """ let found_keys=filter(copy(structure), 'len(filter(split(v:val[1], "|"), "v:val ==# \"'..shellescape(name)..'\"")) > 0')
+    """ if len(found_keys)>0
+    """   let found_key=found_keys[0]
+    """ endif
+
+		" let l = filter(copy(mylist), 'v:val =~ "KEEP"')
+    "" let found_keys=filter(copy(structure), 's:MatchesOneOfPatterns(v:val[1], name)')
+    "" if len(found_keys)>0
+    ""   let found_key=found_keys[0]
+    "" endif
     for k in structure
       " echo name '=~' k[1]
       let found_key=(name =~ '\v^('..k[1]..')$')
@@ -51,8 +82,17 @@ function! GetOpts(args, structure)
   endfunction
   function! _isMain2(arg, structure, name)
     let arg=a:arg
-    let found_key=-1
+    let found_key=[]
     let found_keys=[]
+    " let found_keys=[]
+    """ let found_keys=filter(copy(a:structure), 'len(filter(split(v:val[1], "|"), "v:val ==# \"'..shellescape(a:name)..'\"")) > 0')
+    """ if len(found_keys)>0
+    """   let found_key=found_keys[0]
+    """ endif
+    ""  let found_keys=filter(copy(a:structure), 's:MatchesOneOfPatterns(v:val[1], a:name)')
+    ""  if len(found_keys)>0
+    ""    let found_key=found_keys[0]
+    ""  endif
     for k in a:structure
       " echo a:name '=~' '\v^('..k[1]..')$'
       let found_key=(a:name =~ '\v^('..k[1]..')$')
@@ -116,7 +156,6 @@ function! GetOpts(args, structure)
         let varname=f[0]
         let condition=f[1]
         let cardinality=f[2]
-
         " if cardinality=~'\d' || cardinality=="*" || cardinality=="+" || cardinality=="=" || cardinality=="?" || cardinality =~ '{\(\d*\):\(\d*\)}' | endif
         if cardinality == 0
           " if mainargcount[i_main]==0
@@ -152,7 +191,6 @@ function! GetOpts(args, structure)
         " echo "setting 3" varname
         call add(opts[varname], pack)
         " len(pack) == 0 || 
-
         if i<len(args) && !_isMain2(args[i], structure, name)
           let isDefault=1
         endif
@@ -5905,17 +5943,6 @@ function! s:PrevBuffer() abort
     endtry
     call s:ShowPopup()
 endfunction
-
-" Keymaps
-noremap <F1>   :call <SID>NextBuffer()<CR>
-noremap <S-F1> :call <SID>PrevBuffer()<CR>
-tnoremap <F1>   <C-\><C-o>:call <SID>NextBuffer()<CR>
-tnoremap <S-F1> <C-\><C-o>:call <SID>PrevBuffer()<CR>
-noremap <Tab>   :call <SID>NextBuffer()<CR>
-noremap <S-Tab> :call <SID>PrevBuffer()<CR>
-
-" map <F2> :echo t:buffers<cr>
-" map <F3> :echo FullPaths(t:buffers)<cr>
 
 " function! ShowPendingKeys(keys)
 "   let lines = []

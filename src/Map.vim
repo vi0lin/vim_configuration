@@ -1057,4 +1057,16 @@ NewMap -map [C :copen<cr>
 NewMap -map [A :cprev<cr>
 NewMap -map [B :cnext<cr>
 
+" Keymaps
+NewMap -no <F1> :call <SID>NextBuffer()<CR>
+NewMap -no <S-F1> :call <SID>PrevBuffer()<CR>
+NewMap -t -no <F1> <C-\><C-o>:call <SID>NextBuffer()<CR>
+NewMap -t -no <S-F1> <C-\><C-o>:call <SID>PrevBuffer()<CR>
+nnoremap <C-i> <C-i>
+NewMap -no <Tab> :call <SID>NextBuffer()<CR>
+NewMap -no <S-Tab> :call <SID>PrevBuffer()<CR>
+
+" map <F2> :echo t:buffers<cr>
+" map <F3> :echo FullPaths(t:buffers)<cr>
+
 endif
