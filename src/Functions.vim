@@ -21,6 +21,22 @@ endfunction
 " 0.05 - 0.5
 " 2. Work Trough Specs More Precisely Instead Of Occasionally Decisiontaking
 
+let s:go_matrix=[]
+" Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
+function GetOpts2(args, structure)
+  let opts={'args':[]}
+  let getopts={'args': a:args, 'structure': a:structure}
+  let argtypes=[]     " [1,0,0,1,0,0,0,0,1,0,0] oder [0,0,1,0,0,1,0,0,0,0,1,0,0]
+  let default_index=0 " 9                            0
+  let mainargcount=[] " [1, 4, 0]                [0]
+  function! Specification() closure
+    echo getopts.args
+    echo getopts.structure
+  endfunction
+  call Specification()
+endfunction
+echo GetOpts2(['-v','-c', 'NewMap', '-t','test', 'abc'], s:newmap_optschema)
+
 function! GetOpts(args, structure)
   " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
   let opts={'args':[]}

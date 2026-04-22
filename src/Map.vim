@@ -20,6 +20,7 @@ let s:newmap_optschema = [
   \ [ 'silent', 'Silent|silent', 0],
   \ [ 'noremap', 'No|no|noremap|Noremap', 0],
   \ ]
+
 function NewMapKeyCheckAll(...)
   for n in s:newmaps
     echo GetOpts(n.args, s:newmap_optschema)
@@ -50,8 +51,7 @@ function NewMapKeyCheckAll(...)
 endfunction
 
 function FunctionName(...)
-  let schema= []
-  let opts=GetOpts(a:000, schema)
+  let opts=GetOpts2(a:000, [])
   " echo opts
   if opts.args==0
     " echo substitute(expand('<sfile>'), '.*\.\.|\s', '', '')
@@ -81,6 +81,12 @@ endfunction
 command! -range -nargs=* FunctionName call FunctionName(<f-args>)
 " NewMap -n -no <f1> :FunctionName 3<CR>:FunctionName 1<cr>
 
+function SelectFunctionBlock(...)
+  call search(FunctionName(3), 'bcW')
+endfunction
+command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
+NewMap -no <F1> :call <SID>SelectFunctionBlock()<CR>
+
 let s:newmaps=[]
 function! NewMap(...)
   let functionName = FunctionName(5)
@@ -98,7 +104,20 @@ function! NewMap(...)
   " endif
   " for n in s:newmaps
   " echo opts
-  if !opts.normal && !opts.visual && !opts.command && !opts.insert && !opts.terminal && !opts.x && !opts.s && !opts.o && !opts.l
+  " put /
+  " \(if\|&&\)\@<!\s\+
+  " put :
+  " '<,'>s/\(if\|&&\)\@<!\s\+/\r\\ /g
+  " In Command Line <C-r>/
+  if !opts.normal
+  \ && !opts.visual
+  \ && !opts.command
+  \ && !opts.insert
+  \ && !opts.terminal
+  \ && !opts.x
+  \ && !opts.s
+  \ && !opts.o
+  \ && !opts.l
     let opts.map=1
   endif
   if opts.noremap
