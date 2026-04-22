@@ -107,7 +107,7 @@ function! NewMap(...)
   " put /
   " \(if\|&&\)\@<!\s\+
   " put :
-  " '<,'>s/\(if\|&&\)\@<!\s\+/\r\\ /g
+  " '<,'>s/\%\(if\|&&\)\@<!\s\+/\r\\ /g
   " In Command Line <C-r>/
   if !opts.normal
   \ && !opts.visual
