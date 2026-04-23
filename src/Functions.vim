@@ -21,21 +21,114 @@ endfunction
 " 0.05 - 0.5
 " 2. Work Trough Specs More Precisely Instead Of Occasionally Decisiontaking
 
-let s:go_matrix=[]
+let s:lookup_matrix=[]
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
 function GetOpts2(args, structure)
+  let functionName = FunctionName(5)
   let opts={'args':[]}
   let getopts={'args': a:args, 'structure': a:structure}
-  let argtypes=[]     " [1,0,0,1,0,0,0,0,1,0,0] oder [0,0,1,0,0,1,0,0,0,0,1,0,0]
-  let default_index=0 " 9                            0
-  let mainargcount=[] " [1, 4, 0]                [0]
+  " delimeter-arg='--'
+  function ComputeArg(arg, returnStructure=0)
+    if StartsWithDash(a:arg)
+      if IsInLookup(a:arg)
+        return !returnStructure && 1 || MatchesFromLookup(a:arg)
+      elseif IsInStructure(a:arg)
+        return !returnStructure && 1 || MatchesFromStructure(a:arg)
+      else
+        return returnStructure && 0 || []
+      endif
+    endif
+  endfunction
+  function! StartsWithDash(arg)
+    if a:arg[0:1] =~ '\v^-{1,2}'
+      return 1
+    else
+      return 0
+    endif
+  endfunction
+  function CheckArg(arg)
+    return StatsWithDash(a:arg) && ( IsInLookup(a:arg) || IsInStructure(a:arg) )
+  endfunction
+  function MatchesFromStructure(arg, feed_lookup=1) closure
+    let matches=[]
+    for k in structure
+      let match=(a:arg=~ '\v^('..k[1]..')$')
+      if match
+        call add(matches, k)
+      endif
+    endfor
+    if a:feed_lookup
+      let s:lookup_matrix[functionname][a:arg]=matches
+    endif
+    return matches
+  endfunction
+  function IsInStructure(arg) closure
+    let matches=[]
+    for k in structure
+      let match=(a:arg=~ '\v^('..k[1]..')$')
+      if match
+        return 1
+      endif
+    endfor
+    return 0
+  endfunction
+  function IsInLookup(arg) closure
+    if len(s:lookup_matrix[functionname][a:arg])>0
+      return 1
+    else
+      return 0
+    endif
+  endfunction
+  function MatchesFromLookup(arg)
+    return s:lookup_matrix[functionname][a:arg]
+  endfunction
+  let argtypes=[]        " [1,0,0,1,0,0,0,0,1,0,0] oder [0,0,1,0,0,1,0,0,0,0,1,0,0]
+  let delimeter_index=-1 " -1
+  let default_index=-1   "  9                            0                              oder [0, 6]
+  let mainargcount=[]    " [1, 4, 0]                    [0]
   function! Specification() closure
-    echo getopts.args
-    echo getopts.structure
+    " args - args_string
+    let arg_idx = 0
+    let mainarg=0
+    for arg_idx in range(0,len(getopts.args)-1)
+      let isMain=ComputeArg(args[arg_idx])
+      if args[arg_idx]=="--"
+        if delimeter_index==-1
+          let delimeter_index=arg_idx
+          if len(args) > arg_idx+1
+            let default_index=arg_idx+1
+          endif
+        else
+          let delimeter_index=[delimeter_index]
+          call add(delimeter_index, [arg_idx])
+          if len(args) > arg_idx+1
+            let default_index=[default_index]
+            call add(default_index, [arg_idx+1])
+          endif
+        endif
+      endif
+      call add(argtypes,isMain)
+      " todo if cardinality extended || default argument
+      if isMain
+        if len(mainargcount) > 0
+          let mainarg+=1
+        endif
+        call add(mainargcount,0)
+      else
+        if len(mainargcount)==0
+          call add(mainargcount,0)
+        endif
+        let mainargcount[mainarg]+=1
+      endif
+    endfor
   endfunction
   call Specification()
+  function BuildOpts() closure
+    return opts
+  endfunction
+  return BuildOpts()
 endfunction
-echo GetOpts2(['-v','-c', 'NewMap', '-t','test', 'abc'], s:newmap_optschema)
+" echo GetOpts2(['-v','-c', 'NewMap', '-t','test', 'abc'], s:newmap_optschema)
 
 function! GetOpts(args, structure)
   " echo filter(s:newmap_optschema, 'v:val[0]!="args"')

@@ -1103,7 +1103,7 @@ NewMap -no ,,,,f :C test abc def geh "OKAY DU?"<cr>
 NewMap -map ,vg :copen<cr>:vimgrep  **/*[D[D[D[D[D
 NewMap -map ,vo :copen<cr>
 
-NewMap -map [1;5A :copen<cr>:vimgrep  **/*[D[D[D[D[D
+NewMap -map [1;5A :copen<cr>:vimgrep   **/*[D[D[D[D[D
 NewMap -map [D :cclose<cr>
 NewMap -map [C :copen<cr>
 NewMap -map [A :cprev<cr>
