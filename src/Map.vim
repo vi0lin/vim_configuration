@@ -1140,5 +1140,10 @@ NewMap -no <leader><leader><F3> :call GitNewBranch()<cr>
 
 NewMap -no <F4> :call GitStashPush()<cr>
 NewMap -no <S-F4> :call GitStashPop()<cr>
+NewCommand command! -range -nargs=* RenameRemote call GitRenameRemote(<f-args>)
+NewCommand command! -range -nargs=* SetRemote call GitSetRemote(<f-args>)
+NewCommand command! -range -nargs=* RenameBranch call GitRenameBranch(<f-args>)
+NewCommand command! -range -nargs=* NewRemote call GitNewRemote(<f-args>)
+NewCommand command! -range -nargs=* NewBranch call GitNewBranch(<f-args>)
 
 endif

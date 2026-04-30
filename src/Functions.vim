@@ -36,7 +36,6 @@ function! GitRenameRemote(...)
   " windo "call Statusline()"
   call Statusline()
 endfunction
-NewCommand command! -range -nargs=* RenameRemote call GitRenameRemote(<f-args>)
 
 function! GitSetRemote(...)
   if len(a:000)>0
@@ -48,7 +47,6 @@ function! GitSetRemote(...)
   call UpdateGit()
   call Statusline()
 endfunction
-NewCommand command! -range -nargs=* SetRemote call GitSetRemote(<f-args>)
 
 function! GitRenameBranch(...)
   if len(a:000)>0
@@ -62,7 +60,6 @@ function! GitRenameBranch(...)
   call UpdateGit()
   call Statusline()
 endfunction
-NewCommand command! -range -nargs=* RenameBranch call GitRenameBranch(<f-args>)
 
 function! GitNewRemote(...)
   if len(a:000)>0
@@ -73,7 +70,6 @@ function! GitNewRemote(...)
   exec "!git remote add "..newname
   call UpdateGit()
 endfunction
-NewCommand command! -range -nargs=* NewRemote call GitNewRemote(<f-args>)
 
 function! GitNewBranch(...)
   if len(a:000)>0
@@ -84,7 +80,6 @@ function! GitNewBranch(...)
   exec "!git branch -m "..w:gitBranch.." "..newname
   call UpdateGit()
 endfunction
-NewCommand command! -range -nargs=* NewBranch call GitNewBranch(<f-args>)
 
 function! DebugCommand(list, delimeter=" ")
   let out=""
@@ -255,7 +250,7 @@ function GetOpts2(args, structure)
   " Debug 0 "TEST" s:lookup_matrix
   return BuildOpts()
 endfunction
-call GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
+" call GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
 
 function! GetOpts(args, structure)
   " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
