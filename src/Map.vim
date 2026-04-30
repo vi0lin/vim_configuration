@@ -1124,4 +1124,20 @@ endfunction
 command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
 NewMap -no <F1> :call SelectFunctionBlock()<CR>
 
+NewMap -no <F1> :call GitInfo()<cr>
+
+NewMap -no <F2> :call SelectRemote(1)<cr>
+NewMap -no <S-F2> :call SelectRemote(-1)<cr>
+NewMap -no <leader><F2> :call GitRenameRemote()<cr>
+NewMap -no <leader><leader><F2> :call GitNewRemote()<cr>
+NewMap -no <leader><leader><leader><F2> :call GitSetRemote()<cr>
+
+NewMap -no <F3> :call SelectBranch(1)<cr>
+NewMap -no <S-F3> :call SelectBranch(-1)<cr>
+NewMap -no <leader><F3> :call GitRenameBranch()<cr>
+NewMap -no <leader><leader><F3> :call GitNewBranch()<cr>
+
+NewMap -no <F4> :call GitStashPush()<cr>
+NewMap -no <S-F4> :call GitStashPop()<cr>
+
 endif

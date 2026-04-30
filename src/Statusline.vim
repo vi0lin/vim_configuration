@@ -8,7 +8,7 @@ function! Statusline()
       exe 'hi! StatusLineNC guibg=#222222 guifg=#885588'
       exe 'hi! StatusLine guibg=#55ff88 guifg=#005500'
       " buffer
-      hi User1 guifg=#ffdad8  guibg=#880c0e ctermfg=88 ctermbg=236
+      hi User1 guifg=#ffdad8  guibg=#080c0e ctermfg=88 ctermbg=236
       hi User2 guifg=#000000  guibg=#f80c0C ctermfg=238 ctermbg=233
       hi User3 guifg=#292b00  guibg=#F4505C ctermfg=88 ctermbg=236
       " hi User3 guifg=#000000  guibg=#f80c0C
@@ -24,10 +24,10 @@ function! Statusline()
     " if !exists("b:NERDTree")
       set statusline=
 
-
       set statusline+=%#User0#%{GitName_Statusline()}
       "Spellanguage & Highlight on?
       " && b:NERDTree.isTabTree()
+      set statusline+=%#User0#%{GitRemote_Statusline()}
       set statusline+=%#User0#%{GitBranch_Statusline()}
       " COLOR 0
       set statusline+=%#User2#%{(mode())}

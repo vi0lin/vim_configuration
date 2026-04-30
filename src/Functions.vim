@@ -11,6 +11,90 @@ function! s:MatchesOneOfPatterns(pattern_string, term) abort
   return 0
 endfunction
 
+let s:debug=0
+function! Debug(...)
+  if a:000[0]!~'\d'
+    echo join(a:000, ' ')
+  else
+    " echo a:000[0] s:debug
+    if s:debug >= a:000[0]
+      echo join(a:000[1:], ' ')
+    endif
+  endif
+endfunction
+NewCommand command! -range -nargs=+ Debug call Debug(<f-args>)
+" Debug 1 "ABC"
+
+function! GitRenameRemote(...)
+  if len(a:000)>0
+    let newname = join(a:000)
+  else
+    let newname=input("Rename [".w:gitRemote."]: ")
+  endif
+  exec "!git remote rename "..w:gitRemote.." "..newname
+  " let w:gitRemote=newname
+  call UpdateGit()
+  " windo "call Statusline()"
+  call Statusline()
+endfunction
+NewCommand command! -range -nargs=* RenameRemote call GitRenameRemote(<f-args>)
+
+function! GitSetRemote(...)
+  if len(a:000)>0
+    let newurl = join(a:000)
+  else
+    let newurl=input("Set "..w:gitRemote.." [".w:gitRemoteUrl."]: ")
+  endif
+  exec "!git remote set-url "..w:gitRemote.." "..newurl
+  call UpdateGit()
+  call Statusline()
+endfunction
+NewCommand command! -range -nargs=* SetRemote call GitSetRemote(<f-args>)
+
+function! GitRenameBranch(...)
+  if len(a:000)>0
+    let newname = join(a:000)
+  else
+    let newname=input("Rename [".w:gitBranch."]: ")
+  endif
+  exec "!git branch -m "..w:gitBranch.." "..newname
+  let w:gitBranch=newname
+  " windo "call Statusline()"
+  call UpdateGit()
+  call Statusline()
+endfunction
+NewCommand command! -range -nargs=* RenameBranch call GitRenameBranch(<f-args>)
+
+function! GitNewRemote(...)
+  if len(a:000)>0
+    let newname = join(a:000)
+  else
+    let newname=input("New: ")
+  endif
+  exec "!git remote add "..newname
+  call UpdateGit()
+endfunction
+NewCommand command! -range -nargs=* NewRemote call GitNewRemote(<f-args>)
+
+function! GitNewBranch(...)
+  if len(a:000)>0
+    let newname = join(a:000)
+  else
+    let newname=input("New: ")
+  endif
+  exec "!git branch -m "..w:gitBranch.." "..newname
+  call UpdateGit()
+endfunction
+NewCommand command! -range -nargs=* NewBranch call GitNewBranch(<f-args>)
+
+function! DebugCommand(list, delimeter=" ")
+  let out=""
+  for x in a:list
+    let out=out..x..a:delimeter
+  endfor
+  echo out
+endfunction
+
 " Optimizing
 " 1. Store Matches (That Matches A Structure Element) Per Function, Create A
 " [ [ "NewMap", "-T"] ['test', 'test|t', 0] ]
@@ -40,21 +124,10 @@ let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
 function GetOpts2(args, structure)
   " echo s:lookup_matrix
-  let debug=0
   let functionName = FunctionName(5)
   let opts={'args':[]}
   let getopts={'args': a:args, 'structure': a:structure}
   " delimeter-arg='--'
-  function! Debug(...) closure
-    " echo a:000
-    if a:000[0]!~'\d'
-      echo join(a:000, ' ')
-    else
-      if a:000[0]>debug
-        echo join(a:000[1:], ' ')
-      endif
-    endif
-  endfunction
   command! -range -nargs=* Debug :call Debug(<f-args>)
   function! Check(arg, returnStructure=0) closure
     if StartsWithDash(a:arg)
@@ -180,10 +253,10 @@ function GetOpts2(args, structure)
   function! BuildOpts() closure
     return opts
   endfunction
-  Debug 1 s:lookup_matrix
+  " Debug 0 "TEST" s:lookup_matrix
   return BuildOpts()
 endfunction
-" call GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
+call GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
 
 function! GetOpts(args, structure)
   " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
@@ -1122,7 +1195,7 @@ fun! CloseOther()
   endfor
 endf
 map <F12> :call CloseOther()<cr>
-map <leader>p :GithubPush<cr>
+map <leader>p :DecidePush<cr>
 
 function! Help()
   " if getbufvar(bufnr(), '&buftype') == 'terminal'
@@ -1669,7 +1742,22 @@ endfunction
 function! GitCheckoutPrevnextCWD()
 endfunction
 
-function! GitStash()
+function! GitSwitch(branch)
+  let x=systemlist("cd "..w:cwd.."; git switch "..a:branch)
+  for i in x
+    echo i
+  endfor
+  call DebugCommand(x)
+  call DebugCommand(w:gitBranchList)
+endfunction
+command! -range -nargs=1 Switch <line1>,<line2>:call GitSwitch(<q-args>)
+
+function! GitStashPush()
+  !git stash push
+endfunction
+
+function! GitStashPop()
+  !git stash pop
 endfunction
 
 function! GitStashCWD()
@@ -1686,7 +1774,16 @@ function! Push(commitmessage='')
   " call system("read")
   " call input("Procceed? [<CR> Yes] [<C-c> Cancel]")
   call GitCommit(a:commitmessage)
-  GithubPush
+  DecidePush
+endfunction
+
+command! -range -nargs=* DecidePush <line1>,<line2>:call DecidePush(<q-args>)
+function DecidePush(...)
+  if IsGithubPush()
+    GithubPush
+  else
+    GitPush
+  endif
 endfunction
 
 command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
@@ -1738,7 +1835,7 @@ function! PushRepo(commitmessage='')
   GitStatus
   GitAddRepo
   call GitCommit(a:commitmessage)
-  GithubPush
+  DecidePush
 endfunction
 
 function! Fetch_Last_Git_Message()
@@ -1786,7 +1883,7 @@ function! PushCWD(commitmessage='')
   GitAddCWD
   call GitCommit(a:commitmessage)
   GitStatus
-  GithubPush
+  DecidePush
 endfunction
 
 function! GetOptExample(...) abort
@@ -1826,6 +1923,10 @@ function! GetOptExample(...) abort
     endif
 endfunction
 
+function! GitMerge(branch)
+  exec '!clear && git merge '..a:branch..' --no-commit --no-ff'
+endfunction
+command! -range -nargs=* Merge <line1>,<line2>:call GitMerge(<f-args>)
 
 command! -range -nargs=0 GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
@@ -1917,7 +2018,7 @@ endfunction
 
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
-  !clear && git push origin master
+  echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
 endfunction
 
 command! -range -nargs=0 Status <line1>,<line2>:call GitStatus()
@@ -1973,9 +2074,11 @@ function! GithubPush()
   \ };
   \ git config '--global' core.autocrlf false;
   \ github_feed $github_user $github_email $github_pat;
-  \ git push origin main;
+  \ git push w:gitRemote w:gitBranch;
   \ github_unfeed;
   \ git config '--global' '--unset-all' core.autocrlf;
+
+  " \ git push origin main;
 endfunction
 
 function! GithubCreateProject(...)
@@ -2480,10 +2583,84 @@ endfunction
 " Git Integration
 
 function! GetBranch()
-  if exists("w:gitBranch") && strlen(w:gitBranch)<20
+  if exists("w:gitBranch")
     return w:gitBranch
   endif
-  return "-"
+  return -1
+endfunction
+
+function! GitGetAllRemote()
+  " let x = systemlist('git remote -v')
+  let x=systemlist("git remote -v|awk '{print $1}'")
+  let z=[]
+  for y in x
+    if index(z,y)==-1
+      call add(z,y)
+    endif
+  endfor
+  " for y in z
+  "   echo y
+  " endfor
+  return z
+endfunction
+
+function! GitInfo()
+  echo w:git
+  echo "\n"
+  " echo w:gitRemoteList
+  echo "Remotes:"
+  for x in systemlist('git remote -v')
+    echo x
+  endfor
+  " echo w:gitBranchList
+  echo "\n"
+  echo "Branches:"
+  for x in systemlist('git branch --list')
+    echo x
+  endfor
+  echo "\n"
+  echo "Modified Files:"
+  call DebugCommand(systemlist('git diff --name-only'))
+  echo "\n"
+  echo "Git Log:"
+  call DebugCommand(systemlist("git log --oneline | head -n 4"), "\n")
+endfunction
+
+function! SelectBranch(int)
+  " echo w:gitBranch_index
+  " var 1
+  " let w:gitBranch=w:gitBranchList[w:gitBranch_index]
+  " var 2
+  "
+  let target=w:gitBranchList[Mod(w:gitBranch_index+a:int, len(w:gitBranchList))]
+  call GitSwitch(target)
+  let w:gitBranch=FindBranch(w:cwd)
+  "endvar
+  call Statusline()
+  call DebugCommand(w:gitBranchList)
+endfunction
+
+function! SelectRemote(int)
+  let w:gitRemote_index=Mod(w:gitRemote_index+a:int, len(w:gitRemoteList))
+  if len(w:gitRemoteList)>0
+    let w:gitRemote=w:gitRemoteList[w:gitRemote_index]
+  endif
+  " windo "call Statusline()"
+  call Statusline()
+  call DebugCommand(w:gitRemoteList)
+endfunction
+
+function IsGithubPush()
+  let list=systemlist('git remote -v')
+  let list=filter(list, 'v:val=~"^'..w:gitRemote..'.*github.com.*(push)"')
+  return len(list)>0
+endfunction
+
+function! GetRemote()
+  if exists("w:gitRemote")
+    return w:gitRemote
+  endif
+  return -1
 endfunction
 
 " Project Manager
@@ -3444,12 +3621,17 @@ function! GitBranch()
   return b[-1]
 endfunction
 
+function! GitRemote()
+  let b=split(w:gitRemote, "/")
+  return b[-1]
+endfunction
+
 function! GitName_Statusline()
   if exists('w:git')
     if w:git==-1
       return ''
     endif
-    return '  '..GitName()
+    return ' '..GitName()
   else
     return ''
   endif
@@ -3466,10 +3648,28 @@ function! GitBranch_Statusline()
   endif
 endfunction
 
+function! GitRemote_Statusline()
+  if exists('w:gitRemote')
+    if w:gitRemote==-1
+      return ''
+    endif
+    return '  '..GitRemote()
+  else
+    return ''
+  endif
+endfunction
+
 function! SetProject(dir)
   echo "TODO Async Backgrounded Job"
   return
   call system("curl http://localhost:8000/SetProject?project="..a:dir)
+endfunction
+
+function AllBranches(path)
+  " let x = systemlist('cd '..a:path..'; git branch')
+  let x=systemlist("cd "..a:path.."; git branch --list | awk {'print $2? $2 : $1'}")
+  let w:gitBranchList = x
+  return w:gitBranchList
 endfunction
 
 function FindBranch(path)
@@ -3477,6 +3677,33 @@ function FindBranch(path)
   let w:gitBranch = x[0]
   " echo w:gitBranch
   return w:gitBranch
+endfunction
+
+function FindRemote(path)
+  if !exists("w:gitRemote_index")
+    let w:gitRemote_index=0
+  endif
+  let x=GitGetAllRemote()
+  if len(x)>0
+    let w:gitRemote = x[w:gitRemote_index]
+    " echo w:gitRemote
+  endif
+  return w:gitRemote
+endfunction
+
+function FindRemoteUrl(path)
+  " if !exists('w:gitRemoteUrl')
+  "   let w:gitRemoteUrl=""
+  " endif
+  " let list=systemlist("cd "..a:path.."; git remote -v")
+  " let list=filter(list, 'v:val=~"^'..w:gitRemote..'.*(push)"')
+  let list=systemlist("cd "..a:path.."; git remote -v | grep \"^"..w:gitRemote.."\" | awk '{print $2}'" )
+  " let list=filter(list, 'v:val=~"^'..w:gitRemote..'.(fetch)"')
+  if len(list)>0
+    let w:gitRemoteUrl = list[0]
+  endif
+  " echo w:gitRemote
+  return w:gitRemoteUrl
 endfunction
 
 function! FindGit(path)
@@ -3512,6 +3739,12 @@ endfunction
 function! GitToggleBranch()
   let x=systemlist("git branch --list | awk {'print $2? $2 : $1'}")
   return x
+endfunction
+
+function! GitToggleRemote()
+  " let x=systemlist("git branch --list | awk {'print $2? $2 : $1'}")
+  " return x
+  return []
 endfunction
 
 function! GETCWD()
@@ -3556,11 +3789,21 @@ function! CD(path)
     " execute "cd ".GetParentDir(a:path)
   endif
   let w:cwd=getcwd()
-  let w:git=FindGit(w:cwd)
-  let w:gitBranch=FindBranch(w:cwd)
+  " Optimize (One Thread, gather All Information In Vim)
+  call UpdateGit()
   if w:git!=-1
   endif
   " echo "Not A Directory"
+endfunction
+
+function! UpdateGit()
+  let w:git=FindGit(w:cwd)
+  let w:gitBranch=FindBranch(w:cwd)
+  let w:gitBranchList=AllBranches(w:cwd)
+  let w:gitBranch_index=index(w:gitBranchList,w:gitBranch)
+  let w:gitRemote=FindRemote(w:cwd)
+  let w:gitRemoteUrl=FindRemoteUrl(w:cwd)
+  let w:gitRemoteList=GitGetAllRemote()
 endfunction
 
 function! SetPointer(path='')
@@ -6261,6 +6504,8 @@ function SmartWincmd(direction)
     " endif
 " echo traceroute
 endfunction
+
+call Statusline()
 
 endif
 
