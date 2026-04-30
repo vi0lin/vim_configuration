@@ -1927,6 +1927,11 @@ function! GitMerge(branch)
 endfunction
 command! -range -nargs=* Merge <line1>,<line2>:call GitMerge(<f-args>)
 
+command! -range -nargs=0 GitUnshallow <line1>,<line2>:call GitUnshallow()
+function! GitUnshallow()
+  !clear && git fetch --unshallow github
+endfunction
+
 command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
