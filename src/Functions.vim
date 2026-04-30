@@ -2018,7 +2018,7 @@ endfunction
 
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
-  echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
+  exec "!clear && git push "..w:gitRemote.." "..w:gitBranch
 endfunction
 
 command! -range -nargs=0 Status <line1>,<line2>:call GitStatus()
@@ -2079,8 +2079,6 @@ function! GithubPush()
   \ git push $gitRemote $gitBranch;
   \ github_unfeed;
   \ git config '--global' '--unset-all' core.autocrlf;
-
-  " \ git push origin main;
 endfunction
 
 function! GithubCreateProject(...)
