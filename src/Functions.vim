@@ -3674,14 +3674,14 @@ function AllBranches(path)
   return w:gitBranchList
 endfunction
 
-function FindBranch(path)
+function! FindBranch(path)
   let x = systemlist('cd '..a:path..'; git branch --show-current')
   let w:gitBranch = x[0]
   " echo w:gitBranch
   return w:gitBranch
 endfunction
 
-function FindRemote(path)
+function! FindRemote(path)
   if !exists("w:gitRemote_index")
     let w:gitRemote_index=0
   endif
@@ -3693,7 +3693,7 @@ function FindRemote(path)
   return w:gitRemote
 endfunction
 
-function FindRemoteUrl(path)
+function! FindRemoteUrl(path)
   " if !exists('w:gitRemoteUrl')
   "   let w:gitRemoteUrl=""
   " endif
@@ -6342,7 +6342,7 @@ function! s:ShowPopup() abort
     let s:timer_id = timer_start(2500, function('s:ClosePopup'))
 endfunction
 " Zum nächsten Buffer springen
-function! s:NextBuffer() abort
+function! NextBuffer() abort
     call s:RefreshFileList()
     if empty(s:file_list) | return | endif
     let current = expand('%:p')
@@ -6367,7 +6367,7 @@ function! s:NextBuffer() abort
     call s:ShowPopup()
 endfunction
 " Zum vorherigen Buffer springen
-function! s:PrevBuffer() abort
+function! PrevBuffer() abort
     call s:RefreshFileList()
     if empty(s:file_list) | return | endif
     let current = expand('%:p')
