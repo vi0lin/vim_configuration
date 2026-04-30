@@ -28,6 +28,7 @@ function! Statusline()
       set statusline+=%#User0#%{GitName_Statusline()}
       "Spellanguage & Highlight on?
       " && b:NERDTree.isTabTree()
+      set statusline+=%#User0#%{GitBranch_Statusline()}
       " COLOR 0
       set statusline+=%#User2#%{(mode())}
       " WorkdirRegister
@@ -212,5 +213,6 @@ function! Statusline()
   "   let b:statusline_initialized=1
   " endif
 endfunction
+call Statusline()
 
 endif

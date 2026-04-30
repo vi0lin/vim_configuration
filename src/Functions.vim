@@ -21,22 +21,60 @@ endfunction
 " 0.05 - 0.5
 " 2. Work Trough Specs More Precisely Instead Of Occasionally Decisiontaking
 
-let s:lookup_matrix=[]
+let s:newmap_optschema = [
+  \ [ 'all', 'A|a|all|All', 0],
+  \ [ 'map', 'M|m|map|Map', 0],
+  \ [ 'normal', 'N|n|normal|Normal', 0],
+  \ [ 'visual', 'V|v|visual|Visual', 0],
+  \ [ 'x', 'X|x', 0],
+  \ [ 's', 'S|s', 0],
+  \ [ 'command', 'C|c|command|command', 0],
+  \ [ 'terminal', 'T|t|terminal|Terminal', 0],
+  \ [ 'o', 'O|o', 0],
+  \ [ 'insert', 'I|i', 0],
+  \ [ 'l', 'L|l', 0],
+  \ [ 'silent', 'Silent|silent', 0],
+  \ [ 'noremap', 'No|no|noremap|Noremap', 0],
+  \ ]
+let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
 function GetOpts2(args, structure)
+  " echo s:lookup_matrix
+  let debug=0
   let functionName = FunctionName(5)
   let opts={'args':[]}
   let getopts={'args': a:args, 'structure': a:structure}
   " delimeter-arg='--'
-  function ComputeArg(arg, returnStructure=0)
-    if StartsWithDash(a:arg)
-      if IsInLookup(a:arg)
-        return !returnStructure && 1 || MatchesFromLookup(a:arg)
-      elseif IsInStructure(a:arg)
-        return !returnStructure && 1 || MatchesFromStructure(a:arg)
-      else
-        return returnStructure && 0 || []
+  function! Debug(...) closure
+    " echo a:000
+    if a:000[0]!~'\d'
+      echo join(a:000, ' ')
+    else
+      if a:000[0]>debug
+        echo join(a:000[1:], ' ')
       endif
+    endif
+  endfunction
+  command! -range -nargs=* Debug :call Debug(<f-args>)
+  function! Check(arg, returnStructure=0) closure
+    if StartsWithDash(a:arg)
+      Debug 1 Starts With Dash
+      if IsInLookup(a:arg)
+        Debug 1 Is In Lookup
+        return !a:returnStructure && 1 || MatchesFromLookup(a:arg)
+      elseif IsInStructure(a:arg)
+        Debug 1 Is In Structure
+        return !a:returnStructure && 1 || MatchesFromStructure(a:arg)
+      else
+        return 0
+        " if !a:returnStructure && 0
+        "   return 0
+        "   else
+        "     return []
+        " endif
+      endif
+    else
+      return 0
     endif
   endfunction
   function! StartsWithDash(arg)
@@ -46,25 +84,25 @@ function GetOpts2(args, structure)
       return 0
     endif
   endfunction
-  function CheckArg(arg)
-    return StatsWithDash(a:arg) && ( IsInLookup(a:arg) || IsInStructure(a:arg) )
-  endfunction
-  function MatchesFromStructure(arg, feed_lookup=1) closure
+  " function CheckArg(arg)
+  "   return StatsWithDash(a:arg) && ( IsInLookup(a:arg) || IsInStructure(a:arg) )
+  " endfunction
+  function! MatchesFromStructure(arg, feed_lookup=1) closure
     let matches=[]
-    for k in structure
+    for k in getopts.structure
       let match=(a:arg=~ '\v^('..k[1]..')$')
       if match
         call add(matches, k)
       endif
     endfor
     if a:feed_lookup
-      let s:lookup_matrix[functionname][a:arg]=matches
+      let s:lookup_matrix[functionName][a:arg]=matches
     endif
     return matches
   endfunction
-  function IsInStructure(arg) closure
+  function! IsInStructure(arg) closure
     let matches=[]
-    for k in structure
+    for k in getopts.structure
       let match=(a:arg=~ '\v^('..k[1]..')$')
       if match
         return 1
@@ -72,63 +110,80 @@ function GetOpts2(args, structure)
     endfor
     return 0
   endfunction
-  function IsInLookup(arg) closure
-    if len(s:lookup_matrix[functionname][a:arg])>0
-      return 1
-    else
-      return 0
+  function! IsInLookup(arg) closure
+    if has_key(s:lookup_matrix, functionName)
+      if has_key(s:lookup_matrix[functionName], a:arg)
+        return 1
+      else
+        return 0
+      endif
     endif
   endfunction
-  function MatchesFromLookup(arg)
-    return s:lookup_matrix[functionname][a:arg]
+  function! MatchesFromLookup(arg) closure
+    return s:lookup_matrix[functionName][a:arg]
   endfunction
-  let argtypes=[]        " [1,0,0,1,0,0,0,0,1,0,0] oder [0,0,1,0,0,1,0,0,0,0,1,0,0]
-  let delimeter_index=-1 " -1
-  let default_index=-1   "  9                            0                              oder [0, 6]
-  let mainargcount=[]    " [1, 4, 0]                    [0]
+  " argtypes         [1,0,0,1,0,0,0,0,1,0,0] oder [0,0,1,0,0,1,0,0,0,0,1,0,0]
+  " delimeter_index  -1
+  " default_index     9                            0                            oder [0, 6]
+  " mainargcount     [1, 4, 0]                    [0]
+  let specs={
+        \ 'argtypes': [],
+        \ 'delimeter_index': -1,
+        \ 'default_index': -1,
+        \ 'mainargcount': []
+        \}
   function! Specification() closure
     " args - args_string
+    " echo functionName
     let arg_idx = 0
     let mainarg=0
     for arg_idx in range(0,len(getopts.args)-1)
-      let isMain=ComputeArg(args[arg_idx])
-      if args[arg_idx]=="--"
-        if delimeter_index==-1
-          let delimeter_index=arg_idx
-          if len(args) > arg_idx+1
-            let default_index=arg_idx+1
-          endif
-        else
-          let delimeter_index=[delimeter_index]
-          call add(delimeter_index, [arg_idx])
-          if len(args) > arg_idx+1
-            let default_index=[default_index]
-            call add(default_index, [arg_idx+1])
-          endif
-        endif
-      endif
-      call add(argtypes,isMain)
-      " todo if cardinality extended || default argument
-      if isMain
-        if len(mainargcount) > 0
-          let mainarg+=1
-        endif
-        call add(mainargcount,0)
-      else
-        if len(mainargcount)==0
-          call add(mainargcount,0)
-        endif
-        let mainargcount[mainarg]+=1
-      endif
+      let check=Check(getopts.args[arg_idx])
+      Debug 4 "-------------------------------------------"
+      Debug 4 "getopts.args[arg_idx]" getopts.args[arg_idx]
+      Debug 4 "check" check
+      Debug 4 "arg_idx" arg_idx
+      " if getopts.args[arg_idx]=="--"
+      "   if delimeter_index==-1
+      "     " func int or []
+      "     let delimeter_index=arg_idx
+      "     if len(args) > arg_idx+1
+      "       let default_index=arg_idx+1
+      "     endif
+      "   else
+      "     " func int or []
+      "     let delimeter_index=[delimeter_index]
+      "     call add(delimeter_index, [arg_idx])
+      "     if len(args) > arg_idx+1
+      "       let default_index=[default_index]
+      "       call add(default_index, [arg_idx+1])
+      "     endif
+      "   endif
+      " endif
+      " call add(argtypes,isMain)
+      " " todo if cardinality extended || default argument
+      " if isMain
+      "   if len(mainargcount) > 0
+      "     let mainarg+=1
+      "   endif
+      "   call add(mainargcount,0)
+      " else
+      "   if len(mainargcount)==0
+      "     call add(mainargcount,0)
+      "   endif
+      "   let mainargcount[mainarg]+=1
+      " endif
+      return specs
     endfor
   endfunction
-  call Specification()
-  function BuildOpts() closure
+  " echo Specification()
+  function! BuildOpts() closure
     return opts
   endfunction
+  Debug 1 s:lookup_matrix
   return BuildOpts()
 endfunction
-" echo GetOpts2(['-v','-c', 'NewMap', '-t','test', 'abc'], s:newmap_optschema)
+" call GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
 
 function! GetOpts(args, structure)
   " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
@@ -2425,8 +2480,8 @@ endfunction
 " Git Integration
 
 function! GetBranch()
-  if exists("b:branch") && strlen(b:branch)<20
-    return b:branch
+  if exists("w:gitBranch") && strlen(w:gitBranch)<20
+    return w:gitBranch
   endif
   return "-"
 endfunction
@@ -3384,12 +3439,28 @@ function! GitName()
   return b[-1]
 endfunction
 
+function! GitBranch()
+  let b=split(w:gitBranch, "/")
+  return b[-1]
+endfunction
+
 function! GitName_Statusline()
   if exists('w:git')
     if w:git==-1
       return ''
     endif
-    return '  '..GitName()..' '
+    return '  '..GitName()
+  else
+    return ''
+  endif
+endfunction
+
+function! GitBranch_Statusline()
+  if exists('w:gitBranch')
+    if w:gitBranch==-1
+      return ''
+    endif
+    return '  '..GitBranch()..' '
   else
     return ''
   endif
@@ -3399,6 +3470,13 @@ function! SetProject(dir)
   echo "TODO Async Backgrounded Job"
   return
   call system("curl http://localhost:8000/SetProject?project="..a:dir)
+endfunction
+
+function FindBranch(path)
+  let x = systemlist('cd '..a:path..'; git branch --show-current')
+  let w:gitBranch = x[0]
+  " echo w:gitBranch
+  return w:gitBranch
 endfunction
 
 function! FindGit(path)
@@ -3429,6 +3507,11 @@ function! CWD_Statusline()
   else
     return w:cwd
   endif
+endfunction
+
+function! GitToggleBranch()
+  let x=systemlist("git branch --list | awk {'print $2? $2 : $1'}")
+  return x
 endfunction
 
 function! GETCWD()
@@ -3474,6 +3557,9 @@ function! CD(path)
   endif
   let w:cwd=getcwd()
   let w:git=FindGit(w:cwd)
+  let w:gitBranch=FindBranch(w:cwd)
+  if w:git!=-1
+  endif
   " echo "Not A Directory"
 endfunction
 
@@ -4943,7 +5029,7 @@ function! BufferSetup()
     endif
     let b:isGitRepo=system("echo -n `git rev-parse --is-inside-work-tree 2>/dev/null || echo -n false`")
     " let b:lastMasterBranch=system("if $isGitRepo; then echo -n `git log master --oneline | head -n 0 | awk '{print $1}'`; else echo -n '...'; fi")
-    " let b:branch=system("if $isGitRepo; then echo -n `git rev-parse --abbrev-ref HEAD`; else echo -n 'not a git repo'; fi")
+    " let w:gitBranch=system("if $isGitRepo; then echo -n `git rev-parse --abbrev-ref HEAD`; else echo -n 'not a git repo'; fi")
     " let b:commitstatus=system("echo -n 'got commited (to be done)'")
     " let b:datetime=system("echo -n `date`")
   endif

@@ -51,7 +51,7 @@ function NewMapKeyCheckAll(...)
 endfunction
 
 function FunctionName(...)
-  let opts=GetOpts2(a:000, [])
+  let opts=GetOpts(a:000, [])
   " echo opts
   if opts.args==0
     " echo substitute(expand('<sfile>'), '.*\.\.|\s', '', '')
@@ -81,15 +81,10 @@ endfunction
 command! -range -nargs=* FunctionName call FunctionName(<f-args>)
 " NewMap -n -no <f1> :FunctionName 3<CR>:FunctionName 1<cr>
 
-function SelectFunctionBlock(...)
-  call search(FunctionName(3), 'bcW')
-endfunction
-command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
-NewMap -no <F1> :call <SID>SelectFunctionBlock()<CR>
-
 let s:newmaps=[]
 function! NewMap(...)
   let functionName = FunctionName(5)
+  " echo functionName
   " echo a:000
   " :call F.Map.new(name, map)
   " try
@@ -1100,6 +1095,8 @@ NewMap -no ,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
 NewMap -no ,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
 NewMap -no ,,,,f :C test abc def geh "OKAY DU?"<cr>
 
+
+" NewMap reduces spaces in commands - opts.args_string
 NewMap -map ,vg :copen<cr>:vimgrep  **/*[D[D[D[D[D
 NewMap -map ,vo :copen<cr>
 
@@ -1120,5 +1117,11 @@ NewMap -no <S-Tab> :call <SID>PrevBuffer()<CR>
 
 " map <F2> :echo t:buffers<cr>
 " map <F3> :echo FullPaths(t:buffers)<cr>
+
+function SelectFunctionBlock(...)
+  call search(FunctionName(3), 'bcW')
+endfunction
+command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
+NewMap -no <F1> :call SelectFunctionBlock()<CR>
 
 endif
