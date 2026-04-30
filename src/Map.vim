@@ -217,6 +217,7 @@ endfunction
 command! -range -nargs=+ NewMap call NewMap(<f-args>)
 command! -range -nargs=+ NewMapKeycheck call NewMapKeycheck(<q-args>)
 
+NewCommand command! -range -nargs=+ Debug call Debug(<f-args>)
 " set <F8>=ük8
 " NewMap -map ük8 :echo "KEYMAPPING"<cr>
 " NewMap -map <F8> :echo "KEYMAPPING"<cr>
