@@ -2055,6 +2055,8 @@ function! GithubPush()
   let $github_user=g:github_user
   let $github_email=g:github_email
   let $github_pat=g:github_pat
+  let $gitRemote=w:gitRemote
+  let $gitBranch=w:gitBranch
   !github_feed() {
   \ username=$1;
   \ email=$2;
@@ -2074,7 +2076,7 @@ function! GithubPush()
   \ };
   \ git config '--global' core.autocrlf false;
   \ github_feed $github_user $github_email $github_pat;
-  \ git push w:gitRemote w:gitBranch;
+  \ git push $gitRemote $gitBranch;
   \ github_unfeed;
   \ git config '--global' '--unset-all' core.autocrlf;
 
