@@ -1879,10 +1879,10 @@ endfunction
 
 command! -range -nargs=* PushCWD <line1>,<line2>:call PushCWD(<q-args>)
 function! PushCWD(commitmessage='')
-  GitStatus
+  " GitStatus
   GitAddCWD
   call GitCommit(a:commitmessage)
-  GitStatus
+  " GitStatus
   DecidePush
 endfunction
 
@@ -1928,10 +1928,10 @@ function! GitMerge(branch)
 endfunction
 command! -range -nargs=* Merge <line1>,<line2>:call GitMerge(<f-args>)
 
-command! -range -nargs=0 GitDiff <line1>,<line2>:call GitDiff(<f-args>)
+command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
-  GitStatus
+  " GitStatus
   let cmd = #{text: '--text', pager: '', cached: '', file: '%'}
   let i = 0
   while i < len(a:000)
@@ -1956,7 +1956,9 @@ function! GitDiff(...)
   let x = [ cmd.text, cmd.pager, cmd.cached, cmd.file ]
   let cleaned=filter(x, 'v:val != "^\\s*$"')
   " exec "!clear && git diff "..join(cleaned, ' ')
-  exec "!clear && git diff "..join(cleaned, ' ')
+  " exec "!clear && git diff "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
+  exec "!clear && git diff "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
+  " exec "!clear && git diff "..w:gitBranch.." "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
   " let x =<< eval trim EOF
   " !clear && git diff {cmd.text} {cmd.pager} {cmd.cached} {cmd.file}
   " EOF
@@ -2018,6 +2020,7 @@ endfunction
 
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
+  echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
   exec "!clear && git push "..w:gitRemote.." "..w:gitBranch
 endfunction
 
