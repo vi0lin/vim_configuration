@@ -1749,7 +1749,7 @@ function! GitCheckoutPrevnextCWD()
 endfunction
 
 function! GitSwitch(branch)
-  let x=systemlist("cd "..w:cwd.."; git switch "..a:branch)
+  let x=systemlist("cd "..CWD().."; git switch "..a:branch)
   for i in x
     echo i
   endfor
@@ -2759,11 +2759,12 @@ function! SelectBranch(int)
   " var 1
   " let w:gitBranch=w:gitBranchList[w:gitBranch_index]
   " var 2
+  let cwd=CWD()
   call UpdateGit()
   let target=w:gitBranchList[Mod(w:gitBranch_index+a:int, len(w:gitBranchList))]
   call GitSwitch(target)
   call UpdateGit()
-  let w:gitBranch=FindBranch(w:cwd)
+  let w:gitBranch=FindBranch(cwd)
   "endvar
   call Statusline()
   " call DebugCommand(w:gitBranchList)
@@ -3803,8 +3804,10 @@ endfunction
 
 function! FindBranch(path)
   let x = systemlist('cd '..a:path..'; git branch --show-current')
-  if len(x)>0
+  if len(x)>0 && exists('w:git') && w:git!=-1
     let w:gitBranch = x[0]
+  else
+    let w:gitBranch = -1
   endif
   " echo w:gitBranch
   return w:gitBranch
@@ -3815,10 +3818,12 @@ function! FindRemote(path)
     let w:gitRemote_index=0
   endif
   let x=GitGetAllRemote()
-  if len(x)>0
+  if len(x)>0 && exists('w:git') && w:git!=-1
     let w:gitRemote = x[w:gitRemote_index]
-    " echo w:gitRemote
+  else
+    let w:gitRemote = -1
   endif
+    " echo w:gitRemote
   return w:gitRemote
 endfunction
 
@@ -3860,10 +3865,12 @@ function! FindGit(path)
 endfunction
 
 function! CWD_Statusline()
-  if w:cwd=='/'
+  if CWD()=='/'
     return '/'
-  else
+  elseif exists('w:cwd')
     return w:cwd
+  else
+    return ''
   endif
 endfunction
 
@@ -3893,7 +3900,11 @@ function! CWD()
     " redir=>w:cwd | pwd | redir END
     " let w:cwd=substitute(w:cwd, '\n', "", 'g')
   endif
-  return w:cwd
+  if exists('w:cwd')
+    return w:cwd
+  else
+    return ''
+  endif
 endfunction
 
 function! WFilePrev()
@@ -3928,12 +3939,13 @@ function! CD(path)
 endfunction
 
 function! UpdateGit()
-  let w:git=FindGit(w:cwd)
-  let w:gitBranch=FindBranch(w:cwd)
-  let w:gitBranchList=AllBranches(w:cwd)
+  let cwd=CWD()
+  let w:git=FindGit(cwd)
+  let w:gitBranch=FindBranch(cwd)
+  let w:gitBranchList=AllBranches(cwd)
   let w:gitBranch_index=index(w:gitBranchList,w:gitBranch)
-  let w:gitRemote=FindRemote(w:cwd)
-  let w:gitRemoteUrl=FindRemoteUrl(w:cwd)
+  let w:gitRemote=FindRemote(cwd)
+  let w:gitRemoteUrl=FindRemoteUrl(cwd)
   let w:gitRemoteList=GitGetAllRemote()
 endfunction
 

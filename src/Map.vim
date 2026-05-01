@@ -615,6 +615,8 @@ NewMap -map <leader>b :call Bash(VS())<cr>
 " map <leader>p :call PYTHON(VS())<cr>
 " map <leader>r :call RUST(VS())<cr>
 
+NewMap -map <leader>b :Buffers<cr>
+
 NewMap -map <localleader>iv :call VIM(input("vimscript: "), 'exec_input_vs')<cr>
 NewMap -map <localleader>ib :call BASH(input("bash: "), 'exec_input_vs')<cr>
 NewMap -map <localleader>ip :call PYTHON(input("python: "), 'exec_input_vs')<cr>
