@@ -1846,12 +1846,12 @@ command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(commitmessage='')
   " Todo GetOpts2
   " GitStatus
-  StashPushAutoStash
+  GitStashPushAutoStash
   let out=systemlist("git pull "..w:gitRemote.." "..w:gitBranch.." --rebase")
   for o in out
     echo o
   endfor
-  StashPopAutoStash
+  GitStashPopAutoStash
 endfunction
 
 command! -range -nargs=? Stash <line1>,<line2>:call Stash(<q-args>)
