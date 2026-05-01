@@ -1836,11 +1836,28 @@ endfunction
 command! -range -nargs=* DecidePush <line1>,<line2>:call DecidePush(<q-args>)
 function DecidePush(...)
   if IsGithubPush()
-    GithubPush
+    call Github('push '..w:gitRemote..' '..w:gitBranch)
   else
     GitPush
   endif
 endfunction
+
+function GitDeleteBranchOnRemote(...)
+  " GetOpts2
+  " --current (default)
+  " :GitDeleteBranchOnRemoteOnRemote list
+  " :GitDeleteBranchOnRemoteOnRemote --current
+  call Github('push '..w:gitRemote..' --delete '..w:gitBranch)
+endfunction
+command! -range -nargs=* GitDeleteBranchOnRemote <line1>,<line2>:call GitDeleteBranchOnRemote(<q-args>)
+
+function GitDeleteLastUnpushedCommit(...)
+  let x = systemlist('git reset --soft HEAD~1')
+  for y in x
+    echo y
+  endfor
+endfunction
+command! -range -nargs=* GitDeleteLastUnpushedCommit <line1>,<line2>:call GitDeleteLastUnpushedCommit(<q-args>)
 
 command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(commitmessage='')
@@ -2159,14 +2176,17 @@ if !exists('g:github_user') | let g:github_user='your_username' | endif
 if !exists('g:github_email') | let g:github_email='your_email' | endif
 if !exists('g:github_pat') | let g:github_pat='{pat_TOKEN}' | endif
 if !exists('g:github_ghp') | let g:github_ghp='{ghp_TOKEN}' | endif
-command! -range -nargs=0 GithubPush <line1>,<line2>:call GithubPush()
-function! GithubPush()
+function! Github(...)
+  let args=join(a:000, ' ')
+  echo args
+  return
   Pull
   let $github_user=g:github_user
   let $github_email=g:github_email
   let $github_pat=g:github_pat
   let $gitRemote=w:gitRemote
   let $gitBranch=w:gitBranch
+  let $args=args
   !github_feed() {
   \ username=$1;
   \ email=$2;
@@ -2186,10 +2206,11 @@ function! GithubPush()
   \ };
   \ git config '--global' core.autocrlf false;
   \ github_feed $github_user $github_email $github_pat;
-  \ git push $gitRemote $gitBranch;
+  \ git push $args;
   \ github_unfeed;
   \ git config '--global' '--unset-all' core.autocrlf;
 endfunction
+command! -range -nargs=* Github <line1>,<line2>:call Github(<q-args>)
 
 function! GithubCreateProject(...)
   let $name=a:000[0]
