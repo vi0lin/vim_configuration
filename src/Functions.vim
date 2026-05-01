@@ -1769,10 +1769,12 @@ function! GitStashPopAutoStash()
   " Check If git stash list Contains UUID
   " Remove UUID after POP
   let stashes=systemlist('git stash list')
-  for stash in filter(stashes,'v:val=~"'..g:lastStash..'"')
+  " for stash in filter(stashes,'v:val=~"'..g:lastStash..'"')
+  for stash in filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
     let name=substitute(stash,':.*',"","")
     let x = systemlist("git stash pop "..name)
-    echo "compute " stash
+    " let x = []
+    " echo "compute " stash
     for line in x
       echo line
     endfor
