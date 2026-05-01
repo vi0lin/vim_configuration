@@ -1770,18 +1770,21 @@ function! GitStashPopAutoStash(...)
   " Remove UUID after POP
   let stashes=systemlist('git stash list')
   " for stash in filter(stashes,'v:val=~"'..g:lastStash..'"')
+  echo stashes
+  echo filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
   for stash in filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
     let name=substitute(stash,':.*',"","")
-    echo "git stash pop "..name
-    let x = systemlist("git stash pop "..name)
-    " let x = []
-    " echo "compute " stash
-    for line in x
-      echo line
-    endfor
-    if exists("g:lastStash")
-      unlet g:lastStash
-    endif
+    echo name
+    " " echo "git stash pop "..name
+    " let x = systemlist("git stash pop "..name)
+    " " let x = []
+    " " echo "compute " stash
+    " for line in x
+    "   echo line
+    " endfor
+    " if exists("g:lastStash")
+    "   unlet g:lastStash
+    " endif
   endfor
 endfunction
 command! -range -nargs=0 GitStashPopAutoStash <line1>,<line2>:call GitStashPopAutoStash(<q-args>)
@@ -1790,16 +1793,19 @@ function GitStashPush()
   " Todo Add Message Argument
   !git stash push
 endfunction
+command! -range -nargs=0 GitStashPush <line1>,<line2>:call GitStashPush(<q-args>)
 
 function GitStashPop()
   " Todo Add Message Argument
   !git stash pop
 endfunction
+command! -range -nargs=0 GitStashPop <line1>,<line2>:call GitStashPop(<q-args>)
 
 function GitStashDrop()
   " Todo Add Message Argument
   !git stash drop
 endfunction
+command! -range -nargs=0 GitStashDrop <line1>,<line2>:call GitStashDrop(<q-args>)
 
 function! GitStashCWD()
 endfunction
@@ -5390,8 +5396,8 @@ endfunction
 
 function! NewUUID()
   let g:seed = srand()
-  let min=00000000000000000000
-  let nr=rand(g:seed) %  99999999999999999999  " to echo a random number between 0-99
+  let min=1000000000
+  let nr=Mod(rand(g:seed), 9999999999)  " to echo a random number between 0-99
   let out=min+nr
   return out
 endfunction
