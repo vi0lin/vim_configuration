@@ -1752,7 +1752,8 @@ command! -range -nargs=1 Switch <line1>,<line2>:call GitSwitch(<q-args>)
 if !exists("g:lastStash")
   let g:lastStash=""
 endif
-function! GitStashPush()
+function! GitStashPushAutoStash()
+  " GetOpt2 --auto
   let message="stash-"..NewUUID()
   let g:lastStash=message
   " Add Stash UUID Functionality
@@ -1760,18 +1761,36 @@ function! GitStashPush()
   let x = systemlist("git stash push -m "..message)
   call Debug(0, x)
 endfunction
+command! -range -nargs=0 StashPushAutoStash <line1>,<line2>:call StashPushAutoStash(<q-args>)
 
-function! GitStashPop()
+function! GitStashPopAutoStash()
+  " GetOpt2 --auto
   " Add Stash UUID Functionality
   " Check If git stash list Contains UUID
   " Remove UUID after POP
   let stashes=systemlist('git stash list')
-  if len(filter(stashes,'v:val=~"'..g:lastStash..'"'))>0
-    echo stashes
-    echo "gonna pop" . g:lastStash
-    unlet g:lastStash
-    " !git stash pop
-  endif
+  for stash in filter(stashes,'v:val=~"'..g:lastStash..'"')
+    let name=substitute(stash,':.*',"","")
+    let x = systemlist("git stash pop "..name)
+    echo "compute " stash
+    for line in x
+      echo line
+    endfor
+    if exists("g:lastStash")
+      unlet g:lastStash
+    endif
+  endfor
+endfunction
+command! -range -nargs=0 StashPopAutoStash <line1>,<line2>:call StashPopAutoStash(<q-args>)
+
+function GitStashPush()
+  " Todo Add Message Argument
+  !git stash push
+endfunction
+
+function GitStashPop()
+  " Todo Add Message Argument
+  !git stash pop
 endfunction
 
 function! GitStashCWD()
@@ -1802,10 +1821,10 @@ endfunction
 
 command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(commitmessage='')
-  GitStatus
-  StashPush
+  " GitStatus
+  StashPushAutoStash
   !git pull origin main --no-rebase
-  StashPop
+  StashPopAutoStash
 endfunction
 
 command! -range -nargs=? Stash <line1>,<line2>:call Stash(<q-args>)
@@ -1834,13 +1853,13 @@ endfunction
 
 command! -range -nargs=? StashPush <line1>,<line2>:call StashPush(<q-args>)
 function! StashPush(commitmessage='')
-  GitStatus
+  " GitStatus
   !git stash push
 endfunction
 
 command! -range -nargs=? StashPop <line1>,<line2>:call StashPop(<q-args>)
 function! StashPop(commitmessage='')
-  GitStatus
+  " GitStatus
   !git stash pop
 endfunction
 
