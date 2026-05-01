@@ -869,7 +869,9 @@ command! -range -nargs=+ Ut call Ut(<f-args>)
 
 
 " vnoremap <C-S-v> :<C-u><cr>
-NewMap -n -no <C-S-v> :norm "+p
+" Buggy
+" NewMap -n -no <C-S-v> :norm "+p
+" NewMap -n -no <C-V> :norm "+p
 " unmap <C-S-v>
 NewMap -i -no <C-S-v> <c-r>+
 " nnoremap <C-v> :norm "+p
@@ -1119,6 +1121,12 @@ NewMap -no <S-Tab> :call PrevBuffer()<CR>
 
 " map <F2> :echo t:buffers<cr>
 " map <F3> :echo FullPaths(t:buffers)<cr>
+
+function SelectFunctionBlock(...)
+  call search(FunctionName(3), 'bcW')
+endfunction
+command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
+NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<CR>
 
 function SelectFunctionBlock(...)
   call search(FunctionName(3), 'bcW')
