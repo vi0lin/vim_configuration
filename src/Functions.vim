@@ -2052,6 +2052,10 @@ function! Log()
   exec "!clear && git log"
 endfunction
 
+function GithubPullNoMerge()
+  !git pull github main --no-rebase
+endfunction
+
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
   " echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
