@@ -2652,10 +2652,11 @@ function! SelectBranch(int)
   call UpdateGit()
   let target=w:gitBranchList[Mod(w:gitBranch_index+a:int, len(w:gitBranchList))]
   call GitSwitch(target)
+  call UpdateGit()
   let w:gitBranch=FindBranch(w:cwd)
   "endvar
   call Statusline()
-  call DebugCommand(w:gitBranchList)
+  " call DebugCommand(w:gitBranchList)
 endfunction
 
 function! SelectRemote(int)
