@@ -1847,7 +1847,7 @@ function! Pull(commitmessage='')
   " Todo GetOpts2
   " GitStatus
   StashPushAutoStash
-  let out=systemlist("git pull origin main --no-rebase")
+  let out=systemlist("git pull "..w:gitRemote.." "..w:gitBranch.." --rebase")
   for o in out
     echo o
   endfor
