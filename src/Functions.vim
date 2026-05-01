@@ -1772,6 +1772,7 @@ function! GitStashPopAutoStash()
   " for stash in filter(stashes,'v:val=~"'..g:lastStash..'"')
   for stash in filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
     let name=substitute(stash,':.*',"","")
+    echo "git stash pop "..name
     let x = systemlist("git stash pop "..name)
     " let x = []
     " echo "compute " stash
@@ -1793,6 +1794,11 @@ endfunction
 function GitStashPop()
   " Todo Add Message Argument
   !git stash pop
+endfunction
+
+function GitStashDrop()
+  " Todo Add Message Argument
+  !git stash drop
 endfunction
 
 function! GitStashCWD()

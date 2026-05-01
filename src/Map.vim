@@ -1126,6 +1126,7 @@ NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<CR>
 
 NewMap -no <F1> :call GitInfo()<cr>
 NewMap -no <S-F1> :call GitInfo('--stash')<cr>
+NewMap -no <C-S-F1> :call GitStashDrop()<cr>
 NewMap -no <leader><leader><F1> :call GitCommitRepo()<cr>
 NewMap -no <leader><F1> :call GitCommitRepo(input("Commit Message: "))<cr>
 
