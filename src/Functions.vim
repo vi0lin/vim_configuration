@@ -1835,9 +1835,13 @@ endfunction
 
 command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(commitmessage='')
+  " Todo GetOpts2
   " GitStatus
   StashPushAutoStash
-  !git pull origin main --no-rebase
+  let out=systemlist("git pull origin main --no-rebase")
+  for o in out
+    echo o
+  endfor
   StashPopAutoStash
 endfunction
 
