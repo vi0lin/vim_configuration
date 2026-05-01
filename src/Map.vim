@@ -1082,7 +1082,8 @@ NewMap -map <C-S-Tab> :tabp<cr>
 
 NewMap -no <leader>qd :Diff --all<cr>
 NewMap -no <leader>qr :PushCWD  
-NewMap -no <leader>qv :Pull
+NewMap -no <leader>qv :Pull<cr>
+NewMap -no <leader>ql :Log<cr>
 NewMap -no <leader>qs :Status<CR>
 NewMap -no <leader>qu :StashPush<CR>
 NewMap -no <leader>qo :StashPop<CR>
