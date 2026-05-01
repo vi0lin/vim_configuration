@@ -1108,10 +1108,10 @@ NewMap -map [B :cnext<cr>
 " Keymaps
 " Dont NewMap this
 nnoremap <C-i> <C-i>
-NewMap -no <F1> :call NextBuffer()<CR>
-NewMap -no <S-F1> :call PrevBuffer()<CR>
-NewMap -t -no <F1> <C-\><C-o>:call NextBuffer()<CR>
-NewMap -t -no <S-F1> <C-\><C-o>:call PrevBuffer()<CR>
+" NewMap -no <F1> :call NextBuffer()<CR>
+" NewMap -no <S-F1> :call PrevBuffer()<CR>
+" NewMap -t -no <F1> <C-\><C-o>:call NextBuffer()<CR>
+" NewMap -t -no <S-F1> <C-\><C-o>:call PrevBuffer()<CR>
 NewMap -no <Tab> :call NextBuffer()<CR>
 NewMap -no <S-Tab> :call PrevBuffer()<CR>
 
@@ -1125,6 +1125,7 @@ command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
 NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<CR>
 
 NewMap -no <F1> :call GitInfo()<cr>
+NewMap -no <S-F1> :call GitInfo('--stash')<cr>
 NewMap -no <leader><leader><F1> :call GitCommitRepo()<cr>
 NewMap -no <leader><F1> :call GitCommitRepo(input("Commit Message: "))<cr>
 

@@ -1955,6 +1955,7 @@ endfunction
 command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
+  " Use GetOpt2
   " GitStatus
   let cmd = #{text: '--text', pager: '', cached: '', file: '%', post: '', repo: ''}
   let i = 0
@@ -2667,7 +2668,12 @@ function! GitGetAllRemote()
   return z
 endfunction
 
-function! GitInfo()
+function! GitInfo(...)
+  " Use GetOpts2
+  let stash=0
+  if len(a:000) > 0 && a:000[0]=="--stash"
+    let stash=1
+  endif
   echo w:git
   echo "\n"
   " echo w:gitRemoteList
@@ -2689,7 +2695,17 @@ function! GitInfo()
   call DebugCommand(systemlist("git log --oneline | head -n 4"), "\n")
   echo "\n"
   echo "Stashes:"
-  call DebugCommand(systemlist("git stash list"), "\n")
+  let stashes=systemlist("git stash list")
+  call DebugCommand(stashes, "\n")
+  if stash
+    for x in stashes
+      let s=substitute(x, ":.*$", "", "")
+      let diff=systemlist("git stash show -p "..s)
+      for x in diff
+        echo x
+      endfor
+    endfor
+  endif
 endfunction
 
 function! SelectBranch(int)
