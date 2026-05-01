@@ -27,6 +27,15 @@ endfunction
 function! SmartFold()
 endfunction
 
+function GitRebase()
+  !git pull --rebase
+  " check all conflicts
+  " git add src/Functions.vim
+  !git remote --continue
+  !git remote --skip
+  !git remote --abort
+endfunction
+
 function! GitRenameRemote(...)
   if len(a:000)>0
     let newname = join(a:000)
