@@ -1760,7 +1760,7 @@ function! GitStashPushAutoStash(...)
   " Add UUID
   let x = systemlist("git stash push -m "..message)
   e %
-  call Debug(0, x)
+  " call Debug(0, x)
 endfunction
 command! -range -nargs=0 GitStashPushAutoStash <line1>,<line2>:call GitStashPushAutoStash(<q-args>)
 
