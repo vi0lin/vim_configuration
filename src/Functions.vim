@@ -1775,14 +1775,12 @@ function! GitStashPopAutoStash(...)
   " echo filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
   for stash in filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
     let name=substitute(stash,':.*',"","")
-    " echo name
-    " " echo "git stash pop "..name
+    " echo "git stash pop "..name
     let x = systemlist("git stash pop "..name)
-    " let x = []
-    " echo "compute " stash
-    for line in x
-      echo line
-    endfor
+    """ Debug
+    """ for line in x
+    """   echo line
+    """ endfor
     if exists("g:lastStash")
       unlet g:lastStash
     endif
