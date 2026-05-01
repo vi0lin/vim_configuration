@@ -2049,7 +2049,8 @@ endfunction
 
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
-  exec "!clear && git push "..w:gitRemote.." "..w:gitBranch
+  echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
+  " exec "!clear && git push "..w:gitRemote.." "..w:gitBranch
 endfunction
 
 command! -range -nargs=0 Status <line1>,<line2>:call GitStatus()
