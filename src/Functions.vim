@@ -24,6 +24,9 @@ function! Debug(...)
 endfunction
 " Debug 1 "ABC"
 
+function! SmartFold()
+endfunction
+
 function! GitRenameRemote(...)
   if len(a:000)>0
     let newname = join(a:000)
@@ -1747,10 +1750,17 @@ endfunction
 command! -range -nargs=1 Switch <line1>,<line2>:call GitSwitch(<q-args>)
 
 function! GitStashPush()
-  !git stash push
+  let message="stash-"..NewUUID()
+  " Add Stash UUID Functionality
+  " Add UUID
+  let x = systemlist("git stash push -m "..message)
+  call Debug(0, x)
 endfunction
 
 function! GitStashPop()
+  " Add Stash UUID Functionality
+  " Check If git stash list Contains UUID
+  " Remove UUID after POP
   !git stash pop
 endfunction
 
@@ -6251,8 +6261,9 @@ function! KeyHandler(key)
     return ''
   endif
 endfunction
-nnoremap <expr> <leader>F KeyHandler(getchar())
 
+nnoremap <expr> <leader>F KeyHandler(getchar())
+nnoremap <leader>F :put=string(KeyToArray(getchar()))<cr>
 " ---- grep settings -------------------------------------------------
 " set grepprg=grep\ -nH\ --\ -r\ -w\ $*
 " set grepprg=grep -nrw -- $*
