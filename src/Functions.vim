@@ -2204,7 +2204,7 @@ function! Github(...)
   \ };
   \ git config '--global' core.autocrlf false;
   \ github_feed $github_user $github_email $github_pat;
-  \ git push $args;
+  \ git $args;
   \ github_unfeed;
   \ git config '--global' '--unset-all' core.autocrlf;
 endfunction
