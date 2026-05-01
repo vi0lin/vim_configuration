@@ -609,11 +609,6 @@ NewMap -map <leader><Space> :call ToggleZoom()<cr>
 
 NewMap -map <silent> <S-F1> :SearchCword<cr>
 
-" map <F1> :call EXEC()<cr>
-" map <S-F1> :EXECINPUT<cr>
-NewMap -map <leader><F1> :EXECTOGGLE<cr>
-NewMap -map <leader><leader><F1> :INTERPRETERTOGGLE<cr>
-
 " map <leader>v :call VIM(VS())<cr>
 NewMap -map <leader>b :call BASH(VS())<cr>
 NewMap -map <leader>b :call Bash(VS())<cr>
@@ -1123,17 +1118,11 @@ NewMap -no <S-Tab> :call PrevBuffer()<CR>
 " map <F2> :echo t:buffers<cr>
 " map <F3> :echo FullPaths(t:buffers)<cr>
 
-function SelectFunctionBlock(...)
+function! SelectFunctionBlock(...)
   call search(FunctionName(3), 'bcW')
 endfunction
 command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
 NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<CR>
-
-function SelectFunctionBlock(...)
-  call search(FunctionName(3), 'bcW')
-endfunction
-command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
-NewMap -no <F1> :call SelectFunctionBlock()<CR>
 
 NewMap -no <F1> :call GitInfo()<cr>
 NewMap -no <leader><leader><F1> :call GitCommitRepo()<cr>

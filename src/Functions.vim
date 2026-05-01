@@ -2058,6 +2058,7 @@ endfunction
 
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
+  Pull
   " echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
   exec "!clear && git push "..w:gitRemote.." "..w:gitBranch
 endfunction
@@ -2093,6 +2094,7 @@ if !exists('g:github_pat') | let g:github_pat='{pat_TOKEN}' | endif
 if !exists('g:github_ghp') | let g:github_ghp='{ghp_TOKEN}' | endif
 command! -range -nargs=0 GithubPush <line1>,<line2>:call GithubPush()
 function! GithubPush()
+  Pull
   let $github_user=g:github_user
   let $github_email=g:github_email
   let $github_pat=g:github_pat

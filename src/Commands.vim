@@ -171,9 +171,6 @@ NewCommand command! -nargs=0 SearchCword exec "vimgrep /<cword>/j "..GetProject(
 NewCommand command -nargs=0 -range Build <line1>,<line2>call Build()
 NewCommand command -nargs=0 -range BuildStop <line1>,<line2>call BuildStop()
 " NewCommand command -nargs=0 -range Run <line1>,<line2>call Run()
-NewCommand command -nargs=0 -range EXEC <line1>,<line2>call EXEC()
-NewCommand command -nargs=0 -range EXECTOGGLE <line1>,<line2>call EXECTOGGLE()
-NewCommand command -nargs=0 -range INTERPRETERTOGGLE <line1>,<line2>call INTERPRETERTOGGLE()
 NewCommand command! -nargs=+ CheckListContains call s:CheckList(<q-args>)
 
 " ---- commands ------------------------------------------------------
