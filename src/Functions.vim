@@ -2047,8 +2047,14 @@ function! GitCommitRepo(message='')
   exec '!clear && git commit -m "'..msg..'"'
 endfunction
 
+command! -range -nargs=0 Log <line1>,<line2>:call Log()
+function! Log()
+  exec "!clear && git log"
+endfunction
+
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
+  " echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
   exec "!clear && git push "..w:gitRemote.." "..w:gitBranch
 endfunction
 
