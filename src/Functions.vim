@@ -1770,21 +1770,21 @@ function! GitStashPopAutoStash(...)
   " Remove UUID after POP
   let stashes=systemlist('git stash list')
   " for stash in filter(stashes,'v:val=~"'..g:lastStash..'"')
-  echo stashes
-  echo filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
+  " echo stashes
+  " echo filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
   for stash in filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
     let name=substitute(stash,':.*',"","")
-    echo name
+    " echo name
     " " echo "git stash pop "..name
-    " let x = systemlist("git stash pop "..name)
-    " " let x = []
-    " " echo "compute " stash
-    " for line in x
-    "   echo line
-    " endfor
-    " if exists("g:lastStash")
-    "   unlet g:lastStash
-    " endif
+    let x = systemlist("git stash pop "..name)
+    " let x = []
+    " echo "compute " stash
+    for line in x
+      echo line
+    endfor
+    if exists("g:lastStash")
+      unlet g:lastStash
+    endif
   endfor
 endfunction
 command! -range -nargs=0 GitStashPopAutoStash <line1>,<line2>:call GitStashPopAutoStash(<q-args>)
