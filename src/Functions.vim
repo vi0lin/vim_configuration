@@ -1752,7 +1752,7 @@ command! -range -nargs=1 Switch <line1>,<line2>:call GitSwitch(<q-args>)
 if !exists("g:lastStash")
   let g:lastStash=""
 endif
-function! GitStashPushAutoStash()
+function! GitStashPushAutoStash(...)
   " GetOpt2 --auto
   let message="stash-"..NewUUID()
   let g:lastStash=message
@@ -1761,9 +1761,9 @@ function! GitStashPushAutoStash()
   let x = systemlist("git stash push -m "..message)
   call Debug(0, x)
 endfunction
-command! -range -nargs=0 StashPushAutoStash <line1>,<line2>:call StashPushAutoStash(<q-args>)
+command! -range -nargs=0 GitStashPushAutoStash <line1>,<line2>:call GitStashPushAutoStash(<q-args>)
 
-function! GitStashPopAutoStash()
+function! GitStashPopAutoStash(...)
   " GetOpt2 --auto
   " Add Stash UUID Functionality
   " Check If git stash list Contains UUID
@@ -1784,7 +1784,7 @@ function! GitStashPopAutoStash()
     endif
   endfor
 endfunction
-command! -range -nargs=0 StashPopAutoStash <line1>,<line2>:call StashPopAutoStash(<q-args>)
+command! -range -nargs=0 GitStashPopAutoStash <line1>,<line2>:call GitStashPopAutoStash(<q-args>)
 
 function GitStashPush()
   " Todo Add Message Argument
