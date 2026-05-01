@@ -1931,7 +1931,7 @@ command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
   " GitStatus
-  let cmd = #{text: '--text', pager: '', cached: '', file: '%'}
+  let cmd = #{text: '--text', pager: '', cached: '', file: '%', post: '', repo: ''}
   let i = 0
   while i < len(a:000)
     let arg = a:000[i]
@@ -1945,6 +1945,13 @@ function! GitDiff(...)
       let cmd.pager=''
     elseif arg ==# '-c' || arg ==# '--cached'
       let cmd.cached='--cached'
+    elseif arg ==# '--post'
+      let cmd.post=a:000[i+1]
+      let i+=1
+    elseif arg==#'-l' || arg==# '--local'
+      let cmd.repo=''
+    elseif arg==#'-r' || arg==# '--remote'
+      let cmd.repo=w:gitRemote.."/"..w:gitBranch
     endif
     let i += 1
   endwhile
@@ -1952,11 +1959,13 @@ function! GitDiff(...)
   " !clear && git diff --text %
   " !clear && git diff --cached --text %
   " let args=join([ cmd.text, cmd.pager, cmd.cached, cmd.file ], ' ')
+  echo cmd
   let x = [ cmd.text, cmd.pager, cmd.cached, cmd.file ]
   let cleaned=filter(x, 'v:val != "^\\s*$"')
   " exec "!clear && git diff "..join(cleaned, ' ')
   " exec "!clear && git diff "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
-  exec "!clear && git diff "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
+  " echo "!clear && git diff "..cmd.repo.." "..cmd.post.." "..join(cleaned, ' ')
+  exec "!clear && git diff "..cmd.repo.." "..cmd.post.." "..join(cleaned, ' ')
   " exec "!clear && git diff "..w:gitBranch.." "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
   " let x =<< eval trim EOF
   " !clear && git diff {cmd.text} {cmd.pager} {cmd.cached} {cmd.file}
