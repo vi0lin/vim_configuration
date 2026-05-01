@@ -1127,6 +1127,8 @@ command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
 NewMap -no <F1> :call SelectFunctionBlock()<CR>
 
 NewMap -no <F1> :call GitInfo()<cr>
+NewMap -no <leader><leader><F1> :call GitCommitRepo()<cr>
+NewMap -no <leader><F1> :call GitCommitRepo(input("Commit Message: "))<cr>
 
 NewMap -no <F2> :call SelectRemote(1)<cr>
 NewMap -no <S-F2> :call SelectRemote(-1)<cr>

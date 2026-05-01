@@ -2017,6 +2017,22 @@ function! GitCommit(message='')
   exec '!clear && git commit -m "'..msg..'"'
 endfunction
 
+command! -range -nargs=? GitCommitRepo <line1>,<line2>:call GitCommitRepo(<args>)
+function! GitCommitRepo(message='')
+  GitAddRepo
+  call GitMessage(a:message)
+  let msg=''
+  if a:message==''
+    let msg=g:lastcommitmessage
+  else
+    let msg=a:message
+  endif
+  " echo msg
+  " call input(msg)
+  " echo '!clear && git commit -m "'..msg..'"'
+  exec '!clear && git commit -m "'..msg..'"'
+endfunction
+
 command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
 function! GitPush()
   echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
@@ -2633,7 +2649,7 @@ function! SelectBranch(int)
   " var 1
   " let w:gitBranch=w:gitBranchList[w:gitBranch_index]
   " var 2
-  "
+  call UpdateGit()
   let target=w:gitBranchList[Mod(w:gitBranch_index+a:int, len(w:gitBranchList))]
   call GitSwitch(target)
   let w:gitBranch=FindBranch(w:cwd)
