@@ -3790,7 +3790,9 @@ endfunction
 
 function! FindBranch(path)
   let x = systemlist('cd '..a:path..'; git branch --show-current')
-  let w:gitBranch = x[0]
+  if len(x)>0
+    let w:gitBranch = x[0]
+  endif
   " echo w:gitBranch
   return w:gitBranch
 endfunction
