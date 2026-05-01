@@ -1749,8 +1749,12 @@ function! GitSwitch(branch)
 endfunction
 command! -range -nargs=1 Switch <line1>,<line2>:call GitSwitch(<q-args>)
 
+if !exists("g:lastStash")
+  let g:lastStash=""
+endif
 function! GitStashPush()
   let message="stash-"..NewUUID()
+  let g:lastStash=message
   " Add Stash UUID Functionality
   " Add UUID
   let x = systemlist("git stash push -m "..message)
@@ -1761,7 +1765,13 @@ function! GitStashPop()
   " Add Stash UUID Functionality
   " Check If git stash list Contains UUID
   " Remove UUID after POP
-  !git stash pop
+  let stashes=systemlist('git stash list')
+  if len(filter(stashes,'v:val=~"'..g:lastStash..'"'))>0
+    echo stashes
+    echo "gonna pop" . g:lastStash
+    unlet g:lastStash
+    " !git stash pop
+  endif
 endfunction
 
 function! GitStashCWD()
@@ -2677,6 +2687,9 @@ function! GitInfo()
   echo "\n"
   echo "Git Log:"
   call DebugCommand(systemlist("git log --oneline | head -n 4"), "\n")
+  echo "\n"
+  echo "Stashes:"
+  call DebugCommand(systemlist("git stash list"), "\n")
 endfunction
 
 function! SelectBranch(int)
