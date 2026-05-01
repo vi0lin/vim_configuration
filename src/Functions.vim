@@ -1927,6 +1927,11 @@ function! GitUnshallow()
   !clear && git fetch --unshallow github
 endfunction
 
+function CreateRepositoryBare()
+  !git init --bare
+  !git symbolic-ref HEAD refs/heads/main
+endfunction
+
 command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
 command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
