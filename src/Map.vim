@@ -673,7 +673,7 @@ NewMap -no <C-S-g>            :call AgIn(Folder_Repo())<CR>
 NewMap -no <A-g>              :call AgIn(Folder_Repo())<CR>
 NewMap -no <A-S-g>            :call AgIn(Folder_Repo(1))<CR>
 NewMap -no <A-C-g>            :call AgIn(Folder_Repo(1))<CR>
-NewMap -no <A-S-C-g>          :call AgIn('/'))<CR>
+NewMap -no <A-S-C-g>          :call AgIn('/')<CR>
 " noremap <A-S-C-g>            :call AgIn(Folder_System())<CR>
 "  nnoremap <C-S-p>          :OpenFileFZFRepo<CR>
 

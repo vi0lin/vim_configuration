@@ -3665,9 +3665,10 @@ function! Files(path)
   " echo a:path
   " exec ":Files" a:path
   " exec "Files" a:path..'/'
-  call fzf#vim#files(a:path)
+  " echo a:path
+  "call fzf#vim#files(a:path)
   " call Redraw()
-  " call fzf#run({'dir': a:path})
+  call fzf#run({'dir': a:path})
   " call fzf#run({'dir': a:path, 'window': { 'width': 0.9, 'height': 0.6 } })
   " call fzf#run({'dir': '/', 'window': { 'width': 0.9, 'height': 0.6 } })
   " call fzf#run(fzf#wrap('', { 'dir': a:path }, 0 ))
@@ -3676,6 +3677,10 @@ function! Files(path)
   " let opts['window'] = window_opts['window']
   " call fzf#run(opts)
   " call fzf#run({'dir': a:path, 'source': 'find .', 'sink': 'e', 'window': {'width':0.9, 'height': 0.6}})
+  " let i=0
+  " while i < 100
+  "   let i += 1 
+  " endwhile
   unlet g:temporaryfix
 endfunction
 
