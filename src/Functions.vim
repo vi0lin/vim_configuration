@@ -1,5 +1,5 @@
 " Avoid cdo prompt for overwiting files
-if !exists("g:vim_advantages_got_sourced")
+if !exists("g:vim_configuration_src_got_sourced")
 
 function! s:MatchesOneOfPatterns(pattern_string, term) abort
   let patterns = split(a:pattern_string, '|', 1)
@@ -898,13 +898,13 @@ endfunction
 " NewMap map <leader>ab :RECP<cr>
 
 function! Re()
-  if exists('g:vim_advantages_got_sourced')
-    unlet g:vim_advantages_got_sourced
+  if exists('g:vim_configuration_src_got_sourced')
+    unlet g:vim_configuration_src_got_sourced
   endif
 endfunction
 
 function! ReEnd()
-  let g:vim_advantages_got_sourced='true'
+  let g:vim_configuration_src_got_sourced='true'
 endfunction
 
 function! JumpToNextFile(dir) abort
@@ -2334,27 +2334,28 @@ function! SetEnvironment(user_dir='~', main_repo='', source_dir='', bashrc='~/.b
   let g:vimrc = "~/.vimrc"
   " let g:vim = "~/.vim/plugged/vim_configuration"
   let g:vim = $VIMRUNTIME
-  let g:vim_advantages = split(&runtimepath, ",")[0]..'/plugged/vim_configuration/autoload/vim_configuration'
+  let g:vim_configuration_src = split(&runtimepath, ",")[0]..'/plugged/vim_configuration/autoload/vim_configuration'
   let g:b_environment_set=1
 endfunction
 " call EnsureEnvironment()
 call SetEnvironment()
 let runtimepath=split(&runtimepath, ",")[0]
-let g:vim_advantages=runtimepath..'/plugged/vim_configuration/autoload/vim_configuration'
-let g:vim_advantages=runtimepath..'/plugged/vim_configuration/src'
-let g:vim_advantages=runtimepath..'/plugged/vim_configuration/src'
+let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/autoload/vim_configuration'
+let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
+let g:vim_configuration=runtimepath..'/plugged/vim_configuration/'
+let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
 let mapleader=","
-exec 'source '.g:vim_advantages.'/Commands.vim'
-exec 'source '.g:vim_advantages.'/Utilize.vim'
-exec 'source '.g:vim_advantages.'/Map.vim'
-let unreleased=g:vim_advantages.'/Functions.vim.unreleased'
+exec 'source '.g:vim_configuration_src.'/Commands.vim'
+exec 'source '.g:vim_configuration_src.'/Utilize.vim'
+exec 'source '.g:vim_configuration_src.'/Map.vim'
+let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
 function! SourceIfFileExists(file)
   if filereadable(a:file)
     exec "source "..a:file
   endif
 endfunction
-call SourceIfFileExists(g:vim_advantages.'/src.unreleased/HiddenFunctions.vim')
-call SourceIfFileExists(g:vim_advantages.'/src.unreleased/HiddenFunctions.vim9')
+call SourceIfFileExists(g:vim_configuration.'/src.unreleased/HiddenFunctions.vim')
+call SourceIfFileExists(g:vim_configuration.'/src.unreleased/HiddenFunctions.vim9')
 
 " General Variables
 if !exists("g:__pattern") | let g:__pattern={} | endif
@@ -2379,7 +2380,7 @@ let g:WindowChanged=0
 let __pressedKey=""
 let __pressedControl=""
 let g:FileFinder_verbose=1
-let f1 = [ g:vim_advantages."/Functions.vim", g:main_repo."/.bashrc"]
+let f1 = [ g:vim_configuration_src."/Functions.vim", g:main_repo."/.bashrc"]
 let projects=[ g:source_dir, g:main_repo ]
 let g:executor_list={    "executor_list": {        "bash": "bash",        "bash external": "bash",        "python3": "python3",        "python3 external": "python3",    },    "machines_settings": g:vim.."/machines.settings"}
 let g:RecursiveCounter=0
@@ -2408,10 +2409,10 @@ if !empty("g:exec_type") | let exec_type=0 | endif
 if !exists("g:modechanged") | let modechanged="Normal" | endif
 let exec_types=[ "Default", "Vim", "Bash", "Python", "Rust" ]
 
-exec 'source '.g:vim_advantages.'/Statusline.vim'
-" exec 'source '.g:vim_advantages.'/Utilize.vim'
-exec 'source '.g:vim_advantages.'/TextActions.vim'
-exec 'source '.g:vim_advantages.'/Autocommands.vim'
+exec 'source '.g:vim_configuration_src.'/Statusline.vim'
+" exec 'source '.g:vim_configuration_src.'/Utilize.vim'
+exec 'source '.g:vim_configuration_src.'/TextActions.vim'
+exec 'source '.g:vim_configuration_src.'/Autocommands.vim'
 syntax on
 set tabpagemax=50
 " set tabstop=2
@@ -4926,7 +4927,7 @@ endfunction
 "     else
 "       let filee=expand(file)
 "       if !filereadable(filee)
-"         let filee = g:vim_advantages.."/"..file
+"         let filee = g:vim_configuration_src.."/"..file
 "       endif
 "       if filereadable(filee)
 "         silent exec pre..filee
@@ -6305,16 +6306,16 @@ endfunction
 function! LayoutVim()
   call _tabnew_if_not_empty_buffer()
   let layout=[
-    \ g:vim_advantages."/Functions.vim",
-    \ g:vim_advantages."/Map.vim",
-    \ g:vim_advantages."/Commands.vim",
-    \ g:vim_advantages."/../install.sh",
-    \ g:vim_advantages."/../.gitignore",
-    \ g:vim_advantages."/../plugin/vim_configuration.vim",
-    \ g:vim_advantages."/../README.md",
-    \ g:vim_advantages."/Autocommands.vim",
-    \ g:vim_advantages."/Functions.vim9",
-    \ g:vim_advantages."/Statusline.vim",
+    \ g:vim_configuration_src."/Functions.vim",
+    \ g:vim_configuration_src."/Map.vim",
+    \ g:vim_configuration_src."/Commands.vim",
+    \ g:vim_configuration_src."/../install.sh",
+    \ g:vim_configuration_src."/../.gitignore",
+    \ g:vim_configuration_src."/../plugin/vim_configuration.vim",
+    \ g:vim_configuration_src."/../README.md",
+    \ g:vim_configuration_src."/Autocommands.vim",
+    \ g:vim_configuration_src."/Functions.vim9",
+    \ g:vim_configuration_src."/Statusline.vim",
     \]
   " for file in layout
   "   exec "b".file
@@ -6361,16 +6362,16 @@ endfunction
 "     " \ [ "Utilize.vim", "s"],
 "     " \ [ g:vimrc, "v"],
 "   let layout=[
-"     \ [ g:vim_advantages."/Functions.vim", "H"],
-"     \ [ g:vim_advantages."/Map.vim", "v"],
-"     \ [ g:vim_advantages."/Commands.vim", "v"],
-"     \ [ g:vim_advantages."/../install.sh", "v"],
-"     \ [ g:vim_advantages."/../.gitignore", "v"],
-"     \ [ g:vim_advantages."/../plugin/vim_configuration.vim", "v"],
-"     \ [ g:vim_advantages."/../readme.md", "v"],
-"     \ [ g:vim_advantages."/Autocommands.vim", "J"],
-"     \ [ g:vim_advantages."/Functions.vim9", "v"],
-"     \ [ g:vim_advantages."/Statusline.vim", "v"],
+"     \ [ g:vim_configuration_src."/Functions.vim", "H"],
+"     \ [ g:vim_configuration_src."/Map.vim", "v"],
+"     \ [ g:vim_configuration_src."/Commands.vim", "v"],
+"     \ [ g:vim_configuration_src."/../install.sh", "v"],
+"     \ [ g:vim_configuration_src."/../.gitignore", "v"],
+"     \ [ g:vim_configuration_src."/../plugin/vim_configuration.vim", "v"],
+"     \ [ g:vim_configuration_src."/../readme.md", "v"],
+"     \ [ g:vim_configuration_src."/Autocommands.vim", "J"],
+"     \ [ g:vim_configuration_src."/Functions.vim9", "v"],
+"     \ [ g:vim_configuration_src."/Statusline.vim", "v"],
 "     \]
 "     " \ [ g:bashrc, "v", "G"],
 "     " \ [ "/usr/local/share/vim/vim91/plugin/vim_configuration.vim", "v"],
@@ -6700,4 +6701,4 @@ call Statusline()
 
 endif
 
-let g:vim_advantages_got_sourced='true'
+let g:vim_configuration_src_got_sourced='true'
