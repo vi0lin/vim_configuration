@@ -687,11 +687,11 @@ NewMap -no <A-S-C-g>          :call AgIn('/')<CR>
 NewMap -n -no <leader>o              :OpenFileCommandLineSameDir<CR>
 NewMap -n -no <leader>.              :OpenFileCommandLineCWD<CR>
 NewMap -n -no <leader><leader>.      :OpenFileCommandLineSameDir<CR>
-NewMap -n -no <leader>.              :call CommandLineFiles(Folder_Up(0))<CR>
-NewMap -n -no <leader><leader>.              :call CommandLineFiles(Folder_Up(1))<CR>
-NewMap -n -no <leader><leader><leader>.              :call CommandLineFiles(Folder_Up(2))<CR>
-NewMap -n -no <leader><leader><leader><leader>.              :call CommandLineFiles(Folder_Up(3))<CR>
-NewMap -n -no <leader><leader><leader><leader><leader>.              :call CommandLineFiles(Folder_Up(4))<CR>
+NewMap -n -no <leader>.              :call CommandLineFiles(Folder_Up(v:count, 0))<CR>
+NewMap -n -no <leader><leader>.              :call CommandLineFiles(Folder_Up(v:count, 1))<CR>
+NewMap -n -no <leader><leader><leader>.              :call CommandLineFiles(Folder_Up(v:count, 2))<CR>
+NewMap -n -no <leader><leader><leader><leader>.              :call CommandLineFiles(Folder_Up(v:count, 3))<CR>
+NewMap -n -no <leader><leader><leader><leader><leader>.              :call CommandLineFiles(Folder_Up(v:count, 4))<CR>
 
 NewMap -c -no <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
 NewMap -c -no <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
