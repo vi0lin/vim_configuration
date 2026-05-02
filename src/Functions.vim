@@ -3666,9 +3666,9 @@ function! Files(path)
   " exec ":Files" a:path
   " exec "Files" a:path..'/'
   " echo a:path
-  "call fzf#vim#files(a:path)
+  call fzf#vim#files(a:path)
   " call Redraw()
-  call fzf#run({'dir': a:path})
+  " call fzf#run({'dir': a:path})
   " call fzf#run({'dir': a:path, 'window': { 'width': 0.9, 'height': 0.6 } })
   " call fzf#run({'dir': '/', 'window': { 'width': 0.9, 'height': 0.6 } })
   " call fzf#run(fzf#wrap('', { 'dir': a:path }, 0 ))
