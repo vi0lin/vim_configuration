@@ -1,5 +1,5 @@
 " Todo NewMap Checker
-if !exists("g:vim_advantages_got_sourced")
+if !exists("g:vim_configuration_src_got_sourced")
 
 import autoload "./Functions.vim9" as F
 
@@ -1114,8 +1114,10 @@ nnoremap <C-i> <C-i>
 " NewMap -no <S-F1> :call PrevBuffer()<CR>
 " NewMap -t -no <F1> <C-\><C-o>:call NextBuffer()<CR>
 " NewMap -t -no <S-F1> <C-\><C-o>:call PrevBuffer()<CR>
-NewMap -no <Tab> :call NextBuffer()<CR>
-NewMap -no <S-Tab> :call PrevBuffer()<CR>
+" NewMap -no <Tab> :call NextBuffer()<CR>
+" NewMap -no <S-Tab> :call PrevBuffer()<CR>
+NewMap -no -all <F12> :call NextBuffer()<CR>
+NewMap -no -all <S-F12> :call PrevBuffer()<CR>
 
 " map <F2> :echo t:buffers<cr>
 " map <F3> :echo FullPaths(t:buffers)<cr>
