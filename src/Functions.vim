@@ -1,5 +1,5 @@
 " Avoid cdo prompt for overwiting files
-if !exists("g:vim_configuration_src_got_sourced")
+if !exists("g:vim_advantages_got_sourced")
 
 function! s:MatchesOneOfPatterns(pattern_string, term) abort
   let patterns = split(a:pattern_string, '|', 1)
@@ -898,13 +898,13 @@ endfunction
 " NewMap map <leader>ab :RECP<cr>
 
 function! Re()
-  if exists('g:vim_configuration_src_got_sourced')
-    unlet g:vim_configuration_src_got_sourced
+  if exists('g:vim_advantages_got_sourced')
+    unlet g:vim_advantages_got_sourced
   endif
 endfunction
 
 function! ReEnd()
-  let g:vim_configuration_src_got_sourced='true'
+  let g:vim_advantages_got_sourced='true'
 endfunction
 
 function! JumpToNextFile(dir) abort
@@ -6701,4 +6701,4 @@ call Statusline()
 
 endif
 
-let g:vim_configuration_src_got_sourced='true'
+let g:vim_advantages_got_sourced='true'

@@ -1,5 +1,5 @@
 " Todo NewMap Checker
-if !exists("g:vim_configuration_src_got_sourced")
+if !exists("g:vim_advantages_got_sourced")
 
 import autoload "./Functions.vim9" as F
 

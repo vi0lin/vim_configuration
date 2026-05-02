@@ -274,7 +274,7 @@ install() {
   echo "Installing vim_configuration (with plug.vim)"
 
   # check if vim_configuration got sourced
-  vimgather got_sourced "try | if exists('g:vim_configuration_got_sourced') | echo g:vim_configuration_got_sourced | endif | endtry"
+  vimgather got_sourced "try | if exists('g:vim_advantages_got_sourced') | echo g:vim_advantages_got_sourced | endif | endtry"
 
   # debug "Got Sourced:" $got_sourced
 
@@ -302,7 +302,7 @@ install() {
 
   check_signature $existing
 
-  vimgather got_sourced "try | if exists('g:vim_configuration_got_sourced') | echo g:vim_configuration_got_sourced | endif | endtry"
+  vimgather got_sourced "try | if exists('g:vim_advantages_got_sourced') | echo g:vim_advantages_got_sourced | endif | endtry"
 
   debug "Got Sourced:" $got_sourced
 
