@@ -1091,16 +1091,17 @@ func! ShowKeyNotation() abort
     echo 'Best-guess mapping notation → ' .. Key2Notation(k)
 endfunc
 
-function! Folder_Up(nr)
+function! Folder_Up(count, nr)
   let path=CWD()
   let i = 0
   " echo path a:nr i
-  while i < a:nr
+  while i < a:nr+a:count
     let path=GetParentDir(path)
     let i += 1
   endwhile
   return path
 endfunction
+
 function! Folder_Project()
   return CWD()
 endfunction

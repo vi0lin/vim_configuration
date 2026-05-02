@@ -640,22 +640,22 @@ NewMap -n -no <leader>dd :call Rewindworkdir()<cr>
 "" nnoremap <C-A-->            :FindInFileFZFSystem<CR>
 "" " nnoremap <C-S-p>            :FindInFileFZFRepo<CR>
 
-NewMap -map <leader>p                                         :call Files(Folder_Up(0))<cr>
-NewMap -map <leader><leader>p                                 :call Files(Folder_Up(1))<cr>
-NewMap -map <leader><leader><leader>p                         :call Files(Folder_Up(2))<cr>
-NewMap -map <leader><leader><leader><leader>p                 :call Files(Folder_Up(3))<cr>
-NewMap -map <leader><leader><leader><leader><leader>p         :call Files(Folder_Up(4))<cr>
-NewMap -map <leader><leader><leader><leader><leader><leader>p :call Files(Folder_Up(5))<cr>
+NewMap -map <leader>p                                         :call Files(Folder_Up(v:count, 0))<cr>
+NewMap -map <leader><leader>p                                 :call Files(Folder_Up(v:count, 1))<cr>
+NewMap -map <leader><leader><leader>p                         :call Files(Folder_Up(v:count, 2))<cr>
+NewMap -map <leader><leader><leader><leader>p                 :call Files(Folder_Up(v:count, 3))<cr>
+NewMap -map <leader><leader><leader><leader><leader>p         :call Files(Folder_Up(v:count, 4))<cr>
+NewMap -map <leader><leader><leader><leader><leader><leader>p :call Files(Folder_Up(v:count, 5))<cr>
 
 NewMap -map <C-b> :Buffers<cr>
 
 
-NewMap -map <leader>g                                         :call RgDir(Folder_Up(0))<cr>
-NewMap -map <leader><leader>g                                 :call RgDir(Folder_Up(1))<cr>
-NewMap -map <leader><leader><leader>g                         :call RgDir(Folder_Up(2))<cr>
-NewMap -map <leader><leader><leader><leader>g                 :call RgDir(Folder_Up(3))<cr>
-NewMap -map <leader><leader><leader><leader><leader>g         :call RgDir(Folder_Up(4))<cr>
-NewMap -map <leader><leader><leader><leader><leader><leader>g :call RgDir(Folder_Up(5))<cr>
+NewMap -map <leader>g                                         :call RgDir(Folder_Up(v:count, 0))<cr>
+NewMap -map <leader><leader>g                                 :call RgDir(Folder_Up(v:count, 1))<cr>
+NewMap -map <leader><leader><leader>g                         :call RgDir(Folder_Up(v:count, 2))<cr>
+NewMap -map <leader><leader><leader><leader>g                 :call RgDir(Folder_Up(v:count, 3))<cr>
+NewMap -map <leader><leader><leader><leader><leader>g         :call RgDir(Folder_Up(v:count, 4))<cr>
+NewMap -map <leader><leader><leader><leader><leader><leader>g :call RgDir(Folder_Up(v:count, 5))<cr>
 
 NewMap -map <leader>vcd :call CD(Vim_Advantages_Path())<cr>
 
