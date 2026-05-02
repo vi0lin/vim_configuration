@@ -27,7 +27,36 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
 
   " [!IMPORTANT]
   " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders
-  autocmd! BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD()
+  autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter *
+  autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
+
+  " function! s:ShouldRun() abort
+  "   return &filetype !=# 'fzf'
+  "     \ && bufname('%') !~? 'fzf'
+  "     \ && (!exists('g:loaded_fzf') || !getwinvar(win_getid(), '&filetype') == 'fzf')
+  "     \ && (!exists('*nvim_win_get_config') || nvim_win_get_config(0).relative == '')
+  " endfunction
+  " augroup NoFzfAutoCmd
+  "   autocmd!
+  "   autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter *
+  "     \ if s:ShouldRun() | call MakeDirCurrentCWD(expand('<abuf>')) | endif
+  " augroup END
+
+  " augroup NoFzfAutoCmd
+  "   autocmd!
+  "   autocmd BufNew,BufReadPost,BufFilePost,BufEnter *
+  "         \ if index(['fzf'], &filetype) == -1
+  "         \ && bufname('%') !~# 'fzf'
+  "         \ && (!exists('*nvim_win_get_config') || nvim_win_get_config(win_getid()).relative == '') |
+  "         \   call MakeDirCurrentCWD(expand("<abuf>")) |
+  "         \ endif
+  " augroup END
+  " autocmd! BufAdd * call MakeDirCurrentCWD(expand('<abuf>'))
+  " autocmd! BufNew * call MakeDirCurrentCWD(expand('<abuf>'))
+  " autocmd! BufReadPost * call MakeDirCurrentCWD(expand('<abuf>'))
+  " autocmd! BufFilePost * call MakeDirCurrentCWD(expand('<abuf>'))
+  " autocmd! BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
+  " autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
 
   " Bad Fix
   " autocmd VimEnter * messages clear | redraw!
@@ -92,8 +121,6 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
       " endif
     endif
   endfunction
-
-  
 
   autocmd! ModeChanged * call OnModeChange(expand('<amatch>'))
   autocmd! TermChanged * call OnModeChange(expand('<amatch>'))

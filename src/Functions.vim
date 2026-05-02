@@ -936,7 +936,9 @@ endfunction
 
 let g:hostinfo="host@your-ip"
 function! Download_Unreleased()
-  let rem="/home/user/.vim/plugged/vim_configuration/src/"
+  echo "Outdated"
+  return
+  let rem="/home/user/.vim/plugged/vim_configuration/src.unreleased/"
   let loc=rem
   fun! SshD(file) closure
     let c = '!ssh '..g:hostinfo..' "cat '..rem..a:file..'" > '..loc..a:file
@@ -2001,7 +2003,9 @@ function! GetOptExample(...) abort
 endfunction
 
 function! GitMerge(branch)
-  exec '!clear && git merge '..a:branch..' --no-commit --no-ff'
+  " !git merge --rebase
+  " exec '!clear && git merge '..a:branch..' --no-commit --no-ff'
+  exec '!clear && git merge '..a:branch..' --rebase'
 endfunction
 command! -range -nargs=* Merge <line1>,<line2>:call GitMerge(<f-args>)
 
@@ -2349,9 +2353,8 @@ function! SourceIfFileExists(file)
     exec "source "..a:file
   endif
 endfunction
-call SourceIfFileExists(g:vim_advantages.'/Functions.vim.unreleased')
-call SourceIfFileExists(g:vim_advantages.'/Functions.vim9.unreleased')
-
+call SourceIfFileExists(g:vim_advantages.'/src.unreleased/HiddenFunctions.vim')
+call SourceIfFileExists(g:vim_advantages.'/src.unreleased/HiddenFunctions.vim9')
 
 " General Variables
 if !exists("g:__pattern") | let g:__pattern={} | endif
@@ -2840,7 +2843,7 @@ function! JumpFile(path)
       exec "e "..unreadable
       return
   endif
-  call MakeDirCurrentCWD()
+  call MakeDirCurrentCWD(bufnr())
 endfunction
 
 function! JumpProject()
@@ -3530,7 +3533,18 @@ function! OpenFile_callback(id, code, register)
   endif
 endfunction
 
+function! ThisIsFZF(bufnr)
+  return &filetype ==# 'fzf'
+  " return exists('b:fzf')
+  return bufname(a:bufnr) =~# '^\(fzf\|FZF\)'
+  return getbufvar(a:bufnr, '&filetype')==#'fzf'
+  return &filetype ==# 'fzf'
+  return win_gettype() == 'popup'
+  return win_gettype(winnr()) == 'popup'
+endfunction
+
 function! IsPopup(winid)
+  return win_gettype(a:winid) == 'popup'
   " echo popup_getpos(win_getid()) != {}
   " echo popup_getpos(winid) != {}
   let x={}
@@ -3541,8 +3555,15 @@ function! IsPopup(winid)
   return !empty(x)
 endfunction
 
-function! MakeDirCurrentCWD()
-  if !IsPopup(win_getid())
+function! MakeDirCurrentCWD(bufnr)
+  if !exists('g:temporaryfix')
+  " echo expand("%:p:h")
+  " if win_gettype() != 'popup'
+  " echo a:bufnr
+  " echo ThisIsFZF(a:bufnr)
+  " if getbufvar(a:bufnr, '&filetype')!=#'fzf'
+    " echo a:bufnr
+  " && !IsPopup(win_getid())
     let [n, y, x, n, n]=getcurpos()
     " let w:cwd=expand("%:p:h")
     " let w:pointer=expand('%')
@@ -3639,6 +3660,7 @@ function! CB_OpenFileInBuffer(m)
 endfunction
 
 function! Files(path)
+  let g:temporaryfix=0
   " echo a:path
   " exec ":Files" a:path
   " exec "Files" a:path..'/'
@@ -3653,6 +3675,7 @@ function! Files(path)
   " let opts['window'] = window_opts['window']
   " call fzf#run(opts)
   " call fzf#run({'dir': a:path, 'source': 'find .', 'sink': 'e', 'window': {'width':0.9, 'height': 0.6}})
+  unlet g:temporaryfix
 endfunction
 
 function! CommandLineFiles(path)
@@ -3856,9 +3879,11 @@ function! FindRemoteUrl(path)
   " let list=filter(list, 'v:val=~"^'..w:gitRemote..'.(fetch)"')
   if len(list)>0
     let w:gitRemoteUrl = list[0]
+    return w:gitRemoteUrl
+  else
+    return ''
   endif
   " echo w:gitRemote
-  return w:gitRemoteUrl
 endfunction
 
 function! FindGit(path)
@@ -3912,13 +3937,16 @@ function! GETCWD()
 endfunction
 
 function! CWD()
+  " if !IsPopup(win_getid())
+  " if !ThisIsFZF(bufnr())
   if !exists("w:cwd")
     " let w:cwd=expand('%:p:h')
     " call SetPointer('%:p')
-    call MakeDirCurrentCWD()
+    call MakeDirCurrentCWD(bufnr())
     " redir=>w:cwd | pwd | redir END
     " let w:cwd=substitute(w:cwd, '\n', "", 'g')
   endif
+  " endif
   if exists('w:cwd')
     return w:cwd
   else
@@ -6520,7 +6548,7 @@ function! NextBuffer() abort
       " execute 'buffer ' . t:buffers[next_idx]
       " silent call bufload(s:file_bufnrs[next_idx])
       silent noautocmd execute 'buffer' s:file_bufnrs[next_idx]
-      call MakeDirCurrentCWD()
+      call MakeDirCurrentCWD(bufnr())
       " execute 'e ' . t:buffers[next_idx]
     catch
       echo "execute 'buffer ' . fnameescape(s:file_list[next_idx])"
@@ -6542,7 +6570,7 @@ function! PrevBuffer() abort
       " call execute('silent buffer ' . prev)
       " silent call bufload(s:file_bufnrs[prev_idx])
       silent noautocmd execute 'buffer' s:file_bufnrs[prev_idx]
-      call MakeDirCurrentCWD()
+      call MakeDirCurrentCWD(bufnr())
       " execute 'buffer ' . t:buffers[prev_idx]
       " execute 'e ' . t:buffers[prev_idx]
     catch
