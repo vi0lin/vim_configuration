@@ -17,7 +17,7 @@ function! NewCommand(...)
   " echo "Name: "..name
   " echo args
   let command = join(args[i:], ' ')
-  :call F.Command.new(name, command)
+  " :call F.Command.new(name, command)
   try
     exec join(a:000, ' ')
   endtry
