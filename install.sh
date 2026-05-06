@@ -48,7 +48,7 @@ create_signature() {
   for file in "$@"; do
     local path="$file"
     path="${path/#\~/$HOME}"
-    sudo sed -i "\$a$sig_b\n$source_command\n$sig_e" $path
+    $sudo sed -i "\$a$sig_b\n$source_command\n$sig_e" $path
   done
 }
 update_signature() {
@@ -58,7 +58,7 @@ update_signature() {
     path="${path/#\~/$HOME}"
     # sed -z "s/\(^.*$signature\).*\(^.*$signature\)/\1\n\" ${date}\n\2/g" $file
     # sed "/$sig/{N; s/$sig.*$sig/\" $date/}" $file
-    sudo sed -i -n "/$sig_b/{:a;N;/$sig_b/!ba;N;s/.*\n/$sig_b\n$source_command\n/};p" $file
+    $sudo sed -i -n "/$sig_b/{:a;N;/$sig_b/!ba;N;s/.*\n/$sig_b\n$source_command\n/};p" $file
     # sed -E 's/(\d*) (.*)/\0 == \t\1-->\t\2/'
     # echo $stdin | sed -E 's/(\d*) (.*)/\0 == \t\1-->\t\2/'
   done
@@ -70,11 +70,11 @@ update_signature() {
 remove_signature() {
   debug "Remove Signature" $@
   for file in ${files_with_signature[@]}; do
-    sudo sed -i "/$sig_b/,/$sig_e/d" $file
+    $sudo sed -i "/$sig_b/,/$sig_e/d" $file
   done
 }
 signature_exists() {
-  sudo sed -n "/$sig_b/q" $1 && return 0 || return 1
+  $sudo sed -n "/$sig_b/q" $1 && return 0 || return 1
 }
 
 file_exists2() {
@@ -236,21 +236,25 @@ install() {
       manager="apt-get"
       installations="$manager install -y fzf silversearcher-ag ripgrep"
       wget_plug_vim="wget -q $plugvim -O ${plugins}plug.vim"
+      sudo="sudo"
       ;;
     "mac")
       manager="choc"
       installations="$manager install -y fzf silversearcher-ag ripgrep"
       wget_plug_vim="wget -q $plugvim -o ${plugins}plug.vim"
+      sudo=""
       ;;
     "win")
       manager="pacman"
       installations=""
       wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
+      sudo=""
       ;;
     "device")
       manager="apk"
       installations="$manager add fzf ripgrep"
       wget_plug_vim="wget -q $plugvim -P ${plugins}"
+      sudo="sudo"
       ;;
     "unknown"|*)
       echo "Exiting: unknown device"
@@ -259,13 +263,13 @@ install() {
   esac
 
   echo "Installing Additional Software"
-  debug Installation Instruction: "sudo" $installations
-  eval "sudo" $installations
+  debug Installation Instruction: $sudo $installations
+  eval $sudo $installations
 
   if ! $vimplug_exists; then
     echo "Installing Vim Plug (plug.vim)"
-    debug Download Instructions: "sudo" $wget_plug_vim
-    eval "sudo" $wget_plug_vim
+    debug Download Instructions: $sudo $wget_plug_vim
+    eval $sudo $wget_plug_vim
   else
     echo "Plug.vim is already installed"
     echo "Implement Check For Updates"
