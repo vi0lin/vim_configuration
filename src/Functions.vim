@@ -1,3 +1,5 @@
+let s:debug=0
+
 " Avoid cdo prompt for overwiting files
 if !exists("g:vim_advantages_got_sourced")
 
@@ -11,18 +13,21 @@ function! s:MatchesOneOfPatterns(pattern_string, term) abort
   return 0
 endfunction
 
-let s:debug=0
+command! -range -nargs=* Debug :call Debug(<f-args>)
 function! Debug(...)
-  if a:000[0]!~'\d'
-    echo join(a:000, ' ')
-  else
-    " echo a:000[0] s:debug
-    if s:debug >= a:000[0]
-      echo join(a:000[1:], ' ')
-    endif
+  let level = a:000[0]
+  let intend= a:000[1]
+  let args=a:000[2:]
+  let intend_str=""
+  for x in range(intend)
+    let intend_str.=" "
+  endfor
+  if s:debug >= level
+    let o=join(args, ' ')
+    let out=printf(intend_str.."%s", o)
+    echo out
   endif
 endfunction
-" Debug 1 "ABC"
 
 function! SmartFold()
 endfunction
@@ -128,21 +133,46 @@ let s:newmap_optschema = [
   \ ]
 let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
-function GetOpts2(args, structure)
-  " echo s:lookup_matrix
-  let functionName = FunctionName(5)
-  let opts={'args':[]}
-  let getopts={'args': a:args, 'structure': a:structure}
-  " delimeter-arg='--'
-  command! -range -nargs=* Debug :call Debug(<f-args>)
+
+function GetOpts2(args_str, structure)
+  let args_str=a:args_str
+  let args=ParseArgs(args_str)
+  call Debug(1, 0, "=============")
+  call Debug(1, 0, FunctionName())
+  call Debug(1, 0, args)
+  " call Debug(1, 4, a:structure)
+  function! _build() closure
+    let opts={'default':[]}
+    for s in a:structure
+      if s[2]==0
+        let opts[s[0]]=0
+      endif
+    endfor
+    return opts
+  endfunction
+  let opts=_build()
+  function! StructureHelper() closure
+    let sh=[]
+    for s in a:structure
+      let data = split(s[1], '|')
+      call add(sh, data)
+    endfor
+    return sh
+  endfunction
   function! Check(arg, returnStructure=0) closure
+    " let arg_check={ \
+    "   'main': -1, \
+    "   'value': -1, \
+    "       }
     if StartsWithDash(a:arg)
-      Debug 1 Starts With Dash
-      if IsInLookup(a:arg)
-        Debug 1 Is In Lookup
-        return !a:returnStructure && 1 || MatchesFromLookup(a:arg)
-      elseif IsInStructure(a:arg)
-        Debug 1 Is In Structure
+      " LOGIC FÜR DAS SETZEN VON opts.insert opts.normal usw
+      call Debug(1, 0, "Starts With Dash")
+      " if IsInLookup(a:arg)
+      "   call Debug(1, 0, "Is In Lookup")
+      "   return !a:returnStructure && 1 || MatchesFromLookup(a:arg)
+      " elseif IsInStructure(a:arg)
+      if IsInStructure(a:arg)
+        call Debug(1, 0, "Is In Structure")
         return !a:returnStructure && 1 || MatchesFromStructure(a:arg)
       else
         return 0
@@ -157,71 +187,163 @@ function GetOpts2(args, structure)
     endif
   endfunction
   function! StartsWithDash(arg)
-    if a:arg[0:1] =~ '\v^-{1,2}'
+    if a:arg[0:0]=='-' || a:arg[0:1]=='--'
       return 1
     else
       return 0
     endif
   endfunction
+  function! StripDashes(arg)
+    if a:arg[0:1]=='--'
+      return a:arg[2:]
+    endif
+    if a:arg[0:0]=='-'
+      return a:arg[1:]
+    endif
+    return a:arg
+    " if  == "--"
+    "   return substring(a:arg[2:])
+    " endif
+    " if a:arg[0:1] == "-"
+    "   echo string(a:arg[1:])
+    "   return string(a:arg[1:])
+    " endif
+  endfunction
   " function CheckArg(arg)
   "   return StatsWithDash(a:arg) && ( IsInLookup(a:arg) || IsInStructure(a:arg) )
   " endfunction
-  function! MatchesFromStructure(arg, feed_lookup=1) closure
-    let matches=[]
-    for k in getopts.structure
-      let match=(a:arg=~ '\v^('..k[1]..')$')
-      if match
-        call add(matches, k)
+  function! MatchFromStructure(arg) closure
+    let i = 0
+    for k in getopts.structure_helper
+      " call Debug(1,4, k)
+      if index(k,a:arg)>=0
+        call Debug(1,4, "Match: "..a:arg.." "..string(a:structure[i]))
+        return a:structure[i]
       endif
+      " let found_key=(name =~ '\v^('..k[1]..')$')
+      " if found_key
+      "   call add(found_keys, k)
+      " endif
+      let i+=1
     endfor
-    if a:feed_lookup
-      let s:lookup_matrix[functionName][a:arg]=matches
-    endif
+    return []
+    " let matches=[]
+    " for k in getopts.structure
+    "   let match=(a:arg=~ '\v^('..k[1]..')$')
+    "   if match
+    "     call add(matches, k)
+    "   endif
+    " endfor
+    " if a:feed_lookup
+    "   let s:lookup_matrix[functionName][a:arg]=matches
+    " endif
     return matches
   endfunction
   function! IsInStructure(arg) closure
+    let i = 0
     let matches=[]
-    for k in getopts.structure
-      let match=(a:arg=~ '\v^('..k[1]..')$')
-      if match
+    for k in getopts.structure_helper
+      " echo name '=~' k[1]
+      if index(k,a:arg)>=0
+        call add(matches,structure[i])
         return 1
       endif
+      " let found_key=(name =~ '\v^('..k[1]..')$')
+      " if found_key
+      "   call add(found_keys, k)
+      " endif
+      let i+=1
     endfor
     return 0
   endfunction
-  function! IsInLookup(arg) closure
-    if has_key(s:lookup_matrix, functionName)
-      if has_key(s:lookup_matrix[functionName], a:arg)
-        return 1
-      else
-        return 0
-      endif
-    endif
-  endfunction
-  function! MatchesFromLookup(arg) closure
-    return s:lookup_matrix[functionName][a:arg]
-  endfunction
+  " function! IsInLookup(arg) closure
+  "   if has_key(s:lookup_matrix, functionName)
+  "     if has_key(s:lookup_matrix[functionName], a:arg)
+  "       return 1
+  "     else
+  "       return 0
+  "     endif
+  "   endif
+  " endfunction
+  " function! MatchesFromLookup(arg) closure
+  "   return s:lookup_matrix[functionName][a:arg]
+  " endfunction
   " argtypes         [1,0,0,1,0,0,0,0,1,0,0] oder [0,0,1,0,0,1,0,0,0,0,1,0,0]
+  " cardinalities    [0,    n,        0,   ] oder [    2,    0,        1    ]
+  " arg_is_default   [m,d,d,d,d,d,d,d,d,d d] oder [d,d,d,d,d,d,d,d,d,d,d,d,d]
   " delimeter_index  -1
   " default_index     9                            0                            oder [0, 6]
   " mainargcount     [1, 4, 0]                    [0]
+  let getopts={'args': args, 'structure': a:structure, 'structure_helper': StructureHelper() }
+  " call Debug(1,4, getopts.structure_helper)
+  " delimeter-arg='--'
   let specs={
-        \ 'argtypes': [],
-        \ 'delimeter_index': -1,
-        \ 'default_index': -1,
-        \ 'mainargcount': []
-        \}
+    \ 'argtypes': [],
+    \ 'cardinalities': [],
+    \ 'arg_is_default': [],
+    \ 'matches': [],
+    \}
+    " \ 'delimeter_index': -1,
+    " \ 'default_index': -1,
+    " \ 'mainargcount': []
+  let had_default=0
   function! Specification() closure
+    " BUILD SPECS
     " args - args_string
     " echo functionName
+    call Debug(1, 0, "getopts.args: "..string(getopts.args))
     let arg_idx = 0
-    let mainarg=0
+    call Debug(1, 0, "RANGE: "..string(range(0,len(getopts.args)-1)))
     for arg_idx in range(0,len(getopts.args)-1)
-      let check=Check(getopts.args[arg_idx])
-      Debug 4 "-------------------------------------------"
-      Debug 4 "getopts.args[arg_idx]" getopts.args[arg_idx]
-      Debug 4 "check" check
-      Debug 4 "arg_idx" arg_idx
+      " if had_default
+      " endif
+      call Debug(1, 2, "--- arg ---")
+      call Debug(1, 10, "getopts.args[arg_idx]: "..getopts.args[arg_idx])
+      " let check=Check(getopts.args[arg_idx])
+      " if IsMainArg()
+      " endif
+      " if IsValueArg()
+      " endif
+      " if StartsWithDash(a:arg)
+      " endif
+      let stripped_arg=getopts.args[arg_idx]
+      let match=[]
+      if !had_default && StartsWithDash(getopts.args[arg_idx])
+        let stripped_arg=StripDashes(getopts.args[arg_idx])
+        let match=MatchFromStructure(stripped_arg)
+        call add(specs.matches, match)
+      endif
+      if empty(match) && arg_idx==0
+        let had_default=1
+      endif
+
+      if had_default
+        call add(specs.arg_is_default, 1)
+        call add(specs.argtypes, 0)
+      else
+        if !empty(match)
+          call add(specs.arg_is_default, 0)
+          call add(specs.argtypes, 1)
+          call add(specs.cardinalities, match[2])
+        else
+          call add(specs.arg_is_default, 1)
+          call add(specs.argtypes, 0)
+          let had_default=1
+        endif
+      endif
+      if specs.arg_is_default[arg_idx]==1
+        let had_default=1
+      endif
+      call Debug(1, 10, "had_default: "..had_default)
+      " if IsInStructure()
+      " endif
+      " if StartsWithDash(getopts.args[arg_idx])
+      " endif
+      " if ArgBelongsToPreviousMainArgAsValue()
+      " endif
+      call Debug(1, 2, "getopts.args["..arg_idx.."] "..getopts.args[arg_idx])
+      " call Debug(1, 2, "check "..check)
+      call Debug(1, 2, "arg_idx "..arg_idx)
       " if getopts.args[arg_idx]=="--"
       "   if delimeter_index==-1
       "     " func int or []
@@ -239,7 +361,7 @@ function GetOpts2(args, structure)
       "     endif
       "   endif
       " endif
-      " call add(argtypes,isMain)
+      " call add(specs.argtypes,isMain)
       " " todo if cardinality extended || default argument
       " if isMain
       "   if len(mainargcount) > 0
@@ -252,278 +374,43 @@ function GetOpts2(args, structure)
       "   endif
       "   let mainargcount[mainarg]+=1
       " endif
-      return specs
     endfor
+    return specs
   endfunction
   " echo Specification()
   function! BuildOpts() closure
+    call Debug(1, 4, "specs: "..string(Specification()))
+    let arg_idx = 0
+    for arg_idx in range(0,len(getopts.args)-1)
+      if had_default
+        let default=''
+        " echo specs.arg_is_default
+        " echo specs.arg_is_default[arg_idx]
+        if specs.argtypes[arg_idx]==1
+        " if arg_idx>0
+          " if specs.argtypes[arg_idx-1]==1 && specs.cardinalities[arg_idx-1]==0
+            " let str_from=len(getopts.args[arg_idx])
+            " let default=args_str[start:]
+            " echo getopts.args[arg_idx].." cut from "..args_str
+            let args_str=substitute(args_str, getopts.args[arg_idx]..' ', "", "")
+          " endif
+        else
+          let default=args_str
+        endif
+        let opts.default=default
+      endif
+      if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
+        let opts[specs.matches[arg_idx][0]]=1
+      elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
+      endif
+    endfor
+    call Debug(1,0,"opts: "..string(opts))
     return opts
   endfunction
-  " Debug 0 "TEST" s:lookup_matrix
+  " call Debug(1, 0, "TEST" s:lookup_matrix)
   return BuildOpts()
 endfunction
-" call GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
-
-function! GetOpts(args, structure)
-  " echo filter(s:newmap_optschema, 'v:val[0]!="args"')
-  let opts={'args':[]}
-  let args=a:args
-  let structure=a:structure
-  " if filter(a:structure, 'v:val=="args"')>-1
-  "   echo 'error - args is a default variable'
-  "   return
-  " endif
-  " let args=['-N', 'a1', 'a1', '-N', 'a1', '1:', 'a1', 'a1:', '--group']
-  " let structure=[
-  "   \ [ 'group', 'group|g', 0],
-  "   \ [ 'newlines', 'NewLines|N', '*' ]
-  "   \ ]
-  " echo string(args)
-  let ensure_found_key=0
-  let startsWithDash=0
-  let found_keys=[]
-  let name=""
-  let varname=""
-  let condition=""
-  let cardinality=-1
-  " let keys=keys(structure)
-  " let values=values(structure)
-  let items=items(structure)
-  " echo "Structure: " . string(structure)
-  function! _Default(arg) closure
-    for s in structure
-      if s[2]==0
-        let opts[s[0]]=0
-      endif
-    endfor
-  endfunction
-  call _Default(args)
-  function! _isMain(arg) closure
-    let arg=a:arg
-    " '\v^("..v:val[1]..")$'
-    " echo '\v('..structure[0][1]..')'
-    " echo structure[0][1]=~'g'
-    """ let found_keys=filter(copy(structure), 'len(filter(split(v:val[1], "|"), "v:val ==# \"'..shellescape(name)..'\"")) > 0')
-    """ if len(found_keys)>0
-    """   let found_key=found_keys[0]
-    """ endif
-		" let l = filter(copy(mylist), 'v:val =~ "KEEP"')
-    "" let found_keys=filter(copy(structure), 's:MatchesOneOfPatterns(v:val[1], name)')
-    "" if len(found_keys)>0
-    ""   let found_key=found_keys[0]
-    "" endif
-    for k in structure
-      " echo name '=~' k[1]
-      let found_key=(name =~ '\v^('..k[1]..')$')
-      if found_key
-        call add(found_keys, k)
-      endif
-    endfor
-    let startsWithDash=(a:arg[0:1] =~ '\v^-{1,2}')
-    let ensure_found_key=(startsWithDash && len(found_key)>0)
-    return (startsWithDash && ensure_found_key)
-  endfunction
-  function! _isMain2(arg, structure, name)
-    let arg=a:arg
-    let found_key=[]
-    let found_keys=[]
-    " let found_keys=[]
-    """ let found_keys=filter(copy(a:structure), 'len(filter(split(v:val[1], "|"), "v:val ==# \"'..shellescape(a:name)..'\"")) > 0')
-    """ if len(found_keys)>0
-    """   let found_key=found_keys[0]
-    """ endif
-    ""  let found_keys=filter(copy(a:structure), 's:MatchesOneOfPatterns(v:val[1], a:name)')
-    ""  if len(found_keys)>0
-    ""    let found_key=found_keys[0]
-    ""  endif
-    for k in a:structure
-      " echo a:name '=~' '\v^('..k[1]..')$'
-      let found_key=(a:name =~ '\v^('..k[1]..')$')
-      if found_key
-        call add(found_keys, k)
-      endif
-    endfor
-    " echo found_keys
-    let startsWithDash=(a:arg[0:1] =~ '\v^-{1,2}')
-    let ensure_found_key=(startsWithDash && len(found_key)>0)
-    return (startsWithDash && ensure_found_key)
-  endfunction
-  let argtypes=[] " [1,0,0,1,0,0,0,0,1]
-  let mainargcount=[] " [1, 4, 0]
-  function! Specs(args) closure
-    let args=a:args
-    let arg_idx = 0
-    let mainarg=0
-    for arg_idx in range(0,len(args)-1)
-      let _ismain=_isMain2(args[arg_idx], structure, name)
-      call add(argtypes,_ismain)
-      " todo if cardinality extended || default argument
-      if _ismain
-        if len(mainargcount) > 0
-          let mainarg+=1
-        endif
-        call add(mainargcount,0)
-      else
-        if len(mainargcount)==0
-          call add(mainargcount,0)
-        endif
-        let mainargcount[mainarg]+=1
-      endif
-    endfor
-  endfunction
-  call Specs(args)
-  " echo string(argtypes) string(mainargcount)
-  let i = 0
-  let i_main=0
-  let i_arg=0
-  let isDefault=0
-  while i < len(args)
-    " echo args[i]
-    let name = substitute(args[i], '-\+', '', '')
-    let isMain=_isMain(args[i])
-    let isArg=!isMain
-    if (i == 0 && isArg) || isDefault
-      let isDefault=1
-      while i < len(args)
-        call add(opts["args"], args[i] )
-        " if i+1 < len(args) && _isMain(args[i+1]) | break | endif
-        let i += 1
-      endwhile
-    elseif isMain
-      " echo "isMain: " .. args[i]
-      if ensure_found_key
-        " let dump = string(found_keys)
-        " echo "found_keys:" dump
-      endif
-      for f in found_keys
-        let varname=f[0]
-        let condition=f[1]
-        let cardinality=f[2]
-        " if cardinality=~'\d' || cardinality=="*" || cardinality=="+" || cardinality=="=" || cardinality=="?" || cardinality =~ '{\(\d*\):\(\d*\)}' | endif
-        if cardinality == 0
-          " if mainargcount[i_main]==0
-          " echo "setting 1" varname
-          let opts[varname]=1
-          if i+1<len(args) && !_isMain2(args[i+1], structure, name)
-            let isDefault=1
-            let cardinality=-1
-          endif
-        endif
-      endfor
-      " echo "\nMain:" args[i] cardinality
-      let i_arg=0
-      let i_main+=1
-    elseif isArg
-      " echo "Arg: " .. args[i] . ' > ' . varname . ' ' . string([ varname, condition, cardinality])
-      if cardinality==0
-        " echo "setting 2" varname
-        let opts[varname] = 1
-        if i+1<len(args) && !_isMain2(args[i+1], structure, name)
-          let isDefault=1
-        endif
-        " let cardinality=-1
-      elseif cardinality=~'\d'
-        " echo cardinality
-        " specified number of arguments
-        let pack=[]
-        let start_i=i
-        while i < start_i+cardinality
-          call add(pack, args[i])
-          let i += 1
-        endwhile
-        " echo "setting 3" varname
-        call add(opts[varname], pack)
-        " len(pack) == 0 || 
-        if i<len(args) && !_isMain2(args[i], structure, name)
-          let isDefault=1
-        endif
-        " echo string(pack).." adding to opts[\""..varname.."\"]"
-        " echo args
-        " echo opts['args']
-        " echo args[i]
-        " <--- add values to last found keys
-        " skipping logic
-        let cardinality=-1
-      elseif cardinality=="*"
-        " echo "*"
-        " 0 or more as many as possibile
-        let pack=[]
-        while i<len(args)
-          if args[i]=="--"
-            let isDefault=1
-            break
-          else
-            call add(pack, args[i] )
-            if i+1<len(args) && _isMain2(args[i+1], structure, name) | break | endif
-          endif
-          let i += 1
-        endwhile
-        if len(pack) == 0
-          " echo "setting 4" varname
-          let opts[varname] = 1
-        endif
-        if empty(opts[varname])
-          " echo "setting 5" varname
-          let opts[varname]=[]
-        endif
-        " echo string(pack).." adding to opts[\""..varname.."\"]"
-        "
-        " echo "setting 6" varname
-        call add(opts[varname], pack)
-        " echo opts["newlines"]
-        let cardinality=-1
-      elseif cardinality=="+"
-        " 1 or more as many as possibile
-        let pack=[]
-        while i<len(args)
-          if args[i]=="--"
-            let isDefault=1
-            break
-          else
-            call add(pack, args[i])
-            if i+1<len(args) && _isMain2(args[i+1], structure, name) | break | endif
-          endif
-          let i =+ 1
-        endwhile
-        " echo "setting 7" varname
-        call add(opts[varname], pack)
-        let cardinality=-1
-      elseif cardinality=="=" || cardinality=="?"
-        " 0 or 1 as many as possibile
-        if !_isMain2(args[i+1], structure, name)
-          " echo "setting 8" varname
-          call add(opts[varname], [ args[i] ])
-        endif
-        if len(pack[0]) == 0
-          " echo "setting 8" varname
-          let opts[varname] = 1
-        endif
-        let cardinality=-1
-      elseif cardinality =~ '{\(\d*\):\(\d*\)}'
-        let x=matchlist(cardinality, '{\(\d*\):\(\d*\)}')
-        if len(pack[0]) == 0
-          " echo "setting 9" varname
-          let opts[varname] = 1
-        endif
-        " todo
-        let cardinality=-1
-      endif
-      let i_arg+=1
-    endif
-    let i += 1
-  endwhile
-  " echo "\n"
-  " default argument variable, when extending cardinality
-  " automatically array or variable
-  " further testing
-  if len(opts.args) == 1
-    let opts.args=join(opts.args,'')
-    if opts.args=~'\d'
-      let opts.args=str2nr(opts.args)
-    endif
-  endif
-  return opts
-endfunction
+" echo GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
 
 function! ParseArgs(argstr)
   let args = []
@@ -1774,7 +1661,7 @@ function! GitStashPushAutoStash(...)
   if !empty(expand('%'))
     e %
   endif
-  " call Debug(0, x)
+  " call Debug(1, 0, x)
 endfunction
 command! -range -nargs=0 GitStashPushAutoStash <line1>,<line2>:call GitStashPushAutoStash(<q-args>)
 
@@ -3684,7 +3571,7 @@ function! Files(path)
   " call fzf#run({'dir': a:path, 'source': 'find .', 'sink': 'e', 'window': {'width':0.9, 'height': 0.6}})
   " let i=0
   " while i < 100
-  "   let i += 1 
+  "   let i += 1
   " endwhile
   unlet g:temporaryfix
 endfunction
@@ -4688,7 +4575,8 @@ endfunction
 
 function! SendCommandToTerm(direction) range
   " Bug (VS in normalmode sometimes results in the last selected line)
-  let vs=StripComments(VS())
+  " let vs=StripComments(VS())
+  let vs=VS()
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, vs)
 endfunction

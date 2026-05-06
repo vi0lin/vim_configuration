@@ -50,40 +50,42 @@ function NewMapKeyCheckAll(...)
   " endwhile
 endfunction
 
-function FunctionName(...)
-  let opts=GetOpts(a:000, [])
-  " echo opts
-  if opts.args==0
-    " echo substitute(expand('<sfile>'), '.*\.\.|\s', '', '')
-    return substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1',  '')
-    " let x="function SFN[2]..FunctionName"
-  elseif opts.args==1
-    return substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1' , '')
-    " return expand('<file>')
-    " function! GetCurrentFunctionName()
-    "   let line = getline(search('^[[:alpha:]$_]', 'bcnW'))
-    "   return matchstr(line, '\w\+')
-    " endfunction
-  elseif opts.args==2
-    " returnhl argsMsg
-    return getline(search('^[^ \t#/]\\{2}.*[^:]\s*$', 'bWn'))
-    " returnhl None
-  elseif opts.args==3
-    return getline(search('^[[:alpha:]$_]', 'bcnW'))
-  elseif opts.args==4
-    return substitute(getline(search('^[[:alpha:]$_]', 'bcnW')), '', '', '')
-  elseif opts.args==5
-    " put expand('<sfile>')
-    let x = expand('<sfile>')
-    return substitute(x, '.*\s\(.*\)\[\d\].*', '\1', '')
-  endif
+function FunctionName()
+  let x = expand('<sfile>')
+  return substitute(x, '\v.*\ (\w*).*', '\1', '')
+  """ let opts=GetOpts2(a:args, [])
+  """ " echo opts
+  """ return
+  """ if opts.args==0
+  """   " echo substitute(expand('<sfile>'), '.*\.\.|\s', '', '')
+  """   return substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1',  '')
+  """   " let x="function SFN[2]..FunctionName"
+  """ elseif opts.args==1
+  """   return substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1' , '')
+  """   " return expand('<file>')
+  """   " function! GetCurrentFunctionName()
+  """   "   let line = getline(search('^[[:alpha:]$_]', 'bcnW'))
+  """   "   return matchstr(line, '\w\+')
+  """   " endfunction
+  """ elseif opts.args==2
+  """   " returnhl argsMsg
+  """   return getline(search('^[^ \t#/]\\{2}.*[^:]\s*$', 'bWn'))
+  """   " returnhl None
+  """ elseif opts.args==3
+  """   return getline(search('^[[:alpha:]$_]', 'bcnW'))
+  """ elseif opts.args==4
+  """   return substitute(getline(search('^[[:alpha:]$_]', 'bcnW')), '', '', '')
+  """ elseif opts.args==5
+  """   " put expand('<sfile>')
+  """   let x = expand('<sfile>')
+  """   return substitute(x, '.*\s\(.*\)\[\d\].*', '\1', '')
+  """ endif
 endfunction
-command! -range -nargs=* FunctionName call FunctionName(<f-args>)
+command! -range -nargs=* FunctionName call FunctionName(<q-args>)
 " NewMap -n -no <f1> :FunctionName 3<CR>:FunctionName 1<cr>
 
 let s:newmaps=[]
-function! NewMap(...)
-  let functionName = FunctionName(5)
+function! NewMap(args)
   " echo functionName
   " echo a:000
   " :call F.Map.new(name, map)
@@ -91,7 +93,8 @@ function! NewMap(...)
   " call add(s:newmaps, { 'args': a:000 } )
   " endtry
   " echo len(s:newmaps)
-  let opts=GetOpts(a:000, s:newmap_optschema)
+  let opts=GetOpts2(a:args, s:newmap_optschema)
+  " call Debug(3, opts)
   " echo opts
   " return
   " if len(opts.args)>0
@@ -104,6 +107,7 @@ function! NewMap(...)
   " put :
   " '<,'>s/\%\(if\|&&\)\@<!\s\+/\r\\ /g
   " In Command Line <C-r>/
+  if len(opts.default)>0
   if !opts.normal
   \ && !opts.visual
   \ && !opts.command
@@ -147,37 +151,37 @@ function! NewMap(...)
   command! -nargs=* Exec :call Exec(<f-args>)
   " temporarily
   if opts.all
-    call Exec("Amap", silent, join(opts.args, ' '))
+    call Exec("Amap", silent, opts.default)
   else
     if opts.map
-      call Exec(noremap.."map", silent, join(opts.args, ' '))
+      call Exec(noremap.."map", silent, opts.default)
     endif
     if opts.normal
-      call Exec("n"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("n"..noremap.."map", silent, opts.default)
     endif
     if opts.visual
-      call Exec("v"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("v"..noremap.."map", silent, opts.default)
     endif
     if opts.command
-      call Exec("c"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("c"..noremap.."map", silent, opts.default)
     endif
     if opts.insert
-      call Exec("i"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("i"..noremap.."map", silent, opts.default)
     endif
     if opts.terminal
-      call Exec("t"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("t"..noremap.."map", silent, opts.default)
     endif
     if opts.x
-      call Exec("x"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("x"..noremap.."map", silent, opts.default)
     endif
     if opts.s
-      call Exec("s"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("s"..noremap.."map", silent, opts.default)
     endif
     if opts.o
-      call Exec("o"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("o"..noremap.."map", silent, opts.default)
     endif
     if opts.l
-      call Exec("l"..noremap.."map", silent, join(opts.args, ' '))
+      call Exec("l"..noremap.."map", silent, opts.default)
     endif
   endif
     " let opts=GetOpts(n.args, s:newmap_optschema)
@@ -213,8 +217,9 @@ function! NewMap(...)
   " let name = a:000[:0][0]
   " let arg = a:000[1:]
   " call F.NewAssignment(name, arg)
+  endif
 endfunction
-command! -range -nargs=+ NewMap call NewMap(<f-args>)
+command! -range -nargs=+ NewMap call NewMap(<q-args>)
 command! -range -nargs=+ NewMapKeycheck call NewMapKeycheck(<q-args>)
 
 NewCommand command! -range -nargs=+ Debug call Debug(<f-args>)
@@ -245,8 +250,11 @@ NewMap -map <leader><leader>f :call FavoriteFile()<CR>
 NewMap -map <leader><leader>p :call FavoritePath()<CR>
 NewMap -map <C-8> :call Favorite()<CR>
 
-NewMap -map <leader>= :Equal<cr>
 NewMap -map <leader>e :Equal<cr>
+NewMap -map <F9>   :call Width(20)<cr>
+NewMap -map <S-F9> :call Width(20)<cr>
+NewMap -map <F10>   :call Height(20)<cr>
+NewMap -map <S-F10> :call Height(20)<cr>
 
 NewMap -n -no ,s :so %<cr>
 NewMap -map <C-Space> :call SelectCommand()<cr>
@@ -296,10 +304,6 @@ NewMap -v -no <F5> :<C-u>call SendCommandToTerm("h")<cr>
 NewMap -v -no <F6> :<C-u>call SendCommandToTerm("j")<cr>
 NewMap -v -no <F7> :<C-u>call SendCommandToTerm("k")<cr>
 NewMap -v -no <F8> :<C-u>call SendCommandToTerm("l")<cr>
-NewMap -n -no <F5> :call SendCommandToTerm("h")<cr>
-NewMap -n -no <F6> :call SendCommandToTerm("j")<cr>
-NewMap -n -no <F7> :call SendCommandToTerm("k")<cr>
-NewMap -n -no <F8> :call SendCommandToTerm("l")<cr>
 NewMap -i -no <F5> <C-o>:call SendCommandToTerm("h")<cr>
 NewMap -i -no <F6> <C-o>:call SendCommandToTerm("j")<cr>
 NewMap -i -no <F7> <C-o>:call SendCommandToTerm("k")<cr>
@@ -313,20 +317,71 @@ NewMap -t -no <F6> <C-\><C-n>:call SendCommandToTerm("j")<cr>
 NewMap -t -no <F7> <C-\><C-n>:call SendCommandToTerm("k")<cr>
 NewMap -t -no <F8> <C-\><C-n>:call SendCommandToTerm("l")<cr>
 
+NewMap -v -no <C-F5> :<C-u>call RedoCommandToTermWithSigTerm("h")<cr>
+NewMap -v -no <C-F6> :<C-u>call RedoCommandToTermWithSigTerm("j")<cr>
+NewMap -v -no <C-F7> :<C-u>call RedoCommandToTermWithSigTerm("k")<cr>
+NewMap -v -no <C-F8> :<C-u>call RedoCommandToTermWithSigTerm("l")<cr>
+NewMap -i -no <C-F5> <C-o>:call RedoCommandToTermWithSigTerm("h")<cr>
+NewMap -i -no <C-F6> <C-o>:call RedoCommandToTermWithSigTerm("j")<cr>
+NewMap -i -no <C-F7> <C-o>:call RedoCommandToTermWithSigTerm("k")<cr>
+NewMap -i -no <C-F8> <C-o>:call RedoCommandToTermWithSigTerm("l")<cr>
+NewMap -c -no <C-F5> :call RedoCommandToTermWithSigTerm("h", 1)<cr>
+NewMap -c -no <C-F6> :call RedoCommandToTermWithSigTerm("j", 1)<cr>
+NewMap -c -no <C-F7> :call RedoCommandToTermWithSigTerm("k", 1)<cr>
+NewMap -c -no <C-F8> :call RedoCommandToTermWithSigTerm("l", 1)<cr>
+NewMap -t -no <C-F5> <C-\><C-n>:call RedoCommandToTermWithSigTerm("h")<cr>
+NewMap -t -no <C-F6> <C-\><C-n>:call RedoCommandToTermWithSigTerm("j")<cr>
+NewMap -t -no <C-F7> <C-\><C-n>:call RedoCommandToTermWithSigTerm("k")<cr>
+NewMap -t -no <C-F8> <C-\><C-n>:call RedoCommandToTermWithSigTerm("l")<cr>
+
+NewMap -v -no <S-F5> :<C-u>call RedoCommandToTerm("h")<cr>
+NewMap -v -no <S-F6> :<C-u>call RedoCommandToTerm("j")<cr>
+NewMap -v -no <S-F7> :<C-u>call RedoCommandToTerm("k")<cr>
+NewMap -v -no <S-F8> :<C-u>call RedoCommandToTerm("l")<cr>
+NewMap -i -no <S-F5> <C-o>:call RedoCommandToTerm("h")<cr>
+NewMap -i -no <S-F6> <C-o>:call RedoCommandToTerm("j")<cr>
+NewMap -i -no <S-F7> <C-o>:call RedoCommandToTerm("k")<cr>
+NewMap -i -no <S-F8> <C-o>:call RedoCommandToTerm("l")<cr>
+NewMap -c -no <S-F5> :call RedoCommandToTerm("h", 1)<cr>
+NewMap -c -no <S-F6> :call RedoCommandToTerm("j", 1)<cr>
+NewMap -c -no <S-F7> :call RedoCommandToTerm("k", 1)<cr>
+NewMap -c -no <S-F8> :call RedoCommandToTerm("l", 1)<cr>
+NewMap -t -no <S-F5> <C-\><C-n>:call RedoCommandToTerm("h")<cr>
+NewMap -t -no <S-F6> <C-\><C-n>:call RedoCommandToTerm("j")<cr>
+NewMap -t -no <S-F7> <C-\><C-n>:call RedoCommandToTerm("k")<cr>
+NewMap -t -no <S-F8> <C-\><C-n>:call RedoCommandToTerm("l")<cr>
+
+NewMap -v -no <C-S-F5> :<C-u>call SigTermToTerm("h")<cr>
+NewMap -v -no <C-S-F6> :<C-u>call SigTermToTerm("j")<cr>
+NewMap -v -no <C-S-F7> :<C-u>call SigTermToTerm("k")<cr>
+NewMap -v -no <C-S-F8> :<C-u>call SigTermToTerm("l")<cr>
+NewMap -i -no <C-S-F5> <C-o>:call SigTermToTerm("h")<cr>
+NewMap -i -no <C-S-F6> <C-o>:call SigTermToTerm("j")<cr>
+NewMap -i -no <C-S-F7> <C-o>:call SigTermToTerm("k")<cr>
+NewMap -i -no <C-S-F8> <C-o>:call SigTermToTerm("l")<cr>
+NewMap -c -no <C-S-F5> :call SigTermToTerm("h", 1)<cr>
+NewMap -c -no <C-S-F6> :call SigTermToTerm("j", 1)<cr>
+NewMap -c -no <C-S-F7> :call SigTermToTerm("k", 1)<cr>
+NewMap -c -no <C-S-F8> :call SigTermToTerm("l", 1)<cr>
+NewMap -t -no <C-S-F5> <C-\><C-n>:call SigTermToTerm("h")<cr>
+NewMap -t -no <C-S-F6> <C-\><C-n>:call SigTermToTerm("j")<cr>
+NewMap -t -no <C-S-F7> <C-\><C-n>:call SigTermToTerm("k")<cr>
+NewMap -t -no <C-S-F8> <C-\><C-n>:call SigTermToTerm("l")<cr>
+
 " map <F5> :call RedoCommandToTerm("h")<cr>
 " map <F6> :call RedoCommandToTerm("j")<cr>
 " map <F7> :call RedoCommandToTerm("k")<cr>
-NewMap -map <F8> :w!<cr>:call RedoCommandToTerm("l")<cr>
+" NewMap -map <F8> :w!<cr>:call RedoCommandToTerm("l")<cr>
 
-NewMap -map <C-F5> :call SigTermToTerm("h")<cr>
-NewMap -map <C-F6> :call SigTermToTerm("j")<cr>
-NewMap -map <C-F7> :call SigTermToTerm("k")<cr>
-NewMap -map <C-F8> :call SigTermToTerm("l")<cr>
+" NewMap -map <C-F5> :call SigTermToTerm("h")<cr>
+" NewMap -map <C-F6> :call SigTermToTerm("j")<cr>
+" NewMap -map <C-F7> :call SigTermToTerm("k")<cr>
+" NewMap -map <C-F8> :call SigTermToTerm("l")<cr>
 
-NewMap -map <C-S-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
-NewMap -map <C-S-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
-NewMap -map <C-S-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
-NewMap -map <C-S-F8> :w!<cr>:call RedoCommandToTermWithSigTerm("l")<cr>
+" NewMap -map <C-S-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+" NewMap -map <C-S-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+" NewMap -map <C-S-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+" NewMap -map <C-S-F8> :w!<cr>:call RedoCommandToTermWithSigTerm("l")<cr>
 
 NewMap -v -no <F11> :<C-u>call Move('h')<cr>
 NewMap -n -no <F11> :call Move('h')<cr>
@@ -436,7 +491,7 @@ NewMap -n <C-S-A> :call IncRange()<cr>
 " Was Nmap
 NewMap -n <C-S-X> :call DecRange()<cr>
 NewMap -v af :call Vaf()<cr>
-NewMap -v if :call Vif()<cr>
+" NewMap -v if :call Vif()<cr>
 NewMap -v <C-S-A> :call IncRange()<cr>
 NewMap -v <C-S-X> :call DecRange()<cr>
 NewMap -t <leader>X :TIN tail -f $receiver<cr>
@@ -1079,7 +1134,7 @@ NewMap -map <C-S-Tab> :tabp<cr>
 
 NewMap -no <leader>qd :Diff --all<cr>
 NewMap -no <leader><leader>qd :Diff --all --cached<cr>
-NewMap -no <leader>qr :PushCWD  
+NewMap -no <leader>qr :PushCWD 
 NewMap -no <leader>qv :Pull<cr>
 NewMap -no <leader>ql :Log<cr>
 NewMap -no <leader>qs :Status<CR>
@@ -1099,10 +1154,23 @@ NewMap -no ,,,,f :C test abc def geh "OKAY DU?"<cr>
 
 
 " NewMap reduces spaces in commands - opts.args_string
-NewMap -map ,vg :copen<cr>:vimgrep  **/*[D[D[D[D[D
+NewMap -map -range=N ,vg :call VimGrep(v:count)<cr>
 NewMap -map ,vo :copen<cr>
 
-NewMap -map [1;5A :copen<cr>:vimgrep   **/*[D[D[D[D[D
+function VimGrep(count) abort
+  " :copen<cr>:vimgrep "" **/*[D[D[D[D[D
+  copen
+  let x=""
+  let i=0
+  for i in range(a:count)
+    let x+="../"
+    let i =+ 1
+  endfor
+  let command=input(':', 'vimgrep "" '..x..'**/*')
+  exec command
+endfunction
+
+" NewMap -map [1;5A :call VimGrep(v:count)<cr>
 NewMap -map [D :cclose<cr>
 NewMap -map [C :copen<cr>
 NewMap -map [A :cprev<cr>
@@ -1155,4 +1223,6 @@ NewCommand command! -range -nargs=* RenameBranch call GitRenameBranch(<f-args>)
 NewCommand command! -range -nargs=* NewRemote call GitNewRemote(<f-args>)
 NewCommand command! -range -nargs=* NewBranch call GitNewBranch(<f-args>)
 
+NewMap -t -no <C-v> <C-\><C-n>
+NewMap -v -no i <C-c>i
 endif
