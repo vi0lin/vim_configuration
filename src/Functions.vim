@@ -393,8 +393,8 @@ function GetOpts2(args_str, structure)
             " let str_from=len(getopts.args[arg_idx])
             " let default=args_str[start:]
             " echo getopts.args[arg_idx].." cut from "..args_str
-            " let args_str=substitute(args_str, getopts.args[arg_idx]..' ', "", "")
-            let args_str=args_str[len(getopts.args[arg_idx]):]
+            let args_str=substitute(args_str, getopts.args[arg_idx]..' ', "", "")
+            " let args_str=args_str[len(getopts.args[arg_idx]):]
           " endif
         else
           let default=args_str
