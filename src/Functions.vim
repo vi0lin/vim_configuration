@@ -134,11 +134,13 @@ let s:newmap_optschema = [
 let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
 
+let g:sh={}
 function GetOpts2(args_str, structure)
   let args_str=a:args_str
   let args=ParseArgs(args_str)
+  let fn=FunctionName()
   " call Debug(1, 0, "=============")
-  " call Debug(1, 0, FunctionName())
+  " call Debug(1, 0, fn)
   " call Debug(1, 0, args)
   " " call Debug(1, 4, a:structure)
   function! _build() closure
@@ -152,12 +154,20 @@ function GetOpts2(args_str, structure)
   endfunction
   let opts=_build()
   function! StructureHelper() closure
-    let sh=[]
-    for s in a:structure
-      let data = split(s[1], '|')
-      call add(sh, data)
-    endfor
-    return sh
+    if !exists('g:sh[fn]')
+      let value={}
+      " call add(g:sh, { fn: value })
+      let g:sh[fn]={}
+      " echo g:sh
+      for s in a:structure
+        let data = split(s[1], '|')
+        for d in data
+          " call add(g:sh[fn], { d: s })
+          let g:sh[fn][d]=s
+        endfor
+      endfor
+    endif
+    return g:sh
   endfunction
   function! Check(arg, returnStructure=0) closure
     " let arg_check={ \
@@ -213,20 +223,29 @@ function GetOpts2(args_str, structure)
   "   return StatsWithDash(a:arg) && ( IsInLookup(a:arg) || IsInStructure(a:arg) )
   " endfunction
   function! MatchFromStructure(arg) closure
-    let i = 0
-    for k in getopts.structure_helper
-      " " call Debug(1,4, k)
-      if index(k,a:arg)>=0
-        " call Debug(1,4, "Match: "..a:arg.." "..string(a:structure[i]))
-        return a:structure[i]
+    " let i = 0
+    if has_key(getopts.structure_helper, fn)
+      if has_key(getopts.structure_helper[fn], a:arg)
+        return getopts.structure_helper[fn][a:arg]
+      else
+        return []
       endif
-      " let found_key=(name =~ '\v^('..k[1]..')$')
-      " if found_key
-      "   call add(found_keys, k)
-      " endif
-      let i+=1
-    endfor
-    return []
+    else
+      return []
+    endif
+    " for k in getopts.structure_helper
+    "   " " call Debug(1,4, k)
+    "   if index(k,a:arg)>=0
+    "     " call Debug(1,4, "Match: "..a:arg.." "..string(a:structure[i]))
+    "     return a:structure[i]
+    "   endif
+    "   " let found_key=(name =~ '\v^('..k[1]..')$')
+    "   " if found_key
+    "   "   call add(found_keys, k)
+    "   " endif
+    "   let i+=1
+    " endfor
+    " return []
     " let matches=[]
     " for k in getopts.structure
     "   let match=(a:arg=~ '\v^('..k[1]..')$')
@@ -237,7 +256,7 @@ function GetOpts2(args_str, structure)
     " if a:feed_lookup
     "   let s:lookup_matrix[functionName][a:arg]=matches
     " endif
-    return matches
+    " return matches
   endfunction
   function! IsInStructure(arg) closure
     let i = 0
@@ -316,7 +335,6 @@ function GetOpts2(args_str, structure)
       if empty(match) && arg_idx==0
         let had_default=1
       endif
-
       if had_default
         call add(specs.arg_is_default, 1)
         call add(specs.argtypes, 0)
@@ -391,7 +409,6 @@ function GetOpts2(args_str, structure)
           " endif
           let opts.default=args_str
         endif
-      else
         if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
           let opts[specs.matches[arg_idx][0]]=1
         elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
