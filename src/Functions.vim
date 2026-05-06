@@ -142,7 +142,7 @@ function GetOpts2(args_str, structure)
   " call Debug(1, 0, args)
   " " call Debug(1, 4, a:structure)
   function! _build() closure
-    let opts={'default':[]}
+    let opts={'default':args_str}
     for s in a:structure
       if s[2]==0
         let opts[s[0]]=0
@@ -374,16 +374,9 @@ function GetOpts2(args_str, structure)
       "   endif
       "   let mainargcount[mainarg]+=1
       " endif
-    endfor
-    return specs
-  endfunction
-  " echo Specification()
-  function! BuildOpts() closure
-    call Specification()
-    " call Debug(1, 4, "specs: "..string(spec))
-    let arg_idx = 0
-    for arg_idx in range(0,len(getopts.args)-1)
-      if had_default
+      "
+      " THIS
+      if had_default==0
         let default=''
         " echo specs.arg_is_default
         " echo specs.arg_is_default[arg_idx]
@@ -393,19 +386,28 @@ function GetOpts2(args_str, structure)
             " let str_from=len(getopts.args[arg_idx])
             " let default=args_str[start:]
             " echo getopts.args[arg_idx].." cut from "..args_str
-            let args_str=substitute(args_str, getopts.args[arg_idx]..' ', "", "")
-            " let args_str=args_str[len(getopts.args[arg_idx]):]
+            " let args_str=substitute(args_str, getopts.args[arg_idx]..' ', "", "")
+            let args_str=args_str[len(getopts.args[arg_idx])+1:]
           " endif
-        else
-          let default=args_str
+          let opts.default=args_str
         endif
-        let opts.default=default
-      endif
-      if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
-        let opts[specs.matches[arg_idx][0]]=1
-      elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
+      else
+        if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
+          let opts[specs.matches[arg_idx][0]]=1
+        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
+        endif
       endif
     endfor
+    return specs
+  endfunction
+  " echo Specification()
+  function! BuildOpts() closure
+    call Specification()
+    " call Debug(1, 4, "specs: "..string(specs))
+    let arg_idx = 0
+    " for arg_idx in range(0,len(getopts.args)-1)
+    "   " HERE
+    " endfor
     " call Debug(1,0,"opts: "..string(opts))
     return opts
   endfunction
