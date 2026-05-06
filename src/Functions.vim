@@ -137,10 +137,10 @@ let s:lookup_matrix={}
 function GetOpts2(args_str, structure)
   let args_str=a:args_str
   let args=ParseArgs(args_str)
-  call Debug(1, 0, "=============")
-  call Debug(1, 0, FunctionName())
-  call Debug(1, 0, args)
-  " call Debug(1, 4, a:structure)
+  " call Debug(1, 0, "=============")
+  " call Debug(1, 0, FunctionName())
+  " call Debug(1, 0, args)
+  " " call Debug(1, 4, a:structure)
   function! _build() closure
     let opts={'default':[]}
     for s in a:structure
@@ -166,13 +166,13 @@ function GetOpts2(args_str, structure)
     "       }
     if StartsWithDash(a:arg)
       " LOGIC FÜR DAS SETZEN VON opts.insert opts.normal usw
-      call Debug(1, 0, "Starts With Dash")
+      " call Debug(1, 0, "Starts With Dash")
       " if IsInLookup(a:arg)
-      "   call Debug(1, 0, "Is In Lookup")
+      "   " call Debug(1, 0, "Is In Lookup")
       "   return !a:returnStructure && 1 || MatchesFromLookup(a:arg)
       " elseif IsInStructure(a:arg)
       if IsInStructure(a:arg)
-        call Debug(1, 0, "Is In Structure")
+        " call Debug(1, 0, "Is In Structure")
         return !a:returnStructure && 1 || MatchesFromStructure(a:arg)
       else
         return 0
@@ -215,9 +215,9 @@ function GetOpts2(args_str, structure)
   function! MatchFromStructure(arg) closure
     let i = 0
     for k in getopts.structure_helper
-      " call Debug(1,4, k)
+      " " call Debug(1,4, k)
       if index(k,a:arg)>=0
-        call Debug(1,4, "Match: "..a:arg.." "..string(a:structure[i]))
+        " call Debug(1,4, "Match: "..a:arg.." "..string(a:structure[i]))
         return a:structure[i]
       endif
       " let found_key=(name =~ '\v^('..k[1]..')$')
@@ -275,7 +275,7 @@ function GetOpts2(args_str, structure)
   " default_index     9                            0                            oder [0, 6]
   " mainargcount     [1, 4, 0]                    [0]
   let getopts={'args': args, 'structure': a:structure, 'structure_helper': StructureHelper() }
-  " call Debug(1,4, getopts.structure_helper)
+  " " call Debug(1,4, getopts.structure_helper)
   " delimeter-arg='--'
   let specs={
     \ 'argtypes': [],
@@ -291,14 +291,14 @@ function GetOpts2(args_str, structure)
     " BUILD SPECS
     " args - args_string
     " echo functionName
-    call Debug(1, 0, "getopts.args: "..string(getopts.args))
+    " call Debug(1, 0, "getopts.args: "..string(getopts.args))
     let arg_idx = 0
-    call Debug(1, 0, "RANGE: "..string(range(0,len(getopts.args)-1)))
+    " call Debug(1, 0, "RANGE: "..string(range(0,len(getopts.args)-1)))
     for arg_idx in range(0,len(getopts.args)-1)
       " if had_default
       " endif
-      call Debug(1, 2, "--- arg ---")
-      call Debug(1, 10, "getopts.args[arg_idx]: "..getopts.args[arg_idx])
+      " call Debug(1, 2, "--- arg ---")
+      " call Debug(1, 10, "getopts.args[arg_idx]: "..getopts.args[arg_idx])
       " let check=Check(getopts.args[arg_idx])
       " if IsMainArg()
       " endif
@@ -334,16 +334,16 @@ function GetOpts2(args_str, structure)
       if specs.arg_is_default[arg_idx]==1
         let had_default=1
       endif
-      call Debug(1, 10, "had_default: "..had_default)
+      " call Debug(1, 10, "had_default: "..had_default)
       " if IsInStructure()
       " endif
       " if StartsWithDash(getopts.args[arg_idx])
       " endif
       " if ArgBelongsToPreviousMainArgAsValue()
       " endif
-      call Debug(1, 2, "getopts.args["..arg_idx.."] "..getopts.args[arg_idx])
-      " call Debug(1, 2, "check "..check)
-      call Debug(1, 2, "arg_idx "..arg_idx)
+      " call Debug(1, 2, "getopts.args["..arg_idx.."] "..getopts.args[arg_idx])
+      " " call Debug(1, 2, "check "..check)
+      " call Debug(1, 2, "arg_idx "..arg_idx)
       " if getopts.args[arg_idx]=="--"
       "   if delimeter_index==-1
       "     " func int or []
@@ -379,7 +379,8 @@ function GetOpts2(args_str, structure)
   endfunction
   " echo Specification()
   function! BuildOpts() closure
-    call Debug(1, 4, "specs: "..string(Specification()))
+    call Specification()
+    " call Debug(1, 4, "specs: "..string(spec))
     let arg_idx = 0
     for arg_idx in range(0,len(getopts.args)-1)
       if had_default
@@ -404,10 +405,10 @@ function GetOpts2(args_str, structure)
       elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
       endif
     endfor
-    call Debug(1,0,"opts: "..string(opts))
+    " call Debug(1,0,"opts: "..string(opts))
     return opts
   endfunction
-  " call Debug(1, 0, "TEST" s:lookup_matrix)
+  " " call Debug(1, 0, "TEST" s:lookup_matrix)
   return BuildOpts()
 endfunction
 " echo GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
@@ -1661,7 +1662,7 @@ function! GitStashPushAutoStash(...)
   if !empty(expand('%'))
     e %
   endif
-  " call Debug(1, 0, x)
+  " " call Debug(1, 0, x)
 endfunction
 command! -range -nargs=0 GitStashPushAutoStash <line1>,<line2>:call GitStashPushAutoStash(<q-args>)
 
