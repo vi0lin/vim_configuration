@@ -2739,8 +2739,13 @@ function! GitInfo(...)
   endfor
   " echo w:gitBranchList
   echo "\n"
-  echo "Branches:"
+  echo "Local Branches:"
   for x in systemlist('git branch --list')
+    echo x
+  endfor
+  echo "\n"
+  echo "Remote Branches:"
+  for x in systemlist('git branch -r')
     echo x
   endfor
   echo "\n"
