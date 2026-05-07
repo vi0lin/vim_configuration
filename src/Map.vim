@@ -524,13 +524,12 @@ NewMap -map <A-i> 12<C-w>>
 
 " map <leader>h :call TabH()<cr>
 " map <leader>t :call TabL()<cr>
-
 " map <leader>g :call TabH()<cr>
 " map <leader>h :call TabL()<cr>
-
-NewMap -map <A-h> :call TabH()<cr>
-NewMap -map <A-l> :call TabL()<cr>
-
+" NewMap -map <A-h> :call TabH()<cr>
+" NewMap -map <A-l> :call TabL()<cr>
+" NewMap -map <C-Tab> :tabn<cr>
+" NewMap -map <C-S-Tab> :tabp<cr>
 NewMap -map <C-S-M-h> :wincmd H<cr>
 NewMap -map <C-S-M-j> :wincmd J<cr>
 NewMap -map <C-S-M-k> :wincmd K<cr>
@@ -545,6 +544,10 @@ NewMap -t -no <C-S-h> <c-\><c-n>:call SwapWin("h")<cr>
 NewMap -t -no <C-S-j> <c-\><c-n>:call SwapWin("j")<cr>
 NewMap -t -no <C-S-k> <c-\><c-n>:call SwapWin("k")<cr>
 NewMap -t -no <C-S-l> <c-\><c-n>:call SwapWin("l")<cr>
+NewMap -map <A-h> :call IntegrateIn('h')<cr>
+NewMap -map <A-j> :call IntegrateIn('j')<cr>
+NewMap -map <A-k> :call IntegrateIn('k')<cr>
+NewMap -map <A-l> :call IntegrateIn('l')<cr>
 
 NewMap -n -no <leader>fuc :call OpenFileUnderCursor()<cr>
 NewMap -n -no <leader><leader>fb :LayoutBash<cr>
@@ -1148,9 +1151,6 @@ NewMap -map <leader>ab :RECP<cr>
 " NewMap -map <leader>m :call TabBuffers('merge')<cr>
 " NewMap -map <F1> :call TabBuffers('next')<cr>
 " NewMap -map <S-F1> :call TabBuffers('prev')<cr>
-
-NewMap -map <C-Tab> :tabn<cr>
-NewMap -map <C-S-Tab> :tabp<cr>
 
 NewMap -no <leader>qd :Diff --all<cr>
 NewMap -no <leader><leader>qd :Diff --all --cached<cr>

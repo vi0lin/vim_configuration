@@ -4422,6 +4422,52 @@ function! SwapWin(direction)
   execute l:neighbor_win "windo b" l:current_buf
 endfunction
 
+function! FindParent(layout, target_id, parent)
+  let type = a:layout[0]
+  if type == 'leaf'
+    if a:layout[1] == a:target_id
+      return [a:parent, a:layout]
+    endif
+    return []
+  endif
+  let children = a:layout[1]
+  for child in children
+    let result = FindParent(child, a:target_id, a:layout)
+    if !empty(result)
+      return result
+    endif
+  endfor
+  return []
+endfunction
+function! SameContainer(id_a, id_b)
+  let layout = winlayout()
+  let res_a = FindParent(layout, a:id_a, [])
+  let res_b = FindParent(layout, a:id_b, [])
+  if empty(res_a) || empty(res_b)
+    return {'same': 0, 'type': ''}
+  endif
+  let parent_a = res_a[0]
+  let parent_b = res_b[0]
+  let same = (parent_a is parent_b) || (parent_a == parent_b)
+  return {'same': same, 'type': parent_a[0]}  " type: 'row' or 'col'
+endfunction
+function! IntegrateIn(direction)
+  " echo "Realize This Somehow"
+  " echo winlayout()
+  " echo win_getid()
+  " echo winnr(a:direction)
+  " echo win_getid(winnr(a:direction))
+  let this_id   = win_getid()
+  let target_id = win_getid(winnr(a:direction))
+  let result = SameContainer(this_id, target_id)
+  if result.same
+    echo 'Same ' . result.type
+  else
+    echo 'Different container'
+  endif
+  call win_splitmove(this_id, target_id, {'vertical': result.type == 'row'})
+endfunction
+
 function! WinBufSwap_Back()
   let thiswin = winnr()
   let thisbuf = bufnr("%")
