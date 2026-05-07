@@ -1,4 +1,4 @@
-let s:debug=0
+let g:debug=0
 
 " Avoid cdo prompt for overwiting files
 if !exists("g:vim_advantages_got_sourced")
@@ -14,20 +14,75 @@ function! s:MatchesOneOfPatterns(pattern_string, term) abort
 endfunction
 
 command! -range -nargs=* Debug :call Debug(<f-args>)
-function! Debug(...)
+function! Debug(opts, ...)
   let level = a:000[0]
-  let intend= a:000[1]
-  let args=a:000[2:]
-  let intend_str=""
-  for x in range(intend)
-    let intend_str.=" "
-  endfor
-  if s:debug >= level
+  if g:debug >= level || ( exists('a:opts.verbose') && a:opts.verbose )
+    let intend= a:000[1]
+    let args=a:000[2:]
+    let intend_str=""
+    for x in range(intend)
+      let intend_str.=" "
+    endfor
     let o=join(args, ' ')
     let out=printf(intend_str.."%s", o)
     echo out
   endif
 endfunction
+
+" function! IfDebug(condition)
+"   let l:vars = {}
+"   for l:line in getline(1, '$')
+"     let l:m = matchlist(l:line, '^\s*let\s\+\(\w\+\)\s*=\s*\(.*\)\s*$')
+"     if len(l:m) > 0
+"       let l:vars[l:m[1]] = trim(l:m[2])
+"     endif
+"   endfor
+"   let l:result = a:condition
+"   for [l:name, l:val] in items(l:vars)
+"     let l:result = substitute(l:result, '\<' . l:name . '\>', l:val, 'g')
+"   endfor
+"   echo 'ifd: ' . l:result
+" endfunction
+" command! -nargs=+ Ifd call IfDebug(<q-args>)
+
+function! Ifd(expr) abort
+  let result = a:expr
+  let tokens = []
+  let tmp = a:expr
+  let pat = '\v<([a-zA-Z_][a-zA-Z0-9_]*)>'
+  let start = 0
+  while 1
+    let m = matchstr(tmp, pat, start)
+    if m == ''
+      break
+    endif
+    let mstart = match(tmp, pat, start)
+    if index(tokens, m) == -1
+      call add(tokens, m)
+    endif
+    let start = mstart + len(m)
+  endwhile
+  for token in tokens
+    if index(['and','or','not','if','else','elseif','endif',
+            \ 'let','call','return','function','endfunction'], token) >= 0
+      continue
+    endif
+    let val = ''
+    let found = 0
+    for prefix in ['', 'g:', 's:', 'b:', 'w:', 't:']
+      if exists(prefix . token)
+        let val = string(eval(prefix . token))
+        let found = 1
+        break
+      endif
+    endfor
+    if found
+      let result = substitute(result, '\v<' . token . '>', val, 'g')
+    endif
+  endfor
+  echo result
+endfunction
+command! -nargs=+ Ifd call Ifd(<q-args>)
 
 function! SmartFold()
 endfunction
@@ -116,43 +171,32 @@ endfunction
 " 0.05 - 0.5
 " 2. Work Trough Specs More Precisely Instead Of Occasionally Decisiontaking
 
-let s:newmap_optschema = [
-  \ [ 'all', 'A|a|all|All', 0],
-  \ [ 'map', 'M|m|map|Map', 0],
-  \ [ 'normal', 'N|n|normal|Normal', 0],
-  \ [ 'visual', 'V|v|visual|Visual', 0],
-  \ [ 'x', 'X|x', 0],
-  \ [ 's', 'S|s', 0],
-  \ [ 'command', 'C|c|command|command', 0],
-  \ [ 'terminal', 'T|t|terminal|Terminal', 0],
-  \ [ 'o', 'O|o', 0],
-  \ [ 'insert', 'I|i', 0],
-  \ [ 'l', 'L|l', 0],
-  \ [ 'silent', 'Silent|silent', 0],
-  \ [ 'noremap', 'No|no|noremap|Noremap', 0],
-  \ ]
 let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
 
 let g:sh={}
-function GetOpts2(args_str, structure)
+  function GetOpts2(args_str, structure, delimeter='--')
   let args_str=a:args_str
   let args=ParseArgs(args_str)
   let fn=FunctionName()
-  " call Debug(1, 0, "=============")
-  " call Debug(1, 0, fn)
-  " call Debug(1, 0, args)
-  " " call Debug(1, 4, a:structure)
+  " call Debug(opts, 1, 4, a:structure)
   function! _build() closure
     let opts={'default':args_str}
     for s in a:structure
       if s[2]==0
         let opts[s[0]]=0
+      elseif s[2]=='n'
+        let opts[s[0]]=[]
+      elseif s[2]==1
+        let opts[s[0]]=""
+      elseif s[2]>1
+        let opts[s[0]]=[]
       endif
     endfor
     return opts
   endfunction
   let opts=_build()
+  call Debug(opts, 5, 0, string(opts))
   function! StructureHelper() closure
     if !exists('g:sh[fn]')
       let value={}
@@ -176,13 +220,13 @@ function GetOpts2(args_str, structure)
     "       }
     if StartsWithDash(a:arg)
       " LOGIC FÜR DAS SETZEN VON opts.insert opts.normal usw
-      " call Debug(1, 0, "Starts With Dash")
+      call Debug(opts, 1, 0, "Starts With Dash")
       " if IsInLookup(a:arg)
-      "   " call Debug(1, 0, "Is In Lookup")
+      "   call Debug(opts, 1, 0, "Is In Lookup")
       "   return !a:returnStructure && 1 || MatchesFromLookup(a:arg)
       " elseif IsInStructure(a:arg)
       if IsInStructure(a:arg)
-        " call Debug(1, 0, "Is In Structure")
+        call Debug(opts, 1, 0, "Is In Structure")
         return !a:returnStructure && 1 || MatchesFromStructure(a:arg)
       else
         return 0
@@ -234,9 +278,9 @@ function GetOpts2(args_str, structure)
       return []
     endif
     " for k in getopts.structure_helper
-    "   " " call Debug(1,4, k)
+    "   " call Debug(opts, 1,4, k)
     "   if index(k,a:arg)>=0
-    "     " call Debug(1,4, "Match: "..a:arg.." "..string(a:structure[i]))
+    "     call Debug(opts, 1,4, "Match: "..a:arg.." "..string(a:structure[i]))
     "     return a:structure[i]
     "   endif
     "   " let found_key=(name =~ '\v^('..k[1]..')$')
@@ -293,8 +337,12 @@ function GetOpts2(args_str, structure)
   " delimeter_index  -1
   " default_index     9                            0                            oder [0, 6]
   " mainargcount     [1, 4, 0]                    [0]
+  call Debug(opts, 1, 0, "============================")
+  call Debug(opts, 1, 2, fn)
+  call Debug(opts, 1, 2, args_str)
+  call Debug(opts, 1, 2, args)
   let getopts={'args': args, 'structure': a:structure, 'structure_helper': StructureHelper() }
-  " " call Debug(1,4, getopts.structure_helper)
+  " call Debug(opts, 1,4, getopts.structure_helper)
   " delimeter-arg='--'
   let specs={
     \ 'argtypes': [],
@@ -305,100 +353,71 @@ function GetOpts2(args_str, structure)
     " \ 'delimeter_index': -1,
     " \ 'default_index': -1,
     " \ 'mainargcount': []
-  let had_default=0
+  let ignore_flags=0
+  " Specifications
   function! Specification() closure
-    " BUILD SPECS
-    " args - args_string
-    " echo functionName
-    " call Debug(1, 0, "getopts.args: "..string(getopts.args))
     let arg_idx = 0
-    " call Debug(1, 0, "RANGE: "..string(range(0,len(getopts.args)-1)))
+    let fill_n=0
+    let bag_name=''
+    call Debug(opts, 1, 1, "getopts.args: "..string(getopts.args))
+    call Debug(opts, 1, 1, "RANGE: "..string(range(0,len(getopts.args)-1)))
     for arg_idx in range(0,len(getopts.args)-1)
-      " if had_default
-      " endif
-      " call Debug(1, 2, "--- arg ---")
-      " call Debug(1, 10, "getopts.args[arg_idx]: "..getopts.args[arg_idx])
-      " let check=Check(getopts.args[arg_idx])
-      " if IsMainArg()
-      " endif
-      " if IsValueArg()
-      " endif
-      " if StartsWithDash(a:arg)
-      " endif
       let stripped_arg=getopts.args[arg_idx]
       let match=[]
-      if !had_default && StartsWithDash(getopts.args[arg_idx])
+      call Debug(opts, 1, 1, "### ".getopts.args[arg_idx]." <- Opt")
+      call Debug(opts, 1, 7, "getopts.args[arg_idx]: "..getopts.args[arg_idx])
+      " Add Match
+      let starts_with_dash=StartsWithDash(getopts.args[arg_idx])
+      " call Debug(opts, 9, 10, "!ignore_flags && starts_with_dash ---> ", !ignore_flags, "&&", starts_with_dash)
+      if !ignore_flags && starts_with_dash
         let stripped_arg=StripDashes(getopts.args[arg_idx])
         let match=MatchFromStructure(stripped_arg)
         call add(specs.matches, match)
       endif
+      " First Argument Is No GetOpt
       if empty(match) && arg_idx==0
-        let had_default=1
+        let ignore_flags=1
       endif
-      if had_default
-        call add(specs.arg_is_default, 1)
-        call add(specs.argtypes, 0)
-      else
-        if !empty(match)
+      " Specs
+      if !ignore_flags
+        " Is Bag Value
+        if !empty(bag_name)
+          call add(specs.argtypes, 2)
           call add(specs.arg_is_default, 0)
+          call add(specs.cardinalities, -1)
+        " Is GetOpt
+        elseif !empty(match)
           call add(specs.argtypes, 1)
+          call add(specs.arg_is_default, 0)
           call add(specs.cardinalities, match[2])
-        else
-          call add(specs.arg_is_default, 1)
+        " Not In GetOpt
+        elseif empty(match)
           call add(specs.argtypes, 0)
-          let had_default=1
+          call add(specs.arg_is_default, 1)
+          call add(specs.cardinalities, -1)
         endif
+      " Defaults
+      else
+        call add(specs.arg_is_default, 1)
+        call add(specs.argtypes, 3)
+        call add(specs.cardinalities, -1)
       endif
+      " Start Default, Just In Case
       if specs.arg_is_default[arg_idx]==1
-        let had_default=1
+        let ignore_flags=1
       endif
-      " call Debug(1, 10, "had_default: "..had_default)
-      " if IsInStructure()
-      " endif
-      " if StartsWithDash(getopts.args[arg_idx])
-      " endif
-      " if ArgBelongsToPreviousMainArgAsValue()
-      " endif
-      " call Debug(1, 2, "getopts.args["..arg_idx.."] "..getopts.args[arg_idx])
-      " " call Debug(1, 2, "check "..check)
-      " call Debug(1, 2, "arg_idx "..arg_idx)
-      " if getopts.args[arg_idx]=="--"
-      "   if delimeter_index==-1
-      "     " func int or []
-      "     let delimeter_index=arg_idx
-      "     if len(args) > arg_idx+1
-      "       let default_index=arg_idx+1
-      "     endif
-      "   else
-      "     " func int or []
-      "     let delimeter_index=[delimeter_index]
-      "     call add(delimeter_index, [arg_idx])
-      "     if len(args) > arg_idx+1
-      "       let default_index=[default_index]
-      "       call add(default_index, [arg_idx+1])
-      "     endif
-      "   endif
-      " endif
-      " call add(specs.argtypes,isMain)
-      " " todo if cardinality extended || default argument
-      " if isMain
-      "   if len(mainargcount) > 0
-      "     let mainarg+=1
-      "   endif
-      "   call add(mainargcount,0)
-      " else
-      "   if len(mainargcount)==0
-      "     call add(mainargcount,0)
-      "   endif
-      "   let mainargcount[mainarg]+=1
-      " endif
-      "
-      " THIS
-      if had_default==0
+      call Debug(opts, 1, 7, "specs: "..string(specs))
+      call Debug(opts, 1, 10, "ignore_flags: "..ignore_flags)
+      call Debug(opts, 1, 10, "getopts.args["..arg_idx.."] "..getopts.args[arg_idx])
+      call Debug(opts, 1, 10, "arg_idx "..arg_idx)
+      " call Debug(opts, 4, 10, specs)
+      " Cut
+      if !ignore_flags
         let default=''
         " echo specs.arg_is_default
         " echo specs.arg_is_default[arg_idx]
-        if specs.argtypes[arg_idx]==1
+        if specs.argtypes[arg_idx]==1 || specs.argtypes[arg_idx]==2
+          call Debug(opts, 1, 10, 'Cutting '..string(len(getopts.args[arg_idx])+1).." chars from left")
         " if arg_idx>0
           " if specs.argtypes[arg_idx-1]==1 && specs.cardinalities[arg_idx-1]==0
             " let str_from=len(getopts.args[arg_idx])
@@ -409,29 +428,73 @@ function GetOpts2(args_str, structure)
           " endif
           let opts.default=args_str
         endif
-        if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
-          let opts[specs.matches[arg_idx][0]]=1
-        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
-        endif
       endif
+      " Processing
+        if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
+          " set-flag
+          let opts[specs.matches[arg_idx][0]]=1
+        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==1
+          " set fill-one
+          " ignore StartsWithDash
+          let bag_name=match[0]
+          call Debug(opts, 1, 10, "bag_name", bag_name)
+          let fill_n=1
+        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
+          " set fill-until-delimeter
+          " ignore StartsWithDash
+          let bag_name=match[0]
+          call Debug(opts, 1, 10, "bag_name", bag_name)
+          let fill_n=-1
+        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=~'\d'
+          " set fill-\d
+          " ignore StartsWithDash
+          let bag_name=match[0]
+          call Debug(opts, 1, 10, "bag_name", bag_name)
+          let fill_n=specs.cardinalities[arg_idx]
+        elseif specs.argtypes[arg_idx]==2
+          " fill-bag
+          " todo FILL BAG - int string dict list
+          call Debug(opts, 1, 10, "FILL BAG")
+          call Debug(opts, 1, 12, 'bag_name: ', bag_name)
+          " call Debug(opts, 1, 12, 'specs.matches', specs.matches)
+          let bag_len=len(opts[bag_name])
+          if bag_len==0
+            let opts[bag_name]=getopts.args[arg_idx]
+          elseif bag_len>0
+            call add(opts[bag_name], [ getopts.args[arg_idx] ])
+          endif
+          call Debug(opts, 10, 12, "bag_name: ", bag_name, ", fill_n: ", fill_n, ", bag_len: ", bag_len, ', opts[bag_name]: :', opts[bag_name])
+          if fill_n>0
+            let fill_n-=1
+          endif
+          if fill_n==-1
+            if getopts.args[arg_idx][0:1]==a:delimeter
+              let fill_n=0
+            endif
+          endif
+          if fill_n==0
+            let bag_name=''
+            call Debug(opts, 1, 10, "bag_name", bag_name)
+          endif
+        endif
     endfor
     return specs
   endfunction
   " echo Specification()
   function! BuildOpts() closure
     call Specification()
-    " call Debug(1, 4, "specs: "..string(specs))
+    call Debug(opts, 1, 10, "------------\nspecs: "..string(specs))
     let arg_idx = 0
     " for arg_idx in range(0,len(getopts.args)-1)
     "   " HERE
     " endfor
-    " call Debug(1,0,"opts: "..string(opts))
+    call Debug(opts, 1,10,"opts: "..string(opts))
     return opts
   endfunction
-  " " call Debug(1, 0, "TEST" s:lookup_matrix)
+  " call Debug(opts, 1, 0, "TEST" s:lookup_matrix)
   return BuildOpts()
 endfunction
-" echo GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], s:newmap_optschema)
+" echo GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], g:newmap_optschema)
 
 function! ParseArgs(argstr)
   let args = []

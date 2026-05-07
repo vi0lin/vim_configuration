@@ -5,25 +5,10 @@ import autoload "./Functions.vim9" as F
 
 let g:FlagReceived=0
 "  \ [ 'args', 'args|Args', '*'],
-let s:newmap_optschema = [
-  \ [ 'all', 'A|a|all|All', 0],
-  \ [ 'map', 'M|m|map|Map', 0],
-  \ [ 'normal', 'N|n|normal|Normal', 0],
-  \ [ 'visual', 'V|v|visual|Visual', 0],
-  \ [ 'x', 'X|x', 0],
-  \ [ 's', 'S|s', 0],
-  \ [ 'command', 'C|c|command|command', 0],
-  \ [ 'terminal', 'T|t|terminal|Terminal', 0],
-  \ [ 'o', 'O|o', 0],
-  \ [ 'insert', 'I|i', 0],
-  \ [ 'l', 'L|l', 0],
-  \ [ 'silent', 'Silent|silent', 0],
-  \ [ 'noremap', 'No|no|noremap|Noremap', 0],
-  \ ]
 
 function NewMapKeyCheckAll(...)
   for n in s:newmaps
-    echo GetOpts(n.args, s:newmap_optschema)
+    echo GetOpts(n.args, g:newmap_optschema)
   endfor
   " let args=a:000[1:]
   " echo "Press ["..args[0][0].."]\nSkip <C-Left>"
@@ -85,6 +70,26 @@ command! -range -nargs=* FunctionName call FunctionName(<q-args>)
 " NewMap -n -no <f1> :FunctionName 3<CR>:FunctionName 1<cr>
 
 let s:newmaps=[]
+let g:newmap_optschema = [
+  \ [ 'all', 'A|a|all|All', 0],
+  \ [ 'map', 'M|m|map|Map', 0],
+  \ [ 'normal', 'N|n|normal|Normal', 0],
+  \ [ 'visual', 'V|v|visual|Visual', 0],
+  \ [ 'x', 'X|x', 0],
+  \ [ 's', 'S|s', 0],
+  \ [ 'command', 'C|c|command|command', 0],
+  \ [ 'terminal', 'T|t|terminal|Terminal', 0],
+  \ [ 'o', 'O|o', 0],
+  \ [ 'insert', 'I|i', 0],
+  \ [ 'l', 'L|l', 0],
+  \ [ 'silent', 'Silent|silent', 0],
+  \ [ 'noremap', 'No|no|noremap|Noremap', 0],
+  \ [ 'unmap', 'unmap|u', 0],
+  \ [ 'dry', 'dry|d', 0],
+  \ [ 'verbose', 'verbose|debug', 0],
+  \ [ 'leaders', 'leaders', 1],
+  \ [ 'key', 'k|key', 1],
+  \ ]
 function! NewMap(args)
   " echo functionName
   " echo a:000
@@ -93,7 +98,7 @@ function! NewMap(args)
   " call add(s:newmaps, { 'args': a:000 } )
   " endtry
   " echo len(s:newmaps)
-  let opts=GetOpts2(a:args, s:newmap_optschema)
+  let opts=GetOpts2(a:args, g:newmap_optschema)
   " call Debug(3, opts)
   " echo opts
   " return
@@ -139,52 +144,62 @@ function! NewMap(args)
     let opts.o=1
     let opts.l=1
   endif
-  function! Echo(...)
+  function! Echo(...) closure
     let parts=filter(copy(a:000), 'v:val!=""')
     echo join(parts, ' ')
   endfunction
   command! -nargs=* Echo :call Echo(<f-args>)
-  function! Exec(...)
+  function! Exec(...) closure
     let parts=filter(copy(a:000), 'v:val!=""')
+    if opts.verbose
+      echo join(parts, ' ')
+    endif
+    if opts.dry
+      echo join(parts, ' ')
+    endif
     exec join(parts, ' ')
   endfunction
   command! -nargs=* Exec :call Exec(<f-args>)
+  let command=join(filter([opts.key, opts.default], 'v:val!=""'), ' ')
   " temporarily
   if opts.all
-    call Exec("Amap", silent, opts.default)
+    call Exec("Amap", silent, command)
   else
     if opts.map
-      call Exec(noremap.."map", silent, opts.default)
+      call Exec(noremap.."map", silent, command)
     endif
     if opts.normal
-      call Exec("n"..noremap.."map", silent, opts.default)
+      call Exec("n"..noremap.."map", silent, command)
     endif
     if opts.visual
-      call Exec("v"..noremap.."map", silent, opts.default)
+      call Exec("v"..noremap.."map", silent, command)
     endif
     if opts.command
-      call Exec("c"..noremap.."map", silent, opts.default)
+      call Exec("c"..noremap.."map", silent, command)
     endif
     if opts.insert
-      call Exec("i"..noremap.."map", silent, opts.default)
+      call Exec("i"..noremap.."map", silent, command)
     endif
     if opts.terminal
-      call Exec("t"..noremap.."map", silent, opts.default)
+      call Exec("t"..noremap.."map", silent, command)
     endif
     if opts.x
-      call Exec("x"..noremap.."map", silent, opts.default)
+      call Exec("x"..noremap.."map", silent, command)
     endif
     if opts.s
-      call Exec("s"..noremap.."map", silent, opts.default)
+      call Exec("s"..noremap.."map", silent, command)
     endif
     if opts.o
-      call Exec("o"..noremap.."map", silent, opts.default)
+      call Exec("o"..noremap.."map", silent, command)
     endif
     if opts.l
-      call Exec("l"..noremap.."map", silent, opts.default)
+      call Exec("l"..noremap.."map", silent, command)
+    endif
+    if opts.unmap
+      call Exec("unmap", silent, command)
     endif
   endif
-    " let opts=GetOpts(n.args, s:newmap_optschema)
+    " let opts=GetOpts(n.args, g:newmap_optschema)
     " echo opts.map opts.silent n.args[0] opts.command
     " let map=""
     " let silent=""
@@ -220,6 +235,7 @@ function! NewMap(args)
   endif
 endfunction
 command! -range -nargs=+ NewMap call NewMap(<q-args>)
+
 command! -range -nargs=+ NewMapKeycheck call NewMapKeycheck(<q-args>)
 
 NewCommand command! -range -nargs=+ Debug call Debug(<f-args>)
@@ -549,10 +565,10 @@ NewMap -v <C-l> <C-w>l
 NewMap -v <C-h> <C-w>h
 NewMap -v <C-k> <C-w>k
 NewMap -v <C-j> <C-w>j
-NewMap -n -no <silent> <C-h> :call SmartWincmd('h')<CR>
-NewMap -n -no <silent> <C-j> :call SmartWincmd('j')<CR>
-NewMap -n -no <silent> <C-k> :call SmartWincmd('k')<CR>
-NewMap -n -no <silent> <C-l> :call SmartWincmd('l')<CR>
+NewMap -n -no -silent <C-h> :call SmartWincmd('h')<CR>
+NewMap -n -no -silent <C-j> :call SmartWincmd('j')<CR>
+NewMap -n -no -silent <C-k> :call SmartWincmd('k')<CR>
+NewMap -n -no -silent <C-l> :call SmartWincmd('l')<CR>
 NewMap -v <BS> :call backspace()<CR>
 NewMap -v & :&<CR>
 NewMap -v <leader>F :echo VS()<cr>
@@ -650,10 +666,10 @@ NewMap -map <leader><Space> :call GetCCWD()<cr>
 " vmap <silent> <C-s> :w!<CR>
 " imap <silent> <C-s> :w!<CR>l
 
-NewMap -n <silent> <C-s> :SaveFile<cr>
-NewMap -v <silent> <C-s> :SaveFile<cr>
+NewMap -n -silent <C-s> :SaveFile<cr>
+NewMap -v -silent <C-s> :SaveFile<cr>
 " was imap
-NewMap -i <silent> <C-s> :SaveFile<CR>l
+NewMap -i -silent <C-s> :SaveFile<CR>l
 
 NewMap -n -no <localleader>f :InsertFunction<CR>
 NewMap -n -no <space>f :InsertFilename<CR>
@@ -662,7 +678,7 @@ NewMap -n -no <space>f :InsertFilename<CR>
 
 NewMap -map <leader><Space> :call ToggleZoom()<cr>
 
-NewMap -map <silent> <S-F1> :SearchCword<cr>
+NewMap -map -silent <S-F1> :SearchCword<cr>
 
 " map <leader>v :call VIM(VS())<cr>
 NewMap -map <leader>b :call BASH(VS())<cr>
@@ -835,17 +851,17 @@ NewMap -no <leader><leader><leader>j :IntelligentJumping<cr>
 " exec "nmap <leader>r :!bash ".g:lastRunCommand." -e ".$workdir."/.bashrc<cr>"
 menu Run.Show :call ToggleRun()
 menu Projects.Show :call ToggleProjects()
-NewMap -n <silent> <c-h> :wincmd h<cr>
-NewMap -n <silent> <c-j> :wincmd j<cr>
-NewMap -n <silent> <c-k> :wincmd k<cr>
-NewMap -n <silent> <c-l> :wincmd l<cr>
+NewMap -n -silent <c-h> :wincmd h<cr>
+NewMap -n -silent <c-j> :wincmd j<cr>
+NewMap -n -silent <c-k> :wincmd k<cr>
+NewMap -n -silent <c-l> :wincmd l<cr>
 " menu Actions.SED :call NvimStudioSubstitution()<cr>
 " noremap <leader>v :normal viW"ay<cr>:echo <c-r>a<cr>
-NewMap -v -no <silent> p "_dP
-NewMap -v -no <silent> y y:call ClipboardYank()<CR>
-NewMap -v -no <silent> d d:call ClipboardYank()<CR>
-NewMap -n -no <silent> dd dd:call ClipboardYank()<CR>
-NewMap -n -no <silent> p :call ClipboardPaste("n")<CR>p
+NewMap -v -no -silent p "_dP
+NewMap -v -no -silent y y:call ClipboardYank()<CR>
+NewMap -v -no -silent d d:call ClipboardYank()<CR>
+NewMap -n -no -silent dd dd:call ClipboardYank()<CR>
+NewMap -n -no -silent p :call ClipboardPaste("n")<CR>p
 NewMap -v -no p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<CR>p
 NewMap -n <BS> :call backspaceN()<CR>
 " was cmap
@@ -873,10 +889,10 @@ NewMap -v -no Y :<C-u>let @+ = @+ . join(getline("'<", "'>"), "\n") . "\n"<CR>
 " noremap <expr> <leader><leader>s ShowMode()
 
 " Move Lines
-NewMap -n -no <silent> <A-k> :m-2<cr>
-NewMap -n -no <silent> <A-j> :m+1<cr>
-NewMap -v -no <silent> <A-k> :m '<-2<CR>gv=gv
-NewMap -v -no <silent> <A-j> :m '>+1<CR>gv=gv
+NewMap -n -no -silent <A-k> :m-2<cr>
+NewMap -n -no -silent <A-j> :m+1<cr>
+NewMap -v -no -silent <A-k> :m '<-2<CR>gv=gv
+NewMap -v -no -silent <A-j> :m '>+1<CR>gv=gv
 
 NewMap -no < <<
 NewMap -no > >>
@@ -930,9 +946,11 @@ NewMap -i -no <C-S-v> <c-r>+
 " inoremap <C-v> <c-r>+
 " nnoremap <C-v>
 " inoremap <C-v>
-NewMap -map <leader>v :visualblock<cr>
+" NewMap -map <leader>v :visualblock<cr>
 
-NewMap -map <leader>v :Vim<cr>
+" NewMap -map <leader>v :Vim<cr>
+" unmap <leader>v
+" NewMap -unmap <leader>v
 " inoremap <C-S-v> <C-o>:<cr>
 " cnoremap <C-S-v> :<cr>
 " tnoremap <C-S-v> <C-\><C-n>:<cr>
@@ -1074,12 +1092,12 @@ NewMap -map <C-S-'> 20zl
 
 
 " ---- quickfix navigation -------------------------------------------
-NewMap -n -no <silent> <leader>f  :copen<CR>
-NewMap -n -no <silent> <C-Down>   :cnext<CR>zz
-NewMap -n -no <silent> <C-Up>     :cprev<CR>zz
-NewMap -n -no <silent> <leader>N  :cfirst<CR>zz
-NewMap -n -no <silent> <leader>P  :clast<CR>zz
-NewMap -n -no <silent> <leader>c  :cclose<CR>
+NewMap -n -no -silent <leader>f  :copen<CR>
+NewMap -n -no -silent <C-Down>   :cnext<CR>zz
+NewMap -n -no -silent <C-Up>     :cprev<CR>zz
+NewMap -n -no -silent <leader>N  :cfirst<CR>zz
+NewMap -n -no -silent <leader>P  :clast<CR>zz
+NewMap -n -no -silent <leader>c  :cclose<CR>
 
 " " ---- location list navigation --------------------------------------
 " nnoremap <silent> <leader>lq :lopen<CR>
@@ -1088,8 +1106,10 @@ NewMap -n -no <silent> <leader>c  :cclose<CR>
 " nnoremap <silent> <leader>lN :lfirst<CR>zz
 " nnoremap <silent> <leader>lP :llast<CR>zz
 
-NewMap -v <leader>s :source<cr>
-NewMap -n <leader>S :Re \| :%source \| :ReEnd<cr>
+NewMap -v -key <leader>s :source<cr>
+NewMap -n -key <leader>S :Re \| :%source \| :ReEnd<cr>
+NewMap -map -key ,rd :call RedoLeaderS()<cr>
+
 "!! source even with comment # // " literals
 NewMap -no <F6> :autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,BufLeave,WinEnter,BufWinEnter,BufUnload *<cr>
 NewMap -no <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
@@ -1142,32 +1162,35 @@ NewMap -no <leader>qu :StashPush<CR>
 NewMap -no <leader>qo :StashPop<CR>
 
 " Variants / Extending Command Line Experience
-NewMap -no <expr> ,,vg1 :echo "vimgrep term **/*.ext" \| :call feedkeys(':vimgrep ')
-NewMap -no ,,vg2 :call input("vimgrep term **/*.ext\n") \| call feedkeys(':')
-NewMap -no ,,vg3 :echo "vimgrep term **/*.ext"<cr> \| :call feedkeys(':')<cr>
-NewMap -no ,,vg4 <expr> <leader><leader>vg call echo("tset") \| call feedkeys(':')
-NewMap -no ,,vg5 :execute input("hint\n:")<cr>
-NewMap -no ,,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
-NewMap -no ,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
-NewMap -no ,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
-NewMap -no ,,,,f :C test abc def geh "OKAY DU?"<cr>
+" NewMap -no <expr> ,,nomap0 :echo "vimgrep term **/*.ext" \| :call feedkeys(':vimgrep ')
+" NewMap -no ,,nomap2 :call input("vimgrep term **/*.ext\n") \| call feedkeys(':')
+" NewMap -no ,,nomap3 :echo "vimgrep term **/*.ext"<cr> \| :call feedkeys(':')<cr>
+" NewMap -no ,,nomap4 <expr> <leader><leader>vg call echo("tset") \| call feedkeys(':')
+" NewMap -no ,,nomap5 :execute input("hint\n:")<cr>
+" NewMap -no ,,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
+" NewMap -no ,,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
+" NewMap -no ,f :call feedkeys(':'..input("hint\n:").."\n")<cr>
+" NewMap -no ,,,,f :C test abc def geh "OKAY DU?"<cr>
 
 
 " NewMap reduces spaces in commands - opts.args_string
-NewMap -map -range=N ,vg :call VimGrep(v:count)<cr>
-NewMap -map ,vo :copen<cr>
+" NewMap -map ,vo :copen<cr>
+
+" NewMap -map -leaders 0:10 -key {leaders}vg :call VimGrep(v:count)<cr>
+NewMap -map -key ,m :call VimGrep(v:count)<cr>
+NewMap -map ,m :call VimGrep(v:count)<cr>
 
 function VimGrep(count) abort
   " :copen<cr>:vimgrep "" **/*[D[D[D[D[D
-  copen
   let x=""
   let i=0
   for i in range(a:count)
-    let x+="../"
+    let x.="../"
     let i =+ 1
   endfor
-  let command=input(':', 'vimgrep "" '..x..'**/*')
+  let command=input(':', "vimgrep \"\" "..x.."**/*\<Home>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>")
   exec command
+  copen
 endfunction
 
 " NewMap -map [1;5A :call VimGrep(v:count)<cr>
@@ -1177,7 +1200,7 @@ NewMap -map [A :cprev<cr>
 NewMap -map [B :cnext<cr>
 
 " Keymaps
-" Dont NewMap this
+" Dont NewMap this (Its A Fix For Ctrl+i triggering Tab)
 nnoremap <C-i> <C-i>
 " NewMap -no <F1> :call NextBuffer()<CR>
 " NewMap -no <S-F1> :call PrevBuffer()<CR>
