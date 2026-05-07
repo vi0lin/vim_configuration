@@ -91,9 +91,9 @@ function GitRebase()
   !git pull --rebase
   " check all conflicts
   " git add src/Functions.vim
-  !git remote --continue
-  !git remote --skip
-  !git remote --abort
+  !git rebase --continue
+  !git rebase --skip
+  !git rebase --abort
 endfunction
 
 function! GitRenameRemote(...)

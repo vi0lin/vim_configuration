@@ -1160,6 +1160,7 @@ NewMap -map <leader>ab :RECP<cr>
 NewMap -no <leader>qd :Diff --all<cr>
 NewMap -no <leader><leader>qd :Diff --all --cached<cr>
 NewMap -no <leader>qr :PushCWD 
+NewMap -no <leader><leader>qr :GithubPush<cr>
 NewMap -no <leader>qv :Pull<cr>
 NewMap -no <leader>ql :Log<cr>
 NewMap -no <leader>qs :Status<CR>
