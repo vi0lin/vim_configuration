@@ -15,6 +15,8 @@ wget -qO- https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/
 ```
 
 #### Windows
+> [!WARNING]
+> Windows Installation Is Broken
 ```
 curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh
 "C:\Program Files\Git\bin\bash.exe" .\install.sh
@@ -30,23 +32,46 @@ del install.sh
 call plug#begin()
   Plug 'vi0lin/vim_configuration'
 call plug#end()
-:PlugInstall
+PlugInstall
 ```
 
 # Features
 <table>
   <thead>
     <tr>
-      <th colspan=2><b>Quick Filesystem Traversal</b></th>
+      <th colspan=2><b>Filesystem Access</b></th>
+    </tr>
+    <tr>
+      <th ><b>Key</b></th>
+      <th ><b>Explanation</b></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td colspan=2>
-        You can Quickly Access The Filesystem<br>/path/to/file/<b>File.ext</b><br>
-        The first part, gets highlighted accordingly to your cwd.<br>
-        Step up with <code>C ,</code> and step in with <code>C .</code>
-        Then, <code>Tab</code> or <code>C-p</code> uses this pointer for effectively moving around the operating systems directory tree.
+      <td>
+        {count},.<br>
+        ,,. ,,,. ,,,,. ,,,,,.
+      </td>
+      <td>
+        :Open File:  [{dir}]  {dir}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {count}<C-p>
+        ,p ,,p ,,,p ,,,,p ,,,,,p
+      </td>
+      <td>
+        FZF Files
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {count}<C-g>
+        ,g ,,g ,,,g ,,,,g ,,,,,g
+      </td>
+      <td>
+        FZF Ag
       </td>
     </tr>
   </tbody>

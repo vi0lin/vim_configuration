@@ -1037,13 +1037,15 @@ endfunction
 
 function! RgDir(args)
   call fzf#vim#grep('rg --column --line-number --color=always --smart-case --files '.shellescape(split(a:args)[0]))
+
 endfunction
 command! -bang -nargs=* -complete=dir RgDir :call RgDir(<q-args>)
 nnoremap <leader>rg :RgDir<space>
 
-function! AgIn(path, ...)
-  let query = join(a:000, ' ')
-  call fzf#vim#ag(query, {'dir': a:path})
+function! AgIn(path)
+  let g:temporaryfix=0
+  call fzf#vim#ag('', {'dir': a:path})
+  unlet g:temporaryfix
 endfunction
 command! -nargs=+ -complete=dir AgIn call AgIn(<f-args>)
 
@@ -3961,11 +3963,11 @@ endfunction
 
 
 if !exists("g:shortenpath")
-  let shortenpath=0
+  let shortenpath=-1
 endif
 
 if !exists("g:shortenpath_file")
-  let shortenpath_file=1
+  let shortenpath_file=-1
 endif
 
 function! ToggleShortenPath()

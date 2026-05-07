@@ -23,12 +23,6 @@ function! Statusline()
     hi User0 guifg=#000000 guibg=#d3d3d3 ctermfg=152 ctermbg=233
     " if !exists("b:NERDTree")
       set statusline=
-
-      set statusline+=%#User0#%{GitName_Statusline()}
-      "Spellanguage & Highlight on?
-      " && b:NERDTree.isTabTree()
-      set statusline+=%#User0#%{GitRemote_Statusline()}
-      set statusline+=%#User0#%{GitBranch_Statusline()}
       " COLOR 0
       set statusline+=%#User2#%{(mode())}
       " WorkdirRegister
@@ -54,9 +48,10 @@ function! Statusline()
       " set statusline+=%#User7#*\ %{(1?'%1*':'%4*')}\ [%n]                                 "buffernr
       "
       " Path
-      " set statusline+=%#User0#\ \ \ %{GetPath_Statusline()}\ \ \  "Spellanguage & Highlight on?
+      " set statusline+=%#User1#\ \ \ %{GetPath_Statusline()}\ \ \  "Spellanguage & Highlight on?
 
       " %:p:h
+      set statusline+=%#User2#%{PathCharwise_All(CWD(),1)}/ "Spellanguage & Highlight on?
       set statusline+=%#User0#%{PathCharwise_All(RELATIVE(),g:shortenpath_file)}\ \ \  "Spellanguage & Highlight on?
       "
       " Buffer Number
@@ -66,6 +61,13 @@ function! Statusline()
 
       " Long Buffer Type
       set statusline+=%#User0#%=
+
+
+      set statusline+=%#User0#%{GitName_Statusline()}
+      "Spellanguage & Highlight on?
+      " && b:NERDTree.isTabTree()
+      set statusline+=%#User0#%{GitRemote_Statusline()}
+      set statusline+=%#User0#%{GitBranch_Statusline()}
       " Long Buffer Type
       " set statusline+=%#User0#%0a%{(GetType())}%=
       """" set statusline+=%#User2#%{(exists('b:state')&&b:state.type=='buffer'?'%=\ ':'')}
