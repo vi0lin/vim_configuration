@@ -133,7 +133,7 @@ function! GitRenameBranch(...)
   call Statusline()
 endfunction
 
-function! GitNewRemote(...)
+function! GitRemoteAdd(...)
   if len(a:000)>0
     let newname = join(a:000)
   else
@@ -1992,9 +1992,17 @@ function! GitUnshallow()
   !clear && git fetch --unshallow github
 endfunction
 
-function CreateRepositoryBare()
+function GitInitRepositoryBare()
   !git init --bare
   !git symbolic-ref HEAD refs/heads/main
+endfunction
+
+function GitInitRepository()
+  let output=systemlist("git init")
+  " ; git branch -m "..a:branch
+  echo output
+  call UpdateGit()
+  call Statusline()
 endfunction
 
 command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)

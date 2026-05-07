@@ -748,6 +748,11 @@ NewMap -no <A-g>              :call AgIn(Folder_Repo())<CR>
 NewMap -no <A-S-g>            :call AgIn(Folder_Repo(1))<CR>
 NewMap -no <A-C-g>            :call AgIn(Folder_Repo(1))<CR>
 NewMap -no <A-S-C-g>          :call AgIn('/')<CR>
+
+"todo GitRepoUp
+" NewMap -no <C-m>              :GitFiles<CR>
+" NewMap -no <C-m>              :call GitFiles(Folder_Repo(v:count))<CR>
+NewMap -no <C-m>              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<CR>
 " noremap <A-S-C-g>            :call AgIn(Folder_System())<CR>
 "  nnoremap <C-S-p>          :OpenFileFZFRepo<CR>
 
@@ -1223,14 +1228,17 @@ NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<CR>
 NewMap -no <F1> :call GitInfo()<cr>
 NewMap -no <S-F1> :call GitInfo('--stash')<cr>
 NewMap -no <C-S-F1> :call GitStashDrop()<cr>
-NewMap -no ,,,<F1> :call GitDeleteLastUnpushedCommit()<cr>
-NewMap -no ,,<F1> :call GitCommitRepo()<cr>
-NewMap -no ,<F1> :call GitCommitRepo(input("Commit Message: "))<cr>
+NewMap -no ,,,,<F1> :call GitDeleteLastUnpushedCommit()<cr>
+NewMap -no ,,,<F1> :call GitCommitRepo()<cr>
+NewMap -no ,,<F1> :call GitCommitRepo(input("Commit Message: "))<cr>
+NewMap -no ,<F1> :call GitAddRepo()<cr>
+NewMap -no ,,,,,<F1> :call GitInitRepository()<cr>
+NewMap -no ,,,,,,<F1> :call GitInitRepositoryBare()<cr>
 
 NewMap -no <F2> :call SelectRemote(1)<cr>
 NewMap -no <S-F2> :call SelectRemote(-1)<cr>
 NewMap -no ,<F2> :call GitRenameRemote()<cr>
-NewMap -no ,,<F2> :call GitNewRemote()<cr>
+NewMap -no ,,<F2> :call GitRemoteAdd()<cr>
 NewMap -no ,,,<F2> :call GitSetRemote()<cr>
 
 NewMap -no <F3> :call SelectBranch(1)<cr>
@@ -1243,7 +1251,7 @@ NewMap -no <S-F4> :call GitStashPop()<cr>
 NewCommand command! -range -nargs=* RenameRemote call GitRenameRemote(<f-args>)
 NewCommand command! -range -nargs=* SetRemote call GitSetRemote(<f-args>)
 NewCommand command! -range -nargs=* RenameBranch call GitRenameBranch(<f-args>)
-NewCommand command! -range -nargs=* NewRemote call GitNewRemote(<f-args>)
+NewCommand command! -range -nargs=* RemoteAdd call GitRemoteAdd(<f-args>)
 NewCommand command! -range -nargs=* NewBranch call GitNewBranch(<f-args>)
 
 NewMap -t -no <C-v> <C-\><C-n>
