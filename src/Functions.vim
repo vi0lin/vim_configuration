@@ -2191,6 +2191,7 @@ function! Github(...)
   \ git config '--global' '--unset-all' core.autocrlf;
 endfunction
 command! -range -nargs=* Github <line1>,<line2>:call Github(<q-args>)
+command! -range -nargs=0 GithubPush <line1>,<line2>:call Github('push '..w:gitRemote..' '..w:gitBranch)
 
 function! GithubCreateProject(...)
   let $name=a:000[0]

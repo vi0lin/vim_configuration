@@ -526,8 +526,8 @@ NewMap -map <A-i> 12<C-w>>
 " map <leader>t :call TabL()<cr>
 " map <leader>g :call TabH()<cr>
 " map <leader>h :call TabL()<cr>
-" NewMap -map <A-h> :call TabH()<cr>
-" NewMap -map <A-l> :call TabL()<cr>
+NewMap -map <A-h> :call TabH()<cr>
+NewMap -map <A-l> :call TabL()<cr>
 " NewMap -map <C-Tab> :tabn<cr>
 " NewMap -map <C-S-Tab> :tabp<cr>
 NewMap -map <C-S-M-h> :wincmd H<cr>
