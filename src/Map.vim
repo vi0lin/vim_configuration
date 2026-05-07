@@ -544,10 +544,10 @@ NewMap -t -no <C-S-h> <c-\><c-n>:call SwapWin("h")<cr>
 NewMap -t -no <C-S-j> <c-\><c-n>:call SwapWin("j")<cr>
 NewMap -t -no <C-S-k> <c-\><c-n>:call SwapWin("k")<cr>
 NewMap -t -no <C-S-l> <c-\><c-n>:call SwapWin("l")<cr>
-NewMap -map <A-h> :call IntegrateIn('h')<cr>
-NewMap -map <A-j> :call IntegrateIn('j')<cr>
-NewMap -map <A-k> :call IntegrateIn('k')<cr>
-NewMap -map <A-l> :call IntegrateIn('l')<cr>
+" NewMap -map <A-h> :call IntegrateIn('h')<cr>
+" NewMap -map <A-j> :call IntegrateIn('j')<cr>
+" NewMap -map <A-k> :call IntegrateIn('k')<cr>
+" NewMap -map <A-l> :call IntegrateIn('l')<cr>
 
 NewMap -n -no <leader>fuc :call OpenFileUnderCursor()<cr>
 NewMap -n -no <leader><leader>fb :LayoutBash<cr>
