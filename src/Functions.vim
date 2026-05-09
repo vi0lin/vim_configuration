@@ -1622,11 +1622,9 @@ function! COTests()
 	" 	\ | setlocal nomodifiable
 	" echo getqflist({'winid' : 1}).winid
 	" echo getloclist(2, {'winid' : 1}).winid
-
   "  " get the title of the current quickfix list
   "  :echo getqflist({'title' : 0}).title
   "  " get the identifier of the current quickfix list
-
   "  :let qfid = getqflist({'id' : 0}).id
   "  " get the identifier of the fourth quickfix list in the stack
   "  :let qfid = getqflist({'nr' : 4, 'id' : 0}).id
@@ -1703,14 +1701,14 @@ us"ing these functions are below:
   "  :call setloclist(0, [], ' ', {'lines' : systemlist('grep -Hn main *.c')})
   "  " replace the location list entries for the third window
   "  :call setloclist(3, [], 'r', {'items' : newItems})
-
   let l:cmd = g:bashrc_source..'; wakeup 0 0 2'
   call job_start(l:cmd, {
     \ 'out_cb': {channel, msg -> execute('cgetexpr msg')},
     \ 'close_cb': {channel -> execute('lopen')},
     \ })
 endfunction
-map <C-F8> :call COTests()<cr>
+" map <C-F8> :call COTests()<cr>
+" unmap <C-F8>
 
 function! GitCheckoutPrevback()
 endfunction
@@ -2549,10 +2547,8 @@ function! VS() range
   call CommandInfo()
   let [l:start_line, l:start_col]=getpos("'<")[1:2]
   let [l:end_line, l:end_col]=getpos("'>")[1:2]
-
   let [g:start_line, g:start_col]=getpos("'<")[1:2]
   let [g:end_line, g:end_col]=getpos("'>")[1:2]
-
   let lines=getline(l:start_line, l:end_line)
   fun! _prep_visualblock() closure
     for line in lines
@@ -6744,5 +6740,28 @@ endfunction
 call Statusline()
 
 endif
+
+function! ExecVS() range
+  let cursorpos=getcurpos()
+  let lines=VS()
+  execute join(lines, "\n")
+  call cursor(cursorpos[1], cursorpos[2])
+endfunction
+
+function! ExecFunction()
+  let cursorpos=getcurpos()
+  let x=search('^[[:alpha:]$_]', 'bcW')
+  let y=search('^[[:alpha:]$_]', 'W')
+  let lines=getline(x, y)
+  execute join(lines, "\n")
+  call cursor(cursorpos[1], cursorpos[2])
+endfunction
+
+function! TEST()
+  " echo VS()
+  " echo "x,!"
+endfunction
+
+call TEST()
 
 let g:vim_advantages_got_sourced='true'

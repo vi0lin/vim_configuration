@@ -122,6 +122,8 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
     endif
   endfunction
 
+  " autocmd! ModeChanged * call CommandInfo()
+  " autocmd! ModeChanged *
   autocmd! ModeChanged * call OnModeChange(expand('<amatch>'))
   autocmd! TermChanged * call OnModeChange(expand('<amatch>'))
   " autocmd! TermLeave * call OnModeChange(expand('<amatch>'))

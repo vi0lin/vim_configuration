@@ -324,10 +324,10 @@ NewMap -i -no <F5> <C-o>:call SendCommandToTerm("h")<cr>
 NewMap -i -no <F6> <C-o>:call SendCommandToTerm("j")<cr>
 NewMap -i -no <F7> <C-o>:call SendCommandToTerm("k")<cr>
 NewMap -i -no <F8> <C-o>:call SendCommandToTerm("l")<cr>
-NewMap -c -no <F5> :call SendCommandToTerm("h", 1)<cr>
-NewMap -c -no <F6> :call SendCommandToTerm("j", 1)<cr>
-NewMap -c -no <F7> :call SendCommandToTerm("k", 1)<cr>
-NewMap -c -no <F8> :call SendCommandToTerm("l", 1)<cr>
+NewMap -c -n -no <F5> :call SendCommandToTerm("h")<cr>
+NewMap -c -n -no <F6> :call SendCommandToTerm("j")<cr>
+NewMap -c -n -no <F7> :call SendCommandToTerm("k")<cr>
+NewMap -c -n -no <F8> :call SendCommandToTerm("l")<cr>
 NewMap -t -no <F5> <C-\><C-n>:call SendCommandToTerm("h")<cr>
 NewMap -t -no <F6> <C-\><C-n>:call SendCommandToTerm("j")<cr>
 NewMap -t -no <F7> <C-\><C-n>:call SendCommandToTerm("k")<cr>
@@ -341,10 +341,10 @@ NewMap -i -no <C-F5> <C-o>:call RedoCommandToTermWithSigTerm("h")<cr>
 NewMap -i -no <C-F6> <C-o>:call RedoCommandToTermWithSigTerm("j")<cr>
 NewMap -i -no <C-F7> <C-o>:call RedoCommandToTermWithSigTerm("k")<cr>
 NewMap -i -no <C-F8> <C-o>:call RedoCommandToTermWithSigTerm("l")<cr>
-NewMap -c -no <C-F5> :call RedoCommandToTermWithSigTerm("h", 1)<cr>
-NewMap -c -no <C-F6> :call RedoCommandToTermWithSigTerm("j", 1)<cr>
-NewMap -c -no <C-F7> :call RedoCommandToTermWithSigTerm("k", 1)<cr>
-NewMap -c -no <C-F8> :call RedoCommandToTermWithSigTerm("l", 1)<cr>
+NewMap -c -n -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+NewMap -c -n -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+NewMap -c -n -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+NewMap -c -n -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
 NewMap -t -no <C-F5> <C-\><C-n>:call RedoCommandToTermWithSigTerm("h")<cr>
 NewMap -t -no <C-F6> <C-\><C-n>:call RedoCommandToTermWithSigTerm("j")<cr>
 NewMap -t -no <C-F7> <C-\><C-n>:call RedoCommandToTermWithSigTerm("k")<cr>
@@ -358,10 +358,10 @@ NewMap -i -no <S-F5> <C-o>:call RedoCommandToTerm("h")<cr>
 NewMap -i -no <S-F6> <C-o>:call RedoCommandToTerm("j")<cr>
 NewMap -i -no <S-F7> <C-o>:call RedoCommandToTerm("k")<cr>
 NewMap -i -no <S-F8> <C-o>:call RedoCommandToTerm("l")<cr>
-NewMap -c -no <S-F5> :call RedoCommandToTerm("h", 1)<cr>
-NewMap -c -no <S-F6> :call RedoCommandToTerm("j", 1)<cr>
-NewMap -c -no <S-F7> :call RedoCommandToTerm("k", 1)<cr>
-NewMap -c -no <S-F8> :call RedoCommandToTerm("l", 1)<cr>
+NewMap -c -n -no <S-F5> :call RedoCommandToTerm("h")<cr>
+NewMap -c -n -no <S-F6> :call RedoCommandToTerm("j")<cr>
+NewMap -c -n -no <S-F7> :call RedoCommandToTerm("k")<cr>
+NewMap -c -n -no <S-F8> :call RedoCommandToTerm("l")<cr>
 NewMap -t -no <S-F5> <C-\><C-n>:call RedoCommandToTerm("h")<cr>
 NewMap -t -no <S-F6> <C-\><C-n>:call RedoCommandToTerm("j")<cr>
 NewMap -t -no <S-F7> <C-\><C-n>:call RedoCommandToTerm("k")<cr>
@@ -375,15 +375,19 @@ NewMap -i -no <C-S-F5> <C-o>:call SigTermToTerm("h")<cr>
 NewMap -i -no <C-S-F6> <C-o>:call SigTermToTerm("j")<cr>
 NewMap -i -no <C-S-F7> <C-o>:call SigTermToTerm("k")<cr>
 NewMap -i -no <C-S-F8> <C-o>:call SigTermToTerm("l")<cr>
-NewMap -c -no <C-S-F5> :call SigTermToTerm("h", 1)<cr>
-NewMap -c -no <C-S-F6> :call SigTermToTerm("j", 1)<cr>
-NewMap -c -no <C-S-F7> :call SigTermToTerm("k", 1)<cr>
-NewMap -c -no <C-S-F8> :call SigTermToTerm("l", 1)<cr>
+NewMap -c -n -no <C-S-F5> :call SigTermToTerm("h")<cr>
+NewMap -c -n -no <C-S-F6> :call SigTermToTerm("j")<cr>
+NewMap -c -n -no <C-S-F7> :call SigTermToTerm("k")<cr>
+NewMap -c -n -no <C-S-F8> :call SigTermToTerm("l")<cr>
 NewMap -t -no <C-S-F5> <C-\><C-n>:call SigTermToTerm("h")<cr>
 NewMap -t -no <C-S-F6> <C-\><C-n>:call SigTermToTerm("j")<cr>
 NewMap -t -no <C-S-F7> <C-\><C-n>:call SigTermToTerm("k")<cr>
 NewMap -t -no <C-S-F8> <C-\><C-n>:call SigTermToTerm("l")<cr>
 
+" todo With Leader / Register As Target To A Specified Key
+
+" NewMap -v -no . :<Up>
+NewMap -v -no . :<Up><CR>
 " map <F5> :call RedoCommandToTerm("h")<cr>
 " map <F6> :call RedoCommandToTerm("j")<cr>
 " map <F7> :call RedoCommandToTerm("k")<cr>
@@ -1114,7 +1118,8 @@ NewMap -n -no -silent <leader>c  :cclose<CR>
 " nnoremap <silent> <leader>lN :lfirst<CR>zz
 " nnoremap <silent> <leader>lP :llast<CR>zz
 
-NewMap -v -key <leader>s :source<cr>
+NewMap -n -key ,<C-s> :call ExecFunction()<cr>
+NewMap -v -n -key <leader>s :call ExecVS()<cr>
 NewMap -n -key <leader>S :Re \| :%source \| :ReEnd<cr>
 NewMap -map -key ,rd :call RedoLeaderS()<cr>
 
@@ -1257,4 +1262,6 @@ NewCommand command! -range -nargs=* NewBranch call GitNewBranch(<f-args>)
 
 NewMap -t -no <C-v> <C-\><C-n>
 NewMap -v -no i <C-c>i
+NewMap -v -silent <C-c> <C-c>:call CommandInfo()<cr>
+
 endif
