@@ -1,4 +1,61 @@
 let g:debug=0
+let g:unreleased=resolve(expand('<sfile>:p:h')..'/../')..'/.unreleased'
+let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
+let g:generated_src=g:vim_configuration_path..'/generated_src'
+
+function CreateFileAndPathIfNotExists(file)
+  let dir = fnamemodify(a:file, ':h')
+  if !isdirectory(dir)
+    call mkdir(dir, 'p')
+  endif
+  if !filereadable(a:file)
+    call writefile([], a:file)
+  endif
+  return filereadable(a:file)
+endfunction
+
+function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
+  return Read(a:file)
+endfunction
+
+function! BuildSystemsGitProjects(file=g:unreleased..'/.gitprojects')
+  let gitprojects=systemlist("find / -name .git -type d 2>/dev/null | sed 's|/.git||'")
+  " echo gitprojects
+  return Write(gitprojects, a:file)
+endfunction
+
+function Read(file)
+  if CreateFileAndPathIfNotExists(a:file)
+    " put =readfile(a:file)
+    let array=readfile(a:file)
+  return array
+  endif
+  return []
+endfunction
+
+function Write(data, file)
+  if CreateFileAndPathIfNotExists(a:file)
+    call writefile(a:data, a:file, 'b')
+  endif
+endfunction
+
+function ToggleFavorite(n)
+endfunction
+
+function ClearUnreachableFavorite()
+endfunction
+
+function SetUnsetFavorite()
+  let g:favorites=Read(g:unreleased..'/.favorites')
+  let index=index(g:favorites, expand('%:p:h'))
+  if index>=0
+    call remove(g:favorites, index)
+    call Write(g:favorites, g:unreleased..'/.favorites')
+  else
+    call add(g:favorites, expand('%:p:h'))
+    call Write(g:favorites, g:unreleased..'/.favorites')
+  endif
+endfunction
 
 " Avoid cdo prompt for overwiting files
 if !exists("g:vim_advantages_got_sourced")
@@ -2199,6 +2256,62 @@ endfunction
 command! -range -nargs=* Github <line1>,<line2>:call Github(<q-args>)
 command! -range -nargs=0 GithubPush <line1>,<line2>:call Github('push '..w:gitRemote..' '..w:gitBranch)
 
+function DB()
+  let database=g:unreleased.."/database.sqlite3"
+  let x="tagebuch"
+    !store() {
+    \  __where=""
+    \  __orderby=""
+    \  __limit=""
+    \  __store_file=$database
+    \  __store="x"
+    \  # echo $@
+    \  if [ "$1" == "create" ]; then
+    \    sqlite3 $__store_file << EOF
+    \    create table if not exists $2(${@:3});
+    \EOF
+    \  elif [ "$1" == "table" ]; then
+    \    __store=$2
+    \  elif [ "$1" == "getlast" ]; then
+    \    __where=""
+    \    __orderby="order by time desc"
+    \    __limit="limit 1"
+    \    l=$(sqlite3 $__store_file << EOF
+    \    select ${@:2} from $__store $__where $__orderby $__limit;
+    \EOF
+    \    )
+    \    echo $l
+    \  elif [ "$1" == "get" ]; then
+    \    echo """ select ${@:2} from $__store $__where $__orderby $__limit;"""
+    \    l=$(sqlite3 $__store_file << EOF
+    \    select ${@:2} from $__store $__where $__orderby $__limit;
+    \EOF
+    \    echo $l
+    \    )
+    \  elif [ "$1" == "add" ]; then
+    \    sqlite3 $__store_file << EOF
+    \    insert into $__store values(${@:2});
+    \EOF
+    \  elif [ "$1" == "addtimed" ]; then
+    \    # TODO VALUES SEPERATION time='',\ndata=''
+    \    sqlite3 $__store_file << EOF
+    \    insert into $__store values(datetime('now', 'localtime'), ${@:2});
+    \EOF
+    \  elif [ "$1" == "difftime" ]; then
+    \    l=`store getlast time`
+    \    # echo $l
+    \    # date -d"$l"
+    \    last=$(date -d"$l" +%s)
+    \    now=$(date +%s)
+    \    echo $(($now-$last))
+    \  fi
+    \}
+    \store $1
+endfunction
+
+function FindGitProjects()
+endfunction
+
 function! GithubCreateProject(...)
   let $name=a:000[0]
   let $desc=join(a:000[1:], " ")
@@ -2332,7 +2445,8 @@ let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
 let mapleader=","
 exec 'source '.g:vim_configuration_src.'/Commands.vim'
 exec 'source '.g:vim_configuration_src.'/Utilize.vim'
-exec 'source '.g:vim_configuration_src.'/Map.vim'
+exec 'source '.g:vim_configuration_src.'/NewMap.vim'
+exec 'source '.g:generated_src.'/NewMap.vim'
 let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
 function! SourceIfFileExists(file)
   if filereadable(a:file)
