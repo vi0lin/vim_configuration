@@ -51,8 +51,8 @@ PlugInstall
   <tbody>
     <tr>
       <td>
-        {count}&lt;leader&gt;.<br>
-        {count}&lt;leader&gt;{1:5}.
+        {*}&lt;leader&gt;.<br>
+        {*}&lt;leader&gt;{+}.
       </td>
       <td>
         OpenFile
@@ -62,8 +62,8 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}&lt;C-p&gt;<br>
-        {count}&lt;leader&gt;{1:5}p
+        {*}&lt;C-p&gt;<br>
+        {*}&lt;leader&gt;{+}p
       </td>
       <td>
         FZF Files
@@ -73,8 +73,8 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}&lt;C-g&gt;<br>
-        {count}&lt;leader&gt;{1:5}g
+        {*}&lt;C-g&gt;<br>
+        {*}&lt;leader&gt;{+}g
       </td>
       <td>
         FZF Ag
@@ -84,8 +84,8 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}&lt;C-b&gt;<br>
-        {count}&lt;leader&gt;{1:5}b
+        {*}&lt;C-b&gt;<br>
+        {*}&lt;leader&gt;{+}b
       </td>
       <td>
         FZF Buffers 
@@ -95,8 +95,8 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}&lt;C-{undefined}&gt;<br>
-        {count}&lt;leader&gt;{1:5}{undefined}
+        {*}&lt;C-{undefined}&gt;<br>
+        {*}&lt;leader&gt;{+}{undefined}
       </td>
       <td>
         FZF {Systems Git Projects}
@@ -106,8 +106,8 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}&lt;C-{undefined}&gt;<br>
-        {count}&lt;leader&gt;{1:5}{undefined}
+        {*}&lt;C-{undefined}&gt;<br>
+        {*}&lt;leader&gt;{+}{undefined}
       </td>
       <td>
         FZF {Favorites}
@@ -117,8 +117,8 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}&lt;C-{undefined}&gt;<br>
-        count}&lt;leader&gt;{1:5}{undefined}
+        {*}&lt;C-{undefined}&gt;<br>
+        {*}&lt;leader&gt;{+}{undefined}
       </td>
       <td>
         FZF {systemctl Services}
