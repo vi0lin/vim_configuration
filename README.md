@@ -39,7 +39,13 @@ PlugInstall
 <table>
   <thead>
     <tr>
-      <th colspan=3><b>Filesystem Access</b></th>
+      <th colspan=4><b>Filesystem Access</b></th>
+    </tr>
+    <tr>
+      <th>{*} Means any number<br>{+} Means 1 to n repititions of the previous character. </th>
+      <td></th>
+      <td></th>
+      <td></th>
     </tr>
     <tr>
       <th ><b>Keymap</b></th>
@@ -138,6 +144,9 @@ PlugInstall
   </tbody>
 </table>
 -->
+
+## Favorites
+How To Create Favorites And How To Remove Them
 
 ## GetOpts
 ```
