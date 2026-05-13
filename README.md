@@ -49,7 +49,7 @@ PlugInstall
   <tbody>
     <tr>
       <td>
-        {count}&lt;leader&gt;.
+        {count}&lt;leader&gt;.<br>
         {count}&lt;leader&gt;{1:5}.
       </td>
       <td>
@@ -58,7 +58,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-p>
+        {count}<C-p><br>
         {count}&lt;leader&gt;{1:5}p
       </td>
       <td>
@@ -67,7 +67,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-g>
+        {count}<C-g><br>
         {count}&lt;leader&gt;{1:5}g
       </td>
       <td>
@@ -76,7 +76,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-b>
+        {count}<C-b><br>
         {count}&lt;leader&gt;{1:5}b
       </td>
       <td>
@@ -85,7 +85,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-{undefined}>
+        {count}<C-{undefined}><br>
         {count}&lt;leader&gt;{1:5}{undefined}
       </td>
       <td>
@@ -94,7 +94,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-{undefined}>
+        {count}<C-{undefined}><br>
         {count}&lt;leader&gt;{1:5}{undefined}
       </td>
       <td>
@@ -103,7 +103,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-{undefined}>
+        {count}<C-{undefined}><br>
         count}&lt;leader&gt;{1:5}{undefined}
       </td>
       <td>
