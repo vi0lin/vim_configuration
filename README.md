@@ -58,7 +58,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-p><br>
+        {count}&lt;C-p&gt;<br>
         {count}&lt;leader&gt;{1:5}p
       </td>
       <td>
@@ -67,7 +67,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-g><br>
+        {count}&lt;C-g&gt;<br>
         {count}&lt;leader&gt;{1:5}g
       </td>
       <td>
@@ -76,7 +76,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-b><br>
+        {count}&lt;C-b&gt;<br>
         {count}&lt;leader&gt;{1:5}b
       </td>
       <td>
@@ -85,7 +85,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-{undefined}><br>
+        {count}&lt;C-{undefined}&gt;<br>
         {count}&lt;leader&gt;{1:5}{undefined}
       </td>
       <td>
@@ -94,7 +94,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-{undefined}><br>
+        {count}&lt;C-{undefined}&gt;<br>
         {count}&lt;leader&gt;{1:5}{undefined}
       </td>
       <td>
@@ -103,7 +103,7 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {count}<C-{undefined}><br>
+        {count}&lt;C-{undefined}&gt;<br>
         count}&lt;leader&gt;{1:5}{undefined}
       </td>
       <td>
