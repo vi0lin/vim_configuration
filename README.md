@@ -49,8 +49,8 @@ PlugInstall
   <tbody>
     <tr>
       <td>
-        {count},.<br>
-        ,,. ,,,. ,,,,. ,,,,,.
+        {count},.
+        {count},{1:5}.
       </td>
       <td>
         :Open File:  [{dir}]  {dir}
@@ -59,7 +59,7 @@ PlugInstall
     <tr>
       <td>
         {count}<C-p>
-        ,p ,,p ,,,p ,,,,p ,,,,,p
+        {count},{1:5}p
       </td>
       <td>
         FZF Files
@@ -68,10 +68,46 @@ PlugInstall
     <tr>
       <td>
         {count}<C-g>
-        ,g ,,g ,,,g ,,,,g ,,,,,g
+        {count},{1:5}g
       </td>
       <td>
         FZF Ag
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {count}<C-b>
+        {count},{1:5}b
+      </td>
+      <td>
+        FZF Buffers 
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {count}<C-{undefined}>
+        {count},{1:5}{undefined}
+      </td>
+      <td>
+        FZF {Systems Git Projects}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {count}<C-{undefined}>
+        {count},{1:5}{undefined}
+      </td>
+      <td>
+        FZF {Favorites}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {count}<C-{undefined}>
+        {count},{1:5}{undefined}
+      </td>
+      <td>
+        FZF {systemctl Services}
       </td>
     </tr>
   </tbody>
