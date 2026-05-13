@@ -30,7 +30,7 @@ endfunction
 function! FunctionName()
   let x = expand('<sfile>')
   return substitute(x, '\v.*\ (\w*).*', '\1', '')
-  """ let opts=GetOpts2(a:args, [])
+  """ let opts=GetOpts(a:args, [])
   """ " echo opts
   """ return
   """ if opts.args==0
@@ -110,7 +110,7 @@ function! NewMap(args)
   " call add(s:newmaps, { 'args': a:000 } )
   " endtry
   " echo len(s:newmaps)
-  let opts=GetOpts2(a:args, g:newmap_optschema)
+  let opts=GetOpts(a:args, g:newmap_optschema)
   " call Debug(3, opts)
   " echo opts
   " return

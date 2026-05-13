@@ -236,7 +236,7 @@ let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
 
 let g:sh={}
-  function GetOpts2(args_str, structure, delimeter='--')
+  function GetOpts(args_str, structure, delimeter='--')
   let args_str=a:args_str
   let args=ParseArgs(args_str)
   let fn=FunctionName()
@@ -555,7 +555,7 @@ let g:sh={}
   " call Debug(opts, 1, 0, "TEST" s:lookup_matrix)
   return BuildOpts()
 endfunction
-" echo GetOpts2(['-v', '-o', '-c', '-t','test', 'abc'], g:newmap_optschema)
+" echo GetOpts(['-v', '-o', '-c', '-t','test', 'abc'], g:newmap_optschema)
 
 function! ParseArgs(argstr)
   let args = []
@@ -1882,7 +1882,7 @@ function! DecidePush(...)
 endfunction
 
 function! GitDeleteBranchOnRemote(...)
-  " GetOpts2
+  " GetOpts
   " --current (default)
   " :GitDeleteBranchOnRemoteOnRemote list
   " :GitDeleteBranchOnRemoteOnRemote --current
@@ -1900,7 +1900,7 @@ command! -range -nargs=* GitDeleteLastUnpushedCommit <line1>,<line2>:call GitDel
 
 command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(commitmessage='')
-  " Todo GetOpts2
+  " Todo GetOpts
   " GitStatus
   GitStashPushAutoStash
   let out=systemlist("git pull "..w:gitRemote.." "..w:gitBranch.." --rebase")
@@ -2905,7 +2905,7 @@ function! GitGetAllRemote()
 endfunction
 
 function! GitInfo(...)
-  " Use GetOpts2
+  " Use GetOpts
   let stash=0
   if len(a:000) > 0 && a:000[0]=="--stash"
     let stash=1
