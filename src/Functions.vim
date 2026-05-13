@@ -1,9 +1,12 @@
+" Avoid cdo prompt for overwiting files
+if !exists("g:vim_advantages_got_sourced")
+
 let g:debug=0
 let g:unreleased=resolve(expand('<sfile>:p:h')..'/../')..'/.unreleased'
 let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
 let g:generated_src=g:vim_configuration_path..'/generated_src'
 
-function CreateFileAndPathIfNotExists(file)
+function! CreateFileAndPathIfNotExists(file)
   let dir = fnamemodify(a:file, ':h')
   if !isdirectory(dir)
     call mkdir(dir, 'p')
@@ -12,6 +15,10 @@ function CreateFileAndPathIfNotExists(file)
     call writefile([], a:file)
   endif
   return filereadable(a:file)
+endfunction
+
+function! GetSystemsServices(file=g:unreleased..'/.services')
+  return Read(a:file)
 endfunction
 
 function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
@@ -24,7 +31,7 @@ function! BuildSystemsGitProjects(file=g:unreleased..'/.gitprojects')
   return Write(gitprojects, a:file)
 endfunction
 
-function Read(file)
+function! Read(file)
   if CreateFileAndPathIfNotExists(a:file)
     " put =readfile(a:file)
     let array=readfile(a:file)
@@ -33,19 +40,19 @@ function Read(file)
   return []
 endfunction
 
-function Write(data, file)
+function! Write(data, file, append='b')
   if CreateFileAndPathIfNotExists(a:file)
-    call writefile(a:data, a:file, 'b')
+    call writefile(a:data, a:file, a:append)
   endif
 endfunction
 
-function ToggleFavorite(n)
+function! ToggleFavorite(n)
 endfunction
 
-function ClearUnreachableFavorite()
+function! ClearUnreachableFavorite()
 endfunction
 
-function SetUnsetFavorite()
+function! SetUnsetFavorite()
   let g:favorites=Read(g:unreleased..'/.favorites')
   let index=index(g:favorites, expand('%:p:h'))
   if index>=0
@@ -56,9 +63,6 @@ function SetUnsetFavorite()
     call Write(g:favorites, g:unreleased..'/.favorites')
   endif
 endfunction
-
-" Avoid cdo prompt for overwiting files
-if !exists("g:vim_advantages_got_sourced")
 
 function! s:MatchesOneOfPatterns(pattern_string, term) abort
   let patterns = split(a:pattern_string, '|', 1)
@@ -144,7 +148,7 @@ command! -nargs=+ Ifd call Ifd(<q-args>)
 function! SmartFold()
 endfunction
 
-function GitRebase()
+function! GitRebase()
   !git pull --rebase
   " check all conflicts
   " git add src/Functions.vim
@@ -1833,19 +1837,19 @@ function! GitStashPopAutoStash(...)
 endfunction
 command! -range -nargs=0 GitStashPopAutoStash <line1>,<line2>:call GitStashPopAutoStash(<q-args>)
 
-function GitStashPush()
+function! GitStashPush()
   " Todo Add Message Argument
   !git stash push
 endfunction
 command! -range -nargs=0 GitStashPush <line1>,<line2>:call GitStashPush(<q-args>)
 
-function GitStashPop()
+function! GitStashPop()
   " Todo Add Message Argument
   !git stash pop
 endfunction
 command! -range -nargs=0 GitStashPop <line1>,<line2>:call GitStashPop(<q-args>)
 
-function GitStashDrop()
+function! GitStashDrop()
   " Todo Add Message Argument
   !git stash drop
 endfunction
@@ -1869,7 +1873,7 @@ function! Push(commitmessage='')
 endfunction
 
 command! -range -nargs=* DecidePush <line1>,<line2>:call DecidePush(<q-args>)
-function DecidePush(...)
+function! DecidePush(...)
   if IsGithubPush()
     call Github('push '..w:gitRemote..' '..w:gitBranch)
   else
@@ -1877,7 +1881,7 @@ function DecidePush(...)
   endif
 endfunction
 
-function GitDeleteBranchOnRemote(...)
+function! GitDeleteBranchOnRemote(...)
   " GetOpts2
   " --current (default)
   " :GitDeleteBranchOnRemoteOnRemote list
@@ -1886,7 +1890,7 @@ function GitDeleteBranchOnRemote(...)
 endfunction
 command! -range -nargs=* GitDeleteBranchOnRemote <line1>,<line2>:call GitDeleteBranchOnRemote(<q-args>)
 
-function GitDeleteLastUnpushedCommit(...)
+function! GitDeleteLastUnpushedCommit(...)
   let x = systemlist('git reset --soft HEAD~1')
   for y in x
     echo y
@@ -2047,12 +2051,78 @@ function! GitUnshallow()
   !clear && git fetch --unshallow github
 endfunction
 
-function GitInitRepositoryBare()
+function! GitInitRepositoryBare()
   !git init --bare
+  !git config --file config http.receivepack true
   !git symbolic-ref HEAD refs/heads/main
 endfunction
 
-function GitInitRepository()
+function! Install()
+  SystemctlReload
+  let $service_file=expand('%')
+  echo $service_file
+  !install_service() {
+  \ sudo ln -s -t /etc/systemd/system `realpath $1`;
+  \ };
+  \install_service $service_file;
+endfunction
+command! -range -nargs=0 Install :call Install()
+
+function! Enable()
+  SystemctlReload
+  let $service_file=expand('%:r')
+  echo $service_file
+  !enable_service() {
+  \ sudo systemctl enable $1;
+  \ };
+  \enable_service $service_file;
+endfunction
+command! -range -nargs=0 Enable :call Enable()
+
+function! SystemctlReload()
+  !reload_services() {
+  \ sudo systemctl daemon-reload;
+  \ };
+  \reload_services;
+endfunction
+command! -range -nargs=0 SystemctlReload :call SystemctlReload()
+
+function! Start()
+  SystemctlReload
+  let $service_file=expand('%:r')
+  echo $service_file
+  !start_service() {
+  \ sudo systemctl start $1;
+  \ };
+  \start_service $service_file;
+endfunction
+command! -range -nargs=0 Start :call Start()
+
+function! Stop()
+  SystemctlReload
+  let $service_file=expand('%:r')
+  echo $service_file
+  !stop_service() {
+  \ sudo systemctl stop $1;
+  \ };
+  \stop_service $service_file;
+endfunction
+command! -range -nargs=0 Stop :call Stop()
+
+function! Status()
+  SystemctlReload
+  let $service_file=expand('%:r')
+  echo $service_file
+  !status_service() {
+  \ sudo systemctl status $1;
+  \ };
+  \status_service $service_file;
+endfunction
+command! -range -nargs=0 Status :call Status(<f-args>)
+
+
+
+function! GitInitRepository()
   let output=systemlist("git init")
   " ; git branch -m "..a:branch
   echo output
@@ -2181,7 +2251,7 @@ function! Log()
   exec "!clear && git log"
 endfunction
 
-function GithubPullNoMerge()
+function! GithubPullNoMerge()
   !git pull github main --no-rebase
 endfunction
 
@@ -2256,7 +2326,7 @@ endfunction
 command! -range -nargs=* Github <line1>,<line2>:call Github(<q-args>)
 command! -range -nargs=0 GithubPush <line1>,<line2>:call Github('push '..w:gitRemote..' '..w:gitBranch)
 
-function DB()
+function! DB()
   let database=g:unreleased.."/database.sqlite3"
   let x="tagebuch"
     !store() {
@@ -2309,7 +2379,7 @@ function DB()
     \store $1
 endfunction
 
-function FindGitProjects()
+function! FindGitProjects()
 endfunction
 
 function! GithubCreateProject(...)
@@ -2905,7 +2975,7 @@ function! SelectRemote(int)
   call DebugCommand(w:gitRemoteList)
 endfunction
 
-function IsGithubPush()
+function! IsGithubPush()
   let list=systemlist('git remote -v')
   let list=filter(list, 'v:val=~"^'..w:gitRemote..'.*github.com.*(push)"')
   return len(list)>0
@@ -3467,7 +3537,7 @@ endfunction
 "  vim getopts how to parse quoted strings in getopts of a function
 
 if !exists("g:commandbuilder") | let g:commandbuilder={} | endif
-function s:commandbuilder(qargs)
+function! s:commandbuilder(qargs)
   let args=ParseArgs(a:qargs)
   for arg in args[1:-1]
     let value = input('')
@@ -3945,7 +4015,7 @@ function! SetProject(dir)
   call system("curl http://localhost:8000/SetProject?project="..a:dir)
 endfunction
 
-function AllBranches(path)
+function! AllBranches(path)
   " let x = systemlist('cd '..a:path..'; git branch')
   let x=systemlist("cd "..a:path.."; git branch --list | awk {'print $2? $2 : $1'}")
   let w:gitBranchList = x
@@ -5465,12 +5535,12 @@ function! Resize(keymap)
   call DebugKeys()
 endfunction
 
-function Width(width)
+function! Width(width)
   exec "vertical resize "..a:width
 endfunction
 command! -nargs=1 Width call Width(<q-args>)
 
-function Height(height)
+function! Height(height)
   exec "horizontal resize "..a:height
 endfunction
 command! -nargs=1 Height call Height(<q-args>)
@@ -5689,7 +5759,7 @@ function! BufNew()
   " call TabBuffers('bufenter')
 endfunction
 
-function TabBuffers(method)
+function! TabBuffers(method)
   " let buffers=gettabvar(tabpagenr(), 'buffers')
   let method=a:method
   if method == 'init'
@@ -5767,12 +5837,12 @@ function! TabBuffers_Delete(bufnr)
 endfunction
 call TabBuffers('init')
 
-function BufDelete()
+function! BufDelete()
   " let nr = (bufnr('#') == -1 ? bufnr('%') : bufnr('#'))
   " call input(nr.." delete")
 endfunction
 
-function BufWipeout()
+function! BufWipeout()
   " call input(bufnr().." wipeout")
 endfunction
 
@@ -6140,7 +6210,7 @@ function! GetTempfileLine()
 endfunction
 
 " Plugins
-function Has_Plug_Vim()
+function! Has_Plug_Vim()
   let x=execute('scriptnames')->split("\\n")->map({_,v -> v->substitute('^\s*\d\+:\s*','','')})
   " echo x
   " for xi in x
@@ -6172,7 +6242,7 @@ function! Sourced_Plug_Vim()
   return g:Sourced_Plug_Vim
 endfunction
 
-function Update()
+function! Update()
   :PlugInstall
   :PlugUpdate
 endfunction
@@ -6197,7 +6267,7 @@ endfunction
 
 let g:plugfile="~/.vim/autoload/plug.vim"
 
-function InitPlug()
+function! InitPlug()
   call plug#begin()
     " Plug 'dense-analysis/ale'
     " Plug 'junegunn/fzf'
@@ -6586,11 +6656,11 @@ endfunction
 
 " StaticWin --title Information --new --top --foremost
 
-function FullPath(bufnr)
+function! FullPath(bufnr)
   return fnamemodify(bufname(b), ':p')
 endfunction
 " Custom fzf command with your own list
-function FullPaths(buffers)
+function! FullPaths(buffers)
   let pack=[]
   for b in a:buffers
     " echo bufname(42)
@@ -6802,7 +6872,7 @@ endfunction
 "   end
 " end
 
-function SmartWincmd(direction)
+function! SmartWincmd(direction)
   let start_win = win_getid()
   let i = 1
   let traceroute=[]
@@ -6853,12 +6923,11 @@ endfunction
 
 call Statusline()
 
-endif
-
 function! ExecVS() range
   let cursorpos=getcurpos()
-  let lines=VS()
-  execute join(lines, "\n")
+  " let lines=VS()
+  " eval join(lines, "\n")
+  '<,'>source
   call cursor(cursorpos[1], cursorpos[2])
 endfunction
 
@@ -6876,6 +6945,5 @@ function! TEST()
   " echo "x,!"
 endfunction
 
-call TEST()
-
 let g:vim_advantages_got_sourced='true'
+endif

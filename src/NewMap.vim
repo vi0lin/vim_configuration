@@ -74,6 +74,7 @@ endfunction
 command! -nargs=* NewMapExec :call NewMapExec(<f-args>)
 
 let g:newmap_buildfile=[]
+let g:newmap_buildfile_dicts=[]
 function! NewMapBuildFile(...)
   let parts=filter(copy(a:000), 'v:val!=""')
   call add(g:newmap_buildfile, join(parts, ' '))
@@ -227,16 +228,36 @@ function! NewMap(args)
   " let name = a:000[:0][0]
   " let arg = a:000[1:]
   " call F.NewAssignment(name, arg)
+  "
+  " echo string(opts)
+  " call add(g:newmap_buildfile_dicts, json_encode(opts))
   endif
 endfunction
 command! -range -nargs=+ NewMap call NewMap(<q-args>)
 command! -range -nargs=+ NewMapKeycheck call NewMapKeycheck(<q-args>)
 
-function! NewMapWriteBuildFile()
-  unlet g:vim_advantages_got_sourced
+
+function! GenerateWeak()
+  if exists('g:vim_advantages_got_sources')
+    unlet g:vim_advantages_got_sourced
+  endif
+  exec 'source '.g:vim_configuration_src.'/Map.vim'
+  " echo g:newmap_buildfile
+  " echo g:newmap_buildfile_dicts
+  " return json_decode(join(readfile(a:file), "\n"))
+  let g:newmap_buildfile=[]
+  let g:newmap_buildfile_dicts=[]
+endfunction
+command! -range -nargs=0 GenerateWeak call GenerateWeak()
+
+function! Generate()
+  if exists('g:vim_advantages_got_sources')
+    unlet g:vim_advantages_got_sourced
+  endif
   exec 'source '.g:vim_configuration_src.'/Map.vim'
   call Write(g:newmap_buildfile, g:generated_src..'/NewMap.vim')
+  call Write(g:newmap_buildfile_dicts, g:generated_src..'/NewMap.vim', 'a')
   let g:newmap_buildfile=[]
+  let g:newmap_buildfile_dicts=[]
 endfunction
-command! -range -nargs=0 NewMapWriteBuildFile call NewMapWriteBuildFile()
-
+command! -range -nargs=0 Generate call Generate()

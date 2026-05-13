@@ -34,11 +34,11 @@ NewMap -map <leader><leader>f :call FavoriteFile()<CR>
 NewMap -map <leader><leader>p :call FavoritePath()<CR>
 NewMap -map <C-8> :call Favorite()<CR>
 
-NewMap -map <leader>e :Equal<cr>
-NewMap -map <F9>   :call Width(20)<cr>
-NewMap -map <S-F9> :call Width(20)<cr>
-NewMap -map <F10>   :call Height(20)<cr>
-NewMap -map <S-F10> :call Height(20)<cr>
+" NewMap -map <leader>e :Equal<cr>
+" NewMap -map <F9>   :call Width(20)<cr>
+" NewMap -map <S-F9> :call Width(20)<cr>
+" NewMap -map <F10>   :call Height(20)<cr>
+" NewMap -map <S-F10> :call Height(20)<cr>
 
 NewMap -n -no ,s :so %<cr>
 NewMap -map <C-Space> :call SelectCommand()<cr>
@@ -171,17 +171,27 @@ NewMap -v -no . :<Up><CR>
 " NewMap -map <C-S-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
 " NewMap -map <C-S-F8> :w!<cr>:call RedoCommandToTermWithSigTerm("l")<cr>
 
-NewMap -v -no <F11> :<C-u>call Move('h')<cr>
-NewMap -n -no <F11> :call Move('h')<cr>
-NewMap -i -no <F11> <C-o>:call Move('h')<cr>
-NewMap -c -no <F11> :call Move('h')<cr>
-NewMap -t -no <F11> <C-\><C-n>:call Move('h')<cr>
+" NewMap -v -no <F11> :<C-u>call Move('h')<cr>
+" NewMap -n -no <F11> :call Move('h')<cr>
+" NewMap -i -no <F11> <C-o>:call Move('h')<cr>
+" NewMap -c -no <F11> :call Move('h')<cr>
+" NewMap -t -no <F11> <C-\><C-n>:call Move('h')<cr>
+" NewMap -v -no <F12> :<C-u>call Move('l')<cr>
+" NewMap -n -no <F12> :call Move('l')<cr>
+" NewMap -i -no <F12> <C-o>:call Move('l')<cr>
+" NewMap -c -no <F12> :call Move('l', 'c')<cr>
+" NewMap -t -no <F12> <C-\><C-n>:call Move('l', 't')<cr>
 
-NewMap -v -no <S-F11> :<C-u>call Move('l')<cr>
-NewMap -n -no <S-F11> :call Move('l')<cr>
-NewMap -i -no <S-F11> <C-o>:call Move('l')<cr>
-NewMap -c -no <S-F11> :call Move('l', 'c')<cr>
-NewMap -t -no <S-F11> <C-\><C-n>:call Move('l', 't')<cr>
+" NewMap -v -no <S-F11> :<C-u>call Move('l')<cr>
+" NewMap -n -no <S-F11> :call Move('l')<cr>
+" NewMap -i -no <S-F11> <C-o>:call Move('l')<cr>
+" NewMap -c -no <S-F11> :call Move('l', 'c')<cr>
+" NewMap -t -no <S-F11> <C-\><C-n>:call Move('l', 't')<cr>
+" NewMap -v -no <S-F12> :<C-u>call Move('l')<cr>
+" NewMap -n -no <S-F12> :call Move('l')<cr>
+" NewMap -i -no <S-F12> <C-o>:call Move('l')<cr>
+" NewMap -c -no <S-F12> :call Move('l', 'c')<cr>
+" NewMap -t -no <S-F12> <C-\><C-n>:call Move('l', 't')<cr>
 
 " noremap <F12> :call BulkMove("cword")<cr>
 " vnoremap <F12> :call BulkMove("visual")<cr>
@@ -895,12 +905,6 @@ NewMap -no <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
 NewMap -no <F8> :call Display()<cr>
 
 NewMap -no ,c :call ToggleComment()<cr>
-
-NewMap -v -no <S-F11> :<C-u>call Move('l')<cr>
-NewMap -n -no <S-F11> :call Move('l')<cr>
-NewMap -i -no <S-F11> <C-o>:call Move('l')<cr>
-NewMap -c -no <S-F11> :call Move('l', 'c')<cr>
-NewMap -t -no <S-F11> <C-\><C-n>:call Move('l', 't')<cr>
 
 NewMap -v <F1> J
 NewMap -map <F2> :call GetKeys()<cr>

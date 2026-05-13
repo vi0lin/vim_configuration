@@ -7,11 +7,6 @@ map <leader><leader>f :call FavoriteFile()<CR>
 map <leader><leader>f :call FavoriteFile()<CR>
 map <leader><leader>p :call FavoritePath()<CR>
 map <C-8> :call Favorite()<CR>
-map <leader>e :Equal<cr>
-map <F9>   :call Width(20)<cr>
-map <S-F9> :call Width(20)<cr>
-map <F10>   :call Height(20)<cr>
-map <S-F10> :call Height(20)<cr>
 nnoremap ,s :so %<cr>
 map <C-Space> :call SelectCommand()<cr>
 map <leader>t :Tidy<cr>
@@ -98,16 +93,6 @@ tnoremap <C-S-F6> <C-\><C-n>:call SigTermToTerm("j")<cr>
 tnoremap <C-S-F7> <C-\><C-n>:call SigTermToTerm("k")<cr>
 tnoremap <C-S-F8> <C-\><C-n>:call SigTermToTerm("l")<cr>
 vnoremap . :<Up><CR>
-vnoremap <F11> :<C-u>call Move('h')<cr>
-nnoremap <F11> :call Move('h')<cr>
-inoremap <F11> <C-o>:call Move('h')<cr>
-cnoremap <F11> :call Move('h')<cr>
-tnoremap <F11> <C-\><C-n>:call Move('h')<cr>
-vnoremap <S-F11> :<C-u>call Move('l')<cr>
-nnoremap <S-F11> :call Move('l')<cr>
-inoremap <S-F11> <C-o>:call Move('l')<cr>
-cnoremap <S-F11> :call Move('l', 'c')<cr>
-tnoremap <S-F11> <C-\><C-n>:call Move('l', 't')<cr>
 Amap <leader>h     :call Open("h", "buffer", "new")<cr>
 Amap <leader>j     :call Open("j", "buffer", "new")<cr>
 Amap <leader>k     :call Open("k", "buffer", "new")<cr>
@@ -406,11 +391,6 @@ noremap <F6> :autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,Buf
 noremap <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
 noremap <F8> :call Display()<cr>
 noremap ,c :call ToggleComment()<cr>
-vnoremap <S-F11> :<C-u>call Move('l')<cr>
-nnoremap <S-F11> :call Move('l')<cr>
-inoremap <S-F11> <C-o>:call Move('l')<cr>
-cnoremap <S-F11> :call Move('l', 'c')<cr>
-tnoremap <S-F11> <C-\><C-n>:call Move('l', 't')<cr>
 vmap <F1> J
 map <F2> :call GetKeys()<cr>
 map <F3> :call FindKeyPerform()<cr>
