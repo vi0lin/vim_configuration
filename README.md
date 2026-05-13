@@ -39,11 +39,13 @@ PlugInstall
 <table>
   <thead>
     <tr>
-      <th colspan=2><b>Filesystem Access</b></th>
+      <th colspan=3><b>Filesystem Access</b></th>
     </tr>
     <tr>
-      <th ><b>Key</b></th>
+      <th ><b>Keymap</b></th>
+      <th ><b>Command</b></th>
       <th ><b>Explanation</b></th>
+      <th ><b>Toggle Option</b></th>
     </tr>
   </thead>
   <tbody>
@@ -53,8 +55,10 @@ PlugInstall
         {count}&lt;leader&gt;{1:5}.
       </td>
       <td>
-        :Open File:  [{dir}]  {dir}
+        OpenFile
       </td>
+      <td>Lets you Choose A File In The Command Line</td>
+      <td>&lt;Tab&gt; and &lt;S-Tab&gt; For Autocompletion<br>&lt;C-Backspace&gt; For Removing Until Ancestor Folder</td>
     </tr>
     <tr>
       <td>
@@ -64,6 +68,8 @@ PlugInstall
       <td>
         FZF Files
       </td>
+      <td>Lets You Search (Upwards) For Filenames</td>
+      <td></td>
     </tr>
     <tr>
       <td>
@@ -73,6 +79,8 @@ PlugInstall
       <td>
         FZF Ag
       </td>
+      <td>Lets You Search (Upwards) For Terms In Files</td>
+      <td></td>
     </tr>
     <tr>
       <td>
@@ -82,6 +90,8 @@ PlugInstall
       <td>
         FZF Buffers 
       </td>
+      <td>Lets You Select An Opened Buffer</td>
+      <td></td>
     </tr>
     <tr>
       <td>
@@ -91,6 +101,8 @@ PlugInstall
       <td>
         FZF {Systems Git Projects}
       </td>
+      <td>Lets You Select A Git Project On Your System</td>
+      <td></td>
     </tr>
     <tr>
       <td>
@@ -100,6 +112,8 @@ PlugInstall
       <td>
         FZF {Favorites}
       </td>
+      <td>Lets You Pick Your Favorite File Or Folder</td>
+      <td></td>
     </tr>
     <tr>
       <td>
@@ -109,6 +123,8 @@ PlugInstall
       <td>
         FZF {systemctl Services}
       </td>
+      <td>Lets You Select System Services</td>
+      <td></td>
     </tr>
   </tbody>
 </table>
