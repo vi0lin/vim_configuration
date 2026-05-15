@@ -944,6 +944,7 @@ NewMap -no <leader>qA :GitAddCWD<CR>
 NewMap -no <leader>qcc :!git rebase --continue<CR>
 NewMap -no <leader>qcs :!git rebase --skip<CR>
 NewMap -no <leader>qca :!git rebase --abort<CR>
+NewMap -no <leader>qf :GitFetch<CR>
 NewMap -no <leader>qu :StashPush<CR>
 NewMap -no <leader>qo :StashPop<CR>
 

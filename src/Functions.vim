@@ -1910,6 +1910,20 @@ function! GitDeleteLastUnpushedCommit(...)
 endfunction
 command! -range -nargs=* GitDeleteLastUnpushedCommit <line1>,<line2>:call GitDeleteLastUnpushedCommit(<q-args>)
 
+command! -range -nargs=* Fetch <line1>,<line2>:call Fetch(<q-args>)
+function! Fetch(remote='', branch='')
+  let remote=a:remote
+  if remote==''
+    let remote=w:gitRemote
+  endif
+  let branch=a:branch
+  if branch==''
+    let branch=''
+  endif
+  let command="git fetch "..remote.." "..branch
+  exec "!"..command
+endfunction
+
 command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(commitmessage='')
   " Todo GetOpts
