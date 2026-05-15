@@ -939,6 +939,11 @@ NewMap -no <leader><leader>qr :GithubPush<cr>
 NewMap -no <leader>qv :Pull<cr>
 NewMap -no <leader>ql :Log<cr>
 NewMap -no <leader>qs :Status<CR>
+NewMap -no <leader>qa :GitAdd<CR>
+NewMap -no <leader>qA :GitAddCWD<CR>
+NewMap -no <leader>qcc :!git rebase --continue<CR>
+NewMap -no <leader>qcs :!git rebase --skip<CR>
+NewMap -no <leader>qca :!git rebase --abort<CR>
 NewMap -no <leader>qu :StashPush<CR>
 NewMap -no <leader>qo :StashPop<CR>
 

@@ -61,8 +61,7 @@ function! Statusline()
 
       " Long Buffer Type
       set statusline+=%#User0#%=
-
-
+      set statusline+=%{IsFavorite()}
       set statusline+=%#User0#%{GitName_Statusline()}
       "Spellanguage & Highlight on?
       " && b:NERDTree.isTabTree()

@@ -259,5 +259,6 @@ function! Generate()
   call Write(g:newmap_buildfile_dicts, g:generated_src..'/NewMap.vim', 'a')
   let g:newmap_buildfile=[]
   let g:newmap_buildfile_dicts=[]
+  exec 'source '.g:generated_src.'/NewMap.vim'
 endfunction
 command! -range -nargs=0 Generate call Generate()

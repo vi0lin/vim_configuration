@@ -2,14 +2,25 @@
 if !exists("g:vim_advantages_got_sourced")
 
 let g:debug=0
-let g:unreleased=resolve(expand('<sfile>:p:h')..'/../')..'/.unreleased'
-let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
-let g:generated_src=g:vim_configuration_path..'/generated_src'
+
+if !exists('g:unreleased')
+  let g:unreleased=resolve(expand('<sfile>:p:h')..'/../')..'/.unreleased'
+endif
+
+if !exists('g:vim_configuration_path')
+  let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
+endif
+
+if !exists('g:generated_src')
+  let g:generated_src=g:vim_configuration_path..'/generated_src'
+endif
 
 function! CreateFileAndPathIfNotExists(file)
   let dir = fnamemodify(a:file, ':h')
   if !isdirectory(dir)
-    call mkdir(dir, 'p')
+    if !filereadable(dir)
+      call mkdir(dir, 'p')
+    endif
   endif
   if !filereadable(a:file)
     call writefile([], a:file)
@@ -152,9 +163,10 @@ function! GitRebase()
   !git pull --rebase
   " check all conflicts
   " git add src/Functions.vim
-  !git rebase --continue
-  !git rebase --skip
-  !git rebase --abort
+  !git rebase --continue "satisfied
+  !git rebase --skip     "überspringen
+  !git rebase --abort    "abbruch
+  !git rebase --amend    "ändern
 endfunction
 
 function! GitRenameRemote(...)
@@ -4201,6 +4213,15 @@ function! PathLast(path)
     endif
   let x = x . '/' . join(parts[-3:], '/')
   return x
+endfunction
+
+function! IsFavorite()
+  " let g:favorites=Read(g:unreleased..'/.favorites')
+  " if index(g:favorites, expand('%:p:h')) >= 0
+  "   return '[F] '
+  " else
+  "   return '[ ] '
+  " endif
 endfunction
 
 function! FavoriteFile()
