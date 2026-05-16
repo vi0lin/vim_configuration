@@ -1894,11 +1894,20 @@ function! DecidePush(...)
 endfunction
 
 function! GitDeleteBranchOnRemote(...)
+  let args=join(a:000, ' ')
+  if args==''
+    " echo 'push '..w:gitRemote..' --delete '..w:gitBranch
+    call Github('push '..w:gitRemote..' --delete '..w:gitBranch)
+  else
+    let remote=split(args, ' ')[0]
+    let branch=split(args, ' ')[1]
+    " echo 'push '..remote..' --delete '..branch
+    call Github('push '..remote..' --delete '..branch)
+  endif
   " GetOpts
   " --current (default)
   " :GitDeleteBranchOnRemoteOnRemote list
   " :GitDeleteBranchOnRemoteOnRemote --current
-  call Github('push '..w:gitRemote..' --delete '..w:gitBranch)
 endfunction
 command! -range -nargs=* GitDeleteBranchOnRemote <line1>,<line2>:call GitDeleteBranchOnRemote(<q-args>)
 
@@ -1909,6 +1918,14 @@ function! GitDeleteLastUnpushedCommit(...)
   endfor
 endfunction
 command! -range -nargs=* GitDeleteLastUnpushedCommit <line1>,<line2>:call GitDeleteLastUnpushedCommit(<q-args>)
+
+function! GitDeleteInitialCommit(...)
+  let x = systemlist('git update-ref -d HEAD')
+  for y in x
+    echo y
+  endfor
+endfunction
+command! -range -nargs=* GitDeleteInitialCommit <line1>,<line2>:call GitDeleteInitialCommit(<q-args>)
 
 command! -range -nargs=* Fetch <line1>,<line2>:call Fetch(<q-args>)
 function! Fetch(remote='', branch='')
@@ -1924,17 +1941,26 @@ function! Fetch(remote='', branch='')
   exec "!"..command
 endfunction
 
-command! -range -nargs=? Pull <line1>,<line2>:call Pull(<q-args>)
-function! Pull(commitmessage='')
+command! -range -nargs=* Pull <line1>,<line2>:call Pull(<q-args>)
+function! Pull(...)
+  let args=join(a:000, ' ')
+  if args==''
+    let pull_args=w:gitRemote.." "..w:gitBranch
+  else
+    let pull_args=join(a:000, ' ')
+  endif
   " Todo GetOpts
   " GitStatus
+  let pull_command="git pull "..pull_args.." --rebase"
   GitStashPushAutoStash
-  let out=systemlist("git pull "..w:gitRemote.." "..w:gitBranch.." --rebase")
+  let out=systemlist(pull_command)
   for o in out
     echo o
   endfor
   GitStashPopAutoStash
 endfunction
+
+" todo Github push -u github wurzeltal:main
 
 command! -range -nargs=? Stash <line1>,<line2>:call Stash(<q-args>)
 function! Stash(commitmessage='')
@@ -2281,13 +2307,6 @@ function! GithubPullNoMerge()
   !git pull github main --no-rebase
 endfunction
 
-command! -range -nargs=0 GitPush <line1>,<line2>:call GitPush()
-function! GitPush()
-  Pull
-  " echo "!clear && git push "..w:gitRemote.." "..w:gitBranch
-  exec "!clear && git push "..w:gitRemote.." "..w:gitBranch
-endfunction
-
 command! -range -nargs=0 Status <line1>,<line2>:call GitStatus()
 command! -range -nargs=0 GitStatus <line1>,<line2>:call GitStatus()
 function! GitStatus()
@@ -2351,6 +2370,18 @@ function! Github(...)
 endfunction
 command! -range -nargs=* Github <line1>,<line2>:call Github(<q-args>)
 command! -range -nargs=0 GithubPush <line1>,<line2>:call Github('push '..w:gitRemote..' '..w:gitBranch)
+
+function! Git(...)
+  " todo: select remote branch, when selected branch was not found or local and remote branch are different ...
+  Pull
+  let args=join(a:000, ' ')
+  let $command=args
+  " push "..w:gitRemote.." "..w:gitBranch
+  !clear && git $command
+endfunction
+command! -range -nargs=* Git <line1>,<line2>:call Git(<q-args>)
+command! -range -nargs=0 GitPush <line1>,<line2>:call Git('push '..w:gitRemote..' '..w:gitBranch)
+
 
 function! DB()
   let database=g:unreleased.."/database.sqlite3"
@@ -2480,6 +2511,7 @@ endfor
   " TODO: Automatic Clone
   " TODO: Set Origin Of Current Folder
   " TODO: Automatic Push Current Directory
+  call GithubIntegrateProject($name)
 endfunction
 command! -range -nargs=* GithubCreateProject <line1>,<line2>:call GithubCreateProject(<f-args>)
 

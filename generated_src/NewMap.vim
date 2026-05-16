@@ -387,7 +387,6 @@ nmap <leader>s :call ExecVS()<cr>
 vmap <leader>s :call ExecVS()<cr>
 nmap <leader>S :Re \| :%source \| :ReEnd<cr>
 map ,rd :call RedoLeaderS()<cr>
-noremap <F6> :autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,BufLeave,WinEnter,BufWinEnter,BufUnload *<cr>
 noremap <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
 noremap <F8> :call Display()<cr>
 noremap ,c :call ToggleComment()<cr>

@@ -900,7 +900,7 @@ NewMap -n -key <leader>S :Re \| :%source \| :ReEnd<cr>
 NewMap -map -key ,rd :call RedoLeaderS()<cr>
 
 "!! source even with comment # // " literals
-NewMap -no <F6> :autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,BufLeave,WinEnter,BufWinEnter,BufUnload *<cr>
+" NewMap -no <F6> :autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,BufLeave,WinEnter,BufWinEnter,BufUnload *<cr>
 NewMap -no <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
 NewMap -no <F8> :call Display()<cr>
 

@@ -251,7 +251,7 @@ endfunction
 command! -range -nargs=0 GenerateWeak call GenerateWeak()
 
 function! Generate()
-  if exists('g:vim_advantages_got_sources')
+  if exists('g:vim_advantages_got_sourced')
     unlet g:vim_advantages_got_sourced
   endif
   exec 'source '.g:vim_configuration_src.'/Map.vim'
