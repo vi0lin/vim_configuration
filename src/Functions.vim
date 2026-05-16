@@ -207,14 +207,17 @@ function! GitRenameBranch(...)
 endfunction
 
 function! GitRemoteAdd(...)
-  if len(a:000)>0
-    let newname = join(a:000)
+  if len(a:000)==1
+    let newname = "origin ".a:000[0]
+  elseif len(a:000)==2
+    let newname = join(a:000, ' ')
   else
-    let newname=input("New: ")
+    let newname=input("Remote Add: ")
   endif
   exec "!git remote add "..newname
   call UpdateGit()
 endfunction
+command! -range -nargs=* GitRemoteAdd <line1>,<line2>:call GitRemoteAdd(<f-args>)
 
 function! GitNewBranch(...)
   if len(a:000)>0
@@ -2511,7 +2514,6 @@ endfor
   " TODO: Automatic Clone
   " TODO: Set Origin Of Current Folder
   " TODO: Automatic Push Current Directory
-  call GithubIntegrateProject($name)
 endfunction
 command! -range -nargs=* GithubCreateProject <line1>,<line2>:call GithubCreateProject(<f-args>)
 
