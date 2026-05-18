@@ -1014,7 +1014,7 @@ NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<CR>
 NewMap -no <F1> :call GitInfo()<cr>
 NewMap -no <S-F1> :call GitInfo('--stash')<cr>
 NewMap -no <C-S-F1> :call GitStashDrop()<cr>
-NewMap -no ,,,,<F-3> :call GitDeleteLastUnpushedCommit()<cr>
+NewMap -no ,,,,<F3> :call GitDeleteLastUnpushedCommit()<cr>
 NewMap -no ,,,<F1> :call GitCommitRepo()<cr>
 NewMap -no ,,<F1> :call GitCommitRepo(input("Commit Message: "))<cr>
 NewMap -no ,<F1> :call GitAddRepo()<cr>
