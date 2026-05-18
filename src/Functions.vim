@@ -3067,6 +3067,7 @@ function! JumpFile(path)
     if isdirectory(parent)
     endif
       exec "e "..file
+      call MakeDirCurrentCWD(bufnr())
       return
   else
     let unreadable=node
@@ -3074,9 +3075,9 @@ function! JumpFile(path)
     if isdirectory(parent)
     endif
       exec "e "..unreadable
+      call MakeDirCurrentCWD(bufnr())
       return
   endif
-  call MakeDirCurrentCWD(bufnr())
 endfunction
 
 function! JumpProject()
@@ -3201,8 +3202,17 @@ function! Basename(path)
   return ""
 endfunction
 
+function! SearchPhrases()
+  let dict={ 'Empty Lines': '\s*$' }
+  return dict
+endfunction
+
 function! POINTER()
-  return w:pointer
+  if exists("w:pointer")
+    return w:pointer
+  else
+    return ''
+  endif
 endfunction
 
 " Eating Lobster 🦞
@@ -3702,6 +3712,7 @@ function! _openfile_andCD(path)
     " call CD(GetParentDir(path))
     exec "hide e "..path
   endif
+  call MakeDirCurrentCWD(bufnr())
 endfunction
 
 function! _openfile_orCD(path)
@@ -5614,6 +5625,16 @@ function! Height(height)
 endfunction
 command! -nargs=1 Height call Height(<q-args>)
 
+function! Bigger()
+  let vim_height = &lines
+  let vim_width = &columns
+  let buf_height = winheight(winnr())
+  let buf_width = winwidth(winnr())
+  exec "vertical resize "..vim_width
+  exec "resize "..vim_height
+endfunction
+command! -nargs=0 Bigger call Bigger()
+
 function! ShrinkH()
   horizontal resize -25
 endfunction
@@ -5644,9 +5665,12 @@ if g:redefine_SaveFile || !exists('*SaveFile')
 endif
 
 if !exists('*SourceVim')
-  function SourceVim()
-    exec "so "..expand('%:p')
-    call Statusline()
+  function! SourceVim()
+    " exec "so "..expand('%:p')
+    Re
+    exec "so "..g:vim_configuration_path.."/src/Functions.vim"
+    ReEnd
+    " call Statusline()
   endfunction
 endif
 
@@ -5826,6 +5850,7 @@ function! BufNew()
   " endif
   " call BufferSetup()
   " call TabBuffers('bufenter')
+  " call MakeDirCurrentCWD(bufnr())
 endfunction
 
 function! TabBuffers(method)
@@ -6745,24 +6770,41 @@ endfunction
 " Make It Possibile To Change Between The Normal And The FZF Popup
 let s:popup_id = -1
 let s:timer_id = -1
-let s:file_list = []
+let g:file_list = []
 " Dateiliste einmalig befüllen (alle geladenen Buffer)
-function! s:RefreshFileList() abort
-  let s:file_list = []
-  let s:file_bufnrs = []
-  " NewMap map <F1> :echo s:file_bufnrs<cr>
-  " let s:file_list=FullPaths(t:buffers)
+function! RefreshFileList() abort
+  let g:file_list = []
+  let g:file_bufnrs = []
+  " NewMap map <F1> :echo g:file_bufnrs<cr>
+  " let g:file_list=FullPaths(t:buffers)
   for buf in getbufinfo({'buflisted': 1})
     if index(t:buffers, buf.bufnr) > -1
       if buf.name != ''
-          " call add(s:file_list, buf.name)
-          " call add(s:file_list, fnamemodify(buf.name, ':p'))
-          " call add(s:file_list, fnamemodify(buf.name, ':p'))
-          call add(s:file_list, fnamemodify(buf.name, ':p'))
-          call add(s:file_bufnrs, buf.bufnr)
+          " call add(g:file_list, buf.name)
+          " call add(g:file_list, fnamemodify(buf.name, ':p'))
+          " call add(g:file_list, fnamemodify(buf.name, ':p'))
+          call add(g:file_list, fnamemodify(buf.name, ':p'))
+          call add(g:file_bufnrs, buf.bufnr)
       endif
     endif
   endfor
+endfunction
+
+" Dateiliste einmalig befüllen (alle geladenen Buffer)
+function! RefreshFileListDir() abort
+	" let tagfiles = glob("`find . -name tags -print`")
+	" let &tags = substitute(tagfiles, "\n", ",", "g")
+  " glob2regpat
+  " globpath
+  let g:file_list = []
+  let g:file_bufnrs = []
+  let files=split(globpath(Folder_Up(0, 0), "**/*"), '\n')
+  call extend(g:file_list,files)
+  call extend(g:file_bufnrs,files)
+  " let g:file_list = []
+  " for file in files
+  "   call add(g:file_list, file)
+  " endfor
 endfunction
 " Popup schließen (Timer-Callback)
 function! s:ClosePopup(timer_id) abort
@@ -6783,12 +6825,12 @@ function! s:ShowPopup() abort
     echo current_file
     let lines = []
     let highlight_line = 1
-    for i in range(len(s:file_list))
+    for i in range(len(g:file_list))
         " Zeige relativen Pfad statt nur Dateiname
-        " let fname = fnamemodify(s:file_list[i], ':~:.')
-        let fname = s:file_list[i]
+        " let fname = fnamemodify(g:file_list[i], ':~:.')
+        let fname = g:file_list[i]
         let prefix = '  '
-        if s:file_list[i] ==# current_file
+        if g:file_list[i] ==# current_file
             let prefix = '▶ '
             let highlight_line = i + 1
         endif
@@ -6804,10 +6846,10 @@ function! s:ShowPopup() abort
         \ 'col':       &columns - 2,
         \ 'minwidth':  max_len + 2,
         \ 'maxwidth':  &columns - 4,
-        \ 'minheight': min([len(s:file_list), max_h]),
+        \ 'minheight': min([len(g:file_list), max_h]),
         \ 'maxheight': max_h,
         \ 'border':    [1, 1, 1, 1],
-        \ 'title':     ' Buffers (' . len(s:file_list) . ') ' . GETCWD() . ' ',
+        \ 'title':     ' Buffers (' . len(g:file_list) . ') ' . GETCWD() . ' ',
         \ 'padding':   [0, 1, 0, 1],
         \ 'zindex':    50,
         \ 'mapping':   0,
@@ -6824,51 +6866,63 @@ function! s:ShowPopup() abort
     " Auto-Close nach 2,5 Sekunden
     let s:timer_id = timer_start(2500, function('s:ClosePopup'))
 endfunction
+
 " Zum nächsten Buffer springen
 function! NextBuffer() abort
-    call s:RefreshFileList()
-    if empty(s:file_list) | return | endif
+    if empty(g:file_list) | return | endif
     let current = expand('%:p')
-    let idx = index(s:file_list, current)
-    " let next_idx = (idx + 1) % len(s:file_list)
-    let next_idx = Mod(idx + 1, len(s:file_list))
+    let idx = index(g:file_list, current)
+    " let next_idx = (idx + 1) % len(g:file_list)
+    let next_idx = Mod(idx + 1, len(g:file_list))
     " echo idx next_idx
     try
-      " execute 'silent buffer ' . fnameescape(s:file_list[next_idx])
-      " call execute('silent buffer ' . s:file_list[next_idx])
-      " let next=s:file_list[next_idx]
+      " execute 'silent buffer ' . fnameescape(g:file_list[next_idx])
+      " call execute('silent buffer ' . g:file_list[next_idx])
+      " let next=g:file_list[next_idx]
       " call execute('silent buffer ' . next)
       " exec "badd " . next
       " execute 'buffer ' . t:buffers[next_idx]
-      " silent call bufload(s:file_bufnrs[next_idx])
-      silent noautocmd execute 'buffer' s:file_bufnrs[next_idx]
+      " silent call bufload(g:file_bufnrs[next_idx])
+      " silent noautocmd execute 'buffer' g:file_bufnrs[next_idx]
+      try
+        silent noautocmd execute 'buffer' g:file_list[next_idx]
+      catch
+        silent noautocmd execute 'e' g:file_list[next_idx]
+      endtry
       call MakeDirCurrentCWD(bufnr())
       " execute 'e ' . t:buffers[next_idx]
     catch
-      echo "execute 'buffer ' . fnameescape(s:file_list[next_idx])"
+      echo g:file_list
+      echo next_idx
+      echo "execute 'buffer ' . fnameescape(g:file_list[next_idx])"
     endtry
     call s:ShowPopup()
 endfunction
+
 " Zum vorherigen Buffer springen
 function! PrevBuffer() abort
-    call s:RefreshFileList()
-    if empty(s:file_list) | return | endif
+    if empty(g:file_list) | return | endif
     let current = expand('%:p')
-    let idx = index(s:file_list, current)
-    " let prev_idx = (idx - 1 + len(s:file_list)) % len(s:file_list)
-    let prev_idx = Mod(idx - 1 + len(s:file_list), len(s:file_list))
+    let idx = index(g:file_list, current)
+    " let prev_idx = (idx - 1 + len(g:file_list)) % len(g:file_list)
+    let prev_idx = Mod(idx - 1 + len(g:file_list), len(g:file_list))
     try
-      " execute 'silent buffer ' . fnameescape(s:file_list[prev_idx])
-      " let prev=s:file_list[prev_idx]
+      " execute 'silent buffer ' . fnameescape(g:file_list[prev_idx])
+      " let prev=g:file_list[prev_idx]
       " exec "badd " . next
       " call execute('silent buffer ' . prev)
-      " silent call bufload(s:file_bufnrs[prev_idx])
-      silent noautocmd execute 'buffer' s:file_bufnrs[prev_idx]
+      " silent call bufload(g:file_bufnrs[prev_idx])
+      " silent noautocmd execute 'buffer' g:file_bufnrs[prev_idx]
+      try
+        silent noautocmd execute 'buffer' g:file_list[prev_idx]
+      catch
+        silent noautocmd execute 'e' g:file_list[prev_idx]
+      endtry
       call MakeDirCurrentCWD(bufnr())
       " execute 'buffer ' . t:buffers[prev_idx]
       " execute 'e ' . t:buffers[prev_idx]
     catch
-      echo "execute 'buffer ' . fnameescape(s:file_list[prev_idx])"
+      echo "execute 'buffer ' . fnameescape(g:file_list[prev_idx])"
     endtry
     call s:ShowPopup()
 endfunction

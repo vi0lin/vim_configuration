@@ -8,7 +8,6 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   " exec "source ".g:vim."/src/Functions.vim9"
   " call F.VimInstance.Print("test")
   " finish
-  autocmd! BufWritePost *$vim/src/*.vim :call SourceVim()
   autocmd! WinLeave * :call ClearTermOnWinLeave(expand('<abuf>'))
   autocmd! VimEnter * :call VimEnter()
   autocmd! VimLeave * :call VimLeave()

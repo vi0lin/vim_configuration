@@ -34,6 +34,7 @@ NewCommand command! -range -nargs=+ NewAssignment call NewAssignment(<f-args>)
 " NewCommand FavoriteFile :call FavoriteFile()<CR>
 " NewAssignment FavoriteFile map <leader><leader>f
 NewCommand command! -nargs=0 Equal :norm <C-w>=
+NewCommand command! -nargs=0 Bigger :call Bigger()
 NewCommand command -range -nargs=* BulkMove :call _BulkMove()
 NewCommand command! -range -nargs=+ Move <line1>,<line2>call Move(<f-args>)
 NewCommand command -range -nargs=* SaveRoot :call SaveRoot()
