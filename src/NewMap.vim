@@ -59,7 +59,7 @@ function! FunctionName()
   """ endif
 endfunction
 command! -range -nargs=* FunctionName call FunctionName(<q-args>)
-" NewMap -n -no <f1> :FunctionName 3<CR>:FunctionName 1<cr>
+" NewMap -n -no <f1> :FunctionName 3<cr>:FunctionName 1<cr>
 
 function! NewMapEcho(...)
   let parts=filter(copy(a:000), 'v:val!=""')

@@ -3,12 +3,12 @@ if !exists("g:vim_advantages_got_sourced")
 
 let g:debug=0
 
-if !exists('g:unreleased')
-  let g:unreleased=resolve(expand('<sfile>:p:h')..'/../')..'/.unreleased'
-endif
-
 if !exists('g:vim_configuration_path')
   let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
+endif
+
+if !exists('g:unreleased')
+  let g:unreleased=g:vim_configuration_path..'/.unreleased'
 endif
 
 if !exists('g:generated_src')
@@ -33,7 +33,7 @@ function! GetSystemsServices(file=g:unreleased..'/.services')
 endfunction
 
 function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
-  return Read(a:file)
+  let g:systems_git_projects=Read(a:file)
 endfunction
 
 function! BuildSystemsGitProjects(file=g:unreleased..'/.gitprojects')
@@ -2577,7 +2577,7 @@ exec 'source '.g:vim_configuration_src.'/Commands.vim'
 exec 'source '.g:vim_configuration_src.'/Utilize.vim'
 exec 'source '.g:vim_configuration_src.'/NewMap.vim'
 exec 'source '.g:generated_src.'/NewMap.vim'
-let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
+" let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
 function! SourceIfFileExists(file)
   if filereadable(a:file)
     exec "source "..a:file
@@ -3696,6 +3696,7 @@ endfunction
 
 function! _openfile_andCD(path)
   let path=a:path
+  " exec "cd "..path
   if exists("path") && filereadable(path)
     call _openfile(path)
     " call CD(GetParentDir(path))
@@ -3712,7 +3713,7 @@ function! _openfile_andCD(path)
     " call CD(GetParentDir(path))
     exec "hide e "..path
   endif
-  call MakeDirCurrentCWD(bufnr())
+  " call MakeDirCurrentCWD(bufnr())
 endfunction
 
 function! _openfile_orCD(path)
@@ -3755,25 +3756,29 @@ endfunction
 "   endif
 " endfunction
 
-function! OpenFileSetProject_callback(id, code, register)
-  let path=GetTempfileLine()
+function! OpenFileSetProject_callback(id, code, file)
+  let path=GetTempfileLine(a:file)
   call CD(GetParentDir(path))
-  unlet b:popup_tempfile
   " call _openfile(path)
   call _openfile_andCD(path)
 endfunction
 
-function! OpenFile_callback(id, code, register)
-  let path=GetTempfileLine()
-  unlet b:popup_tempfile
+" function! OpenFile_callback(id, code, file)
+function! OpenFile_callback(file)
+  let path=GetTempfileLine(a:file)
   if path=='0' || path==0
     " echo path"exit"
     if filereadable(path)
+      call _openfile_andCD(path)
+    elseif isdirectory(path)
       call _openfile_andCD(path)
     endif
     return
   else
     call _openfile_andCD(path)
+  endif
+  if filereadable(a:file)
+    call delete(a:file)
   endif
 endfunction
 
@@ -3835,16 +3840,212 @@ endfunction
 " endfunction
 
 function! SetProject_callback(register, id, code)
-  let path=GetTempfileLine()
+  let path=GetTempfileLine(a:file)
   call CD(path)
-  unlet b:popup_tempfile
 endfunction
 
 function! AgFile(title, register, path)
   echo "AG"
 endfunction
 
-function! OpenFile(title, register, path)
+function Projects()
+  call GetSystemsGitProjects()
+  " call Popup_FileStdin("Projects", 'window', g:systems_git_projects, g:unreleased..'/.gitprojects')
+  let file=Popup_Stdin("Projects", 'window', g:systems_git_projects)
+endfunction
+
+function! Popup_Stdin(title, register, list)
+  let outfile="/tmp/outfile_fzf"
+  let stdin_tmp_file="/tmp/tmp_stdin_file"
+  call Write(a:list, stdin_tmp_file)
+  " if a:register =~ 'window\|buffer\|tab\|global'
+  "   let title=a:title.." ["..a:register.."]"
+  " else
+  "   let title=a:title
+  " endif
+  " let list=a:list
+  """ let type=type(list)
+  """ " 1  |v:t_string|
+  """ if type==1
+  """   let lists=[list]
+  """ " 3  |v:t_list|
+  """ " 4  |v:t_dict|
+  """ else
+  """   let lists=list
+  """ endif
+  " function! File_Popup(title, paths, callback, type="file", maxdepth=10, register="")
+  " endfunction
+  " call File_Popup(
+  "       \ title,
+  "       \ list,
+  "       \ function('OpenFile_callback', [outfile]),
+  "       \ "file",
+  "       \)
+  " let paths
+  " let title=' '..title..": "..join(paths, ' ')..' '
+  let title=a:title
+  let type='file'
+  if type=="directory"
+    let type="d"
+  else
+    let type="f"
+  endif
+  " let cmd=call('BuildList', [ "-maxdepth "..a:maxdepth.." -type "..type,  paths])
+  " let cmd="cat | fzf"
+  let cmd=['/bin/bash', '-c', 'fzf -i < '.stdin_tmp_file.' > '..outfile]
+  let g:FileFinder_result=""
+  function! OnStdout(channel, msg)
+  endfunction
+  function! OnError(...)
+  endfunction
+  function! OnExitTerm(bufname, job, code)
+  endfunction
+  let opts={
+        \ 'hidden': 1,
+        \ 'err_cb': 'OnError',
+        \ 'term_name': 'Find',
+        \ 'term_finish': 'close',
+        \ }
+        " \ 'exit_cb': {job, status -> OpenFile_callback(outfile)},
+        " \ 'in_io': 'file',
+        " \ 'in_name': stdin_tmp_file,
+  let tnr=term_start(cmd, opts)
+  let g:tnr=tnr
+  " let job=term_getjob(tnr)
+  " let chan=job_getchannel(job)
+  " call ch_sendraw()
+  " let list=['line1', 'line2', 'line3']
+  " echo text
+	" call ch_sendraw(chan, text)
+	" call ch_close_in(chan)
+  " let stdin = join(list, '\n')
+  " let tnr=term_start(cmd, opts)
+  " let job=term_getjob(tnr)
+  " for l in list
+  "   call job_stdin(job, l."\n")
+  " endfor
+  " call job_stdin(job, '')
+  function! MyFilter(wnid, key)
+    if a:key=='q'
+      call popup_close(a:winid)
+      call OnPopupClose(a:winid, 'User pressed q')
+      return 1
+    endif
+    return 0
+  endfunction
+  " return
+  try
+  let g:pnr=popup_create(tnr, #{
+    \ title: title,
+    \ pos: 'center',
+    \ minwidth: 80,
+    \ minheight: 20,
+    \ maxheight: 80,
+    \ border: [1, 1, 1, 1],
+    \ borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+    \ highlight: 'Pmenu',
+    \ term_cols: 40,
+    \ cursorline: 1,
+    \ zindex: 200,
+    \ callback: {job, status -> OpenFile_callback(outfile)},
+    \ })
+    " \ callback: function('OpenFile_callback', [outfile]),
+    " \ callback: function('OpenFile_callback', [outfile]),
+  catch
+  finally
+  endtry
+endfunction
+
+function! Popup_FileStdin(title, register, list, file)
+  let outfile="/tmp/outfile_fzf"
+  if a:register =~ 'window\|buffer\|tab\|global'
+    let title=a:title.." ["..a:register.."]"
+  else
+    let title=a:title
+  endif
+  let list=a:list
+  let type=type(list)
+  if type==1
+    let lists=[list]
+  else
+    let lists=list
+  endif
+  " function! File_Popup(title, paths, callback, type="file", maxdepth=10, register="")
+  " endfunction
+  " call File_Popup(
+  "       \ title,
+  "       \ list,
+  "       \ function('OpenFile_callback', [outfile]),
+  "       \ "file",
+  "       \)
+  " let paths
+  " let title=' '..title..": "..join(paths, ' ')..' '
+  let title=a:title
+  let type='file'
+  if type=="directory"
+    let type="d"
+  else
+    let type="f"
+  endif
+  " let cmd=call('BuildList', [ "-maxdepth "..a:maxdepth.." -type "..type,  paths])
+  " let cmd="cat | fzf"
+  let cmd="fzf -i > "..outfile
+  let g:FileFinder_result=""
+  function! OnStdout(channel, msg)
+  endfunction
+  function! OnError(...)
+  endfunction
+  function! OnExitTerm(bufname, job, code)
+  endfunction
+  let opts={
+        \ 'hidden': 1,
+        \ 'err_cb': 'OnError',
+        \ 'term_name': 'Find',
+        \ 'in_io': 'file',
+        \ 'in_name': a:file,
+        \ 'term_finish': 'close',
+        \ }
+        " \ 'in_io': 'pipe',
+  let tnr=term_start(cmd, opts)
+  let g:tnr=tnr
+  " let stdin = join(list, '\n')
+  " let list=['line1', 'line2', 'line3']
+  " let tnr=term_start(cmd, opts)
+  " let job=term_getjob(tnr)
+  " for l in list
+  "   call job_stdin(job, l."\n")
+  " endfor
+  " call job_stdin(job, '')
+  function! MyFilter(wnid, key)
+    if a:key=='q'
+      call popup_close(a:winid)
+      call OnPopupClose(a:winid, 'User pressed q')
+      return 1
+    endif
+    return 0
+  endfunction
+  try
+  let g:pnr=popup_create(tnr, #{
+    \ title: title,
+    \ pos: 'center',
+    \ minwidth: 80,
+    \ minheight: 20,
+    \ maxheight: 80,
+    \ border: [1, 1, 1, 1],
+    \ borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+    \ highlight: 'Pmenu',
+    \ term_cols: 40,
+    \ cursorline: 1,
+    \ zindex: 200,
+    \ callback: function('OpenFile_callback', [outfile]),
+    \ })
+  catch
+  finally
+  endtry
+endfunction
+
+function! Popup_FZFBuildString(title, register, path)
+  let outfile="/tmp/outfile_fzf"
   if a:register =~ 'window\|buffer\|tab\|global'
     let title=a:title.." ["..a:register.."]"
   else
@@ -3860,12 +4061,13 @@ function! OpenFile(title, register, path)
   call Find_Popup(
         \ title,
         \ paths,
-        \ function('OpenFile_callback', [a:register]),
+        \ function('OpenFile_callback', [outfile]),
         \ "file",
         \)
 endfunction
 
 function! Changemain_repo(title, register, path)
+  let outfile="/tmp/outfile_fzf"
   if a:register =~ 'window\|buffer\|tab\|global'
     let title="Set ["..a:register[0].."]"
   else
@@ -3881,7 +4083,7 @@ function! Changemain_repo(title, register, path)
   call Find_Popup(
         \ title,
         \ paths,
-        \ function('SetProject_callback', [a:register]),
+        \ function('SetProject_callback', [outfile]),
         \ "directory",
         \)
 endfunction
@@ -3901,6 +4103,10 @@ function! CB_OpenFileInBuffer(m)
     endif
   endif
   call Redraw()
+endfunction
+
+function! Files(path)
+
 endfunction
 
 function! Files(path)
@@ -6192,7 +6398,6 @@ endfunction
 
 function! Find_Popup(title, paths, callback, type="file", maxdepth=10, register="")
   let tempfile="/tmp/tempfile_fzf"
-  let b:popup_tempfile=tempfile
   if a:type=="directory"
     let type="d"
   else
@@ -6281,8 +6486,9 @@ function! Execution_Popup(title, list, callback)
     \ })
 endfunction
 
-function! GetTempfileLine()
-  let tempfile=get(b:, 'popup_tempfile', '')
+function! GetTempfileLine(file)
+  " let tempfile=get(b:, 'popup_tempfile', '')
+  let tempfile=a:file
   if !filereadable(tempfile)
     return
   endif
@@ -6798,9 +7004,13 @@ function! RefreshFileListDir() abort
   " globpath
   let g:file_list = []
   let g:file_bufnrs = []
-  let files=split(globpath(Folder_Up(0, 0), "**/*"), '\n')
-  call extend(g:file_list,files)
-  call extend(g:file_bufnrs,files)
+  let files=split(globpath(Folder_Up(0, 0), "*"), '\n')
+  for f in files
+    if !isdirectory(f) && filereadable(f)
+      call extend(g:file_list,[f])
+      call extend(g:file_bufnrs,[f])
+    endif
+  endfor
   " let g:file_list = []
   " for file in files
   "   call add(g:file_list, file)

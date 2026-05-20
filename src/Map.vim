@@ -17,10 +17,10 @@ NewCommand command! -range -nargs=+ Debug call Debug(<f-args>)
 " NewMap -map <C-S-i> :echo "Implement Bufferjump"<cr>
 " NewMap -map <C-S-o> :echo "Implement Bufferjump"<cr>
 " Jump to previous or next file
-" nnoremap <silent> ,<C-O> :call JumpToNextFile(-1)<CR>
-" nnoremap <silent> ,<C-I> :call JumpToNextFile(1)<CR>
-NewMap -n -no -silent <C-S-o> :call JumpToNextFile(-1)<CR>
-NewMap -n -no -silent <C-S-i> :call JumpToNextFile(1)<CR>
+" nnoremap <silent> ,<C-O> :call JumpToNextFile(-1)<cr>
+" nnoremap <silent> ,<C-I> :call JumpToNextFile(1)<cr>
+NewMap -n -no -silent <C-S-o> :call JumpToNextFile(-1)<cr>
+NewMap -n -no -silent <C-S-i> :call JumpToNextFile(1)<cr>
 " unmap <silent> ,<C-O>
 " unmap <silent> ,<C-I>
 
@@ -29,10 +29,10 @@ NewMap -n -no <C-s> <Nop>
 NewMap -i -no <C-s> <Nop>
 NewMap -v -no <C-s> <Nop>
 
-NewMap -map ,,f :call FavoriteFile()<CR>
-NewMap -map ,,f :call FavoriteFile()<CR>
-NewMap -map ,,p :call FavoritePath()<CR>
-NewMap -map <C-8> :call Favorite()<CR>
+NewMap -map ,,f :call FavoriteFile()<cr>
+NewMap -map ,,f :call FavoriteFile()<cr>
+NewMap -map ,,p :call FavoritePath()<cr>
+NewMap -map <C-8> :call Favorite()<cr>
 
 " NewMap -map ,e :Equal<cr>
 " NewMap -map <F9>   :call Width(20)<cr>
@@ -61,9 +61,9 @@ let mapping={
 " cmap <F10> <C-R>O
 " cmap <F11> <C-R>P
 
-" NewMap -no ,q :q<CR>
-NewMap -no <M-q> :q<CR>
-NewMap -t -no <M-q> <c-\><c-n>:q<CR>
+" NewMap -no ,q :q<cr>
+NewMap -no <M-q> :q<cr>
+NewMap -t -no <M-q> <c-\><c-n>:q<cr>
 
 function Inc(...)
   " put=[a:000]
@@ -157,7 +157,7 @@ NewMap -t -no <C-S-F8> <C-\><C-n>:call SigTermToTerm("l")<cr>
 " todo With Leader / Register As Target To A Specified Key
 
 " NewMap -v -no . :<Up>
-NewMap -v -no . :<Up><CR>
+NewMap -v -no . :<Up><cr>
 " map <F5> :call RedoCommandToTerm("h")<cr>
 " map <F6> :call RedoCommandToTerm("j")<cr>
 " map <F7> :call RedoCommandToTerm("k")<cr>
@@ -270,11 +270,11 @@ NewMap -a <A-Right>      :call Open("L", "buffer", "new")<cr>
 " Amap <A-<C-S-k>> :call Open("K", "buffer", "copy")<cr>
 " Amap <A-<C-S-l>> :call Open("L", "buffer", "copy")<cr>
 
-" NewMap -a ,q :q!<CR>
-NewMap -a <C-q> :hide<CR>
-NewMap -a <C-S-q> :bd!<CR>
-NewMap -a <C-S-q> :q!<CR>
-NewMap -a <C-A-q> :qa!<CR>
+" NewMap -a ,q :q!<cr>
+NewMap -a <C-q> :hide<cr>
+NewMap -a <C-S-q> :bd!<cr>
+NewMap -a <C-S-q> :q!<cr>
+NewMap -a <C-A-q> :qa!<cr>
 NewMap -a <A-q> :call TabClose()<cr>
 NewMap -a ,,r :redraw!<cr>
 " Amap ,ser  :call ServiceMenu()<cr>
@@ -339,10 +339,10 @@ NewMap -n -no ,,fv :LayoutVim<cr>
 
 NewMap -map <m-;> :call ToggleOverviewRight()<cr>
 NewMap -map ,,<F4> :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.bashrc; git_selector "TEST"
-NewMap -map <C-S-F9> :call PreviewBuffer()<CR>
-" map <M-F12> :call Info()<CR>
-NewMap -map <C-F2> :call ToggleWrap()<CR>
-NewMap -map ,,,w :call ToggleWrap()<CR>
+NewMap -map <C-S-F9> :call PreviewBuffer()<cr>
+" map <M-F12> :call Info()<cr>
+NewMap -map <C-F2> :call ToggleWrap()<cr>
+NewMap -map ,,,w :call ToggleWrap()<cr>
 NewMap -map ,in :call Intend()<cr>
 NewMap -map ,,,<space> :IntelligentSelecting<cr>
 NewMap -map ,. @q
@@ -352,19 +352,19 @@ NewMap -v <C-l> <C-w>l
 NewMap -v <C-h> <C-w>h
 NewMap -v <C-k> <C-w>k
 NewMap -v <C-j> <C-w>j
-NewMap -n -no -silent <C-h> :call SmartWincmd('h')<CR>
-NewMap -n -no -silent <C-j> :call SmartWincmd('j')<CR>
-NewMap -n -no -silent <C-k> :call SmartWincmd('k')<CR>
-NewMap -n -no -silent <C-l> :call SmartWincmd('l')<CR>
-NewMap -v <BS> :call backspace()<CR>
-NewMap -v & :&<CR>
+NewMap -n -no -silent <C-h> :call SmartWincmd('h')<cr>
+NewMap -n -no -silent <C-j> :call SmartWincmd('j')<cr>
+NewMap -n -no -silent <C-k> :call SmartWincmd('k')<cr>
+NewMap -n -no -silent <C-l> :call SmartWincmd('l')<cr>
+NewMap -v <BS> :call backspace()<cr>
+NewMap -v & :&<cr>
 NewMap -v ,F :echo VS()<cr>
-NewMap -v ,,g :call AppendToEndRange()<CR>
-NewMap -v ,G :AppendAll<CR>
-NewMap -v ,u :!uniq<CR>
-NewMap -v <M-v> :call VPaste("Visual")<CR>
-NewMap -v <M-c> :call VCopy("Visual")<CR>
-NewMap -v <M-x> :call VCut("Visual")<CR>
+NewMap -v ,,g :call AppendToEndRange()<cr>
+NewMap -v ,G :AppendAll<cr>
+NewMap -v ,u :!uniq<cr>
+NewMap -v <M-v> :call VPaste("Visual")<cr>
+NewMap -v <M-c> :call VCopy("Visual")<cr>
+NewMap -v <M-x> :call VCut("Visual")<cr>
 " NewMap -v <c-c> "*y
 NewMap -t <c-o> <c-\><c-n><c-o>
 " was imap
@@ -393,7 +393,7 @@ NewMap -t -no <C-k> k<cr>
 NewMap -t -no <C-j> j<cr>
 " was imap
 NewMap -i <c-w><c-w> <c-w><c-w>
-NewMap -t  :call ExitTerminal()<CR>
+NewMap -t  :call ExitTerminal()<cr>
 " was imap
 NewMap -i <A-'> ä
 " was imap
@@ -415,9 +415,9 @@ NewMap -t <S-ScrollWheelDown> <C-\><C-n>
 NewMap -t <Esc> i
 NewMap -t <LeftMouse> <C-\><C-n>
 
-NewMap -map ,,,m :call Toggle_Set_Last_Git_Message()<CR>
-NewMap -map ,,,l :call ToggleLineState()<CR>
-NewMap -map ,,,L :call ToggleLineStateGlobal()<CR>
+NewMap -map ,,,m :call Toggle_Set_Last_Git_Message()<cr>
+NewMap -map ,,,l :call ToggleLineState()<cr>
+NewMap -map ,,,L :call ToggleLineStateGlobal()<cr>
 NewMap -map ,,s :call Statusline_TogglePath()<cr>
 
 NewMap -map ,,d :echo g:debug_layout<cr>
@@ -449,17 +449,17 @@ NewMap -map ,<Space> :call GetCCWD()<cr>
 " NewMap -n ,a :AddFunctionUserInput<cr>
 " NewMap -v ,a :AddFunctionVisualSplit<cr>
 
-" nmap <silent> <C-s> :w!<CR>
-" vmap <silent> <C-s> :w!<CR>
-" imap <silent> <C-s> :w!<CR>l
+" nmap <silent> <C-s> :w!<cr>
+" vmap <silent> <C-s> :w!<cr>
+" imap <silent> <C-s> :w!<cr>l
 
 NewMap -n -silent <C-s> :SaveFile<cr>
 NewMap -v -silent <C-s> :SaveFile<cr>
 " was imap
-NewMap -i -silent <C-s> :SaveFile<CR>l
+NewMap -i -silent <C-s> :SaveFile<cr>l
 
-NewMap -n -no <localleader>f :InsertFunction<CR>
-NewMap -n -no <space>f :InsertFilename<CR>
+NewMap -n -no <localleader>f :InsertFunction<cr>
+NewMap -n -no <space>f :InsertFilename<cr>
 
 " map ,c :call CTags()<cr>
 
@@ -481,23 +481,23 @@ NewMap -map <localleader>ib :call BASH(input("bash: "), 'exec_input_vs')<cr>
 NewMap -map <localleader>ip :call PYTHON(input("python: "), 'exec_input_vs')<cr>
 NewMap -map <localleader>ir :call RUST(input("rust: "), 'exec_input_vs')<cr>
 
-NewMap -n -no <space>p :CopyFileNameToClipboard<CR>
-NewMap -n -no <space>P :CopyWholePathToClipboard<CR>
-NewMap -n -no <space>r :InsertReceiver<CR>
+NewMap -n -no <space>p :CopyFileNameToClipboard<cr>
+NewMap -n -no <space>P :CopyWholePathToClipboard<cr>
+NewMap -n -no <space>r :InsertReceiver<cr>
 NewMap -n -no ,dd :call Rewindworkdir()<cr>
 
-"" nnoremap <C-p>              :OpenFileFZFProject<CR>
-"" nnoremap <A-p>              :OpenFileFZFRepo<CR>
-"" nnoremap <A-S-p>            :call OpenFileFZFRepo(1)<CR>
-"" nnoremap <A-S-C-p>          :call OpenFileFZFRepo(2)<CR>
-"" nnoremap <C-A-p>            :OpenFileFZFSystem<CR>
-"" " nnoremap <C-S-p>            :OpenFileFZFRepo<CR>
-"" nnoremap <C-->              :FindInFileFZFProject<CR>
-"" nnoremap <A-->              :FindInFileFZFRepo<CR>
-"" nnoremap <A-S-->            :call FindInFileFZFRepo(1)<CR>
-"" nnoremap <A-S-C-->          :call FindInFileFZFRepo(2)<CR>
-"" nnoremap <C-A-->            :FindInFileFZFSystem<CR>
-"" " nnoremap <C-S-p>            :FindInFileFZFRepo<CR>
+"" nnoremap <C-p>              :OpenFileFZFProject<cr>
+"" nnoremap <A-p>              :OpenFileFZFRepo<cr>
+"" nnoremap <A-S-p>            :call OpenFileFZFRepo(1)<cr>
+"" nnoremap <A-S-C-p>          :call OpenFileFZFRepo(2)<cr>
+"" nnoremap <C-A-p>            :OpenFileFZFSystem<cr>
+"" " nnoremap <C-S-p>            :OpenFileFZFRepo<cr>
+"" nnoremap <C-->              :FindInFileFZFProject<cr>
+"" nnoremap <A-->              :FindInFileFZFRepo<cr>
+"" nnoremap <A-S-->            :call FindInFileFZFRepo(1)<cr>
+"" nnoremap <A-S-C-->          :call FindInFileFZFRepo(2)<cr>
+"" nnoremap <C-A-->            :FindInFileFZFSystem<cr>
+"" " nnoremap <C-S-p>            :FindInFileFZFRepo<cr>
 
 NewMap -map ,<Space>                                         :call Files(Folder_Up(v:count, 0))<cr>
 NewMap -map ,,<Space>                                 :call Files(Folder_Up(v:count, 1))<cr>
@@ -515,53 +515,66 @@ NewMap -map ,,,,,,g :call AgIn(Folder_Up(v:count, 5))<cr>
 
 NewMap -map ,vcd :call CD(Vim_Advantages_Path())<cr>
 
-NewMap -no <C-Space>              :call Files(Folder_Project())<CR>
-NewMap -no <C-S-Space>            :call Files(Folder_Repo())<CR>
-NewMap -no <A-Space>              :call Files(Folder_Repo())<CR>
-NewMap -no <A-S-Space>            :call Files(Folder_Repo(1))<CR>
-NewMap -no <A-C-Space>            :call Files(Folder_Repo(1))<CR>
-NewMap -no <A-S-C-Space>          :call Files('/')<CR>
-" noremap <A-S-C-Space>            :call Files(Folder_System())<CR>
-" nnoremap <C-S-Space>          :OpenFileFZFRepo<CR>
+NewMap -map ,p                :call Projects()<cr>
+NewMap -map ,,p               :call Projects()<cr>
+NewMap -map ,,,p              :call Projects()<cr>
+NewMap -map ,,,,p             :call Projects()<cr>
+NewMap -map ,,,,,p            :call Projects()<cr>
+NewMap -map ,,,,,,p           :call Projects()<cr>
+NewMap -no <C-p>              :call Projects()<cr>
+NewMap -no <C-S-p>            :call Projects()<cr>
+NewMap -no <A-p>              :call Projects()<cr>
+NewMap -no <A-S-p>            :call Projects()<cr>
+NewMap -no <A-C-p>            :call Projects()<cr>
+NewMap -no <A-S-C-p>          :call Projects()<cr>
+
+NewMap -no <C-Space>              :call Files(Folder_Project())<cr>
+NewMap -no <C-S-Space>            :call Files(Folder_Repo())<cr>
+NewMap -no <A-Space>              :call Files(Folder_Repo())<cr>
+NewMap -no <A-S-Space>            :call Files(Folder_Repo(1))<cr>
+NewMap -no <A-C-Space>            :call Files(Folder_Repo(1))<cr>
+NewMap -no <A-S-C-Space>          :call Files('/')<cr>
+" noremap <A-S-C-Space>            :call Files(Folder_System())<cr>
+" nnoremap <C-S-Space>          :OpenFileFZFRepo<cr>
 "
-NewMap -no <C-g>              :call AgIn(Folder_Project())<CR>
-NewMap -no <C-S-g>            :call AgIn(Folder_Repo())<CR>
-NewMap -no <A-g>              :call AgIn(Folder_Repo())<CR>
-NewMap -no <A-S-g>            :call AgIn(Folder_Repo(1))<CR>
-NewMap -no <A-C-g>            :call AgIn(Folder_Repo(1))<CR>
-NewMap -no <A-S-C-g>          :call AgIn('/')<CR>
+NewMap -no <C-g>              :call AgIn(Folder_Project())<cr>
+NewMap -no <C-S-g>            :call AgIn(Folder_Repo())<cr>
+NewMap -no <A-g>              :call AgIn(Folder_Repo())<cr>
+NewMap -no <A-S-g>            :call AgIn(Folder_Repo(1))<cr>
+NewMap -no <A-C-g>            :call AgIn(Folder_Repo(1))<cr>
+NewMap -no <A-S-C-g>          :call AgIn('/')<cr>
 
 "todo GitRepoUp
-" NewMap -no <C-m>              :GitFiles<CR>
-" NewMap -no <C-m>              :call GitFiles(Folder_Repo(v:count))<CR>
-NewMap -no <C-m>              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<CR>
-" noremap <A-S-C-g>            :call AgIn(Folder_System())<CR>
-"  nnoremap <C-S-p>          :OpenFileFZFRepo<CR>
+" NewMap -no <C-m>              :GitFiles<cr>
+" NewMap -no <C-m>              :call GitFiles(Folder_Repo(v:count))<cr>
+NewMap -no <C-m>              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
+" noremap <A-S-C-g>            :call AgIn(Folder_System())<cr>
+"  nnoremap <C-S-p>          :OpenFileFZFRepo<cr>
 
-" map <F3> :call Files(expand($main_repo))<CR>
-" map <S-F3>  :exec "cd "..GetProject().." | Ag"<CR>
+" map <F3> :call Files(expand($main_repo))<cr>
+" map <S-F3>  :exec "cd "..GetProject().." | Ag"<cr>
 
-" nnoremap <C-g>              :OpenFileCommandLineProject<CR>
-" nnoremap <C-S-g>            :OpenFileCommandLineRepo<CR>
-" nnoremap <C-A-g>            :OpenFileCommandLineSystem<CR>
+" nnoremap <C-g>              :OpenFileCommandLineProject<cr>
+" nnoremap <C-S-g>            :OpenFileCommandLineRepo<cr>
+" nnoremap <C-A-g>            :OpenFileCommandLineSystem<cr>
 
-NewMap -n -no ,o              :OpenFileCommandLineSameDir<CR>
-NewMap -n -no ,.              :OpenFileCommandLineCWD<CR>
-NewMap -n -no ,,.      :OpenFileCommandLineSameDir<CR>
-NewMap -n -no ,.              :call CommandLineFiles(Folder_Up(v:count, 0))<CR>
-NewMap -n -no ,,.              :call CommandLineFiles(Folder_Up(v:count, 1))<CR>
-NewMap -n -no ,,,.              :call CommandLineFiles(Folder_Up(v:count, 2))<CR>
-NewMap -n -no ,,,,.              :call CommandLineFiles(Folder_Up(v:count, 3))<CR>
-NewMap -n -no ,,,,,.              :call CommandLineFiles(Folder_Up(v:count, 4))<CR>
+NewMap -n -no ,o              :OpenFileCommandLineSameDir<cr>
+NewMap -n -no ,.              :OpenFileCommandLineCWD<cr>
+NewMap -n -no ,,.      :OpenFileCommandLineSameDir<cr>
+NewMap -n -no ,.              :call CommandLineFiles(Folder_Up(v:count, 0))<cr>
+NewMap -n -no ,,.              :call CommandLineFiles(Folder_Up(v:count, 1))<cr>
+NewMap -n -no ,,,.              :call CommandLineFiles(Folder_Up(v:count, 2))<cr>
+NewMap -n -no ,,,,.              :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
+NewMap -n -no ,,,,,.              :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
 
-NewMap -c -no <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
-NewMap -c -no <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
-NewMap -c -no <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
-NewMap -c -no <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
-NewMap -c -no <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
-NewMap -c -no <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<CR>
+NewMap -c -no <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 
-" cnoremap <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-2], '/')]<CR>
+" cnoremap <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-2], '/')]<cr>
 
 " function! DeleteBackToSlash()
 "     let line = getcmdline()
@@ -576,9 +589,9 @@ NewMap -c -no <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '
 "     endif
 "     return line[:idx]
 " endfunction
-" cnoremap <C-BS> <C-\>eDeleteBackToSlash()<CR>
+" cnoremap <C-BS> <C-\>eDeleteBackToSlash()<cr>
 
-" cnoremap <C-Del> <C-\>estrpart(getcmdline(), 0, getcmdpos()-1) . strpart(getcmdline(), stridx(getcmdline()[getcmdpos()-1:], '/') + getcmdpos())<CR>
+" cnoremap <C-Del> <C-\>estrpart(getcmdline(), 0, getcmdpos()-1) . strpart(getcmdline(), stridx(getcmdline()[getcmdpos()-1:], '/') + getcmdpos())<cr>
 
 " function! DeleteForwardToSlash()
 "     let line = getcmdline()
@@ -590,11 +603,11 @@ NewMap -c -no <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '
 "     endif
 "     return line[:pos-1] . line[pos+idx:]
 " endfunction
-" cnoremap <C-Del> <C-\>eDeleteForwardToSlash()<CR>
+" cnoremap <C-Del> <C-\>eDeleteForwardToSlash()<cr>
 
-" cnoremap <C-BS> <C-\>e substitute(getcmdline()[:getcmdpos()-2], '/[^/]*$', '/', '')<CR>
+" cnoremap <C-BS> <C-\>e substitute(getcmdline()[:getcmdpos()-2], '/[^/]*$', '/', '')<cr>
 
-" cnoremap <C-Del> <C-\>e substitute(getcmdline(), '\(.\{' . (getcmdpos()-1) . '}\)[^/]*\(.*\)', '\1\2', '')<CR>
+" cnoremap <C-Del> <C-\>e substitute(getcmdline(), '\(.\{' . (getcmdpos()-1) . '}\)[^/]*\(.*\)', '\1\2', '')<cr>
 
 " Add functionality, to delete the last dir
 NewMap -c -no <C-,> <Backspace>
@@ -632,9 +645,9 @@ NewMap -i -no <F13> <C-o>:call VS()<cr>
 NewMap -c -no <F13> :call VS('c')<cr>
 NewMap -t -no <F13> <C-\><C-n>:call VS('t')<cr>
 
-NewMap -n <M-v> :call FuncPaste("Normal")<CR>
-NewMap -n <M-c> :call FuncCopy("Normal")<CR>
-NewMap -n <M-x> :call FuncCut("Normal")<CR>
+NewMap -n <M-v> :call FuncPaste("Normal")<cr>
+NewMap -n <M-c> :call FuncCopy("Normal")<cr>
+NewMap -n <M-x> :call FuncCut("Normal")<cr>
 NewMap -no ,,,j :IntelligentJumping<cr>
 
 " exec "nmap ,R :!bash ".g:lastRunCommand." -e ".$workdir."/.bashrc<cr>"
@@ -648,12 +661,12 @@ NewMap -n -silent <c-l> :wincmd l<cr>
 " menu Actions.SED :call NvimStudioSubstitution()<cr>
 " noremap ,v :normal viW"ay<cr>:echo <c-r>a<cr>
 NewMap -v -no -silent p "_dP
-NewMap -v -no -silent y y:call ClipboardYank()<CR>
-NewMap -v -no -silent d d:call ClipboardYank()<CR>
-NewMap -n -no -silent dd dd:call ClipboardYank()<CR>
-NewMap -n -no -silent p :call ClipboardPaste("n")<CR>p
-NewMap -v -no p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<CR>p
-NewMap -n <BS> :call backspaceN()<CR>
+NewMap -v -no -silent y y:call ClipboardYank()<cr>
+NewMap -v -no -silent d d:call ClipboardYank()<cr>
+NewMap -n -no -silent dd dd:call ClipboardYank()<cr>
+NewMap -n -no -silent p :call ClipboardPaste("n")<cr>p
+NewMap -v -no p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
+NewMap -n <BS> :call backspaceN()<cr>
 " was cmap
 NewMap -c <A-'> ä
 " was cmap
@@ -671,18 +684,18 @@ NewMap -c <A--> ß
 " was cmap
 NewMap -n ,F :echo VS()<cr>
 
-NewMap -n ,e :call AppendToEndNormal()<CR>
-NewMap -n ,E :AppendAll<CR>
+NewMap -n ,e :call AppendToEndNormal()<cr>
+NewMap -n ,E :AppendAll<cr>
 
-NewMap -n -no YY :call AppendToClipboard()<CR>
-NewMap -v -no Y :<C-u>let @+ = @+ . join(getline("'<", "'>"), "\n") . "\n"<CR>
+NewMap -n -no YY :call AppendToClipboard()<cr>
+NewMap -v -no Y :<C-u>let @+ = @+ . join(getline("'<", "'>"), "\n") . "\n"<cr>
 " noremap <expr> ,,s ShowMode()
 
 " Move Lines
 NewMap -n -no -silent <A-k> :m-2<cr>
 NewMap -n -no -silent <A-j> :m+1<cr>
-NewMap -v -no -silent <A-k> :m '<-2<CR>gv=gv
-NewMap -v -no -silent <A-j> :m '>+1<CR>gv=gv
+NewMap -v -no -silent <A-k> :m '<-2<cr>gv=gv
+NewMap -v -no -silent <A-j> :m '>+1<cr>gv=gv
 
 NewMap -no < <<
 NewMap -no > >>
@@ -882,19 +895,19 @@ NewMap -map <C-S-'> 20zl
 
 
 " ---- quickfix navigation -------------------------------------------
-NewMap -n -no -silent ,f  :copen<CR>
-NewMap -n -no -silent <C-Down>   :cnext<CR>zz
-NewMap -n -no -silent <C-Up>     :cprev<CR>zz
-NewMap -n -no -silent ,N  :cfirst<CR>zz
-NewMap -n -no -silent ,P  :clast<CR>zz
-NewMap -n -no -silent ,c  :cclose<CR>
+NewMap -n -no -silent ,f  :copen<cr>
+NewMap -n -no -silent <C-Down>   :cnext<cr>zz
+NewMap -n -no -silent <C-Up>     :cprev<cr>zz
+NewMap -n -no -silent ,N  :cfirst<cr>zz
+NewMap -n -no -silent ,P  :clast<cr>zz
+NewMap -n -no -silent ,c  :cclose<cr>
 
 " " ---- location list navigation --------------------------------------
-" nnoremap <silent> ,lq :lopen<CR>
-" " nnoremap <silent> <C-Down>   :lnext<CR>zz
-" " nnoremap <silent> <C-Up>     :lprev<CR>zz
-" nnoremap <silent> ,lN :lfirst<CR>zz
-" nnoremap <silent> ,lP :llast<CR>zz
+" nnoremap <silent> ,lq :lopen<cr>
+" " nnoremap <silent> <C-Down>   :lnext<cr>zz
+" " nnoremap <silent> <C-Up>     :lprev<cr>zz
+" nnoremap <silent> ,lN :lfirst<cr>zz
+" nnoremap <silent> ,lP :llast<cr>zz
 
 NewMap -n -key ,<C-s> :call ExecFunction()<cr>
 NewMap -v -n -key ,s :call ExecVS()<cr>
@@ -935,19 +948,20 @@ NewMap -map ,ab :RECP<cr>
 
 NewMap -no ,qd :Diff --all<cr>
 NewMap -no ,,qd :Diff --all --cached<cr>
-NewMap -no ,qr :PushCWD 
+NewMap -no ,qr :PushCWD
 NewMap -no ,,qr :GithubPush<cr>
 NewMap -no ,qv :Pull<cr>
 NewMap -no ,ql :Log<cr>
-NewMap -no ,qs :Status<CR>
-NewMap -no ,qa :GitAdd<CR>
-NewMap -no ,qA :GitAddCWD<CR>
-NewMap -no ,qcc :!git rebase --continue<CR>
-NewMap -no ,qcs :!git rebase --skip<CR>
-NewMap -no ,qca :!git rebase --abort<CR>
-NewMap -no ,qf :GitFetch<CR>
-NewMap -no ,qu :StashPush<CR>
-NewMap -no ,qo :StashPop<CR>
+NewMap -no ,qs :Status<cr>
+NewMap -no ,qa :GitAdd<cr>
+NewMap -no ,qA :GitAddCWD<cr>
+NewMap -no ,,qa :GitAddCWD<cr>
+NewMap -no ,qcc :!git rebase --continue<cr>
+NewMap -no ,qcs :!git rebase --skip<cr>
+NewMap -no ,qca :!git rebase --abort<cr>
+NewMap -no ,qf :GitFetch<cr>
+NewMap -no ,qu :StashPush<cr>
+NewMap -no ,qo :StashPop<cr>
 
 " Variants / Extending Command Line Experience
 " NewMap -no <expr> ,,nomap0 :echo "vimgrep term **/*.ext" \| :call feedkeys(':vimgrep ')
@@ -989,17 +1003,17 @@ NewMap -map [B :cnext<cr>
 " Keymaps
 " Dont NewMap this (Its A Fix For Ctrl+i triggering Tab)
 nnoremap <C-i> <C-i>
-" NewMap -no <F1> :call NextBuffer()<CR>
-" NewMap -no <S-F1> :call PrevBuffer()<CR>
-" NewMap -t -no <F1> <C-\><C-o>:call NextBuffer()<CR>
-" NewMap -t -no <S-F1> <C-\><C-o>:call PrevBuffer()<CR>
-" NewMap -no <Tab> :call NextBuffer()<CR>
-" NewMap -no <S-Tab> :call PrevBuffer()<CR>
+" NewMap -no <F1> :call NextBuffer()<cr>
+" NewMap -no <S-F1> :call PrevBuffer()<cr>
+" NewMap -t -no <F1> <C-\><C-o>:call NextBuffer()<cr>
+" NewMap -t -no <S-F1> <C-\><C-o>:call PrevBuffer()<cr>
+" NewMap -no <Tab> :call NextBuffer()<cr>
+" NewMap -no <S-Tab> :call PrevBuffer()<cr>
 
-NewMap -no -all <F11> :call RefreshFileList()<cr>:call NextBuffer()<CR>
-NewMap -no -all <S-F11> :call RefreshFileList()<cr>:call PrevBuffer()<CR>
-NewMap -no -all <F10> :call RefreshFileListDir()<cr>:call NextBuffer()<CR>
-NewMap -no -all <S-F10> :call RefreshFileListDir()<cr>:call PrevBuffer()<CR>
+NewMap -no -all <F11> :call RefreshFileList()<cr>:call NextBuffer()<cr>
+NewMap -no -all <S-F11> :call RefreshFileList()<cr>:call PrevBuffer()<cr>
+NewMap -no -all <F10> :call RefreshFileListDir()<cr>:call NextBuffer()<cr>
+NewMap -no -all <S-F10> :call RefreshFileListDir()<cr>:call PrevBuffer()<cr>
 " :call MakeDirCurrentCWD(bufnr())<cr>
 
 " map <F2> :echo t:buffers<cr>
@@ -1009,7 +1023,7 @@ function! SelectFunctionBlock(...)
   call search(FunctionName(3), 'bcW')
 endfunction
 command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
-NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<CR>
+NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<cr>
 
 NewMap -no <F1> :call GitInfo()<cr>
 NewMap -no <S-F1> :call GitInfo('--stash')<cr>
