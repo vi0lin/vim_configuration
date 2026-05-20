@@ -527,6 +527,9 @@ NewMap -no <A-p>              :call Projects()<cr>
 NewMap -no <A-S-p>            :call Projects()<cr>
 NewMap -no <A-C-p>            :call Projects()<cr>
 NewMap -no <A-S-C-p>          :call Projects()<cr>
+NewMap -map <C-S-p>           :call BuildSystemsGitProjects()<cr>
+
+NewMap -map <C-S-m>           :Generate<cr>
 
 NewMap -no <C-Space>              :call Files(Folder_Project())<cr>
 NewMap -no <C-S-Space>            :call Files(Folder_Repo())<cr>

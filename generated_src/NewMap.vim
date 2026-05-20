@@ -289,6 +289,8 @@ noremap <A-p>              :call Projects()<cr>
 noremap <A-S-p>            :call Projects()<cr>
 noremap <A-C-p>            :call Projects()<cr>
 noremap <A-S-C-p>          :call Projects()<cr>
+map <C-S-p>           :call BuildSystemsGitProjects()<cr>
+map <C-S-m>           :Generate<cr>
 noremap <C-Space>              :call Files(Folder_Project())<cr>
 noremap <C-S-Space>            :call Files(Folder_Repo())<cr>
 noremap <A-Space>              :call Files(Folder_Repo())<cr>
