@@ -36,6 +36,7 @@ function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
   if !filereadable(a:file)
     call BuildSystemsGitProjects()
   endif
+  " Add Updating Logic When New Projects Were Visited Or Removed
   let g:systems_git_projects=Read(a:file)
 endfunction
 
