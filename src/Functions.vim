@@ -33,6 +33,9 @@ function! GetSystemsServices(file=g:unreleased..'/.services')
 endfunction
 
 function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
+  if !filereadable(a:file)
+    call BuildSystemsGitProjects()
+  endif
   let g:systems_git_projects=Read(a:file)
 endfunction
 
