@@ -72,6 +72,17 @@ PlugInstall
         {*}&lt;leader&gt;{+}p
       </td>
       <td>
+        Find Git Projects On System
+      </td>
+      <td>Lets You Search For Git Projects</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>
+        {*}&lt;C-Space&gt;<br>
+        {*}&lt;leader&gt;{+}&lt;Space&gt;
+      </td>
+      <td>
         FZF Files
       </td>
       <td>Lets You Search (Upwards) For Filenames</td>
@@ -101,11 +112,11 @@ PlugInstall
     </tr>
     <tr>
       <td>
-        {*}&lt;C-{undefined}&gt;<br>
-        {*}&lt;leader&gt;{+}{undefined}
+        {*}&lt;C-p&gt;<br>
+        {*}&lt;leader&gt;{+}p
       </td>
       <td>
-        FZF {Systems Git Projects}
+        FZF Systems Git Projects
       </td>
       <td>Lets You Select A Git Project On Your System</td>
       <td></td>
