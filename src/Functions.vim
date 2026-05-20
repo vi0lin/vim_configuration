@@ -1948,6 +1948,20 @@ function! Fetch(remote='', branch='')
   exec "!"..command
 endfunction
 
+function CleanEmptyArrayElements(arr)
+  return filter(copy(a:arr), 'v:val != "^\ \*$"')
+endfunction
+
+command! -range -nargs=* Clone <line1>,<line2>:call Clone(<f-args>)
+function! Clone(...)
+  let clone_args=join(CleanEmptyArrayElements(a:000),' ')
+  let clone_command="git clone "..clone_args
+  let out=systemlist(clone_command)
+  for o in out
+    echo o
+  endfor
+endfunction
+
 command! -range -nargs=* Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(...)
   let args=join(a:000, ' ')
