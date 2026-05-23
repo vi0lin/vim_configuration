@@ -5237,6 +5237,10 @@ function! MapCommand(direction) range
   return type(b:MapCommands[a:d])!=3 && b:MapCommands[a:d]=='' || a:d==direction
   endif
   endfunction
+  " For Now Commands Get Assigned To All <F5-F8> Keys
+  " Directions Bounds To The First Direction Set
+  " No Target Term Redefinition Implemented Yet
+  " Commands Can Be Changed But Not Assigned To Another Term
   if _empty_type_string('h')
     let b:MapCommands['h']=data
   endif
@@ -5249,16 +5253,16 @@ function! MapCommand(direction) range
   if _empty_type_string('l')
     let b:MapCommands['l']=data
   endif
-  if _empty_type_string('h')
+  if _empty_type_string('ht')
     let b:MapCommands['ht']=GetBufDirectionIfTerm(a:direction)
   endif
-  if _empty_type_string('j')
+  if _empty_type_string('jt')
     let b:MapCommands['jt']=GetBufDirectionIfTerm(a:direction)
   endif
-  if _empty_type_string('k')
+  if _empty_type_string('kt')
     let b:MapCommands['kt']=GetBufDirectionIfTerm(a:direction)
   endif
-  if _empty_type_string('l')
+  if _empty_type_string('lt')
     let b:MapCommands['lt']=GetBufDirectionIfTerm(a:direction)
   endif
   call SavedCommandToTerm(a:direction)
@@ -5267,11 +5271,12 @@ endfunction
 function! SavedCommandToTerm(direction) range
   let com=b:MapCommands[a:direction]
   let num=b:MapCommands[a:direction..'t']
+  " Todo Directions
   if num!=''
+    let buf=num
   endif
-  let buf=GetBufDirectionIfTerm(a:direction)
+  " let buf=GetBufDirectionIfTerm(a:direction)
   " let buf=winbufnr(win)
-  " echo buf com num
   if buf!=-1
    " let buf=winbufnr(winnr(a:direction))
    call TERM(buf, com)
