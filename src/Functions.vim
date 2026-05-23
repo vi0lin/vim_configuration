@@ -1459,7 +1459,7 @@ function! DirectionBufWin(direction)
   return winbufnr(winnr(a:direction))
 endfunction
 
-function! GetWinDirectionIfTerm(direction)
+function! GetBufDirectionIfTerm(direction)
   for i in range(0, CountWindowsInDirection(a:direction))
     let win=DirectionBufWin(i+1..a:direction)
     if BufIsTerminal(win)
@@ -1508,7 +1508,7 @@ function! GetDirection(key)
 endfunction
 
 function! SearchTargetTerm(direction)
-  let b:target_term=GetWinDirectionIfTerm(a:direction)
+  let b:target_term=GetBufDirectionIfTerm(a:direction)
   return b:target_term
 endfunction
 
@@ -1527,7 +1527,7 @@ function! FixTargetTerm(key)
   " echo DirectionBufUntilTermOrEnd(direction)
   " echo CountWindowsInDirection(direction)
   " echo GetWinTermDirection(direction)
-  let b:target_term_fixed=GetWinDirectionIfTerm(direction)
+  let b:target_term_fixed=GetBufDirectionIfTerm(direction)
   " if BufIsTerminal(buf)
   "   let b:target_term=buf
   " else
@@ -5068,7 +5068,7 @@ endfunction
 
 function! HideTerminal()
   if 1
-    if IsTerminalVisibile()
+    if IsThisTerminalVisibile()
       if IsTerminalFocus()
         if GetKey()=="b"
           execute 'b#'
@@ -5088,7 +5088,7 @@ function! HideTerminal()
       endif
     endif
   else
-    if IsTerminalVisibile()
+    if IsThisTerminalVisibile()
       let g:terminalBuffer=GetBufByUUID(AimTermName())
       let b=bufwinnr(g:terminalBuffer)
       exec b"hide"
@@ -5120,7 +5120,17 @@ function! IsTerminalFocus()
   endif
 endfunction
 
-function! IsTerminalVisibile()
+function! IsTerminalVisibile(num)
+  let visible = {}
+  for t in range(1, tabpagenr('$'))
+      for b in tabpagebuflist(t)
+          let visible[b] = 1
+      endfor
+  endfor
+  return bufexists(a:num) && has_key(visible, a:num)
+endfunction
+
+function! IsThisTerminalVisibile()
   let visible = {}
   for t in range(1, tabpagenr('$'))
       for b in tabpagebuflist(t)
@@ -5201,6 +5211,71 @@ function! SendCustomCommandToTerm(direction, command)
   let x=a:command
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, x)
+endfunction
+
+function! MapCommand(direction) range
+  let data = VS()
+  if !exists("b:MapCommands")
+    let b:MapCommands={
+    \ 'path': expand("%:p"),
+    \ 'h': '',
+    \ 'ht': '',
+    \ 'j': '',
+    \ 'jt': '',
+    \ 'k': '',
+    \ 'kt': '',
+    \ 'l': '',
+    \ 'lt': ''
+    \ }
+  endif
+  if a:direction=='x'
+    echo b:MapCommands
+    return
+  endif
+  let direction=a:direction
+  function! _empty_type_string(d) closure
+  return type(b:MapCommands[a:d])!=3 && b:MapCommands[a:d]=='' || a:d==direction
+  endif
+  endfunction
+  if _empty_type_string('h')
+    let b:MapCommands['h']=data
+  endif
+  if _empty_type_string('j')
+    let b:MapCommands['j']=data
+  endif
+  if _empty_type_string('k')
+    let b:MapCommands['k']=data
+  endif
+  if _empty_type_string('l')
+    let b:MapCommands['l']=data
+  endif
+  if _empty_type_string('h')
+    let b:MapCommands['ht']=GetBufDirectionIfTerm(a:direction)
+  endif
+  if _empty_type_string('j')
+    let b:MapCommands['jt']=GetBufDirectionIfTerm(a:direction)
+  endif
+  if _empty_type_string('k')
+    let b:MapCommands['kt']=GetBufDirectionIfTerm(a:direction)
+  endif
+  if _empty_type_string('l')
+    let b:MapCommands['lt']=GetBufDirectionIfTerm(a:direction)
+  endif
+  call SavedCommandToTerm(a:direction)
+endfunction
+
+function! SavedCommandToTerm(direction) range
+  let com=b:MapCommands[a:direction]
+  let num=b:MapCommands[a:direction..'t']
+  if num!=''
+  endif
+  let buf=GetBufDirectionIfTerm(a:direction)
+  " let buf=winbufnr(win)
+  " echo buf com num
+  if buf!=-1
+   " let buf=winbufnr(winnr(a:direction))
+   call TERM(buf, com)
+  endif
 endfunction
 
 function! SendCommandToTerm(direction) range

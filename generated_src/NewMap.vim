@@ -14,26 +14,38 @@ map <C-Space> :call SelectCommand()<cr>
 map ,t :Tidy<cr>
 noremap <M-q> :q<cr>
 tnoremap <M-q> <c-\><c-n>:q<cr>
-vnoremap <F5> :<C-u>call SendCommandToTerm("h")<cr>
-vnoremap <F6> :<C-u>call SendCommandToTerm("j")<cr>
-vnoremap <F7> :<C-u>call SendCommandToTerm("k")<cr>
-vnoremap <F8> :<C-u>call SendCommandToTerm("l")<cr>
-inoremap <F5> <C-o>:call SendCommandToTerm("h")<cr>
-inoremap <F6> <C-o>:call SendCommandToTerm("j")<cr>
-inoremap <F7> <C-o>:call SendCommandToTerm("k")<cr>
-inoremap <F8> <C-o>:call SendCommandToTerm("l")<cr>
-nnoremap <F5> :call SendCommandToTerm("h")<cr>
-cnoremap <F5> :call SendCommandToTerm("h")<cr>
-nnoremap <F6> :call SendCommandToTerm("j")<cr>
-cnoremap <F6> :call SendCommandToTerm("j")<cr>
-nnoremap <F7> :call SendCommandToTerm("k")<cr>
-cnoremap <F7> :call SendCommandToTerm("k")<cr>
-nnoremap <F8> :call SendCommandToTerm("l")<cr>
-cnoremap <F8> :call SendCommandToTerm("l")<cr>
-tnoremap <F5> <C-\><C-n>:call SendCommandToTerm("h")<cr>
-tnoremap <F6> <C-\><C-n>:call SendCommandToTerm("j")<cr>
-tnoremap <F7> <C-\><C-n>:call SendCommandToTerm("k")<cr>
-tnoremap <F8> <C-\><C-n>:call SendCommandToTerm("l")<cr>
+vnoremap <F5> :<C-u>call SavedCommandToTerm("h")<cr>
+vnoremap <F6> :<C-u>call SavedCommandToTerm("j")<cr>
+vnoremap <F7> :<C-u>call SavedCommandToTerm("k")<cr>
+vnoremap <F8> :<C-u>call SavedCommandToTerm("l")<cr>
+inoremap <F5> <C-o>:call SavedCommandToTerm("h")<cr>
+inoremap <F6> <C-o>:call SavedCommandToTerm("j")<cr>
+inoremap <F7> <C-o>:call SavedCommandToTerm("k")<cr>
+inoremap <F8> <C-o>:call SavedCommandToTerm("l")<cr>
+nnoremap <F5> :call SavedCommandToTerm("h")<cr>
+cnoremap <F5> :call SavedCommandToTerm("h")<cr>
+nnoremap <F6> :call SavedCommandToTerm("j")<cr>
+cnoremap <F6> :call SavedCommandToTerm("j")<cr>
+nnoremap <F7> :call SavedCommandToTerm("k")<cr>
+cnoremap <F7> :call SavedCommandToTerm("k")<cr>
+nnoremap <F8> :call SavedCommandToTerm("l")<cr>
+cnoremap <F8> :call SavedCommandToTerm("l")<cr>
+tnoremap <F5> <C-\><C-n>:call SavedCommandToTerm("h")<cr>
+tnoremap <F6> <C-\><C-n>:call SavedCommandToTerm("j")<cr>
+tnoremap <F7> <C-\><C-n>:call SavedCommandToTerm("k")<cr>
+tnoremap <F8> <C-\><C-n>:call SavedCommandToTerm("l")<cr>
+Amap ,<F5> :call MapCommand("h")<cr>
+Amap ,<F6> :call MapCommand("j")<cr>
+Amap ,<F7> :call MapCommand("k")<cr>
+Amap ,<F8> :call MapCommand("l")<cr>
+Amap ,,<F5> :call MapCommand("x")<cr>
+Amap ,,<F6> :call MapCommand("x")<cr>
+Amap ,,<F7> :call MapCommand("x")<cr>
+Amap ,,<F8> :call MapCommand("x")<cr>
+map ,,,<F5> :call FixTargetTerm('F5')<cr>
+map ,,,<F6> :call FixTargetTerm('F6')<cr>
+map ,,,<F7> :call FixTargetTerm('F7')<cr>
+map ,,,<F8> :call FixTargetTerm('F8')<cr>
 vnoremap <C-F5> :<C-u>call RedoCommandToTermWithSigTerm("h")<cr>
 vnoremap <C-F6> :<C-u>call RedoCommandToTermWithSigTerm("j")<cr>
 vnoremap <C-F7> :<C-u>call RedoCommandToTermWithSigTerm("k")<cr>
@@ -372,10 +384,6 @@ map ,do :diffoff<cr>
 map ,0 :wincmd =<cr>
 inoremap <C-Space> <C-x><C-f>
 inoremap <C-S-v> <c-r>+
-map ,<F5> :call FixTargetTerm('F5')<cr>
-map ,<F6> :call FixTargetTerm('F6')<cr>
-map ,<F7> :call FixTargetTerm('F7')<cr>
-map ,<F8> :call FixTargetTerm('F8')<cr>
 map ,rm :call DeleteFile()<cr>
 map ,n :call NewFile()<cr>
 nmap ,< :norm yy<cr>:norm dd<cr>:wincmd l<cr>:norm gp<cr>:wincmd h<cr>
@@ -403,8 +411,6 @@ nmap ,s :call ExecVS()<cr>
 vmap ,s :call ExecVS()<cr>
 nmap ,S :Re \| :%source \| :ReEnd<cr>
 map ,rd :call RedoLeaderS()<cr>
-noremap <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
-noremap <F8> :call Display()<cr>
 noremap ,c :call ToggleComment()<cr>
 vmap <F1> J
 map <F2> :call GetKeys()<cr>
@@ -412,10 +418,6 @@ map <F3> :call FindKeyPerform()<cr>
 map <F4> :echo AllKeys()<cr>
 tmap <C-v> <C-\><C-n>:call SendCommandToThisTerm([getreg('"')])<cr>i
 vmap ,,s :<C-u>silent redir=>output \| silent '<,'>source \| redir END \| put=output<cr>
-map <F8> <C-w>p
-vnoremap <F8> :<C-u>call SendCommandToTerm("l")<cr>
-nnoremap <F8> :<C-u>call SendCommandToTerm("l")<cr>
-nnoremap <F5> :<C-u>call RedoCommandToTerm("l")<cr>
 map ,aa :RECP --reg *<cr>
 map ,an :RECP --reg "<cr>
 map ,ab :RECP<cr>
@@ -437,6 +439,8 @@ noremap ,qu :StashPush<cr>
 noremap ,qo :StashPop<cr>
 map ,m :call VimGrep(v:count)<cr>
 map ,m :call VimGrep(v:count)<cr>
+map <C-a> :Lines<cr>
+map <C-S-a> :call VimGrep(v:count)<cr>
 map [D :cclose<cr>
 map [C :copen<cr>
 map [A :cprev<cr>

@@ -1,7 +1,6 @@
 " Todo NewMap Checker
 if !exists("g:vim_advantages_got_sourced")
 
-import autoload "./Functions.vim9" as F
 
 let g:FlagReceived=0
 "  \ [ 'args', 'args|Args', '*'],
@@ -86,22 +85,42 @@ command -range -nargs=* Inc :call Inc(<f-args>)
 " x-y
 " print("TEST!")
 
-NewMap -v -no <F5> :<C-u>call SendCommandToTerm("h")<cr>
-NewMap -v -no <F6> :<C-u>call SendCommandToTerm("j")<cr>
-NewMap -v -no <F7> :<C-u>call SendCommandToTerm("k")<cr>
-NewMap -v -no <F8> :<C-u>call SendCommandToTerm("l")<cr>
-NewMap -i -no <F5> <C-o>:call SendCommandToTerm("h")<cr>
-NewMap -i -no <F6> <C-o>:call SendCommandToTerm("j")<cr>
-NewMap -i -no <F7> <C-o>:call SendCommandToTerm("k")<cr>
-NewMap -i -no <F8> <C-o>:call SendCommandToTerm("l")<cr>
-NewMap -c -n -no <F5> :call SendCommandToTerm("h")<cr>
-NewMap -c -n -no <F6> :call SendCommandToTerm("j")<cr>
-NewMap -c -n -no <F7> :call SendCommandToTerm("k")<cr>
-NewMap -c -n -no <F8> :call SendCommandToTerm("l")<cr>
-NewMap -t -no <F5> <C-\><C-n>:call SendCommandToTerm("h")<cr>
-NewMap -t -no <F6> <C-\><C-n>:call SendCommandToTerm("j")<cr>
-NewMap -t -no <F7> <C-\><C-n>:call SendCommandToTerm("k")<cr>
-NewMap -t -no <F8> <C-\><C-n>:call SendCommandToTerm("l")<cr>
+NewMap -v -no <F5> :<C-u>call SavedCommandToTerm("h")<cr>
+NewMap -v -no <F6> :<C-u>call SavedCommandToTerm("j")<cr>
+NewMap -v -no <F7> :<C-u>call SavedCommandToTerm("k")<cr>
+NewMap -v -no <F8> :<C-u>call SavedCommandToTerm("l")<cr>
+NewMap -i -no <F5> <C-o>:call SavedCommandToTerm("h")<cr>
+NewMap -i -no <F6> <C-o>:call SavedCommandToTerm("j")<cr>
+NewMap -i -no <F7> <C-o>:call SavedCommandToTerm("k")<cr>
+NewMap -i -no <F8> <C-o>:call SavedCommandToTerm("l")<cr>
+NewMap -c -n -no <F5> :call SavedCommandToTerm("h")<cr>
+NewMap -c -n -no <F6> :call SavedCommandToTerm("j")<cr>
+NewMap -c -n -no <F7> :call SavedCommandToTerm("k")<cr>
+NewMap -c -n -no <F8> :call SavedCommandToTerm("l")<cr>
+NewMap -t -no <F5> <C-\><C-n>:call SavedCommandToTerm("h")<cr>
+NewMap -t -no <F6> <C-\><C-n>:call SavedCommandToTerm("j")<cr>
+NewMap -t -no <F7> <C-\><C-n>:call SavedCommandToTerm("k")<cr>
+NewMap -t -no <F8> <C-\><C-n>:call SavedCommandToTerm("l")<cr>
+
+NewMap -all -no ,<F5> :call MapCommand("h")<cr>
+NewMap -all -no ,<F6> :call MapCommand("j")<cr>
+NewMap -all -no ,<F7> :call MapCommand("k")<cr>
+NewMap -all -no ,<F8> :call MapCommand("l")<cr>
+
+NewMap -all -no ,,<F5> :call MapCommand("x")<cr>
+NewMap -all -no ,,<F6> :call MapCommand("x")<cr>
+NewMap -all -no ,,<F7> :call MapCommand("x")<cr>
+NewMap -all -no ,,<F8> :call MapCommand("x")<cr>
+
+" map ,<F5> :call RegisterTerminal()<cr>
+" map ,<F6> :call RegisterTerminal()<cr>
+" map ,<F7> :call RegisterTerminal()<cr>
+" map ,<F8> :call RegisterTerminal()<cr>
+
+NewMap -map ,,,<F5> :call FixTargetTerm('F5')<cr>
+NewMap -map ,,,<F6> :call FixTargetTerm('F6')<cr>
+NewMap -map ,,,<F7> :call FixTargetTerm('F7')<cr>
+NewMap -map ,,,<F8> :call FixTargetTerm('F8')<cr>
 
 NewMap -v -no <C-F5> :<C-u>call RedoCommandToTermWithSigTerm("h")<cr>
 NewMap -v -no <C-F6> :<C-u>call RedoCommandToTermWithSigTerm("j")<cr>
@@ -762,15 +781,6 @@ NewMap -i -no <C-S-v> <c-r>+
 " tnoremap <C-S-v> <C-\><C-n>:<cr>
 " let seperator=len(args)>0?', ':''
 
-" map ,<F5> :call RegisterTerminal()<cr>
-" map ,<F6> :call RegisterTerminal()<cr>
-" map ,<F7> :call RegisterTerminal()<cr>
-" map ,<F8> :call RegisterTerminal()<cr>
-NewMap -map ,<F5> :call FixTargetTerm('F5')<cr>
-NewMap -map ,<F6> :call FixTargetTerm('F6')<cr>
-NewMap -map ,<F7> :call FixTargetTerm('F7')<cr>
-NewMap -map ,<F8> :call FixTargetTerm('F8')<cr>
-
 " Ut <F2> :call ToggleShortenPath()<cr>
 " command :call ToggleShortenPath()<cr>
 command! -nargs=0 ShortenPath call ToggleShortenPath()
@@ -919,8 +929,8 @@ NewMap -map -key ,rd :call RedoLeaderS()<cr>
 
 "!! source even with comment # // " literals
 " NewMap -no <F6> :autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,BufLeave,WinEnter,BufWinEnter,BufUnload *<cr>
-NewMap -no <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
-NewMap -no <F8> :call Display()<cr>
+" NewMap -no <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
+" NewMap -no <F8> :call Display()<cr>
 
 NewMap -no ,c :call ToggleComment()<cr>
 
@@ -935,11 +945,11 @@ NewMap -t <C-v> <C-\><C-n>:call SendCommandToThisTerm([getreg('"')])<cr>i
 
 NewMap -v ,,s :<C-u>silent redir=>output \| silent '<,'>source \| redir END \| put=output<cr>
 
-NewMap -map <F8> <C-w>p
-NewMap -v -no <F8> :<C-u>call SendCommandToTerm("l")<cr>
-NewMap -n -no <F8> :<C-u>call SendCommandToTerm("l")<cr>
+" NewMap -map <F8> <C-w>p
+" NewMap -v -no <F8> :<C-u>call SavedCommandToTerm("l")<cr>
+" NewMap -n -no <F8> :<C-u>call SavedCommandToTerm("l")<cr>
 
-NewMap -n -no <F5> :<C-u>call RedoCommandToTerm("l")<cr>
+" NewMap -n -no <F5> :<C-u>call RedoCommandToTerm("l")<cr>
 
 NewMap -map ,aa :RECP --reg *<cr>
 NewMap -map ,an :RECP --reg "<cr>
@@ -981,8 +991,13 @@ NewMap -no ,qo :StashPop<cr>
 " NewMap -map ,vo :copen<cr>
 
 " NewMap -map -leaders 0:10 -key {leaders}vg :call VimGrep(v:count)<cr>
+
 NewMap -map -key ,m :call VimGrep(v:count)<cr>
 NewMap -map ,m :call VimGrep(v:count)<cr>
+" Further Investigation :Lines
+" Integrate VimGrep
+NewMap -map <C-a> :Lines<cr>
+NewMap -map <C-S-a> :call VimGrep(v:count)<cr>
 
 function VimGrep(count) abort
   " :copen<cr>:vimgrep "" **/*[D[D[D[D[D
