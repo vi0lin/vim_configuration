@@ -1,6 +1,9 @@
 " Avoid cdo prompt for overwiting files
-let &t_TI = "\<Esc>[>4;2m"
-let &t_TE = "\<Esc>[>4;m"
+" let &t_TI = "\<Esc>[>4;2m"
+" let &t_TE = "\<Esc>[>4;m"
+
+" let &t_TI = [=1;1u
+" let &t_TE = [>4;m[=0;1u
 
 if !exists("g:vim_advantages_got_sourced")
 
@@ -5247,6 +5250,9 @@ function! DirectionMapCommand(direction) range
 endfunction
 
 function! DirectionMapSmart(direction) range
+  " todo execute (term)
+  " todo execute (hjkl fallback term)
+  " todo execute (newterm J or map(<F5>-<F8>, hjkl))
   call InitMapCommand(a:direction)
   set nomore
   let c = -1

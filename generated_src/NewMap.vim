@@ -214,6 +214,10 @@ Inoremap <C-k> :call SmartWincmd('k')<cr>
 Nnoremap <C-l> :call SmartWincmd('l')<cr>
 Vnoremap <C-l> :call SmartWincmd('l')<cr>
 Inoremap <C-l> :call SmartWincmd('l')<cr>
+TmapInsertmode <C-l> <C-w>l
+TmapInsertmode <C-h> <C-w>h
+TmapInsertmode <C-k> <C-w>k
+TmapInsertmode <C-j> <C-w>j
 Vnoremap <BS> :call backspace()<cr>
 Vnoremap & :&<cr>
 Vnoremap ,F :echo VS()<cr>

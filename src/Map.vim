@@ -392,14 +392,14 @@ NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
 NewMap -no -n ,. @q
 " map ,s :call NvimStudioSubstitution("selection")<cr>
 " map ,S :call NvimStudioSubstitution("file")<cr>
-" NewMap -no -t -im <C-l> <C-w>l
-" NewMap -no -t -im <C-h> <C-w>h
-" NewMap -no -t -im <C-k> <C-w>k
-" NewMap -no -t -im <C-j> <C-w>j
 NewMap -n -v -i -im -no <C-h> :call SmartWincmd('h')<cr>
 NewMap -n -v -i -im -no <C-j> :call SmartWincmd('j')<cr>
 NewMap -n -v -i -im -no <C-k> :call SmartWincmd('k')<cr>
 NewMap -n -v -i -im -no <C-l> :call SmartWincmd('l')<cr>
+NewMap -t -im <C-l> <C-w>l
+NewMap -t -im <C-h> <C-w>h
+NewMap -t -im <C-k> <C-w>k
+NewMap -t -im <C-j> <C-w>j
 NewMap -no -v <BS> :call backspace()<cr>
 NewMap -no -v & :&<cr>
 NewMap -no -v ,F :echo VS()<cr>
