@@ -1,3 +1,4 @@
+" Todo - Unify noremap and map commands
 if !exists("g:vim_advantages_got_sourced")
 
 function! _nnoremap(...) range
@@ -27,11 +28,22 @@ function! _tnoremap(...) range
   let key=a:1[0]
   let keyesc=escape(key, "<>")
   " let keyesc=escape(keyesc, "<>")
-  let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
+  " let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
+  " let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
+  " todo consider taking this back!!!
+  " let mode='\:call SetMode("'.keyesc.'", "Terminal") \|'
   " <C-\><C-n>
   " let mode='<C-\><C-n>:echo "TEST"'
+  "
+  let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
   let cmd = join(a:1[1:])
   exec "tnoremap ".key mode cmd
+endfunction
+function! _tnoremapInsertmode(...) range
+  let key=a:1[0]
+  let keyesc=escape(key, "<>")
+  let cmd = join(a:1[1:])
+  exec "tnoremap ".key cmd
 endfunction
 function! _cnoremap(...) range
   let key=a:1[0]
@@ -41,29 +53,86 @@ function! _cnoremap(...) range
   let cmd = join(a:1[1:])
   exec "cnoremap ".key mode cmd
 endfunction
-function! Nmap(...) range
+
+function! _nmap(...) range
+  let key=a:1[0]
+  let keyesc=escape(key, "<>")
+  let mode=':call SetMode("'.keyesc.'", "Normal") \|'
+  let cmd = join(a:1[1:])
+  exec "nmap ".key mode cmd
+endfunction
+function! _vmap(...) range
+  let key=a:1[0]
+  let keyesc=escape(key, "<>")
+  " let keyesc=escape(keyesc, "<>")
+  let mode=':call SetMode("'.keyesc.'", "Visual") \|'
+  let cmd = "'<,'>".join(a:1[1:])
+  exec "vmap ".key mode cmd
+endfunction
+function! _imap(...) range
+  let key=a:1[0]
+  let keyesc=escape(key, "<>")
+  " let keyesc=escape(keyesc, "<>")
+  let mode='<Esc>:call SetMode("'.keyesc.'", "Insert") \|'
+  let cmd = join(a:1[1:])
+  exec "imap ".key mode cmd
+endfunction
+function! _tmap(...) range
+  let key=a:1[0]
+  let keyesc=escape(key, "<>")
+  " let keyesc=escape(keyesc, "<>")
+  " let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
+  " let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
+  " todo consider taking this back!!!
+  " let mode='\:call SetMode("'.keyesc.'", "Terminal") \|'
+  " let mode="<C-\><C-n>"
+  let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
+  let cmd = join(a:1[1:])
+  exec "tmap" key mode cmd
+endfunction
+function! _tmapInsertmode(...) range
+  let key=a:1[0]
+  let keyesc=escape(key, "<>")
+  let cmd = join(a:1[1:])
+  " let mode='<C-\><C-n>:call SetMode("'.keyesc.'", "Terminal") \|'
+  exec "tmap ".key cmd
+endfunction
+function! _cmap(...) range
+  let key=a:1[0]
+  let keyesc=escape(key, "<>")
+  " let keyesc=escape(keyesc, "<>")
+  let mode=':call SetMode("'.keyesc.'", "Console") \|'
+  let cmd = join(a:1[1:])
+  exec "cmap ".key mode cmd
+endfunction
+
+function! Nnoremap(...) range
   " call _nnoremap(a:000)
   exec "call _nnoremap(a:000)"
 endfunction
-function! Vmap(...) range
+function! Vnoremap(...) range
   " call _vnoremap(a:000)
   exec "call _vnoremap(a:000)"
   " echo "call _vnoremap(a:000)"
   " exec "<a:firstline>,<a:lastline> call _vnoremap(a:000)"
 endfunction
-function! Imap(...) range
+function! Inoremap(...) range
   " call _inoremap(a:000)
   exec "call _inoremap(a:000)"
 endfunction
-function! Tmap(...) range
+function! Tnoremap(...) range
   " call _tnoremap(a:000)
   exec "call _tnoremap(a:000)"
 endfunction
-function! Cmap(...) range
+function! TnoremapInsertmode(...) range
+  " call _tnoremap(a:000)
+  exec "call _tnoremapInsertmode(a:000)"
+endfunction
+function! Cnoremap(...) range
   " call _cnoremap(a:000)
   exec "call _cnoremap(a:000)"
 endfunction
-function! Amap(...) range
+function! Anoremap(...) range
   " echo a:lastline a:lastline
   " exec a:firstline.",".a:lastline."call _nnoremap(a:000)"
   " exec a:firstline.",".a:lastline."call _vnoremap(a:000)"
@@ -99,22 +168,22 @@ function! Amap(...) range
   " call _tnoremap(a:000)
   " call _cnoremap(a:000)
 endfunction
-function! UUNmap(...) range
+function! UUNnoremap(...) range
   call _nnoremap(a:1)
 endfunction
-function! UVmap(...) range
+function! UVnoremap(...) range
   call _vnoremap(a:1)
 endfunction
-function! UImap(...) range
+function! UInoremap(...) range
   call _inoremap(a:1)
 endfunction
-function! UTmap(...) range
+function! UTnoremap(...) range
   call _tnoremap(a:1)
 endfunction
-function! UCmap(...) range
+function! UCnoremap(...) range
   call _cnoremap(a:1)
 endfunction
-function! UAmap(...) range
+function! UAnoremap(...) range
   call _nnoremap([a:1])
   call _vnoremap([a:1])
   call _inoremap([a:1])
@@ -122,34 +191,149 @@ function! UAmap(...) range
   call _cnoremap([a:1])
 endfunction
 "Addon
-"" function NImap(...) range
+"" function NInoremap(...) range
 ""   call _nnoremap(a:000)
 ""   call _inoremap(a:000)
+"" endfunction
+"" command -nargs=+ NInoremap :call NInoremap(<f-args>)
+"" function NVnoremap(...) range
+""   call _nnoremap(a:000)
+""   call _vnoremap(a:000)
+"" endfunction
+"" command -range -nargs=+ NVnoremap :call NVnoremap(<f-args>)
+"" function TVnoremap(...) range
+""   call _tnoremap(a:000)
+""   call _vnoremap(a:000)
+"" endfunction
+"" command -range -nargs=+ TVnoremap :call TVnoremap(<f-args>)
+"" function NVInoremap(...) range
+""   call _nnoremap(a:000)
+""   call _vnoremap(a:000)
+""   call _inoremap(a:000)
+"" endfunction
+"" command -range -nargs=+ NVInoremap :call NVInoremap(<f-args>)
+"" function NITnoremap(...) range
+""   call _nnoremap(a:000)
+""   call _vnoremap(a:000)
+""   call _tnoremap(a:000)
+""   call _inoremap(a:000)
+"" endfunction
+"" command -range -nargs=+ NITnoremap :call NITnoremap(<f-args>)
+
+function! Nmap(...) range
+  " call _nmap(a:000)
+  exec "call _nmap(a:000)"
+endfunction
+function! Vmap(...) range
+  " call _vmap(a:000)
+  exec "call _vmap(a:000)"
+  " echo "call _vmap(a:000)"
+  " exec "<a:firstline>,<a:lastline> call _vmap(a:000)"
+endfunction
+function! Imap(...) range
+  " call _imap(a:000)
+  exec "call _imap(a:000)"
+endfunction
+function! Tmap(...) range
+  " call _tmap(a:000)
+  exec "call _tmap(a:000)"
+endfunction
+function! TmapInsertmode(...) range
+  " call _tmap(a:000)
+  exec "call _tmapInsertmode(a:000)"
+endfunction
+function! Cmap(...) range
+  " call _cmap(a:000)
+  exec "call _cmap(a:000)"
+endfunction
+function! Amap(...) range
+  " echo a:lastline a:lastline
+  " exec a:firstline.",".a:lastline."call _nmap(a:000)"
+  " exec a:firstline.",".a:lastline."call _vmap(a:000)"
+  " exec a:firstline.",".a:lastline."call _imap(a:000)"
+  " exec a:firstline.",".a:lastline."call _tmap(a:000)"
+  " exec a:firstline.",".a:lastline."call _cmap(a:000)"
+" return
+  " if key =~#"A" || key =~#"B" || key =~#"D" || key =~#"E" || key =~#"G" || key =~#"H" || key =~#"I" || key =~#"J" || key =~#"K" || key =~#"L" || key =~#"M" || key =~#"N" || key =~#"O" || key =~#"P" || key =~#"Q" || key =~#"R" || key =~#"S-" || key =~#"T" || key =~#"U" || key =~#"V" || key =~#"W" || key =~#"X" || key =~#"Y" || key =~#"Z"
+  " echo a:000 a:000[0] =~#"<leader>"
+  " return
+  " echo a:000 a:000[0] =~#"<leader>"
+  " exec a:firstline.",".a:lastline."call _nmap(a:000)"
+  " exec a:firstline.",".a:lastline."call _vmap(a:000)"
+  " if ! a:000[0] =~#"<leader>"
+  "   exec a:firstline.",".a:lastline."call _imap(a:000)"
+  " endif
+  " exec a:firstline.",".a:lastline."call _tmap(a:000)"
+  " exec a:firstline.",".a:lastline."call _cmap(a:000)"
+  " return
+  call _nmap(a:000)
+  call _vmap(a:000)
+  if ! a:000[0] =~#"<leader>"
+" obviously not here to fix this issue because i commented it out and tested it.
+"        \ && ! a:000[0] =~#"\\" 
+    call _imap(a:000)
+  endif
+  call _tmap(a:000)
+  call _cmap(a:000)
+  return
+  " call _nmap(a:000)
+  " call _vmap(a:000)
+  " call _imap(a:000)
+  " call _tmap(a:000)
+  " call _cmap(a:000)
+endfunction
+function! UUNmap(...) range
+  call _nmap(a:1)
+endfunction
+function! UVmap(...) range
+  call _vmap(a:1)
+endfunction
+function! UImap(...) range
+  call _imap(a:1)
+endfunction
+function! UTmap(...) range
+  call _tmap(a:1)
+endfunction
+function! UCmap(...) range
+  call _cmap(a:1)
+endfunction
+function! UAmap(...) range
+  call _nmap([a:1])
+  call _vmap([a:1])
+  call _imap([a:1])
+  call _tmap([a:1])
+  call _cmap([a:1])
+endfunction
+"Addon
+"" function NImap(...) range
+""   call _nmap(a:000)
+""   call _imap(a:000)
 "" endfunction
 "" command -nargs=+ NImap :call NImap(<f-args>)
 "" function NVmap(...) range
-""   call _nnoremap(a:000)
-""   call _vnoremap(a:000)
+""   call _nmap(a:000)
+""   call _vmap(a:000)
 "" endfunction
 "" command -range -nargs=+ NVmap :call NVmap(<f-args>)
 "" function TVmap(...) range
-""   call _tnoremap(a:000)
-""   call _vnoremap(a:000)
+""   call _tmap(a:000)
+""   call _vmap(a:000)
 "" endfunction
 "" command -range -nargs=+ TVmap :call TVmap(<f-args>)
 "" function NVImap(...) range
-""   call _nnoremap(a:000)
-""   call _vnoremap(a:000)
-""   call _inoremap(a:000)
+""   call _nmap(a:000)
+""   call _vmap(a:000)
+""   call _imap(a:000)
 "" endfunction
 "" command -range -nargs=+ NVImap :call NVImap(<f-args>)
 "" function NITmap(...) range
-""   call _nnoremap(a:000)
-""   call _vnoremap(a:000)
-""   call _tnoremap(a:000)
-""   call _inoremap(a:000)
+""   call _nmap(a:000)
+""   call _vmap(a:000)
+""   call _tmap(a:000)
+""   call _imap(a:000)
 "" endfunction
 "" command -range -nargs=+ NITmap :call NITmap(<f-args>)
+
 function! Utilize(...) range
   let verbose=0
   let force=0
@@ -281,19 +465,19 @@ function! Utilize(...) range
             endif
           endif
         if insert
-          execute "Imap ".execute
+          execute "Inoremap ".execute
         endif
         if normal
-          execute "Nmap ".execute
+          execute "Nnoremap ".execute
         endif
         if command
-          execute "Tmap ".execute
+          execute "Tnoremap ".execute
         endif
         if visual
-          execute "Vmap ".execute
+          execute "Vnoremap ".execute
         endif
         if command
-          execute "Cmap ".execute
+          execute "Cnoremap ".execute
         endif
       endfor
     endfor

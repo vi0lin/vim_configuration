@@ -1,480 +1,471 @@
-nnoremap <silent> <C-S-o> :call JumpToNextFile(-1)<cr>
-nnoremap <silent> <C-S-i> :call JumpToNextFile(1)<cr>
-nnoremap <C-s> <Nop>
-inoremap <C-s> <Nop>
-vnoremap <C-s> <Nop>
-map ,,f :call FavoriteFile()<cr>
-map ,,f :call FavoriteFile()<cr>
-map ,,p :call FavoritePath()<cr>
-map <C-8> :call Favorite()<cr>
-map <F9> :Equal<cr>
-map <S-F9> :Bigger<cr>
-nnoremap ,s :so %<cr>
-map <C-Space> :call SelectCommand()<cr>
-map ,t :Tidy<cr>
-noremap <M-q> :q<cr>
-tnoremap <M-q> <c-\><c-n>:q<cr>
-vnoremap <F5> :<C-u>call SavedCommandToTerm("h")<cr>
-vnoremap <F6> :<C-u>call SavedCommandToTerm("j")<cr>
-vnoremap <F7> :<C-u>call SavedCommandToTerm("k")<cr>
-vnoremap <F8> :<C-u>call SavedCommandToTerm("l")<cr>
-inoremap <F5> <C-o>:call SavedCommandToTerm("h")<cr>
-inoremap <F6> <C-o>:call SavedCommandToTerm("j")<cr>
-inoremap <F7> <C-o>:call SavedCommandToTerm("k")<cr>
-inoremap <F8> <C-o>:call SavedCommandToTerm("l")<cr>
-nnoremap <F5> :call SavedCommandToTerm("h")<cr>
-cnoremap <F5> :call SavedCommandToTerm("h")<cr>
-nnoremap <F6> :call SavedCommandToTerm("j")<cr>
-cnoremap <F6> :call SavedCommandToTerm("j")<cr>
-nnoremap <F7> :call SavedCommandToTerm("k")<cr>
-cnoremap <F7> :call SavedCommandToTerm("k")<cr>
-nnoremap <F8> :call SavedCommandToTerm("l")<cr>
-cnoremap <F8> :call SavedCommandToTerm("l")<cr>
-tnoremap <F5> <C-\><C-n>:call SavedCommandToTerm("h")<cr>
-tnoremap <F6> <C-\><C-n>:call SavedCommandToTerm("j")<cr>
-tnoremap <F7> <C-\><C-n>:call SavedCommandToTerm("k")<cr>
-tnoremap <F8> <C-\><C-n>:call SavedCommandToTerm("l")<cr>
-Amap ,<F5> :call MapCommand("h")<cr>
-Amap ,<F6> :call MapCommand("j")<cr>
-Amap ,<F7> :call MapCommand("k")<cr>
-Amap ,<F8> :call MapCommand("l")<cr>
-Amap ,,<F5> :call MapCommand("x")<cr>
-Amap ,,<F6> :call MapCommand("x")<cr>
-Amap ,,<F7> :call MapCommand("x")<cr>
-Amap ,,<F8> :call MapCommand("x")<cr>
-map ,,,<F5> :call FixTargetTerm('F5')<cr>
-map ,,,<F6> :call FixTargetTerm('F6')<cr>
-map ,,,<F7> :call FixTargetTerm('F7')<cr>
-map ,,,<F8> :call FixTargetTerm('F8')<cr>
-vnoremap <C-F5> :<C-u>call RedoCommandToTermWithSigTerm("h")<cr>
-vnoremap <C-F6> :<C-u>call RedoCommandToTermWithSigTerm("j")<cr>
-vnoremap <C-F7> :<C-u>call RedoCommandToTermWithSigTerm("k")<cr>
-vnoremap <C-F8> :<C-u>call RedoCommandToTermWithSigTerm("l")<cr>
-inoremap <C-F5> <C-o>:call RedoCommandToTermWithSigTerm("h")<cr>
-inoremap <C-F6> <C-o>:call RedoCommandToTermWithSigTerm("j")<cr>
-inoremap <C-F7> <C-o>:call RedoCommandToTermWithSigTerm("k")<cr>
-inoremap <C-F8> <C-o>:call RedoCommandToTermWithSigTerm("l")<cr>
-nnoremap <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
-cnoremap <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
-nnoremap <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
-cnoremap <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
-nnoremap <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
-cnoremap <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
-nnoremap <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
-cnoremap <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
-tnoremap <C-F5> <C-\><C-n>:call RedoCommandToTermWithSigTerm("h")<cr>
-tnoremap <C-F6> <C-\><C-n>:call RedoCommandToTermWithSigTerm("j")<cr>
-tnoremap <C-F7> <C-\><C-n>:call RedoCommandToTermWithSigTerm("k")<cr>
-tnoremap <C-F8> <C-\><C-n>:call RedoCommandToTermWithSigTerm("l")<cr>
-vnoremap <S-F5> :<C-u>call RedoCommandToTerm("h")<cr>
-vnoremap <S-F6> :<C-u>call RedoCommandToTerm("j")<cr>
-vnoremap <S-F7> :<C-u>call RedoCommandToTerm("k")<cr>
-vnoremap <S-F8> :<C-u>call RedoCommandToTerm("l")<cr>
-inoremap <S-F5> <C-o>:call RedoCommandToTerm("h")<cr>
-inoremap <S-F6> <C-o>:call RedoCommandToTerm("j")<cr>
-inoremap <S-F7> <C-o>:call RedoCommandToTerm("k")<cr>
-inoremap <S-F8> <C-o>:call RedoCommandToTerm("l")<cr>
-nnoremap <S-F5> :call RedoCommandToTerm("h")<cr>
-cnoremap <S-F5> :call RedoCommandToTerm("h")<cr>
-nnoremap <S-F6> :call RedoCommandToTerm("j")<cr>
-cnoremap <S-F6> :call RedoCommandToTerm("j")<cr>
-nnoremap <S-F7> :call RedoCommandToTerm("k")<cr>
-cnoremap <S-F7> :call RedoCommandToTerm("k")<cr>
-nnoremap <S-F8> :call RedoCommandToTerm("l")<cr>
-cnoremap <S-F8> :call RedoCommandToTerm("l")<cr>
-tnoremap <S-F5> <C-\><C-n>:call RedoCommandToTerm("h")<cr>
-tnoremap <S-F6> <C-\><C-n>:call RedoCommandToTerm("j")<cr>
-tnoremap <S-F7> <C-\><C-n>:call RedoCommandToTerm("k")<cr>
-tnoremap <S-F8> <C-\><C-n>:call RedoCommandToTerm("l")<cr>
-vnoremap <C-S-F5> :<C-u>call SigTermToTerm("h")<cr>
-vnoremap <C-S-F6> :<C-u>call SigTermToTerm("j")<cr>
-vnoremap <C-S-F7> :<C-u>call SigTermToTerm("k")<cr>
-vnoremap <C-S-F8> :<C-u>call SigTermToTerm("l")<cr>
-inoremap <C-S-F5> <C-o>:call SigTermToTerm("h")<cr>
-inoremap <C-S-F6> <C-o>:call SigTermToTerm("j")<cr>
-inoremap <C-S-F7> <C-o>:call SigTermToTerm("k")<cr>
-inoremap <C-S-F8> <C-o>:call SigTermToTerm("l")<cr>
-nnoremap <C-S-F5> :call SigTermToTerm("h")<cr>
-cnoremap <C-S-F5> :call SigTermToTerm("h")<cr>
-nnoremap <C-S-F6> :call SigTermToTerm("j")<cr>
-cnoremap <C-S-F6> :call SigTermToTerm("j")<cr>
-nnoremap <C-S-F7> :call SigTermToTerm("k")<cr>
-cnoremap <C-S-F7> :call SigTermToTerm("k")<cr>
-nnoremap <C-S-F8> :call SigTermToTerm("l")<cr>
-cnoremap <C-S-F8> :call SigTermToTerm("l")<cr>
-tnoremap <C-S-F5> <C-\><C-n>:call SigTermToTerm("h")<cr>
-tnoremap <C-S-F6> <C-\><C-n>:call SigTermToTerm("j")<cr>
-tnoremap <C-S-F7> <C-\><C-n>:call SigTermToTerm("k")<cr>
-tnoremap <C-S-F8> <C-\><C-n>:call SigTermToTerm("l")<cr>
-vnoremap . :<Up><cr>
-Amap ,h     :call Open("h", "buffer", "new")<cr>
-Amap ,j     :call Open("j", "buffer", "new")<cr>
-Amap ,k     :call Open("k", "buffer", "new")<cr>
-Amap ,l     :call Open("l", "buffer", "new")<cr>
-Amap ,H     :call Open("H", "buffer", "new")<cr>
-Amap ,J     :call Open("J", "buffer", "new")<cr>
-Amap ,K     :call Open("K", "buffer", "new")<cr>
-Amap ,L     :call Open("L", "buffer", "new")<cr>
-Amap ,,h     :call Open("h", "terminal", "new")<cr>
-Amap ,,j     :call Open("j", "terminal", "new")<cr>
-Amap ,,k     :call Open("k", "terminal", "new")<cr>
-Amap ,,l     :call Open("l", "terminal", "new")<cr>
-Amap ,,H     :call Open("H", "terminal", "new")<cr>
-Amap ,,J     :call Open("J", "terminal", "new")<cr>
-Amap ,,K     :call Open("K", "terminal", "new")<cr>
-Amap ,,L     :call Open("L", "terminal", "new")<cr>
-Amap <A-H>     :call Open("H", "buffer", "new")<cr>
-Amap <A-J>     :call Open("J", "buffer", "new")<cr>
-Amap <A-K>     :call Open("K", "buffer", "new")<cr>
-Amap <A-L>     :call Open("L", "buffer", "new")<cr>
-Amap <A-S-h>     :call Open("h", "terminal", "new")<cr>
-Amap <A-S-j>     :call Open("j", "terminal", "new")<cr>
-Amap <A-S-k>     :call Open("k", "terminal", "new")<cr>
-Amap <A-S-l>     :call Open("l", "terminal", "new")<cr>
-Amap <A-S-H>     :call Open("H", "terminal", "new")<cr>
-Amap <A-S-J>     :call Open("J", "terminal", "new")<cr>
-Amap <A-S-K>     :call Open("K", "terminal", "new")<cr>
-Amap <A-S-L>     :call Open("L", "terminal", "new")<cr>
-Amap <A-S-Left>     :call Open("h", "terminal", "new")<cr>
-Amap <A-S-Down>     :call Open("j", "terminal", "new")<cr>
-Amap <A-S-Up>       :call Open("k", "terminal", "new")<cr>
-Amap <A-S-Right>    :call Open("l", "terminal", "new")<cr>
-Amap <A-S-Left>     :call Open("H", "terminal", "new")<cr>
-Amap <A-S-Down>     :call Open("J", "terminal", "new")<cr>
-Amap <A-S-Up>       :call Open("K", "terminal", "new")<cr>
-Amap <A-S-Right>    :call Open("L", "terminal", "new")<cr>
-Amap <A-Left>       :call Open("h", "buffer", "new")<cr>
-Amap <A-Down>       :call Open("j", "buffer", "new")<cr>
-Amap <A-Up>         :call Open("k", "buffer", "new")<cr>
-Amap <A-Right>      :call Open("l", "buffer", "new")<cr>
-Amap <A-Left>       :call Open("H", "buffer", "new")<cr>
-Amap <A-Down>       :call Open("J", "buffer", "new")<cr>
-Amap <A-Up>         :call Open("K", "buffer", "new")<cr>
-Amap <A-Right>      :call Open("L", "buffer", "new")<cr>
-Amap <C-q> :hide<cr>
-Amap <C-S-q> :bd!<cr>
-Amap <C-S-q> :q!<cr>
-Amap <C-A-q> :qa!<cr>
-Amap <A-q> :call TabClose()<cr>
-Amap ,,r :redraw!<cr>
-Amap <S-F2> :let x=input("Find In Files: ") \| :echo system("grep ".expand('%')." -nrw -e \"".x."\"")<cr>
-Amap ,c call CountRegex()<cr>
-nmap <C-S-A> :call IncRange()<cr>
-nmap <C-S-X> :call DecRange()<cr>
-vmap af :call Vaf()<cr>
-vmap <C-S-A> :call IncRange()<cr>
-vmap <C-S-X> :call DecRange()<cr>
-tmap ,X :TIN tail -f $receiver<cr>
-map <A-S-n> <C-w>+
-map <A-S-m> <C-w>-
-map <A-S-u> <C-w><
-map <A-S-i> <C-w>>
-map <A-n> 12<C-w>+
-map <A-m> 12<C-w>-
-map <A-u> 12<C-w><
-map <A-i> 12<C-w>>
-map <A-h> :call TabH()<cr>
-map <A-l> :call TabL()<cr>
-map <C-S-M-h> :wincmd H<cr>
-map <C-S-M-j> :wincmd J<cr>
-map <C-S-M-k> :wincmd K<cr>
-map <C-S-M-l> :wincmd L<cr>
-map <C-S-h> :call SwapWin("h")<cr>
-map <C-S-j> :call SwapWin("j")<cr>
-map <C-S-k> :call SwapWin("k")<cr>
-map <C-S-l> :call SwapWin("l")<cr>
-tnoremap <C-S-h> <c-\><c-n>:call SwapWin("h")<cr>
-tnoremap <C-S-j> <c-\><c-n>:call SwapWin("j")<cr>
-tnoremap <C-S-k> <c-\><c-n>:call SwapWin("k")<cr>
-tnoremap <C-S-l> <c-\><c-n>:call SwapWin("l")<cr>
-nnoremap ,fuc :call OpenFileUnderCursor()<cr>
-nnoremap ,,fb :LayoutBash<cr>
-nnoremap ,,fv :LayoutVim<cr>
-map <m-;> :call ToggleOverviewRight()<cr>
-map ,,<F4> :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.bashrc; git_selector "TEST"
-map <C-S-F9> :call PreviewBuffer()<cr>
-map <C-F2> :call ToggleWrap()<cr>
-map ,,,w :call ToggleWrap()<cr>
-map ,in :call Intend()<cr>
-map ,,,<space> :IntelligentSelecting<cr>
-map ,. @q
-vmap <C-l> <C-w>l
-vmap <C-h> <C-w>h
-vmap <C-k> <C-w>k
-vmap <C-j> <C-w>j
-nnoremap <silent> <C-h> :call SmartWincmd('h')<cr>
-nnoremap <silent> <C-j> :call SmartWincmd('j')<cr>
-nnoremap <silent> <C-k> :call SmartWincmd('k')<cr>
-nnoremap <silent> <C-l> :call SmartWincmd('l')<cr>
-vmap <BS> :call backspace()<cr>
-vmap & :&<cr>
-vmap ,F :echo VS()<cr>
-vmap ,,g :call AppendToEndRange()<cr>
-vmap ,G :AppendAll<cr>
-vmap ,u :!uniq<cr>
-vmap <M-v> :call VPaste("Visual")<cr>
-vmap <M-c> :call VCopy("Visual")<cr>
-vmap <M-x> :call VCut("Visual")<cr>
-tmap <c-o> <c-\><c-n><c-o>
-imap <C-l> <C-w>li
-imap <C-h> <C-w>hi
-imap <C-j> <C-w>ji
-tmap <C-h> <C-\><C-n><C-h>h
-tmap <C-j> <C-\><C-n><C-j>j
-tmap <C-k> <C-\><C-n><C-k>k
-tmap <C-l> <C-\><C-n><C-w>l
-tmap <C-h> <C-h>h
-tmap <C-j> <C-j>j
-tmap <C-k> <C-k>k
-tmap <C-l> <C-w>l
-tnoremap <C-l> <C-\><C-n>:wincmd l<cr>
-tnoremap <C-h> <C-\><C-n>:wincmd h<cr>
-tnoremap <C-k> <C-\><C-n>:wincmd k<cr>
-tnoremap <C-j> <C-\><C-n>:wincmd j<cr>
-tnoremap <C-l> l<cr>
-tnoremap <C-h> h<cr>
-tnoremap <C-k> k<cr>
-tnoremap <C-j> j<cr>
-imap <c-w><c-w> <c-w><c-w>
-tmap  :call ExitTerminal()<cr>
-imap <A-'> ä
-imap <A-"> Ä
-imap <A-;> ö
-imap <A-:> Ö
-imap <A-[> ü
-imap <A-{> Ü
-imap <A--> ß
-tmap <ScrollWheelUp> <C-\><C-n>
-tmap <S-ScrollWheelUp> <C-\><C-n>
-tmap <ScrollWheelDown> <C-\><C-n>
-tmap <S-ScrollWheelDown> <C-\><C-n>
-tmap <Esc> i
-tmap <LeftMouse> <C-\><C-n>
-map ,,,m :call Toggle_Set_Last_Git_Message()<cr>
-map ,,,l :call ToggleLineState()<cr>
-map ,,,L :call ToggleLineStateGlobal()<cr>
-map ,,s :call Statusline_TogglePath()<cr>
-map ,,d :echo g:debug_layout<cr>
-map ,,B :call Boilerplate_Test()<cr>
-map ,<Space> :call GetCCWD()<cr>
-nmap <silent> <C-s> :SaveFile<cr>
-vmap <silent> <C-s> :SaveFile<cr>
-imap <silent> <C-s> :SaveFile<cr>l
-nnoremap <localleader>f :InsertFunction<cr>
-nnoremap <space>f :InsertFilename<cr>
-map ,<Space> :call ToggleZoom()<cr>
-map <silent> <S-F1> :SearchCword<cr>
-map ,b :call BASH(VS())<cr>
-map ,b :call Bash(VS())<cr>
-map ,b :Buffers<cr>
-map ,b :Buffers<cr>
-map <localleader>iv :call VIM(input("vimscript: "), 'exec_input_vs')<cr>
-map <localleader>ib :call BASH(input("bash: "), 'exec_input_vs')<cr>
-map <localleader>ip :call PYTHON(input("python: "), 'exec_input_vs')<cr>
-map <localleader>ir :call RUST(input("rust: "), 'exec_input_vs')<cr>
-nnoremap <space>p :CopyFileNameToClipboard<cr>
-nnoremap <space>P :CopyWholePathToClipboard<cr>
-nnoremap <space>r :InsertReceiver<cr>
-nnoremap ,dd :call Rewindworkdir()<cr>
-map ,<Space>                                         :call Files(Folder_Up(v:count, 0))<cr>
-map ,,<Space>                                 :call Files(Folder_Up(v:count, 1))<cr>
-map ,,,<Space>                         :call Files(Folder_Up(v:count, 2))<cr>
-map ,,,,<Space>                 :call Files(Folder_Up(v:count, 3))<cr>
-map ,,,,,<Space>         :call Files(Folder_Up(v:count, 4))<cr>
-map ,,,,,,<Space> :call Files(Folder_Up(v:count, 5))<cr>
-map ,g                                         :call AgIn(Folder_Up(v:count, 0))<cr>
-map ,,g                                 :call AgIn(Folder_Up(v:count, 1))<cr>
-map ,,,g                         :call AgIn(Folder_Up(v:count, 2))<cr>
-map ,,,,g                 :call AgIn(Folder_Up(v:count, 3))<cr>
-map ,,,,,g         :call AgIn(Folder_Up(v:count, 4))<cr>
-map ,,,,,,g :call AgIn(Folder_Up(v:count, 5))<cr>
-map ,vcd :call CD(Vim_Advantages_Path())<cr>
-map ,p                :call Projects()<cr>
-map ,,p               :call Projects()<cr>
-map ,,,p              :call Projects()<cr>
-map ,,,,p             :call Projects()<cr>
-map ,,,,,p            :call Projects()<cr>
-map ,,,,,,p           :call Projects()<cr>
-noremap <C-p>              :call Projects()<cr>
-noremap <C-S-p>            :call Projects()<cr>
-noremap <A-p>              :call Projects()<cr>
-noremap <A-S-p>            :call Projects()<cr>
-noremap <A-C-p>            :call Projects()<cr>
-noremap <A-S-C-p>          :call Projects()<cr>
-map <C-S-p>           :call BuildSystemsGitProjects()<cr>
-map <C-S-m>           :Generate<cr>
-noremap <C-Space>              :call Files(Folder_Project())<cr>
-noremap <C-S-Space>            :call Files(Folder_Repo())<cr>
-noremap <A-Space>              :call Files(Folder_Repo())<cr>
-noremap <A-S-Space>            :call Files(Folder_Repo(1))<cr>
-noremap <A-C-Space>            :call Files(Folder_Repo(1))<cr>
-noremap <A-S-C-Space>          :call Files('/')<cr>
-noremap <C-g>              :call AgIn(Folder_Project())<cr>
-noremap <C-S-g>            :call AgIn(Folder_Repo())<cr>
-noremap <A-g>              :call AgIn(Folder_Repo())<cr>
-noremap <A-S-g>            :call AgIn(Folder_Repo(1))<cr>
-noremap <A-C-g>            :call AgIn(Folder_Repo(1))<cr>
-noremap <A-S-C-g>          :call AgIn('/')<cr>
-noremap <C-m>              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
-nnoremap ,o              :OpenFileCommandLineSameDir<cr>
-nnoremap ,.              :OpenFileCommandLineCWD<cr>
-nnoremap ,,.      :OpenFileCommandLineSameDir<cr>
-nnoremap ,.              :call CommandLineFiles(Folder_Up(v:count, 0))<cr>
-nnoremap ,,.              :call CommandLineFiles(Folder_Up(v:count, 1))<cr>
-nnoremap ,,,.              :call CommandLineFiles(Folder_Up(v:count, 2))<cr>
-nnoremap ,,,,.              :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
-nnoremap ,,,,,.              :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
-cnoremap <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
-cnoremap <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
-cnoremap <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
-cnoremap <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
-cnoremap <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
-cnoremap <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
-cnoremap <C-,> <Backspace>
-cnoremap <C-.> <Backspace>
-nnoremap ,cd :call MakeDirCurrentCWD(bufnr())<cr>
-nnoremap <C-Left> :call CD(WFilePrev())<cr>
-nnoremap <C-Right> :call CD(WFileNext())<cr>
-nnoremap <C-,> :call CD(WFilePrev())<cr>
-nnoremap <C-.> :call CD(WFileNext())<cr>
-nnoremap ,<Tab>      :JumpProjectIn<cr>
-nnoremap <localleader><Tab> :JumpProjectIn<cr>
-vnoremap <F14> :<C-u>call VS()<cr>
-nnoremap <F13> :call VS()<cr>
-inoremap <F13> <C-o>:call VS()<cr>
-cnoremap <F13> :call VS('c')<cr>
-tnoremap <F13> <C-\><C-n>:call VS('t')<cr>
-nmap <M-v> :call FuncPaste("Normal")<cr>
-nmap <M-c> :call FuncCopy("Normal")<cr>
-nmap <M-x> :call FuncCut("Normal")<cr>
-noremap ,,,j :IntelligentJumping<cr>
-nmap <silent> <c-h> :wincmd h<cr>
-nmap <silent> <c-j> :wincmd j<cr>
-nmap <silent> <c-k> :wincmd k<cr>
-nmap <silent> <c-l> :wincmd l<cr>
-vnoremap <silent> p "_dP
-vnoremap <silent> y y:call ClipboardYank()<cr>
-vnoremap <silent> d d:call ClipboardYank()<cr>
-nnoremap <silent> dd dd:call ClipboardYank()<cr>
-nnoremap <silent> p :call ClipboardPaste("n")<cr>p
-vnoremap p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
-nmap <BS> :call backspaceN()<cr>
-cmap <A-'> ä
-cmap <A-"> Ä
-cmap <A-;> ö
-cmap <A-:> Ö
-cmap <A-[> ü
-cmap <A-{> Ü
-cmap <A--> ß
-nmap ,F :echo VS()<cr>
-nmap ,e :call AppendToEndNormal()<cr>
-nmap ,E :AppendAll<cr>
-nnoremap YY :call AppendToClipboard()<cr>
-vnoremap Y :<C-u>let @+ = @+ . join(getline("'<", "'>"), "\n") . "\n"<cr>
-nnoremap <silent> <A-k> :m-2<cr>
-nnoremap <silent> <A-j> :m+1<cr>
-vnoremap <silent> <A-k> :m '<-2<cr>gv=gv
-vnoremap <silent> <A-j> :m '>+1<cr>gv=gv
-noremap < <<
-noremap > >>
-vnoremap < <gv
-vnoremap > >gv
-map ,dt :diffthis<cr>
-map ,do :diffoff<cr>
-map ,0 :wincmd =<cr>
-inoremap <C-Space> <C-x><C-f>
-inoremap <C-S-v> <c-r>+
-map ,rm :call DeleteFile()<cr>
-map ,n :call NewFile()<cr>
-nmap ,< :norm yy<cr>:norm dd<cr>:wincmd l<cr>:norm gp<cr>:wincmd h<cr>
-vmap ,< :norm gvy<cr>:norm gvd<cr>:wincmd l<cr>:norm gp<cr>:wincmd h<cr>
-nnoremap <C-S-M-h> :echo JoinSplits("h")<cr>
-nnoremap <C-S-M-j> :echo JoinSplits("j")<cr>
-nnoremap <C-S-M-k> :echo JoinSplits("k")<cr>
-nnoremap <C-S-M-l> :echo JoinSplits("l")<cr>
-nnoremap ,<C-S-M-h> :echo MoveOutOfSplit("h")<cr>
-nnoremap ,<C-S-M-j> :echo MoveOutOfSplit("j")<cr>
-nnoremap ,<C-S-M-k> :echo MoveOutOfSplit("k")<cr>
-nnoremap ,<C-S-M-l> :echo MoveOutOfSplit("l")<cr>
-map <C-;> zh
-map <C-'> zl
-map <C-S-;> 20zh
-map <C-S-'> 20zl
-nnoremap <silent> ,f  :copen<cr>
-nnoremap <silent> <C-Down>   :cnext<cr>zz
-nnoremap <silent> <C-Up>     :cprev<cr>zz
-nnoremap <silent> ,N  :cfirst<cr>zz
-nnoremap <silent> ,P  :clast<cr>zz
-nnoremap <silent> ,c  :cclose<cr>
-nmap ,<C-s> :call ExecFunction()<cr>
-nmap ,s :call ExecVS()<cr>
-vmap ,s :call ExecVS()<cr>
-nmap ,S :Re \| :%source \| :ReEnd<cr>
-map ,rd :call RedoLeaderS()<cr>
-noremap ,c :call ToggleComment()<cr>
-vmap <F1> J
-map <F2> :call GetKeys()<cr>
-map <F3> :call FindKeyPerform()<cr>
-map <F4> :echo AllKeys()<cr>
-tmap <C-v> <C-\><C-n>:call SendCommandToThisTerm([getreg('"')])<cr>i
-vmap ,,s :<C-u>silent redir=>output \| silent '<,'>source \| redir END \| put=output<cr>
-map ,aa :RECP --reg *<cr>
-map ,an :RECP --reg "<cr>
-map ,ab :RECP<cr>
-noremap ,qd :Diff --all<cr>
-noremap ,,qd :Diff --all --cached<cr>
-noremap ,qr :PushCWD
-noremap ,,qr :GithubPush<cr>
-noremap ,qv :Pull<cr>
-noremap ,ql :Log<cr>
-noremap ,qs :Status<cr>
-noremap ,qa :GitAdd<cr>
-noremap ,qA :GitAddCWD<cr>
-noremap ,,qa :GitAddCWD<cr>
-noremap ,qcc :!git rebase --continue<cr>
-noremap ,qcs :!git rebase --skip<cr>
-noremap ,qca :!git rebase --abort<cr>
-noremap ,qf :GitFetch<cr>
-noremap ,qu :StashPush<cr>
-noremap ,qo :StashPop<cr>
-map ,m :call VimGrep(v:count)<cr>
-map ,m :call VimGrep(v:count)<cr>
-map <C-a> :Lines<cr>
-map <C-S-a> :call VimGrep(v:count)<cr>
-map [D :cclose<cr>
-map [C :copen<cr>
-map [A :cprev<cr>
-map [B :cnext<cr>
-Amap <F11> :call RefreshFileList()<cr>:call NextBuffer()<cr>
-Amap <S-F11> :call RefreshFileList()<cr>:call PrevBuffer()<cr>
-Amap <F10> :call RefreshFileListDir()<cr>:call NextBuffer()<cr>
-Amap <S-F10> :call RefreshFileListDir()<cr>:call PrevBuffer()<cr>
-noremap ,,,,,<F1> :call SelectFunctionBlock()<cr>
-noremap <F1> :call GitInfo()<cr>
-noremap <S-F1> :call GitInfo('--stash')<cr>
-noremap <C-S-F1> :call GitStashDrop()<cr>
-noremap ,,,,<F3> :call GitDeleteLastUnpushedCommit()<cr>
-noremap ,,,<F1> :call GitCommitRepo()<cr>
-noremap ,,<F1> :call GitCommitRepo(input("Commit Message: "))<cr>
-noremap ,<F1> :call GitAddRepo()<cr>
-noremap ,,,,,<F1> :call GitInitRepository()<cr>
-noremap ,,,,,,<F1> :call GitInitRepositoryBare()<cr>
-noremap <F2> :call SelectRemote(1)<cr>
-noremap <S-F2> :call SelectRemote(-1)<cr>
-noremap ,<F2> :call GitRenameRemote()<cr>
-noremap ,,<F2> :call GitRemoteAdd()<cr>
-noremap ,,,<F2> :call GitSetRemote()<cr>
-noremap <F3> :call SelectBranch(1)<cr>
-noremap <S-F3> :call SelectBranch(-1)<cr>
-noremap ,<F3> :call GitRenameBranch()<cr>
-noremap ,,<F3> :call GitNewBranch()<cr>
-noremap <F4> :call GitStashPush()<cr>
-noremap <S-F4> :call GitStashPop()<cr>
-tnoremap <C-v> <C-\><C-n>
-vnoremap i <C-c>i
-vmap <silent> <C-c> <C-c>:call CommandInfo()<cr>
-map <F12> :call ToggleFavorite(1)<cr>
-map <S-F12> :call ToggleFavorite(-1)<cr>
-map <C-F12> :call OpenFZF(g:favorites)<cr>
-map ,<F12> :call SetUnsetFavorite()<cr>
-map ,,<F12> :call ClearUnreachableFavorites()<cr>
+Nnoremap <silent> <C-S-o> :call JumpToNextFile(-1)<cr>
+Nnoremap <silent> <C-S-i> :call JumpToNextFile(1)<cr>
+Nnoremap ,,f :call FavoriteFile()<cr>
+Nnoremap ,,f :call FavoriteFile()<cr>
+Nnoremap ,,p :call FavoritePath()<cr>
+Nnoremap <C-8> :call Favorite()<cr>
+Nnoremap <F9> :Equal<cr>
+Nnoremap <S-F9> :Bigger<cr>
+Nnoremap ,s :so %<cr>
+Nnoremap ,t :Tidy<cr>
+Nnoremap <M-q> :q<cr>
+Tnoremap <M-q> <c-\><c-n>:q<cr>
+Vnoremap <F5> :<C-u>call SavedCommandToTerm("h")<cr>
+Vnoremap <F6> :<C-u>call SavedCommandToTerm("j")<cr>
+Vnoremap <F7> :<C-u>call SavedCommandToTerm("k")<cr>
+Vnoremap <F8> :<C-u>call SavedCommandToTerm("l")<cr>
+Inoremap <F5> <C-o>:call SavedCommandToTerm("h")<cr>
+Inoremap <F6> <C-o>:call SavedCommandToTerm("j")<cr>
+Inoremap <F7> <C-o>:call SavedCommandToTerm("k")<cr>
+Inoremap <F8> <C-o>:call SavedCommandToTerm("l")<cr>
+Nnoremap <F5> :call SavedCommandToTerm("h")<cr>
+Cnoremap <F5> :call SavedCommandToTerm("h")<cr>
+Nnoremap <F6> :call SavedCommandToTerm("j")<cr>
+Cnoremap <F6> :call SavedCommandToTerm("j")<cr>
+Nnoremap <F7> :call SavedCommandToTerm("k")<cr>
+Cnoremap <F7> :call SavedCommandToTerm("k")<cr>
+Nnoremap <F8> :call SavedCommandToTerm("l")<cr>
+Cnoremap <F8> :call SavedCommandToTerm("l")<cr>
+Tnoremap <F5> <C-\><C-n>:call SavedCommandToTerm("h")<cr>
+Tnoremap <F6> <C-\><C-n>:call SavedCommandToTerm("j")<cr>
+Tnoremap <F7> <C-\><C-n>:call SavedCommandToTerm("k")<cr>
+Tnoremap <F8> <C-\><C-n>:call SavedCommandToTerm("l")<cr>
+Anoremap ,<F5> :call MapCommand("h")<cr>
+Anoremap ,<F6> :call MapCommand("j")<cr>
+Anoremap ,<F7> :call MapCommand("k")<cr>
+Anoremap ,<F8> :call MapCommand("l")<cr>
+TnoremapInsertmode <C-l> l<cr>
+TnoremapInsertmode <C-h> h<cr>
+TnoremapInsertmode <C-k> k<cr>
+TnoremapInsertmode <C-j> j<cr>
+Anoremap ,,<F5> :call DirectionMapSmart('h')<cr>
+Anoremap ,,<F6> :call DirectionMapSmart('j')<cr>
+Anoremap ,,<F7> :call DirectionMapSmart('k')<cr>
+Anoremap ,,<F8> :call DirectionMapSmart('l')<cr>
+Anoremap ,,,<F5> :call MapCommand("x")<cr>
+Anoremap ,,,<F6> :call MapCommand("x")<cr>
+Anoremap ,,,<F7> :call MapCommand("x")<cr>
+Anoremap ,,,<F8> :call MapCommand("x")<cr>
+Nnoremap ,,,<F5> :call FixTargetTerm('F5')<cr>
+Nnoremap ,,,<F6> :call FixTargetTerm('F6')<cr>
+Nnoremap ,,,<F7> :call FixTargetTerm('F7')<cr>
+Nnoremap ,,,<F8> :call FixTargetTerm('F8')<cr>
+Vnoremap <C-F5> :<C-u>call RedoCommandToTermWithSigTerm("h")<cr>
+Vnoremap <C-F6> :<C-u>call RedoCommandToTermWithSigTerm("j")<cr>
+Vnoremap <C-F7> :<C-u>call RedoCommandToTermWithSigTerm("k")<cr>
+Vnoremap <C-F8> :<C-u>call RedoCommandToTermWithSigTerm("l")<cr>
+Inoremap <C-F5> <C-o>:call RedoCommandToTermWithSigTerm("h")<cr>
+Inoremap <C-F6> <C-o>:call RedoCommandToTermWithSigTerm("j")<cr>
+Inoremap <C-F7> <C-o>:call RedoCommandToTermWithSigTerm("k")<cr>
+Inoremap <C-F8> <C-o>:call RedoCommandToTermWithSigTerm("l")<cr>
+Nnoremap <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+Cnoremap <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+Nnoremap <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+Cnoremap <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+Nnoremap <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+Cnoremap <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+Nnoremap <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
+Cnoremap <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
+Tnoremap <C-F5> <C-\><C-n>:call RedoCommandToTermWithSigTerm("h")<cr>
+Tnoremap <C-F6> <C-\><C-n>:call RedoCommandToTermWithSigTerm("j")<cr>
+Tnoremap <C-F7> <C-\><C-n>:call RedoCommandToTermWithSigTerm("k")<cr>
+Tnoremap <C-F8> <C-\><C-n>:call RedoCommandToTermWithSigTerm("l")<cr>
+Vnoremap <S-F5> :<C-u>call RedoCommandToTerm("h")<cr>
+Vnoremap <S-F6> :<C-u>call RedoCommandToTerm("j")<cr>
+Vnoremap <S-F7> :<C-u>call RedoCommandToTerm("k")<cr>
+Vnoremap <S-F8> :<C-u>call RedoCommandToTerm("l")<cr>
+Inoremap <S-F5> <C-o>:call RedoCommandToTerm("h")<cr>
+Inoremap <S-F6> <C-o>:call RedoCommandToTerm("j")<cr>
+Inoremap <S-F7> <C-o>:call RedoCommandToTerm("k")<cr>
+Inoremap <S-F8> <C-o>:call RedoCommandToTerm("l")<cr>
+Nnoremap <S-F5> :call RedoCommandToTerm("h")<cr>
+Cnoremap <S-F5> :call RedoCommandToTerm("h")<cr>
+Nnoremap <S-F6> :call RedoCommandToTerm("j")<cr>
+Cnoremap <S-F6> :call RedoCommandToTerm("j")<cr>
+Nnoremap <S-F7> :call RedoCommandToTerm("k")<cr>
+Cnoremap <S-F7> :call RedoCommandToTerm("k")<cr>
+Nnoremap <S-F8> :call RedoCommandToTerm("l")<cr>
+Cnoremap <S-F8> :call RedoCommandToTerm("l")<cr>
+Tnoremap <S-F5> <C-\><C-n>:call RedoCommandToTerm("h")<cr>
+Tnoremap <S-F6> <C-\><C-n>:call RedoCommandToTerm("j")<cr>
+Tnoremap <S-F7> <C-\><C-n>:call RedoCommandToTerm("k")<cr>
+Tnoremap <S-F8> <C-\><C-n>:call RedoCommandToTerm("l")<cr>
+Vnoremap <C-S-F5> :<C-u>call SigTermToTerm("h")<cr>
+Vnoremap <C-S-F6> :<C-u>call SigTermToTerm("j")<cr>
+Vnoremap <C-S-F7> :<C-u>call SigTermToTerm("k")<cr>
+Vnoremap <C-S-F8> :<C-u>call SigTermToTerm("l")<cr>
+Inoremap <C-S-F5> <C-o>:call SigTermToTerm("h")<cr>
+Inoremap <C-S-F6> <C-o>:call SigTermToTerm("j")<cr>
+Inoremap <C-S-F7> <C-o>:call SigTermToTerm("k")<cr>
+Inoremap <C-S-F8> <C-o>:call SigTermToTerm("l")<cr>
+Nnoremap <C-S-F5> :call SigTermToTerm("h")<cr>
+Cnoremap <C-S-F5> :call SigTermToTerm("h")<cr>
+Nnoremap <C-S-F6> :call SigTermToTerm("j")<cr>
+Cnoremap <C-S-F6> :call SigTermToTerm("j")<cr>
+Nnoremap <C-S-F7> :call SigTermToTerm("k")<cr>
+Cnoremap <C-S-F7> :call SigTermToTerm("k")<cr>
+Nnoremap <C-S-F8> :call SigTermToTerm("l")<cr>
+Cnoremap <C-S-F8> :call SigTermToTerm("l")<cr>
+Tnoremap <C-S-F5> <C-\><C-n>:call SigTermToTerm("h")<cr>
+Tnoremap <C-S-F6> <C-\><C-n>:call SigTermToTerm("j")<cr>
+Tnoremap <C-S-F7> <C-\><C-n>:call SigTermToTerm("k")<cr>
+Tnoremap <C-S-F8> <C-\><C-n>:call SigTermToTerm("l")<cr>
+Vnoremap . :<Up><cr>
+Anoremap ,h     :call Open("h", "buffer", "new")<cr>
+Anoremap ,j     :call Open("j", "buffer", "new")<cr>
+Anoremap ,k     :call Open("k", "buffer", "new")<cr>
+Anoremap ,l     :call Open("l", "buffer", "new")<cr>
+Anoremap ,H     :call Open("H", "buffer", "new")<cr>
+Anoremap ,J     :call Open("J", "buffer", "new")<cr>
+Anoremap ,K     :call Open("K", "buffer", "new")<cr>
+Anoremap ,L     :call Open("L", "buffer", "new")<cr>
+Anoremap ,,h     :call Open("h", "terminal", "new")<cr>
+Anoremap ,,j     :call Open("j", "terminal", "new")<cr>
+Anoremap ,,k     :call Open("k", "terminal", "new")<cr>
+Anoremap ,,l     :call Open("l", "terminal", "new")<cr>
+Anoremap ,,H     :call Open("H", "terminal", "new")<cr>
+Anoremap ,,J     :call Open("J", "terminal", "new")<cr>
+Anoremap ,,K     :call Open("K", "terminal", "new")<cr>
+Anoremap ,,L     :call Open("L", "terminal", "new")<cr>
+Anoremap <A-H>     :call Open("H", "buffer", "new")<cr>
+Anoremap <A-J>     :call Open("J", "buffer", "new")<cr>
+Anoremap <A-K>     :call Open("K", "buffer", "new")<cr>
+Anoremap <A-L>     :call Open("L", "buffer", "new")<cr>
+Anoremap <A-S-h>     :call Open("h", "terminal", "new")<cr>
+Anoremap <A-S-j>     :call Open("j", "terminal", "new")<cr>
+Anoremap <A-S-k>     :call Open("k", "terminal", "new")<cr>
+Anoremap <A-S-l>     :call Open("l", "terminal", "new")<cr>
+Anoremap <A-S-H>     :call Open("H", "terminal", "new")<cr>
+Anoremap <A-S-J>     :call Open("J", "terminal", "new")<cr>
+Anoremap <A-S-K>     :call Open("K", "terminal", "new")<cr>
+Anoremap <A-S-L>     :call Open("L", "terminal", "new")<cr>
+Anoremap <A-S-Left>     :call Open("h", "terminal", "new")<cr>
+Anoremap <A-S-Down>     :call Open("j", "terminal", "new")<cr>
+Anoremap <A-S-Up>       :call Open("k", "terminal", "new")<cr>
+Anoremap <A-S-Right>    :call Open("l", "terminal", "new")<cr>
+Anoremap <A-S-Left>     :call Open("H", "terminal", "new")<cr>
+Anoremap <A-S-Down>     :call Open("J", "terminal", "new")<cr>
+Anoremap <A-S-Up>       :call Open("K", "terminal", "new")<cr>
+Anoremap <A-S-Right>    :call Open("L", "terminal", "new")<cr>
+Anoremap <A-Left>       :call Open("h", "buffer", "new")<cr>
+Anoremap <A-Down>       :call Open("j", "buffer", "new")<cr>
+Anoremap <A-Up>         :call Open("k", "buffer", "new")<cr>
+Anoremap <A-Right>      :call Open("l", "buffer", "new")<cr>
+Anoremap <A-Left>       :call Open("H", "buffer", "new")<cr>
+Anoremap <A-Down>       :call Open("J", "buffer", "new")<cr>
+Anoremap <A-Up>         :call Open("K", "buffer", "new")<cr>
+Anoremap <A-Right>      :call Open("L", "buffer", "new")<cr>
+Anoremap <C-q> :hide<cr>
+Anoremap <C-S-q> :bd!<cr>
+Anoremap <C-S-q> :q!<cr>
+Anoremap <C-A-q> :qa!<cr>
+Anoremap <A-q> :call TabClose()<cr>
+Anoremap ,,r :redraw!<cr>
+Anoremap <S-F2> :let x=input("Find In Files: ") \| :echo system("grep ".expand('%')." -nrw -e \"".x."\"")<cr>
+Anoremap ,c call CountRegex()<cr>
+Nnoremap <C-S-A> :call IncRange()<cr>
+Nnoremap <C-S-X> :call DecRange()<cr>
+Vnoremap af :call Vaf()<cr>
+Vnoremap <C-S-A> :call IncRange()<cr>
+Vnoremap <C-S-X> :call DecRange()<cr>
+Tnoremap ,X :TIN tail -f $receiver<cr>
+Nnoremap <A-S-n> <C-w>+
+Nnoremap <A-S-m> <C-w>-
+Nnoremap <A-S-u> <C-w><
+Nnoremap <A-S-i> <C-w>>
+Nnoremap <A-n> 12<C-w>+
+Nnoremap <A-m> 12<C-w>-
+Nnoremap <A-u> 12<C-w><
+Nnoremap <A-i> 12<C-w>>
+Nnoremap <A-h> :call TabH()<cr>
+Nnoremap <A-l> :call TabL()<cr>
+Nnoremap <C-S-M-h> :wincmd H<cr>
+Nnoremap <C-S-M-j> :wincmd J<cr>
+Nnoremap <C-S-M-k> :wincmd K<cr>
+Nnoremap <C-S-M-l> :wincmd L<cr>
+Nnoremap <C-S-h> :call SwapWin("h")<cr>
+Nnoremap <C-S-j> :call SwapWin("j")<cr>
+Nnoremap <C-S-k> :call SwapWin("k")<cr>
+Nnoremap <C-S-l> :call SwapWin("l")<cr>
+Tnoremap <C-S-h> <c-\><c-n>:call SwapWin("h")<cr>
+Tnoremap <C-S-j> <c-\><c-n>:call SwapWin("j")<cr>
+Tnoremap <C-S-k> <c-\><c-n>:call SwapWin("k")<cr>
+Tnoremap <C-S-l> <c-\><c-n>:call SwapWin("l")<cr>
+Nnoremap ,fuc :call OpenFileUnderCursor()<cr>
+Nnoremap ,,fb :LayoutBash<cr>
+Nnoremap ,,fv :LayoutVim<cr>
+Nnoremap <m-;> :call ToggleOverviewRight()<cr>
+Nnoremap ,,<F4> :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.bashrc; git_selector "TEST"
+Nnoremap <C-S-F9> :call PreviewBuffer()<cr>
+Nnoremap <C-F2> :call ToggleWrap()<cr>
+Nnoremap ,,,w :call ToggleWrap()<cr>
+Nnoremap ,in :call Intend()<cr>
+Nnoremap ,,,<space> :IntelligentSelecting<cr>
+Nnoremap ,. @q
+Nnoremap <C-h> :call SmartWincmd('h')<cr>
+Vnoremap <C-h> :call SmartWincmd('h')<cr>
+Inoremap <C-h> :call SmartWincmd('h')<cr>
+Nnoremap <C-j> :call SmartWincmd('j')<cr>
+Vnoremap <C-j> :call SmartWincmd('j')<cr>
+Inoremap <C-j> :call SmartWincmd('j')<cr>
+Nnoremap <C-k> :call SmartWincmd('k')<cr>
+Vnoremap <C-k> :call SmartWincmd('k')<cr>
+Inoremap <C-k> :call SmartWincmd('k')<cr>
+Nnoremap <C-l> :call SmartWincmd('l')<cr>
+Vnoremap <C-l> :call SmartWincmd('l')<cr>
+Inoremap <C-l> :call SmartWincmd('l')<cr>
+Vnoremap <BS> :call backspace()<cr>
+Vnoremap & :&<cr>
+Vnoremap ,F :echo VS()<cr>
+Vnoremap ,,g :call AppendToEndRange()<cr>
+Vnoremap ,G :AppendAll<cr>
+Vnoremap ,u :!uniq<cr>
+Vnoremap <M-v> :call VPaste("Visual")<cr>
+Vnoremap <M-c> :call VCopy("Visual")<cr>
+Vnoremap <M-x> :call VCut("Visual")<cr>
+Tnoremap <c-o> <c-\><c-n><c-o>
+Inoremap <C-l> <C-w>li
+Inoremap <C-h> <C-w>hi
+Inoremap <c-w><c-w> <c-w><c-w>
+Tnoremap  :call ExitTerminal()<cr>
+Inoremap <A-'> ä
+Inoremap <A-"> Ä
+Inoremap <A-;> ö
+Inoremap <A-:> Ö
+Inoremap <A-[> ü
+Inoremap <A-{> Ü
+Inoremap <A--> ß
+Tnoremap <ScrollWheelUp> <C-\><C-n>
+Tnoremap <S-ScrollWheelUp> <C-\><C-n>
+Tnoremap <ScrollWheelDown> <C-\><C-n>
+Tnoremap <S-ScrollWheelDown> <C-\><C-n>
+Tnoremap <Esc> i
+Tnoremap <LeftMouse> <C-\><C-n>
+Nnoremap ,,,m :call Toggle_Set_Last_Git_Message()<cr>
+Nnoremap ,,,l :call ToggleLineState()<cr>
+Nnoremap ,,,L :call ToggleLineStateGlobal()<cr>
+Nnoremap ,,s :call Statusline_TogglePath()<cr>
+Nnoremap ,,d :echo g:debug_layout<cr>
+Nnoremap ,,B :call Boilerplate_Test()<cr>
+Nnoremap ,<Space> :call GetCCWD()<cr>
+Nnoremap <C-s> :SaveFile<cr>
+Vnoremap <C-s> :SaveFile<cr>
+Inoremap <silent> <C-s> :SaveFile<cr>l
+Nnoremap <localleader>f :InsertFunction<cr>
+Nnoremap <space>f :InsertFilename<cr>
+Nnoremap ,<Space> :call ToggleZoom()<cr>
+Nnoremap <silent> <S-F1> :SearchCword<cr>
+Nnoremap ,b :call BASH(VS())<cr>
+Nnoremap ,b :call Bash(VS())<cr>
+Nnoremap ,b :Buffers<cr>
+Nnoremap ,b :Buffers<cr>
+Nnoremap <localleader>iv :call VIM(input("vimscript: "), 'exec_input_vs')<cr>
+Nnoremap <localleader>ib :call BASH(input("bash: "), 'exec_input_vs')<cr>
+Nnoremap <localleader>ip :call PYTHON(input("python: "), 'exec_input_vs')<cr>
+Nnoremap <localleader>ir :call RUST(input("rust: "), 'exec_input_vs')<cr>
+Nnoremap <space>p :CopyFileNameToClipboard<cr>
+Nnoremap <space>P :CopyWholePathToClipboard<cr>
+Nnoremap <space>r :InsertReceiver<cr>
+Nnoremap ,dd :call Rewindworkdir()<cr>
+Nnoremap ,<Space>                                         :call Files(Folder_Up(v:count, 0))<cr>
+Nnoremap ,,<Space>                                 :call Files(Folder_Up(v:count, 1))<cr>
+Nnoremap ,,,<Space>                         :call Files(Folder_Up(v:count, 2))<cr>
+Nnoremap ,,,,<Space>                 :call Files(Folder_Up(v:count, 3))<cr>
+Nnoremap ,,,,,<Space>         :call Files(Folder_Up(v:count, 4))<cr>
+Nnoremap ,,,,,,<Space> :call Files(Folder_Up(v:count, 5))<cr>
+Nnoremap ,g                                         :call AgIn(Folder_Up(v:count, 0))<cr>
+Nnoremap ,,g                                 :call AgIn(Folder_Up(v:count, 1))<cr>
+Nnoremap ,,,g                         :call AgIn(Folder_Up(v:count, 2))<cr>
+Nnoremap ,,,,g                 :call AgIn(Folder_Up(v:count, 3))<cr>
+Nnoremap ,,,,,g         :call AgIn(Folder_Up(v:count, 4))<cr>
+Nnoremap ,,,,,,g :call AgIn(Folder_Up(v:count, 5))<cr>
+Nnoremap ,vcd :call CD(Vim_Advantages_Path())<cr>
+Nnoremap ,p                :call Projects()<cr>
+Nnoremap ,,p               :call Projects()<cr>
+Nnoremap ,,,p              :call Projects()<cr>
+Nnoremap ,,,,p             :call Projects()<cr>
+Nnoremap ,,,,,p            :call Projects()<cr>
+Nnoremap ,,,,,,p           :call Projects()<cr>
+Nnoremap <C-p>              :call Projects()<cr>
+Nnoremap <C-S-p>            :call Projects()<cr>
+Nnoremap <A-p>              :call Projects()<cr>
+Nnoremap <A-S-p>            :call Projects()<cr>
+Nnoremap <A-C-p>            :call Projects()<cr>
+Nnoremap <A-S-C-p>          :call Projects()<cr>
+Nnoremap <C-S-p>           :call BuildSystemsGitProjects()<cr>
+Nnoremap <C-S-m>           :Generate<cr>
+Nnoremap <C-Space>              :call Files(Folder_Project())<cr>
+Nnoremap <C-S-Space>            :call Files(Folder_Repo())<cr>
+Nnoremap <A-Space>              :call Files(Folder_Repo())<cr>
+Nnoremap <A-S-Space>            :call Files(Folder_Repo(1))<cr>
+Nnoremap <A-C-Space>            :call Files(Folder_Repo(1))<cr>
+Nnoremap <A-S-C-Space>          :call Files('/')<cr>
+Nnoremap <C-g>              :call AgIn(Folder_Project())<cr>
+Nnoremap <C-S-g>            :call AgIn(Folder_Repo())<cr>
+Nnoremap <A-g>              :call AgIn(Folder_Repo())<cr>
+Nnoremap <A-S-g>            :call AgIn(Folder_Repo(1))<cr>
+Nnoremap <A-C-g>            :call AgIn(Folder_Repo(1))<cr>
+Nnoremap <A-S-C-g>          :call AgIn('/')<cr>
+Nnoremap <C-m>              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
+Nnoremap ,o              :OpenFileCommandLineSameDir<cr>
+Nnoremap ,.              :OpenFileCommandLineCWD<cr>
+Nnoremap ,,.      :OpenFileCommandLineSameDir<cr>
+Nnoremap ,.              :call CommandLineFiles(Folder_Up(v:count, 0))<cr>
+Nnoremap ,,.              :call CommandLineFiles(Folder_Up(v:count, 1))<cr>
+Nnoremap ,,,.              :call CommandLineFiles(Folder_Up(v:count, 2))<cr>
+Nnoremap ,,,,.              :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
+Nnoremap ,,,,,.              :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
+Cnoremap <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+Cnoremap <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+Cnoremap <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+Cnoremap <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+Cnoremap <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+Cnoremap <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+Cnoremap <C-,> <Backspace>
+Cnoremap <C-.> <Backspace>
+Nnoremap ,cd :call MakeDirCurrentCWD(bufnr())<cr>
+Nnoremap <C-Left> :call CD(WFilePrev())<cr>
+Nnoremap <C-Right> :call CD(WFileNext())<cr>
+Nnoremap <C-,> :call CD(WFilePrev())<cr>
+Nnoremap <C-.> :call CD(WFileNext())<cr>
+Nnoremap ,<Tab>      :JumpProjectIn<cr>
+Nnoremap <localleader><Tab> :JumpProjectIn<cr>
+Vnoremap <F14> :<C-u>call VS()<cr>
+Nnoremap <F13> :call VS()<cr>
+Inoremap <F13> <C-o>:call VS()<cr>
+Cnoremap <F13> :call VS('c')<cr>
+Tnoremap <F13> <C-\><C-n>:call VS('t')<cr>
+Nnoremap <M-v> :call FuncPaste("Normal")<cr>
+Nnoremap <M-c> :call FuncCopy("Normal")<cr>
+Nnoremap <M-x> :call FuncCut("Normal")<cr>
+Nnoremap ,,,j :IntelligentJumping<cr>
+Nnoremap <silent> <c-h> :wincmd h<cr>
+Nnoremap <silent> <c-j> :wincmd j<cr>
+Nnoremap <silent> <c-k> :wincmd k<cr>
+Nnoremap <silent> <c-l> :wincmd l<cr>
+Vnoremap <silent> p "_dP
+Vnoremap <silent> y y:call ClipboardYank()<cr>
+Vnoremap <silent> d d:call ClipboardYank()<cr>
+Nnoremap <silent> dd dd:call ClipboardYank()<cr>
+Nnoremap <silent> p :call ClipboardPaste("n")<cr>p
+Vnoremap p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
+Nnoremap <BS> :call backspaceN()<cr>
+Cnoremap <A-'> ä
+Cnoremap <A-"> Ä
+Cnoremap <A-;> ö
+Cnoremap <A-:> Ö
+Cnoremap <A-[> ü
+Cnoremap <A-{> Ü
+Cnoremap <A--> ß
+Nnoremap ,F :echo VS()<cr>
+Nnoremap ,e :call AppendToEndNormal()<cr>
+Nnoremap ,E :AppendAll<cr>
+Nnoremap YY :call AppendToClipboard()<cr>
+Vnoremap Y :<C-u>let @+ = @+ . join(getline("'<", "'>"), "\n") . "\n"<cr>
+Nnoremap <silent> <A-k> :m-2<cr>
+Nnoremap <silent> <A-j> :m+1<cr>
+Vnoremap <silent> <A-k> :m '<-2<cr>gv=gv
+Vnoremap <silent> <A-j> :m '>+1<cr>gv=gv
+Nnoremap < <<
+Nnoremap > >>
+Vnoremap < <gv
+Vnoremap > >gv
+Nnoremap ,dt :diffthis<cr>
+Nnoremap ,do :diffoff<cr>
+Nnoremap ,0 :wincmd =<cr>
+Inoremap <C-Space> <C-x><C-f>
+Inoremap <C-S-v> <c-r>+
+Nnoremap ,rm :call DeleteFile()<cr>
+Nnoremap ,n :call NewFile()<cr>
+Nnoremap ,< :norm yy<cr>:norm dd<cr>:wincmd l<cr>:norm gp<cr>:wincmd h<cr>
+Vnoremap ,< :norm gvy<cr>:norm gvd<cr>:wincmd l<cr>:norm gp<cr>:wincmd h<cr>
+Nnoremap <C-S-M-h> :echo JoinSplits("h")<cr>
+Nnoremap <C-S-M-j> :echo JoinSplits("j")<cr>
+Nnoremap <C-S-M-k> :echo JoinSplits("k")<cr>
+Nnoremap <C-S-M-l> :echo JoinSplits("l")<cr>
+Nnoremap ,<C-S-M-h> :echo MoveOutOfSplit("h")<cr>
+Nnoremap ,<C-S-M-j> :echo MoveOutOfSplit("j")<cr>
+Nnoremap ,<C-S-M-k> :echo MoveOutOfSplit("k")<cr>
+Nnoremap ,<C-S-M-l> :echo MoveOutOfSplit("l")<cr>
+Nnoremap <C-;> zh
+Nnoremap <C-'> zl
+Nnoremap <C-S-;> 20zh
+Nnoremap <C-S-'> 20zl
+Nnoremap <silent> ,f  :copen<cr>
+Nnoremap <silent> <C-Down>   :cnext<cr>zz
+Nnoremap <silent> <C-Up>     :cprev<cr>zz
+Nnoremap <silent> ,N  :cfirst<cr>zz
+Nnoremap <silent> ,P  :clast<cr>zz
+Nnoremap <silent> ,c  :cclose<cr>
+Nnoremap ,<C-s> :call ExecFunction()<cr>
+Nnoremap ,s :call ExecVS()<cr>
+Vnoremap ,s :call ExecVS()<cr>
+Nnoremap ,S :Re \| :%source \| :ReEnd<cr>
+Nnoremap ,rd :call RedoLeaderS()<cr>
+Nnoremap ,c :call ToggleComment()<cr>
+Vnoremap <F1> J
+Nnoremap <F2> :call GetKeys()<cr>
+Nnoremap <F3> :call FindKeyPerform()<cr>
+Nnoremap <F4> :echo AllKeys()<cr>
+Tnoremap <C-v> <C-\><C-n>:call SendCommandToThisTerm([getreg('"')])<cr>i
+Vnoremap ,,s :<C-u>silent redir=>output \| silent '<,'>source \| redir END \| put=output<cr>
+Nnoremap ,aa :RECP --reg *<cr>
+Nnoremap ,an :RECP --reg "<cr>
+Nnoremap ,ab :RECP<cr>
+Nnoremap ,qd :Diff --all<cr>
+Nnoremap ,,qd :Diff --all --cached<cr>
+Nnoremap ,qr :PushCWD
+Nnoremap ,,qr :GithubPush<cr>
+Nnoremap ,qv :Pull<cr>
+Nnoremap ,ql :Log<cr>
+Nnoremap ,qs :Status<cr>
+Nnoremap ,qa :GitAdd<cr>
+Nnoremap ,qA :GitAddCWD<cr>
+Nnoremap ,,qa :GitAddCWD<cr>
+Nnoremap ,qcc :!git rebase --continue<cr>
+Nnoremap ,qcs :!git rebase --skip<cr>
+Nnoremap ,qca :!git rebase --abort<cr>
+Nnoremap ,qf :GitFetch<cr>
+Nnoremap ,qu :StashPush<cr>
+Nnoremap ,qo :StashPop<cr>
+Nnoremap ,m :call VimGrep(v:count)<cr>
+Nnoremap ,m :call VimGrep(v:count)<cr>
+Nnoremap <M-a> :Lines<cr>
+Nnoremap <C-S-a> :call VimGrep(v:count)<cr>
+Nnoremap [D :cclose<cr>
+Nnoremap [C :copen<cr>
+Nnoremap [A :cprev<cr>
+Nnoremap [B :cnext<cr>
+Anoremap <F11> :call RefreshFileList()<cr>:call NextBuffer()<cr>
+Anoremap <S-F11> :call RefreshFileList()<cr>:call PrevBuffer()<cr>
+Anoremap <F10> :call RefreshFileListDir()<cr>:call NextBuffer()<cr>
+Anoremap <S-F10> :call RefreshFileListDir()<cr>:call PrevBuffer()<cr>
+Nnoremap ,,,,,<F1> :call SelectFunctionBlock()<cr>
+Nnoremap <F1> :call GitInfo()<cr>
+Nnoremap <S-F1> :call GitInfo('--stash')<cr>
+Nnoremap <C-S-F1> :call GitStashDrop()<cr>
+Nnoremap ,,,,<F3> :call GitDeleteLastUnpushedCommit()<cr>
+Nnoremap ,,,<F1> :call GitCommitRepo()<cr>
+Nnoremap ,,<F1> :call GitCommitRepo(input("Commit Message: "))<cr>
+Nnoremap ,<F1> :call GitAddRepo()<cr>
+Nnoremap ,,,,,<F1> :call GitInitRepository()<cr>
+Nnoremap ,,,,,,<F1> :call GitInitRepositoryBare()<cr>
+Nnoremap <F2> :call SelectRemote(1)<cr>
+Nnoremap <S-F2> :call SelectRemote(-1)<cr>
+Nnoremap ,<F2> :call GitRenameRemote()<cr>
+Nnoremap ,,<F2> :call GitRemoteAdd()<cr>
+Nnoremap ,,,<F2> :call GitSetRemote()<cr>
+Nnoremap <F3> :call SelectBranch(1)<cr>
+Nnoremap <S-F3> :call SelectBranch(-1)<cr>
+Nnoremap ,<F3> :call GitRenameBranch()<cr>
+Nnoremap ,,<F3> :call GitNewBranch()<cr>
+Nnoremap <F4> :call GitStashPush()<cr>
+Nnoremap <S-F4> :call GitStashPop()<cr>
+Tnoremap <C-v> <C-\><C-n>
+Vnoremap i <C-c>i
+Vnoremap <C-c> :call CommandInfo()<cr>
+Nnoremap <F12> :call ToggleFavorite(1)<cr>
+Nnoremap <S-F12> :call ToggleFavorite(-1)<cr>
+Nnoremap <C-F12> :call OpenFZF(g:favorites)<cr>
+Nnoremap ,<F12> :call SetUnsetFavorite()<cr>
+Nnoremap ,,<F12> :call ClearUnreachableFavorites()<cr>

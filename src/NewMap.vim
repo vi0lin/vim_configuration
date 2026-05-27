@@ -83,7 +83,6 @@ command! -nargs=* NewMapBuildFile :call NewMapBuildFile(<f-args>)
 let s:newmaps=[]
 let g:newmap_optschema = [
   \ [ 'all', 'A|a|all|All', 0],
-  \ [ 'map', 'M|m|map|Map', 0],
   \ [ 'normal', 'N|n|normal|Normal', 0],
   \ [ 'visual', 'V|v|visual|Visual', 0],
   \ [ 'x', 'X|x', 0],
@@ -100,6 +99,9 @@ let g:newmap_optschema = [
   \ [ 'verbose', 'verbose|debug', 0],
   \ [ 'leaders', 'leaders', 1],
   \ [ 'key', 'k|key', 1],
+  \ [ 'vs', 'vs', 1],
+  \ [ 'insertmode', 'im|insertmode', 0],
+  \ [ 'insertmode2', 'im2|insertmode2', 0],
   \ ]
 
 function! NewMap(args)
@@ -134,7 +136,7 @@ function! NewMap(args)
   \ && !opts.s
   \ && !opts.o
   \ && !opts.l
-    let opts.map=1
+    let opts.normal=1
   endif
   if opts.noremap
     let noremap="nore"
@@ -159,37 +161,50 @@ function! NewMap(args)
   let command=join(filter([opts.key, opts.default], 'v:val!=""'), ' ')
   " temporarily
   if opts.all
-    call NewMapBuildFile("Amap", silent, command)
+    call NewMapBuildFile("A"..noremap.."map", silent, command)
   else
-    if opts.map
-      call NewMapBuildFile(noremap.."map", silent, command)
-    endif
     if opts.normal
-      call NewMapBuildFile("n"..noremap.."map", silent, command)
+      " call NewMapBuildFile("n"..noremap.."map", silent, command)
+      " call NewMapBuildFile("n"..noremap.."map", silent, command)
+      " call NewMapBuildFile(noremap.."map", silent, command)
+      call NewMapBuildFile("N"..noremap.."map", silent, command)
     endif
     if opts.visual
-      call NewMapBuildFile("v"..noremap.."map", silent, command)
+      " call NewMapBuildFile("v"..noremap.."map", silent, command)
+      call NewMapBuildFile("V"..noremap.."map", silent, command)
     endif
     if opts.command
-      call NewMapBuildFile("c"..noremap.."map", silent, command)
+      " call NewMapBuildFile("c"..noremap.."map", silent, command)
+      call NewMapBuildFile("C"..noremap.."map", silent, command)
     endif
     if opts.insert
-      call NewMapBuildFile("i"..noremap.."map", silent, command)
+      call NewMapBuildFile("I"..noremap.."map", silent, command)
     endif
-    if opts.terminal
-      call NewMapBuildFile("t"..noremap.."map", silent, command)
+    " Idea To Fix Open Leaving Insertmode
+    " if opts.terminal && opts.insertmode2
+    "   call NewMapBuildFile("T"..noremap.."mapInsertmode2", silent, command)
+    " endif
+    if opts.terminal && opts.insertmode
+      call NewMapBuildFile("T"..noremap.."mapInsertmode", silent, command)
+    elseif opts.terminal
+      " call NewMapBuildFile("t"..noremap.."map", silent, command)
+      call NewMapBuildFile("T"..noremap.."map", silent, command)
     endif
     if opts.x
-      call NewMapBuildFile("x"..noremap.."map", silent, command)
+      " call NewMapBuildFile("x"..noremap.."map", silent, command)
+      call NewMapBuildFile("X"..noremap.."map", silent, command)
     endif
     if opts.s
-      call NewMapBuildFile("s"..noremap.."map", silent, command)
+      " call NewMapBuildFile("s"..noremap.."map", silent, command)
+      call NewMapBuildFile("S"..noremap.."map", silent, command)
     endif
     if opts.o
-      call NewMapBuildFile("o"..noremap.."map", silent, command)
+      " call NewMapBuildFile("o"..noremap.."map", silent, command)
+      call NewMapBuildFile("O"..noremap.."map", silent, command)
     endif
     if opts.l
-      call NewMapBuildFile("l"..noremap.."map", silent, command)
+      " call NewMapBuildFile("l"..noremap.."map", silent, command)
+      call NewMapBuildFile("L"..noremap.."map", silent, command)
     endif
     if opts.unmap
       call NewMapBuildFile("unmap", silent, command)

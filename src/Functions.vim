@@ -1,4 +1,7 @@
 " Avoid cdo prompt for overwiting files
+let &t_TI = "\<Esc>[>4;2m"
+let &t_TE = "\<Esc>[>4;m"
+
 if !exists("g:vim_advantages_got_sourced")
 
 let g:debug=0
@@ -1467,6 +1470,16 @@ function! GetBufDirectionIfTerm(direction)
     endif
   endfor
   return -1
+endfunction
+
+function! FindSomeTerm()
+  for dir in [ 'k', 'h', 'l', 'j' ]
+    let buf = GetBufDirectionIfTerm(dir)
+    if buf!=-1
+      return [dir,buf]
+    endif
+  endfor
+  return [ -1, -1 ]
 endfunction
 
 function! BufType(nr)
@@ -4764,8 +4777,11 @@ function! ClearTermOnWinLeave(bufnr)
 endfunction
 
 function! Open(direction, type="buffer", mode="copy", file="")
+  " todo fix left insertmode
   let file=""
+  let foremost=index(['H','J','K','L'], a:direction)>=0
   " call WinSwapBuf_Prep()
+  call WinSwap_Prep()
   let projectpath=CWD()
   let previous_bufname = bufname('%')
   let previous_win = winnr('$')
@@ -4882,6 +4898,12 @@ function! Open(direction, type="buffer", mode="copy", file="")
   endif
   if !insert && terminal
     startinsert
+  endif
+  if foremost
+    if h | wincmd H | elseif j | wincmd J | elseif k | wincmd L | elseif l | wincmd L | endif
+  " call WinSwapBuf_Back()
+  " exec previous_win "wincmd w"
+  call WinSwap_Back()
   endif
 endfunction
 
@@ -5213,8 +5235,87 @@ function! SendCustomCommandToTerm(direction, command)
   call TERM(buf, x)
 endfunction
 
-function! MapCommand(direction) range
-  let data = VS()
+function! DirectionAllMapCommand(direction) range
+  let b:MapCommands['ht']=a:direction
+  let b:MapCommands['jt']=a:direction
+  let b:MapCommands['kt']=a:direction
+  let b:MapCommands['lt']=a:direction
+endfunction
+
+function! DirectionMapCommand(direction) range
+  let b:MapCommands[a:direction..'t']=a:direction
+endfunction
+
+function! DirectionMapSmart(direction) range
+  call InitMapCommand(a:direction)
+  set nomore
+  let c = -1
+  " let all=["k5", "k6","k7","k8"]
+  let all=["\<F5>", "\<F6>","\<F7>","\<F8>"]
+  let alll=["<F5>", "<F6>","<F7>","<F8>"]
+  " let all=["\<F5>"[0]->char2nr(), "<F6>", "<F7>", "<F8>"]
+  " while nr2char(c)!="\<F5>"
+  " while nr2char(c)!="\<F5>"
+    " let c = getcharstr()
+  let boom=[ 0, 0, 0, 0 ]
+  if g:keymap==',,<F5>' | let boom[0]=1 |
+  elseif g:keymap==',,<F6>' | let boom[1]=1 |
+  elseif g:keymap==',,<F7>' | let boom[2]=1 |
+  elseif g:keymap==',,<F8>' | let boom[3]=1 | endif
+  echo map(copy(alll), 'boom[v:key] ? v:val : repeat("-", len(v:val))')
+  let index=-1
+  let default='----'
+  while index([120], c)==-1
+    let c = getchar()
+    echo "\r"
+    redraw
+    let index=index(all, c)
+    if index>=0
+      let boom[index]=!boom[index]
+      " echo all[index] ':' boom[index] ':' boom
+      " echo map(copy(alll), 'boom[v:key] ? v:val : default')
+      let keys=filter(copy(alll), 'boom[v:key]')
+      echo map(copy(alll), 'boom[v:key] ? v:val : repeat("-", len(v:val))')
+    else
+      let indexes=filter(range(len(boom)), 'boom[v:key]')
+      for i in indexes
+        let dir=nr2char(c)
+        " echo "assigning ".. i .." to "..dir
+        "echo "assigning ".. i .." to "..dir
+        if dir..'t'=='ht'
+          let b:MapCommands['ht']=dir
+        elseif dir..'t'=='jt'
+          let b:MapCommands['jt']=dir
+        elseif dir..'t'=='kt'
+          let b:MapCommands['kt']=dir
+        elseif dir..'t'=='lt'
+          let b:MapCommands['lt']=dir
+        endif
+        echo Format(b:MapCommands)
+      endfor
+    endif
+    " echo "\r" | redraw!
+    " let keys=map(copy(alll), 'boom[v:key]')
+    " for k in keys
+    "   echom k
+    " endfor
+    " echo boom
+    " let idx=-1
+    " for f in boom
+    "   let idx+=1
+    "   if f==1
+    "     echom alll[idx]
+    "     " echo nr2char(alll[f])
+    "   endif
+    " endfor
+    " let c = nr2char(getchar())
+    " echo c index(all, c)
+    " echo c type(c)
+    " echo all[0] type(all[0])
+  endwhile
+endfunction
+
+function InitMapCommand(direction)
   if !exists("b:MapCommands")
     let b:MapCommands={
     \ 'path': expand("%:p"),
@@ -5227,7 +5328,13 @@ function! MapCommand(direction) range
     \ 'l': '',
     \ 'lt': ''
     \ }
+    call MapCommand(a:direction)
   endif
+endfunction
+
+function! MapCommand(direction) range
+  let data = VS()
+  call InitMapCommand(a:direction)
   if a:direction=='x'
     echo b:MapCommands
     return
@@ -5254,26 +5361,36 @@ function! MapCommand(direction) range
     let b:MapCommands['l']=data
   endif
   if _empty_type_string('ht')
-    let b:MapCommands['ht']=GetBufDirectionIfTerm(a:direction)
+    let b:MapCommands['ht']=a:direction
   endif
   if _empty_type_string('jt')
-    let b:MapCommands['jt']=GetBufDirectionIfTerm(a:direction)
+    let b:MapCommands['jt']=a:direction
   endif
   if _empty_type_string('kt')
-    let b:MapCommands['kt']=GetBufDirectionIfTerm(a:direction)
+    let b:MapCommands['kt']=a:direction
   endif
   if _empty_type_string('lt')
-    let b:MapCommands['lt']=GetBufDirectionIfTerm(a:direction)
+    let b:MapCommands['lt']=a:direction
   endif
   call SavedCommandToTerm(a:direction)
 endfunction
 
 function! SavedCommandToTerm(direction) range
+  call InitMapCommand(a:direction)
   let com=b:MapCommands[a:direction]
   let num=b:MapCommands[a:direction..'t']
+  let buf=-1
   " Todo Directions
   if num!=''
-    let buf=num
+    " let buf=num
+    let buf=GetBufDirectionIfTerm(a:direction)
+    if buf==-1
+      let [dir,buf]=FindSomeTerm()
+    endif
+    if buf==-1
+      call Open('J', "terminal", "new")
+      let [dir,buf]=FindSomeTerm()
+    endif
   endif
   " let buf=GetBufDirectionIfTerm(a:direction)
   " let buf=winbufnr(win)
@@ -6855,9 +6972,10 @@ endfunction
 
 function! SetMode(keymap, mode)
   let g:mode=a:mode
-  if a:keymap!=""
-    let [ key, leaders, fkey, vs ] = UtilHelper(a:keymap)
-  endif
+  let g:keymap=a:keymap
+  " if a:keymap!=""
+  "   let [ key, leaders, fkey, vs ] = UtilHelper(a:keymap)
+  " endif
 endfunction
 
 function! GetMode()
@@ -7302,6 +7420,9 @@ endfunction
 "     " Otherwise loop and keep moving
 "   end
 " end
+
+function Shorten()
+endfunction
 
 function! SmartWincmd(direction)
   let start_win = win_getid()
