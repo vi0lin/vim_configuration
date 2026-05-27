@@ -200,16 +200,12 @@ Nnoremap ,,,<space> :IntelligentSelecting<cr>
 Nnoremap ,. @q
 Nnoremap <C-h> :call SmartWincmd('h')<cr>
 Vnoremap <C-h> :call SmartWincmd('h')<cr>
-Inoremap <C-h> :call SmartWincmd('h')<cr>
 Nnoremap <C-j> :call SmartWincmd('j')<cr>
 Vnoremap <C-j> :call SmartWincmd('j')<cr>
-Inoremap <C-j> :call SmartWincmd('j')<cr>
 Nnoremap <C-k> :call SmartWincmd('k')<cr>
 Vnoremap <C-k> :call SmartWincmd('k')<cr>
-Inoremap <C-k> :call SmartWincmd('k')<cr>
 Nnoremap <C-l> :call SmartWincmd('l')<cr>
 Vnoremap <C-l> :call SmartWincmd('l')<cr>
-Inoremap <C-l> :call SmartWincmd('l')<cr>
 TnoremapInsertmode <C-l> l
 TnoremapInsertmode <C-h> h
 TnoremapInsertmode <C-k> k

@@ -389,10 +389,16 @@ NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
 NewMap -no -n ,. @q
 " map ,s :call NvimStudioSubstitution("selection")<cr>
 " map ,S :call NvimStudioSubstitution("file")<cr>
-NewMap -n -v -i -im -no <C-h> :call SmartWincmd('h')<cr>
-NewMap -n -v -i -im -no <C-j> :call SmartWincmd('j')<cr>
-NewMap -n -v -i -im -no <C-k> :call SmartWincmd('k')<cr>
-NewMap -n -v -i -im -no <C-l> :call SmartWincmd('l')<cr>
+NewMap -n -v -im -no <C-h> :call SmartWincmd('h')<cr>
+NewMap -n -v -im -no <C-j> :call SmartWincmd('j')<cr>
+NewMap -n -v -im -no <C-k> :call SmartWincmd('k')<cr>
+NewMap -n -v -im -no <C-l> :call SmartWincmd('l')<cr>
+NewMap -t -im -no <C-l> l
+NewMap -t -im -no <C-h> h
+NewMap -t -im -no <C-k> k
+NewMap -t -im -no <C-j> j
+
+" Unnessecary
 " NewMap -t -im <C-l> <C-w>l
 " NewMap -t -im <C-h> <C-w>h
 " NewMap -t -im <C-k> <C-w>k
@@ -401,10 +407,6 @@ NewMap -n -v -i -im -no <C-l> :call SmartWincmd('l')<cr>
 "" works NewMap -t -im -no <C-h> h<cr>
 "" works NewMap -t -im -no <C-k> k<cr>
 "" works NewMap -t -im -no <C-j> j<cr>
-NewMap -t -im -no <C-l> l
-NewMap -t -im -no <C-h> h
-NewMap -t -im -no <C-k> k
-NewMap -t -im -no <C-j> j
 
 NewMap -no -v <BS> :call backspace()<cr>
 NewMap -no -v & :&<cr>
