@@ -18,8 +18,10 @@ NewCommand command! -range -nargs=+ Debug call Debug(<f-args>)
 " Jump to previous or next file
 " nnoremap <silent> ,<C-O> :call JumpToNextFile(-1)<cr>
 " nnoremap <silent> ,<C-I> :call JumpToNextFile(1)<cr>
-NewMap -n -no -silent <C-S-o> :call JumpToNextFile(-1)<cr>
-NewMap -n -no -silent <C-S-i> :call JumpToNextFile(1)<cr>
+
+" todo add silent
+NewMap -n -no <C-S-o> :call JumpToNextFile(-1)<cr>
+NewMap -n -no <C-S-i> :call JumpToNextFile(1)<cr>
 " unmap <silent> ,<C-O>
 " unmap <silent> ,<C-I>
 
@@ -503,7 +505,8 @@ NewMap -no -n ,<Space> :call GetCCWD()<cr>
 NewMap -no -n <C-s> :SaveFile<cr>
 NewMap -no -v <C-s> :SaveFile<cr>
 " was imap
-NewMap -no -i -silent <C-s> :SaveFile<cr>l
+" todo add silent
+NewMap -no -i <C-s> :SaveFile<cr>l
 
 NewMap -n -no <localleader>f :InsertFunction<cr>
 NewMap -n -no <space>f :InsertFilename<cr>
@@ -512,7 +515,8 @@ NewMap -n -no <space>f :InsertFilename<cr>
 
 NewMap -no -n ,<Space> :call ToggleZoom()<cr>
 
-NewMap -no -n -silent <S-F1> :SearchCword<cr>
+"todo add silent
+NewMap -no -n <S-F1> :SearchCword<cr>
 
 " map ,v :call VIM(VS())<cr>
 NewMap -no -n ,b :call BASH(VS())<cr>
@@ -704,17 +708,21 @@ NewMap -no ,,,j :IntelligentJumping<cr>
 " exec "nmap ,r :!bash ".g:lastRunCommand." -e ".$workdir."/.bashrc<cr>"
 menu Run.Show :call ToggleRun()
 menu Projects.Show :call ToggleProjects()
-NewMap -no -n -silent <c-h> :wincmd h<cr>
-NewMap -no -n -silent <c-j> :wincmd j<cr>
-NewMap -no -n -silent <c-k> :wincmd k<cr>
-NewMap -no -n -silent <c-l> :wincmd l<cr>
+" todo add silent
+NewMap -no -n <c-h> :wincmd h<cr>
+NewMap -no -n <c-j> :wincmd j<cr>
+NewMap -no -n <c-k> :wincmd k<cr>
+NewMap -no -n <c-l> :wincmd l<cr>
 " menu Actions.SED :call NvimStudioSubstitution()<cr>
 " noremap ,v :normal viW"ay<cr>:echo <c-r>a<cr>
-NewMap -v -no -silent p "_dP
-NewMap -v -no -silent y y:call ClipboardYank()<cr>
-NewMap -v -no -silent d d:call ClipboardYank()<cr>
-NewMap -n -no -silent dd dd:call ClipboardYank()<cr>
-NewMap -n -no -silent p :call ClipboardPaste("n")<cr>p
+
+" todo add silent
+" NewMap -v -no p "_dP
+" NewMap -v -no y y:call ClipboardYank()<cr>
+" NewMap -v -no d d:call ClipboardYank()<cr>
+" NewMap -n -no dd dd:call ClipboardYank()<cr>
+" NewMap -n -no p :call ClipboardPaste("n")<cr>p
+
 NewMap -v -no p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
 NewMap -no -n <BS> :call backspaceN()<cr>
 " was cmap
@@ -742,10 +750,11 @@ NewMap -v -no Y :<C-u>let @+ = @+ . join(getline("'<", "'>"), "\n") . "\n"<cr>
 " noremap <expr> ,,s ShowMode()
 
 " Move Lines
-NewMap -n -no -silent <A-k> :m-2<cr>
-NewMap -n -no -silent <A-j> :m+1<cr>
-NewMap -v -no -silent <A-k> :m '<-2<cr>gv=gv
-NewMap -v -no -silent <A-j> :m '>+1<cr>gv=gv
+" todo add silent
+NewMap -n -no <A-k> :m-2<cr>
+NewMap -n -no <A-j> :m+1<cr>
+NewMap -v -no <A-k> :m '<-2<cr>gv=gv
+NewMap -v -no <A-j> :m '>+1<cr>gv=gv
 
 NewMap -no < <<
 NewMap -no > >>
@@ -936,12 +945,13 @@ NewMap -no -n <C-S-'> 20zl
 
 
 " ---- quickfix navigation -------------------------------------------
-NewMap -n -no -silent ,f  :copen<cr>
-NewMap -n -no -silent <C-Down>   :cnext<cr>zz
-NewMap -n -no -silent <C-Up>     :cprev<cr>zz
-NewMap -n -no -silent ,N  :cfirst<cr>zz
-NewMap -n -no -silent ,P  :clast<cr>zz
-NewMap -n -no -silent ,c  :cclose<cr>
+" todo add silent
+NewMap -n -no ,f  :copen<cr>
+NewMap -n -no <C-Down>   :cnext<cr>zz
+NewMap -n -no <C-Up>     :cprev<cr>zz
+NewMap -n -no ,N  :cfirst<cr>zz
+NewMap -n -no ,P  :clast<cr>zz
+NewMap -n -no ,c  :cclose<cr>
 
 " " ---- location list navigation --------------------------------------
 " nnoremap <silent> ,lq :lopen<cr>

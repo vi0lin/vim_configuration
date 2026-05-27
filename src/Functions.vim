@@ -5,6 +5,8 @@
 " let &t_TI = [=1;1u
 " let &t_TE = [>4;m[=0;1u
 
+set nomore
+
 if !exists("g:vim_advantages_got_sourced")
 
 let g:debug=0

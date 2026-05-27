@@ -1,5 +1,5 @@
-Nnoremap <silent> <C-S-o> :call JumpToNextFile(-1)<cr>
-Nnoremap <silent> <C-S-i> :call JumpToNextFile(1)<cr>
+Nnoremap <C-S-o> :call JumpToNextFile(-1)<cr>
+Nnoremap <C-S-i> :call JumpToNextFile(1)<cr>
 Nnoremap ,,f :call FavoriteFile()<cr>
 Nnoremap ,,f :call FavoriteFile()<cr>
 Nnoremap ,,p :call FavoritePath()<cr>
@@ -250,11 +250,11 @@ Nnoremap ,,B :call Boilerplate_Test()<cr>
 Nnoremap ,<Space> :call GetCCWD()<cr>
 Nnoremap <C-s> :SaveFile<cr>
 Vnoremap <C-s> :SaveFile<cr>
-Inoremap <silent> <C-s> :SaveFile<cr>l
+Inoremap <C-s> :SaveFile<cr>l
 Nnoremap <localleader>f :InsertFunction<cr>
 Nnoremap <space>f :InsertFilename<cr>
 Nnoremap ,<Space> :call ToggleZoom()<cr>
-Nnoremap <silent> <S-F1> :SearchCword<cr>
+Nnoremap <S-F1> :SearchCword<cr>
 Nnoremap ,b :call BASH(VS())<cr>
 Nnoremap ,b :call Bash(VS())<cr>
 Nnoremap ,b :Buffers<cr>
@@ -339,15 +339,10 @@ Nnoremap <M-v> :call FuncPaste("Normal")<cr>
 Nnoremap <M-c> :call FuncCopy("Normal")<cr>
 Nnoremap <M-x> :call FuncCut("Normal")<cr>
 Nnoremap ,,,j :IntelligentJumping<cr>
-Nnoremap <silent> <c-h> :wincmd h<cr>
-Nnoremap <silent> <c-j> :wincmd j<cr>
-Nnoremap <silent> <c-k> :wincmd k<cr>
-Nnoremap <silent> <c-l> :wincmd l<cr>
-Vnoremap <silent> p "_dP
-Vnoremap <silent> y y:call ClipboardYank()<cr>
-Vnoremap <silent> d d:call ClipboardYank()<cr>
-Nnoremap <silent> dd dd:call ClipboardYank()<cr>
-Nnoremap <silent> p :call ClipboardPaste("n")<cr>p
+Nnoremap <c-h> :wincmd h<cr>
+Nnoremap <c-j> :wincmd j<cr>
+Nnoremap <c-k> :wincmd k<cr>
+Nnoremap <c-l> :wincmd l<cr>
 Vnoremap p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
 Nnoremap <BS> :call backspaceN()<cr>
 Cnoremap <A-'> ä
@@ -362,10 +357,10 @@ Nnoremap ,e :call AppendToEndNormal()<cr>
 Nnoremap ,E :AppendAll<cr>
 Nnoremap YY :call AppendToClipboard()<cr>
 Vnoremap Y :<C-u>let @+ = @+ . join(getline("'<", "'>"), "\n") . "\n"<cr>
-Nnoremap <silent> <A-k> :m-2<cr>
-Nnoremap <silent> <A-j> :m+1<cr>
-Vnoremap <silent> <A-k> :m '<-2<cr>gv=gv
-Vnoremap <silent> <A-j> :m '>+1<cr>gv=gv
+Nnoremap <A-k> :m-2<cr>
+Nnoremap <A-j> :m+1<cr>
+Vnoremap <A-k> :m '<-2<cr>gv=gv
+Vnoremap <A-j> :m '>+1<cr>gv=gv
 Nnoremap < <<
 Nnoremap > >>
 Vnoremap < <gv
@@ -391,12 +386,12 @@ Nnoremap <C-;> zh
 Nnoremap <C-'> zl
 Nnoremap <C-S-;> 20zh
 Nnoremap <C-S-'> 20zl
-Nnoremap <silent> ,f  :copen<cr>
-Nnoremap <silent> <C-Down>   :cnext<cr>zz
-Nnoremap <silent> <C-Up>     :cprev<cr>zz
-Nnoremap <silent> ,N  :cfirst<cr>zz
-Nnoremap <silent> ,P  :clast<cr>zz
-Nnoremap <silent> ,c  :cclose<cr>
+Nnoremap ,f  :copen<cr>
+Nnoremap <C-Down>   :cnext<cr>zz
+Nnoremap <C-Up>     :cprev<cr>zz
+Nnoremap ,N  :cfirst<cr>zz
+Nnoremap ,P  :clast<cr>zz
+Nnoremap ,c  :cclose<cr>
 Nnoremap ,<C-s> :call ExecFunction()<cr>
 Nnoremap ,s :call ExecVS()<cr>
 Vnoremap ,s :call ExecVS()<cr>

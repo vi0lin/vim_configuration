@@ -6,6 +6,10 @@ function! _nnoremap(...) range
   let keyesc=escape(key, "<>")
   let mode=':call SetMode("'.keyesc.'", "Normal") \|'
   let cmd = join(a:1[1:])
+  " todo <silent> is not the key
+  " echo key
+  " echo cmd
+  " echo "nnoremap ".key mode cmd
   exec "nnoremap ".key mode cmd
 endfunction
 function! _vnoremap(...) range
