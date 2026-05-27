@@ -113,11 +113,6 @@ NewMap -all -no ,<F6> :call MapCommand("j")<cr>
 NewMap -all -no ,<F7> :call MapCommand("k")<cr>
 NewMap -all -no ,<F8> :call MapCommand("l")<cr>
 
-NewMap -t -im -no <C-l> l<cr>
-NewMap -t -im -no <C-h> h<cr>
-NewMap -t -im -no <C-k> k<cr>
-NewMap -t -im -no <C-j> j<cr>
-
 " NewMap -all -no ,,<F5> :call DirectionMapCommand("h")<cr>
 " NewMap -all -no ,,<F6> :call DirectionMapCommand("j")<cr>
 " NewMap -all -no ,,<F7> :call DirectionMapCommand("k")<cr>
@@ -396,10 +391,19 @@ NewMap -n -v -i -im -no <C-h> :call SmartWincmd('h')<cr>
 NewMap -n -v -i -im -no <C-j> :call SmartWincmd('j')<cr>
 NewMap -n -v -i -im -no <C-k> :call SmartWincmd('k')<cr>
 NewMap -n -v -i -im -no <C-l> :call SmartWincmd('l')<cr>
-NewMap -t -im <C-l> <C-w>l
-NewMap -t -im <C-h> <C-w>h
-NewMap -t -im <C-k> <C-w>k
-NewMap -t -im <C-j> <C-w>j
+" NewMap -t -im <C-l> <C-w>l
+" NewMap -t -im <C-h> <C-w>h
+" NewMap -t -im <C-k> <C-w>k
+" NewMap -t -im <C-j> <C-w>j
+"" works NewMap -t -im -no <C-l> l<cr>
+"" works NewMap -t -im -no <C-h> h<cr>
+"" works NewMap -t -im -no <C-k> k<cr>
+"" works NewMap -t -im -no <C-j> j<cr>
+NewMap -t -im -no <C-l> l
+NewMap -t -im -no <C-h> h
+NewMap -t -im -no <C-k> k
+NewMap -t -im -no <C-j> j
+
 NewMap -no -v <BS> :call backspace()<cr>
 NewMap -no -v & :&<cr>
 NewMap -no -v ,F :echo VS()<cr>

@@ -34,10 +34,6 @@ Anoremap ,<F5> :call MapCommand("h")<cr>
 Anoremap ,<F6> :call MapCommand("j")<cr>
 Anoremap ,<F7> :call MapCommand("k")<cr>
 Anoremap ,<F8> :call MapCommand("l")<cr>
-TnoremapInsertmode <C-l> l<cr>
-TnoremapInsertmode <C-h> h<cr>
-TnoremapInsertmode <C-k> k<cr>
-TnoremapInsertmode <C-j> j<cr>
 Anoremap ,,<F5> :call DirectionMapSmart('h')<cr>
 Anoremap ,,<F6> :call DirectionMapSmart('j')<cr>
 Anoremap ,,<F7> :call DirectionMapSmart('k')<cr>
@@ -214,10 +210,10 @@ Inoremap <C-k> :call SmartWincmd('k')<cr>
 Nnoremap <C-l> :call SmartWincmd('l')<cr>
 Vnoremap <C-l> :call SmartWincmd('l')<cr>
 Inoremap <C-l> :call SmartWincmd('l')<cr>
-TmapInsertmode <C-l> <C-w>l
-TmapInsertmode <C-h> <C-w>h
-TmapInsertmode <C-k> <C-w>k
-TmapInsertmode <C-j> <C-w>j
+TnoremapInsertmode <C-l> l
+TnoremapInsertmode <C-h> h
+TnoremapInsertmode <C-k> k
+TnoremapInsertmode <C-j> j
 Vnoremap <BS> :call backspace()<cr>
 Vnoremap & :&<cr>
 Vnoremap ,F :echo VS()<cr>
