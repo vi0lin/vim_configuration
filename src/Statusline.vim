@@ -3,8 +3,8 @@ if !exists("g:vim_advantages_got_sourced")
 
 let breakpoint=66
 let g:ST_Mode=[]
-call add(g:ST_Mode, [ breakpoint, {->mode()}, ''])
-call add(g:ST_Mode, [ breakpoint, {->bufnr()}, ''])
+call add(g:ST_Mode, [ breakpoint, {->mode()..' '}, ''])
+call add(g:ST_Mode, [ breakpoint, {->bufnr()..' '}, ''])
 call add(g:ST_Mode, [ breakpoint, {->PathCharwise_All(CWD(),1)}, ''])
 call add(g:ST_Mode, [ breakpoint, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}])
 call add(g:ST_Mode, [ breakpoint, "%#User0# %= %<", "%#User0# %= %<"])
@@ -13,7 +13,7 @@ call add(g:ST_Mode, [ breakpoint, {->GitName_Statusline()}, {->GitName_Statuslin
 call add(g:ST_Mode, [ breakpoint, {->GitRemote_Statusline()}, {->GitRemote_Statusline()}])
 call add(g:ST_Mode, [ breakpoint, {->GitBranch_Statusline()}, {->GitBranch_Statusline()}])
 call add(g:ST_Mode, [ breakpoint, {->exists('b:state.exec_keys')&&b:state.type=='terminal'?b:state.exec_keys:''}, ''])
-call add(g:ST_Mode, [ breakpoint, {->getcurpos()[1]..'/'..line('$')}, ''])
+call add(g:ST_Mode, [ breakpoint, {->'  '..getcurpos()[1]..'/'..line('$')}, ''])
 call add(g:ST_Mode, [ breakpoint, {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''}, ''])
 
 function! Statusline()

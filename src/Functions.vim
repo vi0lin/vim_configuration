@@ -4307,7 +4307,7 @@ function! GitBranch_Statusline()
     if w:gitBranch==-1
       return ''
     endif
-    return '  '..GitBranch()..' '
+    return '  '..GitBranch()
   else
     return ''
   endif
