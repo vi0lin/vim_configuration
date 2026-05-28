@@ -4887,6 +4887,12 @@ function! Open(direction, type="buffer", mode="copy", file="")
   elseif a:mode=="copy"
   elseif a:mode=="new" && a:type != "terminal"
     " enew
+  elseif type(a:mode)==0
+    if bufexists(a:mode)
+      exec "b".a:mode
+      " if BufVisibileInCurrentTab(bufnr())
+      " endif
+    endif
   endif
   if terminal && h
     exec "wincmd h"
@@ -5388,6 +5394,37 @@ function! MapCommand(direction) range
   call SavedCommandToTerm(a:direction)
 endfunction
 
+function! BufVisibileInCurrentTab(bufnr) abort
+  for l:winnr in range(1, winnr('$'))
+    if winbufnr(l:winnr) == a:bufnr
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
+
+function! BufVisibileAndAlive(bufnr) abort
+  for l:winnr in range(1, winnr('$'))
+    if winbufnr(l:winnr) == a:bufnr
+      if getbufvar(a:bufnr, '&buftype') ==# 'terminal'
+        return term_getstatus(a:bufnr) ==# 'running'
+      endif
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
+
+function! BufExistsAndAlive(bufnr) abort
+  if bufexists(a:bufnr)
+    if getbufvar(a:bufnr, '&buftype') ==# 'terminal'
+      return term_getstatus(a:bufnr) =~# 'running'
+    endif
+    return 0
+  endif
+  return 0
+endfunction
+
 function! SavedCommandToTerm(direction) range
   call InitMapCommand(a:direction)
   let com=b:MapCommands[a:direction]
@@ -5397,7 +5434,6 @@ function! SavedCommandToTerm(direction) range
   if !bufexists(term.buf)
     let term.buf=-1
   endif
-
   if term.buf==-1
     " let buf=term
     let term.buf=GetBufDirectionIfTerm(a:direction)
@@ -5408,9 +5444,12 @@ function! SavedCommandToTerm(direction) range
       call Open('J', "terminal", "new")
       let [term.dir,term.buf]=FindSomeTerm()
     endif
-  else
+  elseif !bufexists(term.buf)
     call Open('J', "terminal", "new")
     let [term.dir,term.buf]=FindSomeTerm()
+  elseif BufExistsAndAlive(bufnr())
+    echo "Try To ReOpen"
+    " call Open('J', "terminal", term.buf)
   endif
   " let b:MapCommand[a:direction..'t']={'buf': buf, 'dir': dir }
   " let buf=GetBufDirectionIfTerm(a:direction)

@@ -23,6 +23,7 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! BufWinEnter * :call BufWinEnter()
   autocmd! BufEnter * :call BufEnter()
   autocmd! BufEnter * :call Statusline()
+  autocmd! WinResized	* :call Statusline()
 
   " [!IMPORTANT]
   " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders

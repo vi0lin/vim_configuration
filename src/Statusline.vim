@@ -1,19 +1,20 @@
 " Statusline.vim
 if !exists("g:vim_advantages_got_sourced")
 
+let breakpoint=66
 let g:ST_Mode=[]
-call add(g:ST_Mode, {->mode()})
-call add(g:ST_Mode, {->bufnr()})
-call add(g:ST_Mode, {->PathCharwise_All(CWD(),1)})
-call add(g:ST_Mode, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)})
-call add(g:ST_Mode, "%#User0#%=")
-call add(g:ST_Mode, {->IsFavorite()})
-call add(g:ST_Mode, {->GitName_Statusline()})
-call add(g:ST_Mode, {->GitRemote_Statusline()})
-call add(g:ST_Mode, {->GitBranch_Statusline()})
-call add(g:ST_Mode, {->exists('b:state.exec_keys')&&b:state.type=='terminal'?b:state.exec_keys:''})
-call add(g:ST_Mode, {->getcurpos()[1]..'/'..line('$')})
-call add(g:ST_Mode, {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''})
+call add(g:ST_Mode, [ breakpoint, {->mode()}, ''])
+call add(g:ST_Mode, [ breakpoint, {->bufnr()}, ''])
+call add(g:ST_Mode, [ breakpoint, {->PathCharwise_All(CWD(),1)}, ''])
+call add(g:ST_Mode, [ breakpoint, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}])
+call add(g:ST_Mode, [ breakpoint, "%#User0# %= %<", "%#User0# %= %<"])
+call add(g:ST_Mode, [ breakpoint, {->IsFavorite()}, ''])
+call add(g:ST_Mode, [ breakpoint, {->GitName_Statusline()}, {->GitName_Statusline()}])
+call add(g:ST_Mode, [ breakpoint, {->GitRemote_Statusline()}, {->GitRemote_Statusline()}])
+call add(g:ST_Mode, [ breakpoint, {->GitBranch_Statusline()}, {->GitBranch_Statusline()}])
+call add(g:ST_Mode, [ breakpoint, {->exists('b:state.exec_keys')&&b:state.type=='terminal'?b:state.exec_keys:''}, ''])
+call add(g:ST_Mode, [ breakpoint, {->getcurpos()[1]..'/'..line('$')}, ''])
+call add(g:ST_Mode, [ breakpoint, {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''}, ''])
 
 function! Statusline()
   let b:sl=[]
@@ -34,11 +35,18 @@ function! Statusline()
     hi User0 guifg=#000000 guibg=#d3d3d3 ctermfg=152 ctermbg=233
       set statusline=
       let l:sl=''
+      let buf_height = winheight(winnr())
+      let buf_width = winwidth(winnr())
       for i in range(len(g:ST_Mode)-1)
-        if type(g:ST_Mode[i])==2
-          let l:sl.='%#User2#%{g:ST_Mode['..i..']()} '
+        if buf_width>=g:ST_Mode[i][0]
+          let func=1
         else
-          let l:sl.='%#User2#'..g:ST_Mode[i]
+          let func=2
+        endif
+        if type(g:ST_Mode[i][func])==2
+          let l:sl.='%#User2#%{g:ST_Mode['..i..']['..func..']()} '
+        else
+          let l:sl.='%#User2#'..g:ST_Mode[i][func]
         endif
       endfor
       let &statusline=l:sl
