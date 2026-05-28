@@ -51,10 +51,10 @@ function! Statusline()
         "   let func=2
         " endif
         if type(g:ST_Mode[i][w:w])==2
-          let l:sl.='%#User2#%{(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][g:w])}'
+          let l:sl.='%#User2#%{(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w])}'
           " let l:sl.='%#User2#%{winwidth(winnr())>=50?g:ST_Mode['..i..'][1]():g:ST_Mode['..i..'][2]()}\ '
-        elseif type(g:ST_Mode[i][g:w])==1
-          let l:sl.='%#User2#'..g:ST_Mode[i][g:w]
+        elseif type(g:ST_Mode[i][w:w])==1
+          let l:sl.='%#User2#'..g:ST_Mode[i][w:w]
         endif
       endfor
       let &statusline=l:sl
