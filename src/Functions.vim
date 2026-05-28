@@ -4588,9 +4588,9 @@ function! PathCharwise_All(path, except=0, prependSlash=v:false, appendSlash=v:f
   let parts=split(a:path,'/')
   let out=''
   if a:path=='/'||a:prependSlash
-    let out='/'
-  else
     let out=''
+  else
+    let out='/'
   endif
   for i in range(0, len(parts)-1)
     if i>=len(parts)-except

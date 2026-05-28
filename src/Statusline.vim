@@ -1,20 +1,22 @@
 " Statusline.vim
 if !exists("g:vim_advantages_got_sourced")
 
-let breakpoint=66
+let g:breakpoint=60
 let g:ST_Mode=[]
-call add(g:ST_Mode, [ breakpoint, {->mode()..' '}, ''])
-call add(g:ST_Mode, [ breakpoint, {->bufnr()..' '}, ''])
-call add(g:ST_Mode, [ breakpoint, {->PathCharwise_All(CWD(),1)}, ''])
-call add(g:ST_Mode, [ breakpoint, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}])
-call add(g:ST_Mode, [ breakpoint, "%#User0# %= %<", "%#User0# %= %<"])
-call add(g:ST_Mode, [ breakpoint, {->IsFavorite()}, ''])
-call add(g:ST_Mode, [ breakpoint, {->GitName_Statusline()}, {->GitName_Statusline()}])
-call add(g:ST_Mode, [ breakpoint, {->GitRemote_Statusline()}, {->GitRemote_Statusline()}])
-call add(g:ST_Mode, [ breakpoint, {->GitBranch_Statusline()}, {->GitBranch_Statusline()}])
-call add(g:ST_Mode, [ breakpoint, {->exists('b:state.exec_keys')&&b:state.type=='terminal'?b:state.exec_keys:''}, ''])
-call add(g:ST_Mode, [ breakpoint, {->'  '..getcurpos()[1]..'/'..line('$')}, ''])
-call add(g:ST_Mode, [ breakpoint, {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''}, ''])
+call add(g:ST_Mode, [ "2", {->mode()..' '}, ''])
+call add(g:ST_Mode, [ "2", {->bufnr()..' '}, ''])
+call add(g:ST_Mode, [ "0", {->PathCharwise_All(CWD(),1)..'/'}, ''])
+call add(g:ST_Mode, [ "2", {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file)}])
+call add(g:ST_Mode, [ "2", "%#User0# %= %<", "%#User0# %= %<"])
+call add(g:ST_Mode, [ "2", {->IsFavorite()}, ''])
+call add(g:ST_Mode, [ "2", {->GitName_Statusline()}, {->GitName_Statusline()}])
+call add(g:ST_Mode, [ "2", {->GitRemote_Statusline()}, {->GitRemote_Statusline()}])
+call add(g:ST_Mode, [ "2", {->GitBranch_Statusline()}, {->GitBranch_Statusline()}])
+call add(g:ST_Mode, [ "2", {->exists('b:state.exec_keys')&&b:state.type=='terminal'?b:state.exec_keys:''}, ''])
+call add(g:ST_Mode, [ "2", {-> '  '..getcurpos()[1]..'/'..line('$')}, ''])
+call add(g:ST_Mode, [ "2", {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''}, ''])
+call add(g:ST_Mode, [ "2", ' ', ' '])
+call add(g:ST_Mode, [ "2", ' ', ' '])
 
 function! Statusline()
   let b:sl=[]
@@ -33,10 +35,11 @@ function! Statusline()
       hi User9 guifg=#ffffff  guibg=#F14025 ctermfg=152 ctermbg=236
       hi User0 guifg=#ffffff  guibg=#094afe ctermfg=152 ctermbg=236
     hi User0 guifg=#000000 guibg=#d3d3d3 ctermfg=152 ctermbg=233
+    hi User0 guifg=#000000 guibg=#d3d3d3 ctermfg=255255255 ctermbg=233
       set statusline=
       let w:w=1
       function! MyFunc()
-        if winwidth(winnr())>=50
+        if winwidth(winnr())>=g:breakpoint
           let w:w=1
         else
           let w:w=2
@@ -50,11 +53,13 @@ function! Statusline()
         " else
         "   let func=2
         " endif
-        if type(g:ST_Mode[i][w:w])==2
-          let l:sl.='%#User2#%{(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w])}'
+        let usercolor=g:ST_Mode[i][0]
+        if type(g:ST_Mode[i][1])==2
+          let l:sl.='%#User'..usercolor..'#%{(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w])}'
           " let l:sl.='%#User2#%{winwidth(winnr())>=50?g:ST_Mode['..i..'][1]():g:ST_Mode['..i..'][2]()}\ '
-        elseif type(g:ST_Mode[i][w:w])==1
-          let l:sl.='%#User2#'..g:ST_Mode[i][w:w]
+        " elseif type(g:ST_Mode[i][w:w])==1
+        else
+          let l:sl.='%#User'..usercolor..'#'..g:ST_Mode[i][w:w]
         endif
       endfor
       let &statusline=l:sl
