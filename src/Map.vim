@@ -1,7 +1,6 @@
 " Todo -no NewMap Checker
 if !exists("g:vim_advantages_got_sourced")
 
-
 let g:FlagReceived=0
 "  \ [ 'args', 'args|Args', '*'],
 
@@ -580,7 +579,7 @@ NewMap -no <A-p>              :call Projects()<cr>
 NewMap -no <A-S-p>            :call Projects()<cr>
 NewMap -no <A-C-p>            :call Projects()<cr>
 NewMap -no <A-S-C-p>          :call Projects()<cr>
-NewMap -no -n <C-S-p>           :call BuildSystemsGitProjects()<cr>
+NewMap -no -n ,<C-p>           :call BuildSystemsGitProjects()<cr>
 
 NewMap -no -n <C-S-m>           :Generate<cr>
 
@@ -1038,6 +1037,8 @@ NewMap -no -n ,m :call VimGrep(v:count)<cr>
 " Integrate VimGrep
 NewMap -no -n <M-a> :Lines<cr>
 NewMap -no -n <C-S-a> :call VimGrep(v:count)<cr>
+
+NewMap -no -n <C-S-a> :vimgrep "todo" $folderrepo/**/*<cr>
 
 function VimGrep(count) abort
   " :copen<cr>:vimgrep "" **/*[D[D[D[D[D

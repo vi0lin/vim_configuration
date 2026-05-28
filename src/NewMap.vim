@@ -275,5 +275,6 @@ function! Generate()
   let g:newmap_buildfile=[]
   let g:newmap_buildfile_dicts=[]
   exec 'source '.g:generated_src.'/NewMap.vim'
+  echo "Done"
 endfunction
 command! -range -nargs=0 Generate call Generate()

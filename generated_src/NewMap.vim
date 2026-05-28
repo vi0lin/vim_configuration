@@ -288,7 +288,7 @@ Nnoremap <A-p>              :call Projects()<cr>
 Nnoremap <A-S-p>            :call Projects()<cr>
 Nnoremap <A-C-p>            :call Projects()<cr>
 Nnoremap <A-S-C-p>          :call Projects()<cr>
-Nnoremap <C-S-p>           :call BuildSystemsGitProjects()<cr>
+Nnoremap ,<C-p>           :call BuildSystemsGitProjects()<cr>
 Nnoremap <C-S-m>           :Generate<cr>
 Nnoremap <C-Space>              :call Files(Folder_Project())<cr>
 Nnoremap <C-S-Space>            :call Files(Folder_Repo())<cr>
@@ -423,6 +423,7 @@ Nnoremap ,m :call VimGrep(v:count)<cr>
 Nnoremap ,m :call VimGrep(v:count)<cr>
 Nnoremap <M-a> :Lines<cr>
 Nnoremap <C-S-a> :call VimGrep(v:count)<cr>
+Nnoremap <C-S-a> :vimgrep "todo" $folderrepo/**/*<cr>
 Nnoremap [D :cclose<cr>
 Nnoremap [C :copen<cr>
 Nnoremap [A :cprev<cr>

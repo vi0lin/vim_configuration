@@ -263,7 +263,9 @@ let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
 
 let g:sh={}
-  function GetOpts(args_str, structure, delimeter='--')
+function GetOpts(args_str, structure, delimeter='--')
+  " todo add -silent
+  " todo add n arguments
   let args_str=a:args_str
   let args=ParseArgs(args_str)
   let fn=FunctionName()
@@ -2000,6 +2002,7 @@ function! Pull(...)
 endfunction
 
 " todo Github push -u github wurzeltal:main
+" todo Github push github main
 
 command! -range -nargs=? Stash <line1>,<line2>:call Stash(<q-args>)
 function! Stash(commitmessage='')
@@ -4474,6 +4477,7 @@ function! CD(path)
   if w:git!=-1
   endif
   " echo "Not A Directory"
+  let $folderrepo=Folder_Repo()
 endfunction
 
 function! UpdateGit()
