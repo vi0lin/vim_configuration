@@ -1178,7 +1178,7 @@ function! Folder_Repo(backwards=0)
     " getcwd is not userfriendly
     " consider throwing a message
     let file=getcwd()
-    echo "No higher Repo"
+    " echo "No higher Repo"
     return
   endif
   return file
@@ -4708,7 +4708,7 @@ function! FindInFileFZFRepo(backwards=0)
     " getcwd is not userfriendly
     " consider throwing a message
     let file=getcwd()
-    echo "No higher Repo"
+    " echo "No higher Repo"
     return
   endif
   call FZFPopup("Open file: ", "file", file, Callback)
