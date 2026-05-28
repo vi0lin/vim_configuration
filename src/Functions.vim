@@ -6324,6 +6324,7 @@ function! BufWinEnter()
 endfunction
 
 function! BufEnter()
+  call Statusline()
 endfunction
 
 function! BufNew()

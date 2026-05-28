@@ -34,24 +34,33 @@ function! Statusline()
       hi User0 guifg=#ffffff  guibg=#094afe ctermfg=152 ctermbg=236
     hi User0 guifg=#000000 guibg=#d3d3d3 ctermfg=152 ctermbg=233
       set statusline=
-      let l:sl=''
-      let buf_height = winheight(winnr())
-      let buf_width = winwidth(winnr())
-      for i in range(len(g:ST_Mode)-1)
-        if buf_width>=g:ST_Mode[i][0]
-          let func=1
+      let w:w=1
+      function! MyFunc()
+        if winwidth(winnr())>=50
+          let w:w=1
         else
-          let func=2
+          let w:w=2
         endif
-        if type(g:ST_Mode[i][func])==2
-          let l:sl.='%#User2#%{g:ST_Mode['..i..']['..func..']()} '
-        else
-          let l:sl.='%#User2#'..g:ST_Mode[i][func]
+        return ''
+      endfunction
+      let l:sl='%{MyFunc()}'
+      for i in range(len(g:ST_Mode)-1)
+        " if buf_width>=g:ST_Mode[i][0]
+        "   let func=1
+        " else
+        "   let func=2
+        " endif
+        if type(g:ST_Mode[i][w:w])==2
+          let l:sl.='%#User2#%{(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][g:w])}'
+          " let l:sl.='%#User2#%{winwidth(winnr())>=50?g:ST_Mode['..i..'][1]():g:ST_Mode['..i..'][2]()}\ '
+        elseif type(g:ST_Mode[i][g:w])==1
+          let l:sl.='%#User2#'..g:ST_Mode[i][g:w]
         endif
       endfor
       let &statusline=l:sl
       return
 endfunction
+
 call Statusline()
 
 endif
