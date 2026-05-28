@@ -22,7 +22,7 @@ function! Statusline()
       exe 'hi! StatusLine guibg=#55ff88 guifg=#005500'
       " buffer
       hi User1 guifg=#ffdad8  guibg=#080c0e ctermfg=88 ctermbg=236
-      hi User2 guifg=#000000  guibg=#f80c0C ctermfg=238 ctermbg=233
+      hi User2 guifg=#000000  guibg=#f80c0C ctermfg=999 ctermbg=233
       hi User3 guifg=#292b00  guibg=#F4505C ctermfg=88 ctermbg=236
       " term
       hi User4 guifg=#112605  guibg=#ae2e4B ctermfg=152 ctermbg=236
