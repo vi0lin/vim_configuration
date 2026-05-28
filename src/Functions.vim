@@ -1,7 +1,6 @@
 " Avoid cdo prompt for overwiting files
 " let &t_TI = "\<Esc>[>4;2m"
 " let &t_TE = "\<Esc>[>4;m"
-
 " let &t_TI = [=1;1u
 " let &t_TE = [>4;m[=0;1u
 
@@ -5252,7 +5251,8 @@ function! DirectionAllMapCommand(direction) range
 endfunction
 
 function! DirectionMapCommand(direction) range
-  let b:MapCommands[a:direction..'t']=a:direction
+  let key=a:direction..'t'
+  let b:MapCommands[key]=a:direction
 endfunction
 
 function! DirectionMapSmart(direction) range
@@ -5294,14 +5294,15 @@ function! DirectionMapSmart(direction) range
         let dir=nr2char(c)
         " echo "assigning ".. i .." to "..dir
         "echo "assigning ".. i .." to "..dir
-        if dir..'t'=='ht'
-          let b:MapCommands['ht']=dir
-        elseif dir..'t'=='jt'
-          let b:MapCommands['jt']=dir
-        elseif dir..'t'=='kt'
-          let b:MapCommands['kt']=dir
-        elseif dir..'t'=='lt'
-          let b:MapCommands['lt']=dir
+        let pos=dir..'t'
+        if pos=='ht'
+          let b:MapCommands['ht']={ 'term': -1, 'dir': dir }
+        elseif pos=='jt'
+          let b:MapCommands['jt']={ 'term': -1, 'dir': dir }
+        elseif pos=='kt'
+          let b:MapCommands['kt']={ 'term': -1, 'dir': dir }
+        elseif pos=='lt'
+          let b:MapCommands['lt']={ 'term': -1, 'dir': dir }
         endif
         echo Format(b:MapCommands)
       endfor
@@ -5373,16 +5374,16 @@ function! MapCommand(direction) range
     let b:MapCommands['l']=data
   endif
   if _empty_type_string('ht')
-    let b:MapCommands['ht']=a:direction
+    let b:MapCommands['ht']={ 'buf': -1, 'dir': a:direction }
   endif
   if _empty_type_string('jt')
-    let b:MapCommands['jt']=a:direction
+    let b:MapCommands['jt']={ 'buf': -1, 'dir': a:direction }
   endif
   if _empty_type_string('kt')
-    let b:MapCommands['kt']=a:direction
+    let b:MapCommands['kt']={ 'buf': -1, 'dir': a:direction }
   endif
   if _empty_type_string('lt')
-    let b:MapCommands['lt']=a:direction
+    let b:MapCommands['lt']={ 'buf': -1, 'dir': a:direction }
   endif
   call SavedCommandToTerm(a:direction)
 endfunction
@@ -5390,26 +5391,35 @@ endfunction
 function! SavedCommandToTerm(direction) range
   call InitMapCommand(a:direction)
   let com=b:MapCommands[a:direction]
-  let num=b:MapCommands[a:direction..'t']
-  let buf=-1
+  let term=b:MapCommands[a:direction..'t']
+  let [buf, dir]=[ term.buf, term.dir ]
   " Todo Directions
-  if num!=''
-    " let buf=num
-    let buf=GetBufDirectionIfTerm(a:direction)
-    if buf==-1
-      let [dir,buf]=FindSomeTerm()
-    endif
-    if buf==-1
-      call Open('J', "terminal", "new")
-      let [dir,buf]=FindSomeTerm()
-    endif
+  if !bufexists(term.buf)
+    let term.buf=-1
   endif
+
+  if term.buf==-1
+    " let buf=term
+    let term.buf=GetBufDirectionIfTerm(a:direction)
+    if term.buf==-1
+      let [term.dir,term.buf]=FindSomeTerm()
+    endif
+    if term.buf==-1
+      call Open('J', "terminal", "new")
+      let [term.dir,term.buf]=FindSomeTerm()
+    endif
+  else
+    call Open('J', "terminal", "new")
+    let [term.dir,term.buf]=FindSomeTerm()
+  endif
+  " let b:MapCommand[a:direction..'t']={'buf': buf, 'dir': dir }
   " let buf=GetBufDirectionIfTerm(a:direction)
   " let buf=winbufnr(win)
-  if buf!=-1
+  if term.buf!=-1
    " let buf=winbufnr(winnr(a:direction))
-   call TERM(buf, com)
+   call TERM(term.buf, com)
   endif
+  let b:MapCommands[a:direction..'t']
 endfunction
 
 function! SendCommandToTerm(direction) range

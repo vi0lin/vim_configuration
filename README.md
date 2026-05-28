@@ -48,10 +48,10 @@ PlugInstall
       <td></th>
     </tr>
     <tr>
-      <th ><b>Keymap</b></th>
-      <th ><b>Command</b></th>
-      <th ><b>Explanation</b></th>
-      <th ><b>Toggle Option</b></th>
+      <th><b>Keymap</b></th>
+      <th><b>Command</b></th>
+      <th><b>Explanation</b></th>
+      <th><b>Toggle Option</b></th>
     </tr>
   </thead>
   <tbody>
@@ -268,7 +268,7 @@ put=opts
     <tr>
       <td>
         Tab
-      </td><td >Tab Trough Files in CWD
+      </td><td>Tab Trough Files in CWD
       </td>
         <td>
           To-do: Add Filesearch Feature, that filters the list to contain the given keystrokes
@@ -277,7 +277,7 @@ put=opts
     <tr>
       <td>
         [a-zA-Z0-9]
-      </td><td >Search
+      </td><td>Search
       </td>
         <td>
           Unimplemented
