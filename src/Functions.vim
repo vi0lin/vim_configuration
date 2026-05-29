@@ -5492,6 +5492,12 @@ function! BufExistsAndAlive(bufnr) abort
   return 0
 endfunction
 
+function VSRewriteCommand(direction) range
+  call InitMapCommand(a:direction)
+  let b:MapCommands[a:direction]=VS()
+  call SavedCommandToTerm(a:direction)
+endfunction
+
 function! SavedCommandToTerm(direction) range
   call InitMapCommand(a:direction)
   let com=b:MapCommands[a:direction]

@@ -96,10 +96,10 @@ command -range -nargs=* Inc :call Inc(<f-args>)
 " When A Visual Selection Is Set
 " Either Use As Input
 " Or Use As Redefine And Fire Command
-NewMap -v -no <F5> :<C-u>call SavedCommandToTerm("h")<cr>
-NewMap -v -no <F6> :<C-u>call SavedCommandToTerm("j")<cr>
-NewMap -v -no <F7> :<C-u>call SavedCommandToTerm("k")<cr>
-NewMap -v -no <F8> :<C-u>call SavedCommandToTerm("l")<cr>
+NewMap -v -no <F5> :call VSRewriteCommand("h")<cr>
+NewMap -v -no <F6> :call VSRewriteCommand("j")<cr>
+NewMap -v -no <F7> :call VSRewriteCommand("k")<cr>
+NewMap -v -no <F8> :call VSRewriteCommand("l")<cr>
 NewMap -i -no <F5> <C-o>:call SavedCommandToTerm("h")<cr>
 NewMap -i -no <F6> <C-o>:call SavedCommandToTerm("j")<cr>
 NewMap -i -no <F7> <C-o>:call SavedCommandToTerm("k")<cr>
@@ -247,22 +247,22 @@ NewMap -v -no . :<Up><cr>
 
 " Amap <F2> :NERDTreeFind<cr>
 
-NewMap -no -a ,h     :call Open("h", "buffer", "new")<cr>
-NewMap -no -a ,j     :call Open("j", "buffer", "new")<cr>
-NewMap -no -a ,k     :call Open("k", "buffer", "new")<cr>
-NewMap -no -a ,l     :call Open("l", "buffer", "new")<cr>
-NewMap -no -a ,H     :call Open("H", "buffer", "new")<cr>
-NewMap -no -a ,J     :call Open("J", "buffer", "new")<cr>
-NewMap -no -a ,K     :call Open("K", "buffer", "new")<cr>
-NewMap -no -a ,L     :call Open("L", "buffer", "new")<cr>
-NewMap -no -a ,,h     :call Open("h", "terminal", "new")<cr>
-NewMap -no -a ,,j     :call Open("j", "terminal", "new")<cr>
-NewMap -no -a ,,k     :call Open("k", "terminal", "new")<cr>
-NewMap -no -a ,,l     :call Open("l", "terminal", "new")<cr>
-NewMap -no -a ,,H     :call Open("H", "terminal", "new")<cr>
-NewMap -no -a ,,J     :call Open("J", "terminal", "new")<cr>
-NewMap -no -a ,,K     :call Open("K", "terminal", "new")<cr>
-NewMap -no -a ,,L     :call Open("L", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,h     :call Open("h", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,j     :call Open("j", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,k     :call Open("k", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,l     :call Open("l", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,H     :call Open("H", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,J     :call Open("J", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,K     :call Open("K", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,L     :call Open("L", "buffer", "new")<cr>
+NewMap -no -v -n -i -t ,,h     :call Open("h", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,,j     :call Open("j", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,,k     :call Open("k", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,,l     :call Open("l", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,,H     :call Open("H", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,,J     :call Open("J", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,,K     :call Open("K", "terminal", "new")<cr>
+NewMap -no -v -n -i -t ,,L     :call Open("L", "terminal", "new")<cr>
 "
 " Amap <A-h>     :call Open("h", "buffer", "new")<cr>
 " Amap <A-j>     :call Open("j", "buffer", "new")<cr>

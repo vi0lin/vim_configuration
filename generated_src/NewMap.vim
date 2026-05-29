@@ -12,10 +12,10 @@ nnoremap ,s :call SetMode(",s", "Normal") \| :so %<cr>
 nnoremap ,t :call SetMode(",t", "Normal") \| :Tidy<cr>
 nnoremap <M-q> :call SetMode("\<M-q\>", "Normal") \| :q<cr>
 tnoremap <M-q> <C-\><C-n>:call SetMode("\<M-q\>", "Terminal") \| <c-\><c-n>:q<cr>
-vnoremap <F5> :call SetMode("\<F5\>", "Visual") \| :<C-u>call SavedCommandToTerm("h")<cr>
-vnoremap <F6> :call SetMode("\<F6\>", "Visual") \| :<C-u>call SavedCommandToTerm("j")<cr>
-vnoremap <F7> :call SetMode("\<F7\>", "Visual") \| :<C-u>call SavedCommandToTerm("k")<cr>
-vnoremap <F8> :call SetMode("\<F8\>", "Visual") \| :<C-u>call SavedCommandToTerm("l")<cr>
+vnoremap <F5> :call SetMode("\<F5\>", "Visual") \| :call VSRewriteCommand("h")<cr>
+vnoremap <F6> :call SetMode("\<F6\>", "Visual") \| :call VSRewriteCommand("j")<cr>
+vnoremap <F7> :call SetMode("\<F7\>", "Visual") \| :call VSRewriteCommand("k")<cr>
+vnoremap <F8> :call SetMode("\<F8\>", "Visual") \| :call VSRewriteCommand("l")<cr>
 inoremap <F5> :call SetMode("\<F5\>", "Insert") \| <C-o>:call SavedCommandToTerm("h")<cr>
 inoremap <F6> :call SetMode("\<F6\>", "Insert") \| <C-o>:call SavedCommandToTerm("j")<cr>
 inoremap <F7> :call SetMode("\<F7\>", "Insert") \| <C-o>:call SavedCommandToTerm("k")<cr>
@@ -207,157 +207,68 @@ tnoremap <C-S-F8> <C-\><C-n>:call SetMode("\<C-S-F8\>", "Terminal") \| <C-\><C-n
 vnoremap . :call SetMode(".", "Visual") \| :<Up><cr>
 nnoremap ,h :call SetMode(",h", "Normal") \|     :call Open("h", "buffer", "new")<cr>
 vnoremap ,h :call SetMode(",h", "Visual") \|     :call Open("h", "buffer", "new")<cr>
-cnoremap ,h :call SetMode(",h", "Command") \|     :call Open("h", "buffer", "new")<cr>
 tnoremap ,h <C-\><C-n>:call SetMode(",h", "Terminal") \|     :call Open("h", "buffer", "new")<cr>
 inoremap ,h :call SetMode(",h", "Insert") \|     :call Open("h", "buffer", "new")<cr>
-xnoremap ,h :call SetMode(",h", "X") \|     :call Open("h", "buffer", "new")<cr>
-snoremap ,h :call SetMode(",h", "S") \|     :call Open("h", "buffer", "new")<cr>
-onoremap ,h :call SetMode(",h", "O") \|     :call Open("h", "buffer", "new")<cr>
-lnoremap ,h :call SetMode(",h", "L") \|     :call Open("h", "buffer", "new")<cr>
 nnoremap ,j :call SetMode(",j", "Normal") \|     :call Open("j", "buffer", "new")<cr>
 vnoremap ,j :call SetMode(",j", "Visual") \|     :call Open("j", "buffer", "new")<cr>
-cnoremap ,j :call SetMode(",j", "Command") \|     :call Open("j", "buffer", "new")<cr>
 tnoremap ,j <C-\><C-n>:call SetMode(",j", "Terminal") \|     :call Open("j", "buffer", "new")<cr>
 inoremap ,j :call SetMode(",j", "Insert") \|     :call Open("j", "buffer", "new")<cr>
-xnoremap ,j :call SetMode(",j", "X") \|     :call Open("j", "buffer", "new")<cr>
-snoremap ,j :call SetMode(",j", "S") \|     :call Open("j", "buffer", "new")<cr>
-onoremap ,j :call SetMode(",j", "O") \|     :call Open("j", "buffer", "new")<cr>
-lnoremap ,j :call SetMode(",j", "L") \|     :call Open("j", "buffer", "new")<cr>
 nnoremap ,k :call SetMode(",k", "Normal") \|     :call Open("k", "buffer", "new")<cr>
 vnoremap ,k :call SetMode(",k", "Visual") \|     :call Open("k", "buffer", "new")<cr>
-cnoremap ,k :call SetMode(",k", "Command") \|     :call Open("k", "buffer", "new")<cr>
 tnoremap ,k <C-\><C-n>:call SetMode(",k", "Terminal") \|     :call Open("k", "buffer", "new")<cr>
 inoremap ,k :call SetMode(",k", "Insert") \|     :call Open("k", "buffer", "new")<cr>
-xnoremap ,k :call SetMode(",k", "X") \|     :call Open("k", "buffer", "new")<cr>
-snoremap ,k :call SetMode(",k", "S") \|     :call Open("k", "buffer", "new")<cr>
-onoremap ,k :call SetMode(",k", "O") \|     :call Open("k", "buffer", "new")<cr>
-lnoremap ,k :call SetMode(",k", "L") \|     :call Open("k", "buffer", "new")<cr>
-nnoremap ,h :call SetMode(",h", "Normal") \|     :call Open("h", "buffer", "new")<cr>
-vnoremap ,h :call SetMode(",h", "Visual") \|     :call Open("h", "buffer", "new")<cr>
-cnoremap ,h :call SetMode(",h", "Command") \|     :call Open("h", "buffer", "new")<cr>
-tnoremap ,h <C-\><C-n>:call SetMode(",h", "Terminal") \|     :call Open("h", "buffer", "new")<cr>
-inoremap ,h :call SetMode(",h", "Insert") \|     :call Open("h", "buffer", "new")<cr>
-xnoremap ,h :call SetMode(",h", "X") \|     :call Open("h", "buffer", "new")<cr>
-snoremap ,h :call SetMode(",h", "S") \|     :call Open("h", "buffer", "new")<cr>
-onoremap ,h :call SetMode(",h", "O") \|     :call Open("h", "buffer", "new")<cr>
-lnoremap ,h :call SetMode(",h", "L") \|     :call Open("h", "buffer", "new")<cr>
 nnoremap ,l :call SetMode(",l", "Normal") \|     :call Open("l", "buffer", "new")<cr>
 vnoremap ,l :call SetMode(",l", "Visual") \|     :call Open("l", "buffer", "new")<cr>
-cnoremap ,l :call SetMode(",l", "Command") \|     :call Open("l", "buffer", "new")<cr>
 tnoremap ,l <C-\><C-n>:call SetMode(",l", "Terminal") \|     :call Open("l", "buffer", "new")<cr>
 inoremap ,l :call SetMode(",l", "Insert") \|     :call Open("l", "buffer", "new")<cr>
-xnoremap ,l :call SetMode(",l", "X") \|     :call Open("l", "buffer", "new")<cr>
-snoremap ,l :call SetMode(",l", "S") \|     :call Open("l", "buffer", "new")<cr>
-onoremap ,l :call SetMode(",l", "O") \|     :call Open("l", "buffer", "new")<cr>
-lnoremap ,l :call SetMode(",l", "L") \|     :call Open("l", "buffer", "new")<cr>
 nnoremap ,H :call SetMode(",H", "Normal") \|     :call Open("H", "buffer", "new")<cr>
 vnoremap ,H :call SetMode(",H", "Visual") \|     :call Open("H", "buffer", "new")<cr>
-cnoremap ,H :call SetMode(",H", "Command") \|     :call Open("H", "buffer", "new")<cr>
 tnoremap ,H <C-\><C-n>:call SetMode(",H", "Terminal") \|     :call Open("H", "buffer", "new")<cr>
 inoremap ,H :call SetMode(",H", "Insert") \|     :call Open("H", "buffer", "new")<cr>
-xnoremap ,H :call SetMode(",H", "X") \|     :call Open("H", "buffer", "new")<cr>
-snoremap ,H :call SetMode(",H", "S") \|     :call Open("H", "buffer", "new")<cr>
-onoremap ,H :call SetMode(",H", "O") \|     :call Open("H", "buffer", "new")<cr>
-lnoremap ,H :call SetMode(",H", "L") \|     :call Open("H", "buffer", "new")<cr>
 nnoremap ,J :call SetMode(",J", "Normal") \|     :call Open("J", "buffer", "new")<cr>
 vnoremap ,J :call SetMode(",J", "Visual") \|     :call Open("J", "buffer", "new")<cr>
-cnoremap ,J :call SetMode(",J", "Command") \|     :call Open("J", "buffer", "new")<cr>
 tnoremap ,J <C-\><C-n>:call SetMode(",J", "Terminal") \|     :call Open("J", "buffer", "new")<cr>
 inoremap ,J :call SetMode(",J", "Insert") \|     :call Open("J", "buffer", "new")<cr>
-xnoremap ,J :call SetMode(",J", "X") \|     :call Open("J", "buffer", "new")<cr>
-snoremap ,J :call SetMode(",J", "S") \|     :call Open("J", "buffer", "new")<cr>
-onoremap ,J :call SetMode(",J", "O") \|     :call Open("J", "buffer", "new")<cr>
-lnoremap ,J :call SetMode(",J", "L") \|     :call Open("J", "buffer", "new")<cr>
 nnoremap ,K :call SetMode(",K", "Normal") \|     :call Open("K", "buffer", "new")<cr>
 vnoremap ,K :call SetMode(",K", "Visual") \|     :call Open("K", "buffer", "new")<cr>
-cnoremap ,K :call SetMode(",K", "Command") \|     :call Open("K", "buffer", "new")<cr>
 tnoremap ,K <C-\><C-n>:call SetMode(",K", "Terminal") \|     :call Open("K", "buffer", "new")<cr>
 inoremap ,K :call SetMode(",K", "Insert") \|     :call Open("K", "buffer", "new")<cr>
-xnoremap ,K :call SetMode(",K", "X") \|     :call Open("K", "buffer", "new")<cr>
-snoremap ,K :call SetMode(",K", "S") \|     :call Open("K", "buffer", "new")<cr>
-onoremap ,K :call SetMode(",K", "O") \|     :call Open("K", "buffer", "new")<cr>
-lnoremap ,K :call SetMode(",K", "L") \|     :call Open("K", "buffer", "new")<cr>
 nnoremap ,L :call SetMode(",L", "Normal") \|     :call Open("L", "buffer", "new")<cr>
 vnoremap ,L :call SetMode(",L", "Visual") \|     :call Open("L", "buffer", "new")<cr>
-cnoremap ,L :call SetMode(",L", "Command") \|     :call Open("L", "buffer", "new")<cr>
 tnoremap ,L <C-\><C-n>:call SetMode(",L", "Terminal") \|     :call Open("L", "buffer", "new")<cr>
 inoremap ,L :call SetMode(",L", "Insert") \|     :call Open("L", "buffer", "new")<cr>
-xnoremap ,L :call SetMode(",L", "X") \|     :call Open("L", "buffer", "new")<cr>
-snoremap ,L :call SetMode(",L", "S") \|     :call Open("L", "buffer", "new")<cr>
-onoremap ,L :call SetMode(",L", "O") \|     :call Open("L", "buffer", "new")<cr>
-lnoremap ,L :call SetMode(",L", "L") \|     :call Open("L", "buffer", "new")<cr>
 nnoremap ,,h :call SetMode(",,h", "Normal") \|     :call Open("h", "terminal", "new")<cr>
 vnoremap ,,h :call SetMode(",,h", "Visual") \|     :call Open("h", "terminal", "new")<cr>
-cnoremap ,,h :call SetMode(",,h", "Command") \|     :call Open("h", "terminal", "new")<cr>
 tnoremap ,,h <C-\><C-n>:call SetMode(",,h", "Terminal") \|     :call Open("h", "terminal", "new")<cr>
 inoremap ,,h :call SetMode(",,h", "Insert") \|     :call Open("h", "terminal", "new")<cr>
-xnoremap ,,h :call SetMode(",,h", "X") \|     :call Open("h", "terminal", "new")<cr>
-snoremap ,,h :call SetMode(",,h", "S") \|     :call Open("h", "terminal", "new")<cr>
-onoremap ,,h :call SetMode(",,h", "O") \|     :call Open("h", "terminal", "new")<cr>
-lnoremap ,,h :call SetMode(",,h", "L") \|     :call Open("h", "terminal", "new")<cr>
 nnoremap ,,j :call SetMode(",,j", "Normal") \|     :call Open("j", "terminal", "new")<cr>
 vnoremap ,,j :call SetMode(",,j", "Visual") \|     :call Open("j", "terminal", "new")<cr>
-cnoremap ,,j :call SetMode(",,j", "Command") \|     :call Open("j", "terminal", "new")<cr>
 tnoremap ,,j <C-\><C-n>:call SetMode(",,j", "Terminal") \|     :call Open("j", "terminal", "new")<cr>
 inoremap ,,j :call SetMode(",,j", "Insert") \|     :call Open("j", "terminal", "new")<cr>
-xnoremap ,,j :call SetMode(",,j", "X") \|     :call Open("j", "terminal", "new")<cr>
-snoremap ,,j :call SetMode(",,j", "S") \|     :call Open("j", "terminal", "new")<cr>
-onoremap ,,j :call SetMode(",,j", "O") \|     :call Open("j", "terminal", "new")<cr>
-lnoremap ,,j :call SetMode(",,j", "L") \|     :call Open("j", "terminal", "new")<cr>
 nnoremap ,,k :call SetMode(",,k", "Normal") \|     :call Open("k", "terminal", "new")<cr>
 vnoremap ,,k :call SetMode(",,k", "Visual") \|     :call Open("k", "terminal", "new")<cr>
-cnoremap ,,k :call SetMode(",,k", "Command") \|     :call Open("k", "terminal", "new")<cr>
 tnoremap ,,k <C-\><C-n>:call SetMode(",,k", "Terminal") \|     :call Open("k", "terminal", "new")<cr>
 inoremap ,,k :call SetMode(",,k", "Insert") \|     :call Open("k", "terminal", "new")<cr>
-xnoremap ,,k :call SetMode(",,k", "X") \|     :call Open("k", "terminal", "new")<cr>
-snoremap ,,k :call SetMode(",,k", "S") \|     :call Open("k", "terminal", "new")<cr>
-onoremap ,,k :call SetMode(",,k", "O") \|     :call Open("k", "terminal", "new")<cr>
-lnoremap ,,k :call SetMode(",,k", "L") \|     :call Open("k", "terminal", "new")<cr>
 nnoremap ,,l :call SetMode(",,l", "Normal") \|     :call Open("l", "terminal", "new")<cr>
 vnoremap ,,l :call SetMode(",,l", "Visual") \|     :call Open("l", "terminal", "new")<cr>
-cnoremap ,,l :call SetMode(",,l", "Command") \|     :call Open("l", "terminal", "new")<cr>
 tnoremap ,,l <C-\><C-n>:call SetMode(",,l", "Terminal") \|     :call Open("l", "terminal", "new")<cr>
 inoremap ,,l :call SetMode(",,l", "Insert") \|     :call Open("l", "terminal", "new")<cr>
-xnoremap ,,l :call SetMode(",,l", "X") \|     :call Open("l", "terminal", "new")<cr>
-snoremap ,,l :call SetMode(",,l", "S") \|     :call Open("l", "terminal", "new")<cr>
-onoremap ,,l :call SetMode(",,l", "O") \|     :call Open("l", "terminal", "new")<cr>
-lnoremap ,,l :call SetMode(",,l", "L") \|     :call Open("l", "terminal", "new")<cr>
 nnoremap ,,H :call SetMode(",,H", "Normal") \|     :call Open("H", "terminal", "new")<cr>
 vnoremap ,,H :call SetMode(",,H", "Visual") \|     :call Open("H", "terminal", "new")<cr>
-cnoremap ,,H :call SetMode(",,H", "Command") \|     :call Open("H", "terminal", "new")<cr>
 tnoremap ,,H <C-\><C-n>:call SetMode(",,H", "Terminal") \|     :call Open("H", "terminal", "new")<cr>
 inoremap ,,H :call SetMode(",,H", "Insert") \|     :call Open("H", "terminal", "new")<cr>
-xnoremap ,,H :call SetMode(",,H", "X") \|     :call Open("H", "terminal", "new")<cr>
-snoremap ,,H :call SetMode(",,H", "S") \|     :call Open("H", "terminal", "new")<cr>
-onoremap ,,H :call SetMode(",,H", "O") \|     :call Open("H", "terminal", "new")<cr>
-lnoremap ,,H :call SetMode(",,H", "L") \|     :call Open("H", "terminal", "new")<cr>
 nnoremap ,,J :call SetMode(",,J", "Normal") \|     :call Open("J", "terminal", "new")<cr>
 vnoremap ,,J :call SetMode(",,J", "Visual") \|     :call Open("J", "terminal", "new")<cr>
-cnoremap ,,J :call SetMode(",,J", "Command") \|     :call Open("J", "terminal", "new")<cr>
 tnoremap ,,J <C-\><C-n>:call SetMode(",,J", "Terminal") \|     :call Open("J", "terminal", "new")<cr>
 inoremap ,,J :call SetMode(",,J", "Insert") \|     :call Open("J", "terminal", "new")<cr>
-xnoremap ,,J :call SetMode(",,J", "X") \|     :call Open("J", "terminal", "new")<cr>
-snoremap ,,J :call SetMode(",,J", "S") \|     :call Open("J", "terminal", "new")<cr>
-onoremap ,,J :call SetMode(",,J", "O") \|     :call Open("J", "terminal", "new")<cr>
-lnoremap ,,J :call SetMode(",,J", "L") \|     :call Open("J", "terminal", "new")<cr>
 nnoremap ,,K :call SetMode(",,K", "Normal") \|     :call Open("K", "terminal", "new")<cr>
 vnoremap ,,K :call SetMode(",,K", "Visual") \|     :call Open("K", "terminal", "new")<cr>
-cnoremap ,,K :call SetMode(",,K", "Command") \|     :call Open("K", "terminal", "new")<cr>
 tnoremap ,,K <C-\><C-n>:call SetMode(",,K", "Terminal") \|     :call Open("K", "terminal", "new")<cr>
 inoremap ,,K :call SetMode(",,K", "Insert") \|     :call Open("K", "terminal", "new")<cr>
-xnoremap ,,K :call SetMode(",,K", "X") \|     :call Open("K", "terminal", "new")<cr>
-snoremap ,,K :call SetMode(",,K", "S") \|     :call Open("K", "terminal", "new")<cr>
-onoremap ,,K :call SetMode(",,K", "O") \|     :call Open("K", "terminal", "new")<cr>
-lnoremap ,,K :call SetMode(",,K", "L") \|     :call Open("K", "terminal", "new")<cr>
 nnoremap ,,L :call SetMode(",,L", "Normal") \|     :call Open("L", "terminal", "new")<cr>
 vnoremap ,,L :call SetMode(",,L", "Visual") \|     :call Open("L", "terminal", "new")<cr>
-cnoremap ,,L :call SetMode(",,L", "Command") \|     :call Open("L", "terminal", "new")<cr>
 tnoremap ,,L <C-\><C-n>:call SetMode(",,L", "Terminal") \|     :call Open("L", "terminal", "new")<cr>
 inoremap ,,L :call SetMode(",,L", "Insert") \|     :call Open("L", "terminal", "new")<cr>
-xnoremap ,,L :call SetMode(",,L", "X") \|     :call Open("L", "terminal", "new")<cr>
-snoremap ,,L :call SetMode(",,L", "S") \|     :call Open("L", "terminal", "new")<cr>
-onoremap ,,L :call SetMode(",,L", "O") \|     :call Open("L", "terminal", "new")<cr>
-lnoremap ,,L :call SetMode(",,L", "L") \|     :call Open("L", "terminal", "new")<cr>
 nnoremap <A-H> :call SetMode("\<A-H\>", "Normal") \|     :call Open("H", "buffer", "new")<cr>
 vnoremap <A-H> :call SetMode("\<A-H\>", "Visual") \|     :call Open("H", "buffer", "new")<cr>
 cnoremap <A-H> :call SetMode("\<A-H\>", "Command") \|     :call Open("H", "buffer", "new")<cr>
