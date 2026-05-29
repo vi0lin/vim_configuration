@@ -21,6 +21,10 @@ NewCommand command! -range -nargs=+ Debug call Debug(<f-args>)
 " todo add silent
 NewMap -n -no <C-S-o> :call JumpToNextFile(-1)<cr>
 NewMap -n -no <C-S-i> :call JumpToNextFile(1)<cr>
+
+nmap <C-S-z> 
+tmap <C-S-z> <C-\><C-n>
+NewMap -t -n -no <C-z> :hide<cr>
 " unmap <silent> ,<C-O>
 " unmap <silent> ,<C-I>
 
@@ -311,7 +315,8 @@ NewMap -no -a <A-Right>      :call Open("L", "buffer", "new")<cr>
 " Amap <A-<C-S-l>> :call Open("L", "buffer", "copy")<cr>
 
 " NewMap -no -a ,q :q!<cr>
-NewMap -no -a <C-q> :hide<cr>
+" NewMap -no -a <C-q> :hide<cr>
+NewMap -no -a <C-q> :bd!<cr>
 NewMap -no -a <C-S-q> :bd!<cr>
 NewMap -no -a <C-S-q> :q!<cr>
 NewMap -no -a <C-A-q> :qa!<cr>

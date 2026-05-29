@@ -24,6 +24,9 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! BufEnter * :call BufEnter()
   autocmd! BufEnter * :call Statusline()
   autocmd! WinResized	* :call Statusline()
+  " autocmd! FileType fzf tnoremap <Esc> <C-c>
+  " autocmd! FileType fzf autocmd BufLeave <buffer> bdelete!
+  " autocmd! TermClose term://*fzf* execute 'bdelete! '.expand('<abuf>')
 
   " [!IMPORTANT]
   " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders

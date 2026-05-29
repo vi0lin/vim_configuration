@@ -1,5 +1,7 @@
 Nnoremap <C-S-o> :call JumpToNextFile(-1)<cr>
 Nnoremap <C-S-i> :call JumpToNextFile(1)<cr>
+Nnoremap <C-z> :hide<cr>
+Tnoremap <C-z> :hide<cr>
 Nnoremap ,,f :call FavoriteFile()<cr>
 Nnoremap ,,f :call FavoriteFile()<cr>
 Nnoremap ,,p :call FavoritePath()<cr>
@@ -151,7 +153,7 @@ Anoremap <A-Left>       :call Open("H", "buffer", "new")<cr>
 Anoremap <A-Down>       :call Open("J", "buffer", "new")<cr>
 Anoremap <A-Up>         :call Open("K", "buffer", "new")<cr>
 Anoremap <A-Right>      :call Open("L", "buffer", "new")<cr>
-Anoremap <C-q> :hide<cr>
+Anoremap <C-q> :bd!<cr>
 Anoremap <C-S-q> :bd!<cr>
 Anoremap <C-S-q> :q!<cr>
 Anoremap <C-A-q> :qa!<cr>
