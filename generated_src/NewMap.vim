@@ -16,10 +16,10 @@ vnoremap <F5> :call SetMode("\<F5\>", "Visual") \| :call VSRewriteCommand("h")<c
 vnoremap <F6> :call SetMode("\<F6\>", "Visual") \| :call VSRewriteCommand("j")<cr>
 vnoremap <F7> :call SetMode("\<F7\>", "Visual") \| :call VSRewriteCommand("k")<cr>
 vnoremap <F8> :call SetMode("\<F8\>", "Visual") \| :call VSRewriteCommand("l")<cr>
-inoremap <F5> :call SetMode("\<F5\>", "Insert") \| <C-o>:call SavedCommandToTerm("h")<cr>
-inoremap <F6> :call SetMode("\<F6\>", "Insert") \| <C-o>:call SavedCommandToTerm("j")<cr>
-inoremap <F7> :call SetMode("\<F7\>", "Insert") \| <C-o>:call SavedCommandToTerm("k")<cr>
-inoremap <F8> :call SetMode("\<F8\>", "Insert") \| <C-o>:call SavedCommandToTerm("l")<cr>
+inoremap <F5> :call SetMode("\<F5\>", "Insert") \| :call SavedCommandToTerm("h")<cr>
+inoremap <F6> :call SetMode("\<F6\>", "Insert") \| :call SavedCommandToTerm("j")<cr>
+inoremap <F7> :call SetMode("\<F7\>", "Insert") \| :call SavedCommandToTerm("k")<cr>
+inoremap <F8> :call SetMode("\<F8\>", "Insert") \| :call SavedCommandToTerm("l")<cr>
 nnoremap <F5> :call SetMode("\<F5\>", "Normal") \| :call SavedCommandToTerm("h")<cr>
 cnoremap <F5> :call SetMode("\<F5\>", "Command") \| :call SavedCommandToTerm("h")<cr>
 nnoremap <F6> :call SetMode("\<F6\>", "Normal") \| :call SavedCommandToTerm("j")<cr>

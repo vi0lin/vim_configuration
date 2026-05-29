@@ -1,6 +1,8 @@
 " Todo - Unify noremap and map commands
 if !exists("g:vim_advantages_got_sourced")
 
+" visual :<C-u>
+" insert :<C-o>
 function! _map(opts) range
   let map=[]
   let opts=a:opts
@@ -380,11 +382,11 @@ function! Generate()
     unlet g:vim_advantages_got_sourced
   endif
   exec 'source '.g:vim_configuration_src.'/Map.vim'
-  call Write(g:newmap_buildfile, g:generated_src..'/NewMap.vim')
-  call Write(g:newmap_buildfile_dicts, g:generated_src..'/NewMap.vim', 'a')
+  call Write(g:newmap_buildfile, g:generated_src..'/Generate.vim')
+  call Write(g:newmap_buildfile_dicts, g:generated_src..'/Generate.vim', 'a')
   let g:newmap_buildfile=[]
   let g:newmap_buildfile_dicts=[]
-  exec 'source '.g:generated_src.'/NewMap.vim'
+  exec 'source '.g:generated_src.'/Generate.vim'
   echo "Done"
 endfunction
 command! -range -nargs=0 Generate call Generate()

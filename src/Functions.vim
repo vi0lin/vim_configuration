@@ -2619,8 +2619,8 @@ let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
 let mapleader=","
 exec 'source '.g:vim_configuration_src.'/Commands.vim'
 exec 'source '.g:vim_configuration_src.'/Utilize.vim'
-exec 'source '.g:vim_configuration_src.'/NewMap.vim'
-exec 'source '.g:generated_src.'/NewMap.vim'
+exec 'source '.g:vim_configuration_src.'/Generate.vim'
+exec 'source '.g:generated_src.'/Generate.vim'
 " let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
 function! SourceIfFileExists(file)
   if filereadable(a:file)
@@ -5377,7 +5377,7 @@ function! DirectionMapSmart(direction) range
         elseif pos=='lt'
           let b:MapCommands['lt']={ 'term': -1, 'dir': dir }
         endif
-        echo Format(b:MapCommands)
+        " echo Format(b:MapCommands)
       endfor
     endif
     " echo "\r" | redraw!

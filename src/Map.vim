@@ -100,10 +100,10 @@ NewMap -v -no <F5> :call VSRewriteCommand("h")<cr>
 NewMap -v -no <F6> :call VSRewriteCommand("j")<cr>
 NewMap -v -no <F7> :call VSRewriteCommand("k")<cr>
 NewMap -v -no <F8> :call VSRewriteCommand("l")<cr>
-NewMap -i -no <F5> <C-o>:call SavedCommandToTerm("h")<cr>
-NewMap -i -no <F6> <C-o>:call SavedCommandToTerm("j")<cr>
-NewMap -i -no <F7> <C-o>:call SavedCommandToTerm("k")<cr>
-NewMap -i -no <F8> <C-o>:call SavedCommandToTerm("l")<cr>
+NewMap -i -no <F5> :call SavedCommandToTerm("h")<cr>
+NewMap -i -no <F6> :call SavedCommandToTerm("j")<cr>
+NewMap -i -no <F7> :call SavedCommandToTerm("k")<cr>
+NewMap -i -no <F8> :call SavedCommandToTerm("l")<cr>
 NewMap -c -n -no <F5> :call SavedCommandToTerm("h")<cr>
 NewMap -c -n -no <F6> :call SavedCommandToTerm("j")<cr>
 NewMap -c -n -no <F7> :call SavedCommandToTerm("k")<cr>
