@@ -583,6 +583,7 @@ function GetOpts(args_str, structure, delimeter='--')
     "   " HERE
     " endfor
     call Debug(opts, 1,10,"opts: "..string(opts))
+    " let opts.joined=join(opts.default, ' ')
     return opts
   endfunction
   " call Debug(opts, 1, 0, "TEST" s:lookup_matrix)

@@ -250,6 +250,7 @@ NewMap -v -no . :<Up><cr>
 NewMap -no -a ,h     :call Open("h", "buffer", "new")<cr>
 NewMap -no -a ,j     :call Open("j", "buffer", "new")<cr>
 NewMap -no -a ,k     :call Open("k", "buffer", "new")<cr>
+NewMap -no -a ,h     :call Open("h", "buffer", "new")<cr>
 NewMap -no -a ,l     :call Open("l", "buffer", "new")<cr>
 NewMap -no -a ,H     :call Open("H", "buffer", "new")<cr>
 NewMap -no -a ,J     :call Open("J", "buffer", "new")<cr>
@@ -393,24 +394,24 @@ NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
 NewMap -no -n ,. @q
 " map ,s :call NvimStudioSubstitution("selection")<cr>
 " map ,S :call NvimStudioSubstitution("file")<cr>
-NewMap -n -v -im -no <C-h> :call SmartWincmd('h')<cr>
-NewMap -n -v -im -no <C-j> :call SmartWincmd('j')<cr>
-NewMap -n -v -im -no <C-k> :call SmartWincmd('k')<cr>
-NewMap -n -v -im -no <C-l> :call SmartWincmd('l')<cr>
-NewMap -t -im -no <C-l> l
-NewMap -t -im -no <C-h> h
-NewMap -t -im -no <C-k> k
-NewMap -t -im -no <C-j> j
+NewMap -a -un -no <C-h> :call SmartWincmd('h')<cr>
+NewMap -a -un -no <C-j> :call SmartWincmd('j')<cr>
+NewMap -a -un -no <C-k> :call SmartWincmd('k')<cr>
+NewMap -a -un -no <C-l> :call SmartWincmd('l')<cr>
+NewMap -t -un -no <C-l> l
+NewMap -t -un -no <C-h> h
+NewMap -t -un -no <C-k> k
+NewMap -t -un -no <C-j> j
 
 " Unnessecary
-" NewMap -t -im <C-l> <C-w>l
-" NewMap -t -im <C-h> <C-w>h
-" NewMap -t -im <C-k> <C-w>k
-" NewMap -t -im <C-j> <C-w>j
-"" works NewMap -t -im -no <C-l> l<cr>
-"" works NewMap -t -im -no <C-h> h<cr>
-"" works NewMap -t -im -no <C-k> k<cr>
-"" works NewMap -t -im -no <C-j> j<cr>
+" NewMap -t -un <C-l> <C-w>l
+" NewMap -t -un <C-h> <C-w>h
+" NewMap -t -un <C-k> <C-w>k
+" NewMap -t -un <C-j> <C-w>j
+"" works NewMap -t -un -no <C-l> l<cr>
+"" works NewMap -t -un -no <C-h> h<cr>
+"" works NewMap -t -un -no <C-k> k<cr>
+"" works NewMap -t -un -no <C-j> j<cr>
 
 NewMap -no -v <BS> :call backspace()<cr>
 NewMap -no -v & :&<cr>
@@ -762,8 +763,8 @@ NewMap -n -no <A-j> :m+1<cr>
 NewMap -v -no <A-k> :m '<-2<cr>gv=gv
 NewMap -v -no <A-j> :m '>+1<cr>gv=gv
 
-NewMap -no < <<
-NewMap -no > >>
+NewMap -un -no < <<
+NewMap -un -no > >>
 NewMap -v -no < <gv
 NewMap -v -no > >gv
 

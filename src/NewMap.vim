@@ -1,3 +1,102 @@
+" Todo - Unify noremap and map commands
+if !exists("g:vim_advantages_got_sourced")
+
+function! _map(opts) range
+  let map=[]
+  let opts=a:opts
+  let key=opts.key
+  if opts.all
+    let opts.normal=1
+    let opts.visual=1
+    let opts.command=1
+    let opts.insert=1
+    let opts.terminal=1
+    let opts.x=1
+    let opts.s=1
+    let opts.o=1
+    let opts.l=1
+  endif
+  if opts.silent | let silent="<silent>" | else | let silent="" | endif
+  if opts.noremap 
+   let nore="nore" 
+  else
+    let nore="" 
+  endif
+  function! _prefix(mode) closure
+    let prefix=''
+    if !opts.unchanged
+      if a:mode=='normal'
+      elseif a:mode=='visual'
+      elseif a:mode=='command'
+      elseif a:mode=='terminal'
+        let prefix="<C-\\><C-n>"
+      elseif a:mode=='insert'
+      elseif a:mode=='x'
+      elseif a:mode=='s'
+      elseif a:mode=='o'
+      elseif a:mode=='l'
+      endif
+    endif
+    return prefix
+  endfunction
+  function! _setmode(mode) closure
+    if opts.unchanged
+      return ''
+    endif
+    let setmode=prefix..':call SetMode("'.escape(key, "<>").'", "'..a:mode..'") \|'
+    return setmode
+  endfunction
+  function! _build(values) closure
+    call add(map, join(filter(a:values, 'v:val!=""'), ' '))
+  endfunction
+  if opts.normal 
+    let prefix=_prefix('normal')
+    let setmode=_setmode("Normal")
+    call _build([ 'n'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.visual 
+    let prefix=_prefix('visual')
+    let setmode=_setmode("Visual")
+    call _build([ 'v'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.command 
+    let prefix=_prefix('command')
+    let setmode=_setmode("Command")
+    call _build([ 'c'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.terminal 
+    let prefix=_prefix('terminal')
+    let setmode=_setmode("Terminal")
+    call _build([ 't'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.insert 
+    let prefix=_prefix('insert')
+    let setmode=_setmode("Insert")
+    call _build([ 'i'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.x
+    let prefix=_prefix('x')
+    let setmode=_setmode("X")
+    call _build([ 'x'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.s
+    let prefix=_prefix('s')
+    let setmode=_setmode("S")
+    call _build([ 's'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.o
+    let prefix=_prefix('o')
+    let setmode=_setmode("O")
+    call _build([ 'o'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  if opts.l
+    let prefix=_prefix('l')
+    let setmode=_setmode("L")
+    call _build([ 'l'..nore..'map', silent, key, setmode, opts.default ])
+  endif
+  return map
+endfunction
+
 function! NewMapKeyCheckAll(...)
   for n in s:newmaps
     echo GetOpts(n.args, g:newmap_optschema)
@@ -80,6 +179,11 @@ function! NewMapBuildFile(...)
   call add(g:newmap_buildfile, join(parts, ' '))
 endfunction
 command! -nargs=* NewMapBuildFile :call NewMapBuildFile(<f-args>)
+function! NewMapBuildFile2(...)
+  let parts=filter(copy(a:000), 'v:val!=""')
+  call add(g:newmap_buildfile, join(parts, ' '))
+endfunction
+command! -nargs=* NewMapBuildFile :call NewMapBuildFile(<f-args>)
 let s:newmaps=[]
 let g:newmap_optschema = [
   \ [ 'all', 'A|a|all|All', 0],
@@ -100,8 +204,7 @@ let g:newmap_optschema = [
   \ [ 'leaders', 'leaders', 1],
   \ [ 'key', 'k|key', 1],
   \ [ 'vs', 'vs', 1],
-  \ [ 'insertmode', 'im|insertmode', 0],
-  \ [ 'insertmode2', 'im2|insertmode2', 0],
+  \ [ 'unchanged', 'un|unchanged', 0],
   \ ]
 
 function! NewMap(args)
@@ -113,6 +216,10 @@ function! NewMap(args)
   " endtry
   " echo len(s:newmaps)
   let opts=GetOpts(a:args, g:newmap_optschema)
+  if opts.key==''
+    let opts.key=split(opts.default, ' ')[0]
+    let opts.default=join(split(opts.default, ' ')[1:], ' ')
+  endif
   " call Debug(3, opts)
   " echo opts
   " return
@@ -158,58 +265,62 @@ function! NewMap(args)
     let opts.o=1
     let opts.l=1
   endif
-  let command=join(filter([opts.key, opts.default], 'v:val!=""'), ' ')
+  " let command=join(filter([opts.default], 'v:val!=""'), ' ')
   " temporarily
-  if opts.all
-    call NewMapBuildFile("A"..noremap.."map", silent, command)
-  else
-    if opts.normal
-      " call NewMapBuildFile("n"..noremap.."map", silent, command)
-      " call NewMapBuildFile("n"..noremap.."map", silent, command)
-      " call NewMapBuildFile(noremap.."map", silent, command)
-      call NewMapBuildFile("N"..noremap.."map", silent, command)
-    endif
-    if opts.visual
-      " call NewMapBuildFile("v"..noremap.."map", silent, command)
-      call NewMapBuildFile("V"..noremap.."map", silent, command)
-    endif
-    if opts.command
-      " call NewMapBuildFile("c"..noremap.."map", silent, command)
-      call NewMapBuildFile("C"..noremap.."map", silent, command)
-    endif
-    if opts.insert
-      call NewMapBuildFile("I"..noremap.."map", silent, command)
-    endif
-    " Idea To Fix Open Leaving Insertmode
-    " if opts.terminal && opts.insertmode2
-    "   call NewMapBuildFile("T"..noremap.."mapInsertmode2", silent, command)
-    " endif
-    if opts.terminal && opts.insertmode
-      call NewMapBuildFile("T"..noremap.."mapInsertmode", silent, command)
-    elseif opts.terminal
-      " call NewMapBuildFile("t"..noremap.."map", silent, command)
-      call NewMapBuildFile("T"..noremap.."map", silent, command)
-    endif
-    if opts.x
-      " call NewMapBuildFile("x"..noremap.."map", silent, command)
-      call NewMapBuildFile("X"..noremap.."map", silent, command)
-    endif
-    if opts.s
-      " call NewMapBuildFile("s"..noremap.."map", silent, command)
-      call NewMapBuildFile("S"..noremap.."map", silent, command)
-    endif
-    if opts.o
-      " call NewMapBuildFile("o"..noremap.."map", silent, command)
-      call NewMapBuildFile("O"..noremap.."map", silent, command)
-    endif
-    if opts.l
-      " call NewMapBuildFile("l"..noremap.."map", silent, command)
-      call NewMapBuildFile("L"..noremap.."map", silent, command)
-    endif
-    if opts.unmap
-      call NewMapBuildFile("unmap", silent, command)
-    endif
-  endif
+  " echo _map(opts)
+  "
+  call extend(g:newmap_buildfile, _map(opts))
+  " echo g:newmap_buildfile
+  " if opts.all
+  "   call NewMapBuildFile("A"..noremap.."map", silent, command)
+  " else
+  "   if opts.normal
+  "     " call NewMapBuildFile("n"..noremap.."map", silent, command)
+  "     " call NewMapBuildFile("n"..noremap.."map", silent, command)
+  "     " call NewMapBuildFile(noremap.."map", silent, command)
+  "     call NewMapBuildFile("N"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.visual
+  "     " call NewMapBuildFile("v"..noremap.."map", silent, command)
+  "     call NewMapBuildFile("V"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.command
+  "     " call NewMapBuildFile("c"..noremap.."map", silent, command)
+  "     call NewMapBuildFile("C"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.insert
+  "     call NewMapBuildFile("I"..noremap.."map", silent, command)
+  "   endif
+  "   " Idea To Fix Open Leaving unchanged
+  "   " if opts.terminal && opts.unchanged2
+  "   "   call NewMapBuildFile("T"..noremap.."mapunchanged2", silent, command)
+  "   " endif
+  "   if opts.terminal && opts.unchanged
+  "     call NewMapBuildFile("T"..noremap.."mapunchanged", silent, command)
+  "   elseif opts.terminal
+  "     " call NewMapBuildFile("t"..noremap.."map", silent, command)
+  "     call NewMapBuildFile("T"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.x
+  "     " call NewMapBuildFile("x"..noremap.."map", silent, command)
+  "     call NewMapBuildFile("X"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.s
+  "     " call NewMapBuildFile("s"..noremap.."map", silent, command)
+  "     call NewMapBuildFile("S"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.o
+  "     " call NewMapBuildFile("o"..noremap.."map", silent, command)
+  "     call NewMapBuildFile("O"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.l
+  "     " call NewMapBuildFile("l"..noremap.."map", silent, command)
+  "     call NewMapBuildFile("L"..noremap.."map", silent, command)
+  "   endif
+  "   if opts.unmap
+  "     call NewMapBuildFile("unmap", silent, command)
+  "   endif
+  " endif
     " let opts=GetOpts(n.args, g:newmap_optschema)
     " echo opts.map opts.silent n.args[0] opts.command
     " let map=""
@@ -251,7 +362,6 @@ endfunction
 command! -range -nargs=+ NewMap call NewMap(<q-args>)
 command! -range -nargs=+ NewMapKeycheck call NewMapKeycheck(<q-args>)
 
-
 function! GenerateWeak()
   if exists('g:vim_advantages_got_sources')
     unlet g:vim_advantages_got_sourced
@@ -278,3 +388,5 @@ function! Generate()
   echo "Done"
 endfunction
 command! -range -nargs=0 Generate call Generate()
+
+endif
