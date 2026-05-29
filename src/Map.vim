@@ -250,7 +250,6 @@ NewMap -v -no . :<Up><cr>
 NewMap -no -a ,h     :call Open("h", "buffer", "new")<cr>
 NewMap -no -a ,j     :call Open("j", "buffer", "new")<cr>
 NewMap -no -a ,k     :call Open("k", "buffer", "new")<cr>
-NewMap -no -a ,h     :call Open("h", "buffer", "new")<cr>
 NewMap -no -a ,l     :call Open("l", "buffer", "new")<cr>
 NewMap -no -a ,H     :call Open("H", "buffer", "new")<cr>
 NewMap -no -a ,J     :call Open("J", "buffer", "new")<cr>
