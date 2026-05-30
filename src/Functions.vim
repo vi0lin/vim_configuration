@@ -2622,7 +2622,6 @@ let g:vim_configuration=runtimepath..'/plugged/vim_configuration/'
 let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
 let mapleader=","
 exec 'source '.g:vim_configuration_src.'/Commands.vim'
-exec 'source '.g:vim_configuration_src.'/Utilize.vim'
 exec 'source '.g:vim_configuration_src.'/Generate.vim'
 exec 'source '.g:generated_src.'/Generate.vim'
 " let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
@@ -2687,7 +2686,6 @@ if !exists("g:modechanged") | let modechanged="Normal" | endif
 let exec_types=[ "Default", "Vim", "Bash", "Python", "Rust" ]
 
 exec 'source '.g:vim_configuration_src.'/Statusline.vim'
-" exec 'source '.g:vim_configuration_src.'/Utilize.vim'
 exec 'source '.g:vim_configuration_src.'/TextActions.vim'
 exec 'source '.g:vim_configuration_src.'/Autocommands.vim'
 syntax on
@@ -3879,12 +3877,48 @@ endfunction
 
 function Projects()
   call GetSystemsGitProjects()
-  " call Popup_FileStdin("Projects", 'window', g:systems_git_projects, g:unreleased..'/.gitprojects')
-  let file=Popup_Stdin("Projects", 'window', g:systems_git_projects)
+  let outfile="/tmp/outfile_fzf"
+  function! OpenFile_callback(file)
+    let path=GetTempfileLine(a:file)
+    if path=='0' || path==0
+      if filereadable(path)
+        call _openfile_andCD(path)
+      elseif isdirectory(path)
+        call _openfile_andCD(path)
+      endif
+    else
+      call _openfile_andCD(path)
+    endif
+    call _cleanCallback(a:file)
+  endfunction
+  let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(outfile)})}
+  let file=Popup("Projects", 'window', g:systems_git_projects, Cb, outfile)
 endfunction
 
-function! Popup_Stdin(title, register, list)
+function _cleanCallback(file)
+  if filereadable(a:file)
+    call delete(a:file)
+  endif
+  execute 'bd! '.bufnr('Find')
+  " execute 'bwipeout! '.bufnr('Find')
+endfunction
+
+function Commands()
   let outfile="/tmp/outfile_fzf"
+  function! Execute_callback(file)
+    let command=GetTempfileLine(a:file)
+    if command=='0' || command==0
+      echo "exec" command
+    else
+      echo "Errorhandling"
+    endif
+    call _cleanCallback(a:file)
+  endfunction
+  let Cb={job, status -> timer_start(0, {_ -> Execute_callback(outfile)})}
+  let file=Popup("Projects", 'window', g:commands, Cb, outfile)
+endfunction
+
+function! Popup(title, register, list, callback, outfile)
   let stdin_tmp_file="/tmp/tmp_stdin_file"
   call Write(a:list, stdin_tmp_file)
   " if a:register =~ 'window\|buffer\|tab\|global'
@@ -3907,7 +3941,7 @@ function! Popup_Stdin(title, register, list)
   " call File_Popup(
   "       \ title,
   "       \ list,
-  "       \ function('OpenFile_callback', [outfile]),
+  "       \ function('OpenFile_callback', [a:outfile]),
   "       \ "file",
   "       \)
   " let paths
@@ -3921,7 +3955,7 @@ function! Popup_Stdin(title, register, list)
   endif
   " let cmd=call('BuildList', [ "-maxdepth "..a:maxdepth.." -type "..type,  paths])
   " let cmd="cat | fzf"
-  let cmd=['/bin/bash', '-c', 'fzf -i < '.stdin_tmp_file.' > '..outfile]
+  let cmd=['/bin/bash', '-c', 'fzf -i < '.stdin_tmp_file.' > '..a:outfile]
   let g:FileFinder_result=""
   function! OnStdout(channel, msg)
   endfunction
@@ -3946,7 +3980,7 @@ function! Popup_Stdin(title, register, list)
         \ 'term_finish': 'close',
         \ 'exit_cb': function('s:FzfClose'),
         \ }
-        " \ 'exit_cb': {job, status -> OpenFile_callback(outfile)},
+        " \ 'exit_cb': {job, status -> OpenFile_callback(a:outfile)},
         " \ 'in_io': 'file',
         " \ 'in_name': stdin_tmp_file,
   let tnr=term_start(cmd, opts)
@@ -3974,36 +4008,6 @@ function! Popup_Stdin(title, register, list)
     return 0
   endfunction
   " return
-  " function! OpenFile_callback(id, code, file)
-  function! OpenFile_callback(file, pnr)
-    let path=GetTempfileLine(a:file)
-    if path=='0' || path==0
-      " echo path"exit"
-      if filereadable(path)
-        call _openfile_andCD(path)
-      elseif isdirectory(path)
-        call _openfile_andCD(path)
-      endif
-      " call input(a:pnr..' '..g:tnr)
-      " call popup_close(a:pnr)
-      " call popup_close(a:pnr)
-      " call popup_clear(a:pnr)
-      " exec "bd " .. g:tnr
-      execute 'bd! '.bufnr('Find')
-      " execute 'bwipeout! '.bufnr('Find')
-      return
-    else
-      call _openfile_andCD(path)
-    endif
-    if filereadable(a:file)
-      call delete(a:file)
-    endif
-    " call input(a:pnr..' '..g:tnr)
-    " call popup_close(a:pnr)
-    " exec "bd "..g:tnr
-    execute 'bd! '.bufnr('Find')
-    " execute 'bwipeout! '.bufnr('Find')
-  endfunction
   try
   let g:pnr=popup_create(tnr, #{
     \ title: title,
@@ -4017,137 +4021,10 @@ function! Popup_Stdin(title, register, list)
     \ term_cols: 40,
     \ cursorline: 1,
     \ zindex: 200,
-    \ callback: {job, status -> timer_start(0, {_ -> OpenFile_callback(outfile, g:pnr)})},
+    \ callback: a:callback,
     \ })
-    " \ callback: function('OpenFile_callback', [outfile]),
-    " \ callback: function('OpenFile_callback', [outfile]),
-  catch
-  finally
-  endtry
-endfunction
-
-function! Popup_FileStdin(title, register, list, file)
-  let outfile="/tmp/outfile_fzf"
-  if a:register =~ 'window\|buffer\|tab\|global'
-    let title=a:title.." ["..a:register.."]"
-  else
-    let title=a:title
-  endif
-  let list=a:list
-  let type=type(list)
-  if type==1
-    let lists=[list]
-  else
-    let lists=list
-  endif
-  " function! File_Popup(title, paths, callback, type="file", maxdepth=10, register="")
-  " endfunction
-  " call File_Popup(
-  "       \ title,
-  "       \ list,
-  "       \ function('OpenFile_callback', [outfile]),
-  "       \ "file",
-  "       \)
-  " let paths
-  " let title=' '..title..": "..join(paths, ' ')..' '
-  let title=a:title
-  let type='file'
-  if type=="directory"
-    let type="d"
-  else
-    let type="f"
-  endif
-  " let cmd=call('BuildList', [ "-maxdepth "..a:maxdepth.." -type "..type,  paths])
-  " let cmd="cat | fzf"
-  let cmd="fzf -i > "..outfile
-  let g:FileFinder_result=""
-  function! OnStdout(channel, msg)
-  endfunction
-  function! OnError(...)
-    echo "On Error"
-    call popup_close(g:pnr)
-    exec "bd "..g:pnr
-  endfunction
-  function! OnExitTerm(bufname, job, code)
-    echo "On Exit"
-    " call popup_close(g:pnr)
-    " exec "bd "..g:pnr
-  endfunction
-  function! s:FzfClose(job, status) abort
-    execute 'bwipeout! '.bufnr('Find')
-  endfunction
-  let opts={
-        \ 'hidden': 1,
-        \ 'err_cb': 'OnError',
-        \ 'term_name': 'Find',
-        \ 'in_io': 'file',
-        \ 'in_name': a:file,
-        \ 'term_finish': 'close',
-        \ 'exit_cb': function('s:FzfClose'),
-        \ }
-        " \ 'in_io': 'pipe',
-  let tnr=term_start(cmd, opts)
-  let g:tnr=tnr
-  " let stdin = join(list, '\n')
-  " let list=['line1', 'line2', 'line3']
-  " let tnr=term_start(cmd, opts)
-  " let job=term_getjob(tnr)
-  " for l in list
-  "   call job_stdin(job, l."\n")
-  " endfor
-  " call job_stdin(job, '')
-  function! MyFilter(wnid, key)
-    if a:key=='q'
-      call popup_close(a:winid)
-      call OnPopupClose(a:winid, 'User pressed q')
-      return 1
-    endif
-    return 0
-  endfunction
-  try
-  function! OpenFile_callback(file, pnr)
-    let path=GetTempfileLine(a:file)
-    if path=='0' || path==0
-      " echo path"exit"
-      if filereadable(path)
-        call _openfile_andCD(path)
-      elseif isdirectory(path)
-        call _openfile_andCD(path)
-      endif
-      " call input(a:pnr..' '..g:tnr)
-      " call popup_close(a:pnr)
-      " call popup_close(a:pnr)
-      " call popup_clear(a:pnr)
-      " exec "bd " .. g:tnr
-      execute 'bd! '.bufnr('Find')
-      " execute 'bwipeout! '.bufnr('Find')
-      return
-    else
-      call _openfile_andCD(path)
-    endif
-    if filereadable(a:file)
-      call delete(a:file)
-    endif
-    " call input(a:pnr..' '..g:tnr)
-    " call popup_close(a:pnr)
-    " exec "bd "..g:tnr
-    execute 'bd! '.bufnr('Find')
-    " execute 'bwipeout! '.bufnr('Find')
-  endfunction
-  let g:pnr=popup_create(tnr, #{
-    \ title: title,
-    \ pos: 'center',
-    \ minwidth: 80,
-    \ minheight: 20,
-    \ maxheight: 80,
-    \ border: [1, 1, 1, 1],
-    \ borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
-    \ highlight: 'Pmenu',
-    \ term_cols: 40,
-    \ cursorline: 1,
-    \ zindex: 200,
-    \ callback: function('OpenFile_callback', [outfile, g:prn]),
-    \ })
+    " \ callback: function('OpenFile_callback', [a:outfile]),
+    " \ callback: function('OpenFile_callback', [a:outfile]),
   catch
   finally
   endtry
@@ -6727,7 +6604,6 @@ function! Vim(args)
 endfunction
 
 " Customizable FZF Integration
-
 function! BuildString(options, paths, tempfile="")
   let fzf="fzf --multi -i --no-sort --tiebreak=length,begin,index"
   let fzf="fzf --multi -i --tiebreak=begin,length"
@@ -6841,7 +6717,6 @@ function! Execution_Popup(title, list, callback)
 endfunction
 
 function! GetTempfileLine(file)
-  " let tempfile=get(b:, 'popup_tempfile', '')
   let tempfile=a:file
   if !filereadable(tempfile)
     return
@@ -6855,10 +6730,7 @@ function! GetTempfileLine(file)
       return
     endif
     call delete(tempfile)
-    if filereadable(result) || isdirectory(result)
-      return result
-    endif
-    return
+    return result
   endif
   return
 endfunction
@@ -7238,7 +7110,7 @@ endfunction
 "   call _tabnew_if_not_empty_buffer()
 "   " Filename, [hjklHJKLvs], normalcommand
 "     " \ [ "Statusline.vim", "v"],
-"     " \ [ "Utilize.vim", "s"],
+"     " \ [ "Generate.vim", "s"],
 "     " \ [ g:vimrc, "v"],
 "   let layout=[
 "     \ [ g:vim_configuration_src."/Functions.vim", "H"],

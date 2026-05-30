@@ -1,6 +1,11 @@
 " Todo - Unify noremap and map commands
 if !exists("g:vim_advantages_got_sourced")
 
+function! _command(args) range
+  call add(g:commands, a:args)
+endfunction
+command! -range -nargs=+ SCommand call _command(<f-args>)
+
 " visual :<C-u>
 " insert :<C-o>
 function! _map(opts) range
@@ -10,11 +15,13 @@ function! _map(opts) range
   if opts.all >= 1
     let opts.normal=1
     let opts.visual=1
-    let opts.command=1
     let opts.insert=1
     let opts.terminal=1
   endif
   if opts.all >= 2
+    let opts.command=1
+  endif
+  if opts.all >= 3
     let opts.x=1
     let opts.s=1
     let opts.o=1
@@ -37,7 +44,8 @@ function! _map(opts) range
       elseif a:mode=='terminal'
         let prefix="<C-\\><C-n>"
       elseif a:mode=='insert'
-        let prefix="<C-o>"
+        " let prefix="<C-o>"
+        let prefix=""
       elseif a:mode=='x'
       elseif a:mode=='s'
       elseif a:mode=='o'
@@ -108,6 +116,7 @@ let s:newmaps=[]
 let g:newmap_optschema = [
   \ [ 'a', 'A|a', 0],
   \ [ 'aa', 'AA|aa', 0],
+  \ [ 'aaa', 'AAA|aaa', 0],
   \ [ 'all', 'all|All|ALL', 1],
   \ [ 'normal', 'N|n|normal|Normal', 0],
   \ [ 'visual', 'V|v|visual|Visual', 0],

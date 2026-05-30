@@ -408,10 +408,10 @@ NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
 NewMap -no -n ,. @q
 " map ,s :call NvimStudioSubstitution("selection")<cr>
 " map ,S :call NvimStudioSubstitution("file")<cr>
-NewMap -a -un -no <C-h> :call SmartWincmd('h')<cr>
-NewMap -a -un -no <C-j> :call SmartWincmd('j')<cr>
-NewMap -a -un -no <C-k> :call SmartWincmd('k')<cr>
-NewMap -a -un -no <C-l> :call SmartWincmd('l')<cr>
+NewMap -aa -no <C-h> :call SmartWincmd('h')<cr>
+NewMap -aa -no <C-j> :call SmartWincmd('j')<cr>
+NewMap -aa -no <C-k> :call SmartWincmd('k')<cr>
+NewMap -aa -no <C-l> :call SmartWincmd('l')<cr>
 NewMap -t -un -no <C-l> l
 NewMap -t -un -no <C-h> h
 NewMap -t -un -no <C-k> k
@@ -535,7 +535,8 @@ NewMap -no -n <C-s> :SaveFile<cr>
 NewMap -no -v <C-s> :SaveFile<cr>
 " was imap
 " todo add silent
-NewMap -no -i <C-s> :SaveFile<cr>l
+" NewMap -no -i <C-s> :SaveFile<cr>
+NewMap -no -i <C-s> :SaveFile<cr>
 
 NewMap -n -no <localleader>f :InsertFunction<cr>
 NewMap -n -no <space>f :InsertFilename<cr>
@@ -611,12 +612,20 @@ NewMap -no -n ,<C-p>           :call BuildSystemsGitProjects()<cr>
 
 NewMap -no -n <C-S-m>           :Generate<cr>
 
-NewMap -no <C-Space>              :call Files(Folder_Project())<cr>
-NewMap -no <C-S-Space>            :call Files(Folder_Repo())<cr>
-NewMap -no <A-Space>              :call Files(Folder_Repo())<cr>
-NewMap -no <A-S-Space>            :call Files(Folder_Repo(1))<cr>
-NewMap -no <A-C-Space>            :call Files(Folder_Repo(1))<cr>
-NewMap -no <A-S-C-Space>          :call Files('/')<cr>
+" Useful?
+" NewMap -no <C-Space>              :call Files(Folder_Project())<cr>
+" NewMap -no <C-S-Space>            :call Files(Folder_Repo())<cr>
+" NewMap -no <A-Space>              :call Files(Folder_Repo())<cr>
+" NewMap -no <A-S-Space>            :call Files(Folder_Repo(1))<cr>
+" NewMap -no <A-C-Space>            :call Files(Folder_Repo(1))<cr>
+" NewMap -no <A-S-C-Space>          :call Files('/')<cr>
+
+NewMap -no -aa <C-Space>              :call Commands()<cr>
+NewMap -no -aa <C-S-Space>            :call Commands()<cr>
+NewMap -no -aa <A-Space>              :call Commands()<cr>
+NewMap -no -aa <A-S-Space>            :call Commands()<cr>
+NewMap -no -aa <A-C-Space>            :call Commands()<cr>
+NewMap -no -aa <A-S-C-Space>          :call Commands()<cr>
 " noremap <A-S-C-Space>            :call Files(Folder_System())<cr>
 " nnoremap <C-S-Space>          :OpenFileFZFRepo<cr>
 "
@@ -650,17 +659,17 @@ NewMap -n -no ,,,.              :call CommandLineFiles(Folder_Up(v:count, 2))<cr
 NewMap -n -no ,,,,.              :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
 NewMap -n -no ,,,,,.              :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
 " C - \e
-NewMap -c -no <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no -un <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 " C - \e
-NewMap -c -no <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no -un <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 " C - \e
-NewMap -c -no <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no -un <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 " C - \e
-NewMap -c -no <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no -un <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 " C - \e
-NewMap -c -no <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no -un <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 " C - \e
-NewMap -c -no <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+NewMap -c -no -un <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 
 " C - \ C - n
 " cnoremap <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-2], '/')]<cr>
@@ -1047,14 +1056,13 @@ NewMap -no -n ,ab :RECP<cr>
 
 " NewMap -no -n -leaders 0:10 -key {leaders}vg :call VimGrep(v:count)<cr>
 
-NewMap -no -n -key ,m :call VimGrep(v:count)<cr>
-NewMap -no -n ,m :call VimGrep(v:count)<cr>
+NewMap -no -n -key <S-Up> :call VimGrep(v:count)<cr>
 " Further Investigation :Lines
 " Integrate VimGrep
+" Todo - ArrowKeys Set State Command Line VimGrep C-h Moves Folder Up in ../**/*
 NewMap -no -n <M-a> :Lines<cr>
-NewMap -no -n <C-S-a> :call VimGrep(v:count)<cr>
-
-NewMap -no -n <C-S-a> :vimgrep "todo" $folderrepo/**/*<cr>
+NewMap -no -n <S-Down> :call VimGrep(v:count)<cr>
+NewMap -no -n <C-S-Up> :vimgrep "todo" $folderrepo/**/*<cr>
 
 function VimGrep(count) abort
   " :copen<cr>:vimgrep "" **/*[D[D[D[D[D
@@ -1070,10 +1078,14 @@ function VimGrep(count) abort
 endfunction
 
 " NewMap -no -n [1;5A :call VimGrep(v:count)<cr>
-NewMap -no -n [D :cclose<cr>
-NewMap -no -n [C :copen<cr>
-NewMap -no -n [A :cprev<cr>
-NewMap -no -n [B :cnext<cr>
+" NewMap -no -n [D :cclose<cr>
+" NewMap -no -n [C :copen<cr>
+" NewMap -no -n [A :cprev<cr>
+" NewMap -no -n [B :cnext<cr>
+NewMap -no -n <Left> :cclose<cr>
+NewMap -no -n <Right> :copen<cr>
+NewMap -no -n <Up> :cprev<cr>
+NewMap -no -n <Down> :cnext<cr>
 
 " Keymaps
 " Dont -no NewMap this (Its A Fix For Ctrl+i triggering Tab)
@@ -1107,34 +1119,19 @@ nnoremap <C-i> <C-i>
 """ NewMap -no -n ,,<F12> :call ClearUnreachableFavorites()<cr>
 " :call MakeDirCurrentCWD(bufnr())<cr>
 "
-"
-" NewMap -no ,qd :Diff --all<cr>
-" NewMap -no ,,qd :Diff --all --cached<cr>
-" NewMap -no ,qr :PushCWD
-" NewMap -no ,,qr :GithubPush<cr>
-" NewMap -no ,qv :Pull<cr>
-" NewMap -no ,ql :Log<cr>
-" NewMap -no ,qs :Status<cr>
-" NewMap -no ,qa :GitAdd<cr>
-" NewMap -no ,qA :GitAddCWD<cr>
-" NewMap -no ,,qa :GitAddCWD<cr>
-" NewMap -no ,qcc :!git rebase --continue<cr>
-" NewMap -no ,qcs :!git rebase --skip<cr>
-" NewMap -no ,qca :!git rebase --abort<cr>
-" NewMap -no ,qf :GitFetch<cr>
-" NewMap -no ,qu :StashPush<cr>
-" NewMap -no ,qo :StashPop<cr>
+NewMap -no -n <F9> :Pull<cr>
+NewMap -no -n <C-F9> :GitFetch<cr>
 
-NewMap -no -n <F10> :Diff --all<cr>
-NewMap -no -n <S-F10> :Diff --all --cached<cr>
-NewMap -no -n <S-C-F10> :Status<cr>
-NewMap -no -n ,<S-C-F10> :Log<cr>
-NewMap -no -n <F11> :GitAdd<cr>
-NewMap -no -n <S-F11> :GitAddCWD<cr>
-NewMap -no -n <F12> :Pull<cr>
-NewMap -no -n <S-F12> :GitFetch<cr>
-NewMap -no -n <S-C-F12> :PushCWD  
-NewMap -no -n ,<S-C-F12> :DecidePush<cr>
+NewMap -no -n <F10> :Status<cr>
+NewMap -no -n <C-F10> :Diff --all<cr>
+NewMap -no -n <C-S-F10> :Diff --all --cached<cr>
+NewMap -no -n <S-F10> :Log<cr>
+
+NewMap -no -n <C-F11> :GitAdd<cr>
+NewMap -no -n <C-S-F11> :GitAddCWD<cr>
+
+NewMap -no -n <F12> :PushCWD  
+NewMap -no -n <C-F12> :DecidePush<cr>
 NewMap -no -n ,qcc :!git rebase --continue<cr>
 NewMap -no -n ,qcs :!git rebase --skip<cr>
 NewMap -no -n ,qca :!git rebase --abort<cr>
@@ -1179,24 +1176,6 @@ NewCommand command! -range -nargs=* SetRemote call GitSetRemote(<f-args>)
 NewCommand command! -range -nargs=* RenameBranch call GitRenameBranch(<f-args>)
 NewCommand command! -range -nargs=* RemoteAdd call GitRemoteAdd(<f-args>)
 NewCommand command! -range -nargs=* NewBranch call GitNewBranch(<f-args>)
-
-NewMap -no ,qd :Diff --all<cr>
-NewMap -no ,,qd :Diff --all --cached<cr>
-NewMap -no ,qr :PushCWD
-NewMap -no ,,qr :GithubPush<cr>
-NewMap -no ,qv :Pull<cr>
-NewMap -no ,ql :Log<cr>
-NewMap -no ,qs :Status<cr>
-NewMap -no ,qa :GitAdd<cr>
-NewMap -no ,qA :GitAddCWD<cr>
-NewMap -no ,,qa :GitAddCWD<cr>
-NewMap -no ,qcc :!git rebase --continue<cr>
-NewMap -no ,qcs :!git rebase --skip<cr>
-NewMap -no ,qca :!git rebase --abort<cr>
-NewMap -no ,qf :GitFetch<cr>
-NewMap -no ,qu :StashPush<cr>
-NewMap -no ,qo :StashPop<cr>
-
 
 NewMap -t -no -un <C-v> <C-\><C-n>
 "  C - c
