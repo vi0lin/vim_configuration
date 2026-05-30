@@ -31,10 +31,6 @@ if !exists('g:generated_src')
   let g:generated_src=g:vim_configuration_path..'/generated_src'
 endif
 
-if !exists('g:commands')
-  let g:commands=[]
-endif
-
 function! CreateFileAndPathIfNotExists(file)
   let dir = fnamemodify(a:file, ':h')
   if !isdirectory(dir)
@@ -2625,18 +2621,17 @@ let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
 let g:vim_configuration=runtimepath..'/plugged/vim_configuration/'
 let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
 let mapleader=","
-exec 'source '.g:vim_configuration_src.'/Commands.vim'
-exec 'source '.g:vim_configuration_src.'/Generate.vim'
-exec 'source '.g:generated_src.'/Generate.vim'
-" let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
 function! SourceIfFileExists(file)
   if filereadable(a:file)
     exec "source "..a:file
   endif
 endfunction
+exec 'source '.g:vim_configuration_src.'/Commands.vim'
+exec 'source '.g:vim_configuration_src.'/Generate.vim'
+exec 'source '.g:generated_src.'/Generate.vim'
 call SourceIfFileExists(g:vim_configuration.'/src.unreleased/HiddenFunctions.vim')
 call SourceIfFileExists(g:vim_configuration.'/src.unreleased/HiddenFunctions.vim9')
-
+" let unreleased=g:vim_configuration_src.'/Functions.vim.unreleased'
 " General Variables
 if !exists("g:__pattern") | let g:__pattern={} | endif
 if !exists("g:allowChan") | let allowChan=0 | endif
@@ -2650,7 +2645,6 @@ let debugexec=1
 let debugvars=0
 let RunCommandsPrefix="./nvim.studio"
 let lastRunCommand="run.sh"
-let commands=[]
 let old_fkeys=[ "<F1>", "<F2>", "<F3>", "<F4>", "<F5>", "<F6>", "<F7>", "<F8>", "<F9>", "<F10>", "<F11>", "<F12>", "<F13>", "<F14>", "<F15>", "<F16>", "<F17>", "<F18>", "<F19>", "<F20>", "<F21>", "<F22>", "<F23>", "<F24>", "<F25>", "<F26>", "<F27>", "<F28>", "<F29>", "<F30>", "<F31>", "<F32>", "<F33>", "<F34>", "<F35>", "<F36>", "<F37>", "<F38>", "<F39>", "<F40>", "<F41>", "<F42>", "<F43>", "<F44>", "<F45>", "<F46>", "<F47>", "<F48>", "<F49>", "<F50>", "<F51>", "<F52>", "<F53>", "<F54>", "<F55>", "<F56>", "<F57>", "<F58>", "<F59>", "<F60>", "<F61>", "<F62>", "<F63>", "<F64>", "<F65>", "<F66>", "<F67>", "<F68>", "<F69>", "<F70>", "<F71>", "<F72>", ]
 let s:comment_map = {    "c": '\/\/',   "cpp": '\/\/',   "go": '\/\/',   "java": '\/\/',   "javascript": '\/\/',   "lua": '--',   "scala": '\/\/',   "php": '\/\/',   "python": '#',   "ruby": '#',   "rust": '\/\/',   "sh": '#',   "desktop": '#',   "fstab": '#',   "conf": '#',   "profile": '#',   "bashrc": '#',   "bash_profile": '#',   "mail": '>',   "eml": '>',   "bat": 'REM',   "ahk": ';',   "vim": '"',   "tex": '%', }
 let new_fkeys=[ "<F1>", "<F2>", "<F3>", "<F4>", "<F5>", "<F6>", "<F7>", "<F8>", "<F9>", "<F10>", "<F11>", "<F12>", "<S-F1>", "<S-F2>", "<S-F3>", "<S-F4>", "<S-F5>", "<S-F6>", "<S-F7>", "<S-F8>", "<S-F9>", "<S-F10>", "<S-F11>", "<S-F12>", "<C-F1>", "<C-F2>", "<C-F3>", "<C-F4>", "<C-F5>", "<C-F6>", "<C-F7>", "<C-F8>", "<C-F9>", "<C-F10>", "<C-F11>", "<C-F12>", "<C-S-F1>", "<C-S-F2>", "<C-S-F3>", "<C-S-F4>", "<C-S-F5>", "<C-S-F6>", "<C-S-F7>", "<C-S-F8>", "<C-S-F9>", "<C-S-F10>", "<C-S-F11>", "<C-S-F12>", "<M-F1>", "<M-F2>", "<M-F3>", "<M-F4>", "<M-F5>", "<M-F6>", "<M-F7>", "<M-F8>", "<M-F9>", "<M-F10>", "<M-F11>", "<M-F12>", "<M-S-F1>", "<M-S-F2>", "<M-S-F3>", "<M-S-F4>", "<M-S-F5>", "<M-S-F6>", "<M-S-F7>", "<M-S-F8>", "<M-S-F9>", "<M-S-F10>", "<M-S-F11>", "<M-S-F12>", ]
@@ -3912,7 +3906,8 @@ function Commands()
   function! Execute_callback(file)
     let command=GetTempfileLine(a:file)
     if command=='0' || command==0
-      echo "exec" command
+      call TERM(bufnr(), [ command ])
+      norm i
     else
       echo "Errorhandling"
     endif
