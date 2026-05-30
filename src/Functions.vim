@@ -6,6 +6,10 @@
 
 set nomore
 
+function BufLength()
+  return len(filter(range(1, bufnr('$')), 'buflisted(v:val)'))
+endfunction
+
 function CloseFind()
   bufdo | if bufname()=="Find"| bd! | endif
 endfunction
