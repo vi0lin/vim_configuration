@@ -31,7 +31,7 @@ function! _map(opts) range
     if !opts.unchanged
       if a:mode=='normal'
       elseif a:mode=='visual'
-        let prefix="<C-u>"
+        " let prefix="<C-u>"
       elseif a:mode=='command'
         let prefix=""
       elseif a:mode=='terminal'
@@ -64,7 +64,7 @@ function! _map(opts) range
   if opts.visual 
     let prefix=_prefix('visual')
     let setmode=_setmode("Visual")
-    call _build([ 'v'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 'v'..nore..'map', silent, key, setmode, "'<,'>"..opts.default ])
   endif
   if opts.command 
     let prefix=_prefix('command')

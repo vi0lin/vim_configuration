@@ -767,7 +767,8 @@ NewMap -no -n <c-l> :wincmd l<cr>
 " NewMap -n -no dd dd:call ClipboardYank()<cr>
 " NewMap -n -no p :call ClipboardPaste("n")<cr>p
 
-NewMap -v -no p :<C-U>let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
+" C - U
+NewMap -v -no p :let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
 NewMap -no -n <BS> :call backspaceN()<cr>
 " was cmap
 NewMap -no -c <A-'> ä
@@ -989,7 +990,7 @@ NewMap -n -no ,c  :cclose<cr>
 " nnoremap <silent> ,lP :llast<cr>zz
 
 NewMap -no -n -key ,<C-s> :call ExecFunction()<cr>
-NewMap -no -v -n -key ,s :call ExecVS()<cr>
+NewMap -no -v -n ,s :call ExecVS()<cr>
 NewMap -no -n -key ,S :Re \| :%source \| :ReEnd<cr>
 NewMap -no -n -key ,rd :call RedoLeaderS()<cr>
 
@@ -1124,21 +1125,21 @@ nnoremap <C-i> <C-i>
 " NewMap -no ,qu :StashPush<cr>
 " NewMap -no ,qo :StashPop<cr>
 
-NewMap -no <F10> :Diff --all<cr>
-NewMap -no <S-F10> :Diff --all --cached<cr>
-NewMap -no <S-C-F10> :Status<cr>
-NewMap -no ,<S-C-F10> :Log<cr>
-NewMap -no <F11> :GitAdd<cr>
-NewMap -no <S-F11> :GitAddCWD<cr>
-NewMap -no <F12> :Pull<cr>
-NewMap -no <S-F12> :GitFetch<cr>
-NewMap -no <S-C-F12> :PushCWD
-NewMap -no ,<S-C-F12> :DecidePush<cr>
-NewMap -no ,qcc :!git rebase --continue<cr>
-NewMap -no ,qcs :!git rebase --skip<cr>
-NewMap -no ,qca :!git rebase --abort<cr>
-NewMap -no ,<F12> :StashPush<cr>
-NewMap -no ,,<F12> :StashPop<cr>
+NewMap -no -n <F10> :Diff --all<cr>
+NewMap -no -n <S-F10> :Diff --all --cached<cr>
+NewMap -no -n <S-C-F10> :Status<cr>
+NewMap -no -n ,<S-C-F10> :Log<cr>
+NewMap -no -n <F11> :GitAdd<cr>
+NewMap -no -n <S-F11> :GitAddCWD<cr>
+NewMap -no -n <F12> :Pull<cr>
+NewMap -no -n <S-F12> :GitFetch<cr>
+NewMap -no -n <S-C-F12> :PushCWD  
+NewMap -no -n ,<S-C-F12> :DecidePush<cr>
+NewMap -no -n ,qcc :!git rebase --continue<cr>
+NewMap -no -n ,qcs :!git rebase --skip<cr>
+NewMap -no -n ,qca :!git rebase --abort<cr>
+NewMap -no -n ,<F12> :StashPush<cr>
+NewMap -no -n ,,<F12> :StashPop<cr>
 
 
 " map <F2> :echo t:buffers<cr>
