@@ -31,6 +31,10 @@ if !exists('g:generated_src')
   let g:generated_src=g:vim_configuration_path..'/generated_src'
 endif
 
+if !exists('g:commands')
+  let g:commands=[]
+endif
+
 function! CreateFileAndPathIfNotExists(file)
   let dir = fnamemodify(a:file, ':h')
   if !isdirectory(dir)
