@@ -3893,6 +3893,25 @@ function Projects()
   let file=Popup("Projects", 'window', g:systems_git_projects, Cb, outfile)
 endfunction
 
+function OpenFilePopup(list)
+  let outfile="/tmp/outfile_fzf"
+  function! OpenFile_callback(file)
+    let path=GetTempfileLine(a:file)
+    if path=='0' || path==0
+      if filereadable(path)
+        call _openfile_andCD(path)
+      elseif isdirectory(path)
+        call _openfile_andCD(path)
+      endif
+    else
+      call _openfile_andCD(path)
+    endif
+    call _cleanCallback(a:file)
+  endfunction
+  let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(outfile)})}
+  let file=Popup("Projects", 'window', a:list, Cb, outfile)
+endfunction
+
 function _cleanCallback(file)
   if filereadable(a:file)
     call delete(a:file)
@@ -6281,6 +6300,16 @@ function! BufEnter()
 endfunction
 
 function! BufNew()
+  " if &buftype == 'terminal'
+  "   let b:type='terminal'
+  " elseif &buftype == 'buffer'
+  "   let b:type='buffer'
+  " else
+  "   let b:type='buffer'
+  " endif
+endfunction
+
+function! BufAdd()
   " if exists("g:lastmain_repo")
   "   call CD(g:lastmain_repo)
   " endif

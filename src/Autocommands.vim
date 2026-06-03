@@ -14,7 +14,7 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! TabNew * :call TabNew()
   autocmd! WinEnter * :call WinEnter()
   autocmd! WinLeave * :call WinLeave()
-  " autocmd! BufNew * :call BufNew()
+  autocmd! BufNew * :call BufNew()
   " autocmd! BufAdd * :call BufAdd()
   " autocmd! BufEnter * :call BufEnter()
   autocmd! BufDelete * :call BufDelete()
@@ -30,8 +30,8 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
 
   " [!IMPORTANT]
   " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders
-  autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter *
-  autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
+  " autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter *
+  autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
 
   " function! s:ShouldRun() abort
   "   return &filetype !=# 'fzf'
