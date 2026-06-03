@@ -23,6 +23,10 @@ if !exists('g:vim_configuration_path')
   let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
 endif
 
+if !exists('g:favorites')
+  let g:favorites=[]
+endif
+
 if !exists('g:unreleased')
   let g:unreleased=g:vim_configuration_path..'/.unreleased'
 endif
@@ -44,7 +48,18 @@ function! CreateFileAndPathIfNotExists(file)
   return filereadable(a:file)
 endfunction
 
+function OpenUnreleased(file)
+  let file=g:unreleased..'/'..a:file
+  if filereadable(file)
+    exec "e "g:unreleased..'/'..a:file
+  endif
+endfunction
+
 function! GetSystemsServices(file=g:unreleased..'/.services')
+  return Read(a:file)
+endfunction
+
+function! ReadFavorites(file=g:unreleased..'/.favorites')
   return Read(a:file)
 endfunction
 
@@ -83,14 +98,18 @@ endfunction
 function! ClearUnreachableFavorite()
 endfunction
 
+function! SaveFavorites()
+    call Write(g:favorites, g:unreleased..'/.favorites')
+endfunction
+
 function! SetUnsetFavorite()
-  let g:favorites=Read(g:unreleased..'/.favorites')
-  let index=index(g:favorites, expand('%:p:h'))
+  let g:favorites=ReadFavorites()
+  let index=index(g:favorites, expand('%:p'))
   if index>=0
     call remove(g:favorites, index)
     call Write(g:favorites, g:unreleased..'/.favorites')
   else
-    call add(g:favorites, expand('%:p:h'))
+    call add(g:favorites, expand('%:p'))
     call Write(g:favorites, g:unreleased..'/.favorites')
   endif
 endfunction
@@ -3875,41 +3894,33 @@ endfunction
 
 function Projects()
   call GetSystemsGitProjects()
-  let outfile="/tmp/outfile_fzf"
-  function! OpenFile_callback(file)
-    let path=GetTempfileLine(a:file)
-    if path=='0' || path==0
-      if filereadable(path)
-        call _openfile_andCD(path)
-      elseif isdirectory(path)
-        call _openfile_andCD(path)
-      endif
-    else
-      call _openfile_andCD(path)
-    endif
-    call _cleanCallback(a:file)
-  endfunction
-  let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(outfile)})}
-  let file=Popup("Projects", 'window', g:systems_git_projects, Cb, outfile)
+  call OpenFilePopup("Projects", g:systems_git_projects)
 endfunction
 
-function OpenFilePopup(list)
+function FavoritesPopup()
+  let g:favorites=ReadFavorites()
+  call OpenFilePopup("Favorites", g:favorites)
+endfunction
+
+function OpenFilePopup(title, list)
   let outfile="/tmp/outfile_fzf"
   function! OpenFile_callback(file)
     let path=GetTempfileLine(a:file)
-    if path=='0' || path==0
+    if len(path)==0 && (path=='0' || path==0)
+      echo ""
       if filereadable(path)
         call _openfile_andCD(path)
       elseif isdirectory(path)
         call _openfile_andCD(path)
       endif
     else
+      echo path
       call _openfile_andCD(path)
     endif
     call _cleanCallback(a:file)
   endfunction
   let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(outfile)})}
-  let file=Popup("Projects", 'window', a:list, Cb, outfile)
+  let file=Popup(a:title, 'window', a:list, Cb, outfile)
 endfunction
 
 function _cleanCallback(file)
@@ -4508,7 +4519,6 @@ function! Favorite()
         \ "file",
         \)
 endfunction
-
 
 if !exists("g:shortenpath")
   let shortenpath=-1

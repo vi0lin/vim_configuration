@@ -36,10 +36,10 @@ NewMap -t -n -no <C-z> :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
 " NewMap -v -no <C-s> <Nop>
 " unmap <C-s>
 
-NewMap -no -n ,,f :call FavoriteFile()<cr>
-NewMap -no -n ,,f :call FavoriteFile()<cr>
-NewMap -no -n ,,p :call FavoritePath()<cr>
-NewMap -no -n <C-8> :call Favorite()<cr>
+NewMap -no -n ,f :call FavoritesPopup()<cr>
+NewMap -no -n ,,f :call SetUnsetFavorite()<cr>
+" NewMap -no -n <C-8> :call Favorite()<cr>
+NewMap -no -n ,,,f :call OpenUnreleased('.favorites')<cr>
 
 NewMap -n -no ,s :so %<cr>
 " NewMap -no -n <C-Space> :call SelectCommand()<cr>
@@ -984,12 +984,12 @@ NewMap -no -n <C-S-'> 20zl
 
 " ---- quickfix navigation -------------------------------------------
 " todo add silent
-NewMap -n -no ,f  :copen<cr>
-NewMap -n -no <C-Down>   :cnext<cr>zz
-NewMap -n -no <C-Up>     :cprev<cr>zz
-NewMap -n -no ,N  :cfirst<cr>zz
-NewMap -n -no ,P  :clast<cr>zz
-NewMap -n -no ,c  :cclose<cr>
+" NewMap -n -no ,f  :copen<cr>
+" NewMap -n -no <C-Down>   :cnext<cr>zz
+" NewMap -n -no <C-Up>     :cprev<cr>zz
+" NewMap -n -no ,N  :cfirst<cr>zz
+" NewMap -n -no ,P  :clast<cr>zz
+" NewMap -n -no ,c  :cclose<cr>
 
 " " ---- location list navigation --------------------------------------
 " nnoremap <silent> ,lq :lopen<cr>

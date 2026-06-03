@@ -4,10 +4,9 @@ nnoremap <C-S-z> :call SetMode("\<C-S-z\>", "Normal") \| :suspend<cr>
 tnoremap <C-S-z> <C-\><C-n>:call SetMode("\<C-S-z\>", "Terminal") \| :suspend<cr>
 nnoremap <C-z> :call SetMode("\<C-z\>", "Normal") \| :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
 tnoremap <C-z> <C-\><C-n>:call SetMode("\<C-z\>", "Terminal") \| :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
-nnoremap ,,f :call SetMode(",,f", "Normal") \| :call FavoriteFile()<cr>
-nnoremap ,,f :call SetMode(",,f", "Normal") \| :call FavoriteFile()<cr>
-nnoremap ,,p :call SetMode(",,p", "Normal") \| :call FavoritePath()<cr>
-nnoremap <C-8> :call SetMode("\<C-8\>", "Normal") \| :call Favorite()<cr>
+nnoremap ,f :call SetMode(",f", "Normal") \| :call FavoritesPopup()<cr>
+nnoremap ,,f :call SetMode(",,f", "Normal") \| :call SetUnsetFavorite()<cr>
+nnoremap ,,,f :call SetMode(",,,f", "Normal") \| :call OpenUnreleased('.favorites')<cr>
 nnoremap ,s :call SetMode(",s", "Normal") \| :so %<cr>
 nnoremap ,t :call SetMode(",t", "Normal") \| :Tidy<cr>
 nnoremap <M-q> :call SetMode("\<M-q\>", "Normal") \| :q<cr>
@@ -770,12 +769,6 @@ nnoremap <C-;> :call SetMode("\<C-;\>", "Normal") \| zh
 nnoremap <C-'> :call SetMode("\<C-'\>", "Normal") \| zl
 nnoremap <C-S-;> :call SetMode("\<C-S-;\>", "Normal") \| 20zh
 nnoremap <C-S-'> :call SetMode("\<C-S-'\>", "Normal") \| 20zl
-nnoremap ,f :call SetMode(",f", "Normal") \|  :copen<cr>
-nnoremap <C-Down> :call SetMode("\<C-Down\>", "Normal") \|   :cnext<cr>zz
-nnoremap <C-Up> :call SetMode("\<C-Up\>", "Normal") \|     :cprev<cr>zz
-nnoremap ,N :call SetMode(",N", "Normal") \|  :cfirst<cr>zz
-nnoremap ,P :call SetMode(",P", "Normal") \|  :clast<cr>zz
-nnoremap ,c :call SetMode(",c", "Normal") \|  :cclose<cr>
 nnoremap ,<C-s> :call SetMode(",\<C-s\>", "Normal") \| :call ExecFunction()<cr>
 nnoremap ,s :call SetMode(",s", "Normal") \| :call ExecVS()<cr>
 vnoremap ,s :call SetMode(",s", "Visual") \| '<,'>:call ExecVS()<cr>
@@ -799,14 +792,14 @@ nnoremap <Left> :call SetMode("\<Left\>", "Normal") \| :cclose<cr>
 nnoremap <Right> :call SetMode("\<Right\>", "Normal") \| :copen<cr>
 nnoremap <Up> :call SetMode("\<Up\>", "Normal") \| :cprev<cr>
 nnoremap <Down> :call SetMode("\<Down\>", "Normal") \| :cnext<cr>
+nnoremap <F9> :call SetMode("\<F9\>", "Normal") \| :Pull<cr>
+nnoremap <C-F9> :call SetMode("\<C-F9\>", "Normal") \| :GitFetch<cr>
 nnoremap <F10> :call SetMode("\<F10\>", "Normal") \| :Status<cr>
 nnoremap <C-F10> :call SetMode("\<C-F10\>", "Normal") \| :Diff --all<cr>
 nnoremap <C-S-F10> :call SetMode("\<C-S-F10\>", "Normal") \| :Diff --all --cached<cr>
 nnoremap <S-F10> :call SetMode("\<S-F10\>", "Normal") \| :Log<cr>
 nnoremap <C-F11> :call SetMode("\<C-F11\>", "Normal") \| :GitAdd<cr>
 nnoremap <C-S-F11> :call SetMode("\<C-S-F11\>", "Normal") \| :GitAddCWD<cr>
-nnoremap <F9> :call SetMode("\<F9\>", "Normal") \| :Pull<cr>
-nnoremap <C-F9> :call SetMode("\<C-F9\>", "Normal") \| :GitFetch<cr>
 nnoremap <F12> :call SetMode("\<F12\>", "Normal") \| :PushCWD 
 nnoremap <C-F12> :call SetMode("\<C-F12\>", "Normal") \| :DecidePush<cr>
 nnoremap ,qcc :call SetMode(",qcc", "Normal") \| :!git rebase --continue<cr>
