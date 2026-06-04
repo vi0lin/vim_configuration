@@ -18,10 +18,10 @@ function! _map(opts) range
   if opts.all >= 1
     let opts.normal=1
     let opts.visual=1
-    let opts.insert=1
     let opts.terminal=1
   endif
   if opts.all >= 2
+    let opts.insert=1
     let opts.command=1
   endif
   if opts.all >= 3

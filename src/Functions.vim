@@ -4,6 +4,10 @@
 " let &t_TI = [=1;1u
 " let &t_TE = [>4;m[=0;1u
 
+let &t_TI = "\<Esc>[>4;2m"
+let &t_TE = "\<Esc>[>4;0m"
+" set <M-q>=\eq
+
 set nomore
 
 function BufLength()
@@ -1042,6 +1046,19 @@ endfunction
 
 function! TESTTEST()
   echo execute('scriptnames')->split('\n')->map({_,v -> v->substitute('^\s*\d\+:\s*','','')})->join('\n')
+endfunction
+
+function! VimGrep(count) abort
+  " :copen<cr>:vimgrep "" **/*[D[D[D[D[D
+  let x=""
+  let i=0
+  for i in range(a:count)
+    let x.="../"
+    let i =+ 1
+  endfor
+  let command=input(':', "vimgrep \"\" "..x.."**/*\<Home>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>")
+  exec command
+  copen
 endfunction
 
 " function! ExampleGrep()
@@ -5940,7 +5957,6 @@ function! Tidy() range
   norm gv=
   silent '<,'>DeleteEmptyLines
 endfunction
-
 
 function! CountRegex() range
   let pattern="s/^\\s*\\\"/&/gen"

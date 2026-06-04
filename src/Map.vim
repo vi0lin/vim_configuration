@@ -262,22 +262,22 @@ NewMap -v -no . :<Up><cr>
 
 " Amap <F2> :NERDTreeFind<cr>
 
-NewMap -no -v -n -i -t ,h     :call Open("h", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,j     :call Open("j", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,k     :call Open("k", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,l     :call Open("l", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,H     :call Open("H", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,J     :call Open("J", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,K     :call Open("K", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,L     :call Open("L", "buffer", "new")<cr>
-NewMap -no -v -n -i -t ,,h     :call Open("h", "terminal", "new")<cr>
-NewMap -no -v -n -i -t ,,j     :call Open("j", "terminal", "new")<cr>
-NewMap -no -v -n -i -t ,,k     :call Open("k", "terminal", "new")<cr>
-NewMap -no -v -n -i -t ,,l     :call Open("l", "terminal", "new")<cr>
-NewMap -no -v -n -i -t ,,H     :call Open("H", "terminal", "new")<cr>
-NewMap -no -v -n -i -t ,,J     :call Open("J", "terminal", "new")<cr>
-NewMap -no -v -n -i -t ,,K     :call Open("K", "terminal", "new")<cr>
-NewMap -no -v -n -i -t ,,L     :call Open("L", "terminal", "new")<cr>
+NewMap -no -v -n -t ,h     :call Open("h", "buffer", "new")<cr>
+NewMap -no -v -n -t ,j     :call Open("j", "buffer", "new")<cr>
+NewMap -no -v -n -t ,k     :call Open("k", "buffer", "new")<cr>
+NewMap -no -v -n -t ,l     :call Open("l", "buffer", "new")<cr>
+NewMap -no -v -n -t ,H     :call Open("H", "buffer", "new")<cr>
+NewMap -no -v -n -t ,J     :call Open("J", "buffer", "new")<cr>
+NewMap -no -v -n -t ,K     :call Open("K", "buffer", "new")<cr>
+NewMap -no -v -n -t ,L     :call Open("L", "buffer", "new")<cr>
+NewMap -no -v -n -t ,,h     :call Open("h", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,j     :call Open("j", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,k     :call Open("k", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,l     :call Open("l", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,H     :call Open("H", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,J     :call Open("J", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,K     :call Open("K", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,L     :call Open("L", "terminal", "new")<cr>
 "
 " Amap <A-h>     :call Open("h", "buffer", "new")<cr>
 " Amap <A-j>     :call Open("j", "buffer", "new")<cr>
@@ -393,7 +393,7 @@ NewMap -t -no <C-S-l> <c-\><c-n>:call SwapWin("l")<cr>
 " NewMap -no -n <A-k> :call IntegrateIn('k')<cr>
 " NewMap -no -n <A-l> :call IntegrateIn('l')<cr>
 
-NewMap -n -no ,fuc :call OpenFileUnderCursor()<cr>
+" NewMap -n -no ,fuc :call OpenFileUnderCursor()<cr>
 NewMap -n -no ,,fb :LayoutBash<cr>
 NewMap -n -no ,,fv :LayoutVim<cr>
 
@@ -1063,19 +1063,6 @@ NewMap -no -n -key <S-Up> :call VimGrep(v:count)<cr>
 NewMap -no -n <M-a> :Lines<cr>
 NewMap -no -n <S-Down> :call VimGrep(v:count)<cr>
 NewMap -no -n <C-S-Up> :vimgrep "todo" $folderrepo/**/*<cr>
-
-function VimGrep(count) abort
-  " :copen<cr>:vimgrep "" **/*[D[D[D[D[D
-  let x=""
-  let i=0
-  for i in range(a:count)
-    let x.="../"
-    let i =+ 1
-  endfor
-  let command=input(':', "vimgrep \"\" "..x.."**/*\<Home>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>\<Right>")
-  exec command
-  copen
-endfunction
 
 " NewMap -no -n [1;5A :call VimGrep(v:count)<cr>
 " NewMap -no -n [D :cclose<cr>
