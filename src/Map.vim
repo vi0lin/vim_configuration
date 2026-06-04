@@ -331,7 +331,7 @@ NewMap -no -a <A-Right>      :call Open("L", "buffer", "new")<cr>
 
 " NewMap -no -a ,q :q!<cr>
 " NewMap -no -a <C-q> :hide<cr>
-NewMap -no -a <C-q> :if BufLength()>1 \| :bd! \| else \| :q! \| endif<cr>
+NewMap -silent -no -a <C-q> :if BufLength()>1 \| :bd! \| else \| :q! \| endif<cr>
 " NewMap -no -a <C-S-q> :bd!<cr>
 " NewMap -no -a <C-S-q> :q!<cr>
 NewMap -no -a <C-S-q> :qa!<cr>

@@ -15,21 +15,6 @@ function! _map(opts) range
   let map=[]
   let opts=a:opts
   let key=opts.key
-  if opts.all >= 1
-    let opts.normal=1
-    let opts.visual=1
-    let opts.terminal=1
-  endif
-  if opts.all >= 2
-    let opts.insert=1
-    let opts.command=1
-  endif
-  if opts.all >= 3
-    let opts.x=1
-    let opts.s=1
-    let opts.o=1
-    let opts.l=1
-  endif
   if opts.silent | let silent="<silent>" | else | let silent="" | endif
   if opts.noremap 
    let nore="nore" 
@@ -156,6 +141,21 @@ function! NewMap(args)
     let opts.key=split(opts.default, ' ')[0]
     let opts.default=join(split(opts.default, ' ')[1:], ' ')
   endif
+  if opts.all >= 1
+    let opts.normal=1
+    let opts.visual=1
+    let opts.terminal=1
+  endif
+  if opts.all >= 2
+    let opts.insert=1
+    let opts.command=1
+  endif
+  if opts.all >= 3
+    let opts.x=1
+    let opts.s=1
+    let opts.o=1
+    let opts.l=1
+  endif
   if len(opts.default)>0
   if !opts.normal
   \ && !opts.visual
@@ -177,17 +177,17 @@ function! NewMap(args)
   if opts.silent
     let silent = "<silent>"
   endif
-  if opts.all
-    let opts.normal=1
-    let opts.visual=1
-    let opts.command=1
-    let opts.insert=1
-    let opts.terminal=1
-    let opts.x=1
-    let opts.s=1
-    let opts.o=1
-    let opts.l=1
-  endif
+  " if opts.all
+  "   let opts.normal=1
+  "   let opts.visual=1
+  "   let opts.command=1
+  "   let opts.insert=1
+  "   let opts.terminal=1
+  "   let opts.x=1
+  "   let opts.s=1
+  "   let opts.o=1
+  "   let opts.l=1
+  " endif
   call extend(g:newmap_buildfile, _map(opts))
   endif
 endfunction
