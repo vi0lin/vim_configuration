@@ -3923,15 +3923,15 @@ function OpenFilePopup(title, list)
   let outfile="/tmp/outfile_fzf"
   function! OpenFile_callback(file)
     let path=GetTempfileLine(a:file)
-    if len(path)==0 && (path=='0' || path==0)
-      echo ""
-      if filereadable(path)
-        call _openfile_andCD(path)
-      elseif isdirectory(path)
-        call _openfile_andCD(path)
-      endif
+    " consider len(path)==0 || 
+    if (len(path)==1) && (path=='0' || path==0)
+      " echo "aborted"
+      " if filereadable(path)
+      "   call _openfile_andCD(path)
+      " elseif isdirectory(path)
+      "   call _openfile_andCD(path)
+      " endif
     else
-      echo path
       call _openfile_andCD(path)
     endif
     call _cleanCallback(a:file)
@@ -4017,7 +4017,7 @@ function! Popup(title, register, list, callback, outfile)
     " execute 'bwipeout! '.bufnr('Find')
     " execute 'bwipeout! '.bufnr('Find')
     " exec 'bd! '.bufnr('Find')
-    echo bufnr('Find')
+    " echo bufnr('Find')
   endfunction
   let opts={
         \ 'hidden': 1,
