@@ -4,8 +4,8 @@
 " let &t_TI = [=1;1u
 " let &t_TE = [>4;m[=0;1u
 
-let &t_TI = "\<Esc>[>4;2m"
-let &t_TE = "\<Esc>[>4;0m"
+" let &t_TI = "\<Esc>[>4;2m"
+" let &t_TE = "\<Esc>[>4;0m"
 " set <M-q>=\eq
 
 set nomore

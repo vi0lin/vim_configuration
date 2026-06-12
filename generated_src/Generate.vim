@@ -108,138 +108,138 @@ tnoremap <C-S-F6> <C-\><C-n>:call SetMode("\<C-S-F6\>", "Terminal") \| :call Sig
 tnoremap <C-S-F7> <C-\><C-n>:call SetMode("\<C-S-F7\>", "Terminal") \| :call SigTermToTerm("k")<cr>
 tnoremap <C-S-F8> <C-\><C-n>:call SetMode("\<C-S-F8\>", "Terminal") \| :call SigTermToTerm("l")<cr>
 vnoremap . :call SetMode(".", "Visual") \| '<,'>:<Up><cr>
-nnoremap ,h :call SetMode(",h", "Normal") \|     :call Open("h", "buffer", "new")<cr>
-vnoremap ,h :call SetMode(",h", "Visual") \| '<,'>    :call Open("h", "buffer", "new")<cr>
-tnoremap ,h <C-\><C-n>:call SetMode(",h", "Terminal") \|     :call Open("h", "buffer", "new")<cr>
-nnoremap ,j :call SetMode(",j", "Normal") \|     :call Open("j", "buffer", "new")<cr>
-vnoremap ,j :call SetMode(",j", "Visual") \| '<,'>    :call Open("j", "buffer", "new")<cr>
-tnoremap ,j <C-\><C-n>:call SetMode(",j", "Terminal") \|     :call Open("j", "buffer", "new")<cr>
-nnoremap ,k :call SetMode(",k", "Normal") \|     :call Open("k", "buffer", "new")<cr>
-vnoremap ,k :call SetMode(",k", "Visual") \| '<,'>    :call Open("k", "buffer", "new")<cr>
-tnoremap ,k <C-\><C-n>:call SetMode(",k", "Terminal") \|     :call Open("k", "buffer", "new")<cr>
-nnoremap ,l :call SetMode(",l", "Normal") \|     :call Open("l", "buffer", "new")<cr>
-vnoremap ,l :call SetMode(",l", "Visual") \| '<,'>    :call Open("l", "buffer", "new")<cr>
-tnoremap ,l <C-\><C-n>:call SetMode(",l", "Terminal") \|     :call Open("l", "buffer", "new")<cr>
-nnoremap ,H :call SetMode(",H", "Normal") \|     :call Open("H", "buffer", "new")<cr>
-vnoremap ,H :call SetMode(",H", "Visual") \| '<,'>    :call Open("H", "buffer", "new")<cr>
-tnoremap ,H <C-\><C-n>:call SetMode(",H", "Terminal") \|     :call Open("H", "buffer", "new")<cr>
-nnoremap ,J :call SetMode(",J", "Normal") \|     :call Open("J", "buffer", "new")<cr>
-vnoremap ,J :call SetMode(",J", "Visual") \| '<,'>    :call Open("J", "buffer", "new")<cr>
-tnoremap ,J <C-\><C-n>:call SetMode(",J", "Terminal") \|     :call Open("J", "buffer", "new")<cr>
-nnoremap ,K :call SetMode(",K", "Normal") \|     :call Open("K", "buffer", "new")<cr>
-vnoremap ,K :call SetMode(",K", "Visual") \| '<,'>    :call Open("K", "buffer", "new")<cr>
-tnoremap ,K <C-\><C-n>:call SetMode(",K", "Terminal") \|     :call Open("K", "buffer", "new")<cr>
-nnoremap ,L :call SetMode(",L", "Normal") \|     :call Open("L", "buffer", "new")<cr>
-vnoremap ,L :call SetMode(",L", "Visual") \| '<,'>    :call Open("L", "buffer", "new")<cr>
-tnoremap ,L <C-\><C-n>:call SetMode(",L", "Terminal") \|     :call Open("L", "buffer", "new")<cr>
-nnoremap ,,h :call SetMode(",,h", "Normal") \|     :call Open("h", "terminal", "new")<cr>
-vnoremap ,,h :call SetMode(",,h", "Visual") \| '<,'>    :call Open("h", "terminal", "new")<cr>
-tnoremap ,,h <C-\><C-n>:call SetMode(",,h", "Terminal") \|     :call Open("h", "terminal", "new")<cr>
-nnoremap ,,j :call SetMode(",,j", "Normal") \|     :call Open("j", "terminal", "new")<cr>
-vnoremap ,,j :call SetMode(",,j", "Visual") \| '<,'>    :call Open("j", "terminal", "new")<cr>
-tnoremap ,,j <C-\><C-n>:call SetMode(",,j", "Terminal") \|     :call Open("j", "terminal", "new")<cr>
-nnoremap ,,k :call SetMode(",,k", "Normal") \|     :call Open("k", "terminal", "new")<cr>
-vnoremap ,,k :call SetMode(",,k", "Visual") \| '<,'>    :call Open("k", "terminal", "new")<cr>
-tnoremap ,,k <C-\><C-n>:call SetMode(",,k", "Terminal") \|     :call Open("k", "terminal", "new")<cr>
-nnoremap ,,l :call SetMode(",,l", "Normal") \|     :call Open("l", "terminal", "new")<cr>
-vnoremap ,,l :call SetMode(",,l", "Visual") \| '<,'>    :call Open("l", "terminal", "new")<cr>
-tnoremap ,,l <C-\><C-n>:call SetMode(",,l", "Terminal") \|     :call Open("l", "terminal", "new")<cr>
-nnoremap ,,H :call SetMode(",,H", "Normal") \|     :call Open("H", "terminal", "new")<cr>
-vnoremap ,,H :call SetMode(",,H", "Visual") \| '<,'>    :call Open("H", "terminal", "new")<cr>
-tnoremap ,,H <C-\><C-n>:call SetMode(",,H", "Terminal") \|     :call Open("H", "terminal", "new")<cr>
-nnoremap ,,J :call SetMode(",,J", "Normal") \|     :call Open("J", "terminal", "new")<cr>
-vnoremap ,,J :call SetMode(",,J", "Visual") \| '<,'>    :call Open("J", "terminal", "new")<cr>
-tnoremap ,,J <C-\><C-n>:call SetMode(",,J", "Terminal") \|     :call Open("J", "terminal", "new")<cr>
-nnoremap ,,K :call SetMode(",,K", "Normal") \|     :call Open("K", "terminal", "new")<cr>
-vnoremap ,,K :call SetMode(",,K", "Visual") \| '<,'>    :call Open("K", "terminal", "new")<cr>
-tnoremap ,,K <C-\><C-n>:call SetMode(",,K", "Terminal") \|     :call Open("K", "terminal", "new")<cr>
-nnoremap ,,L :call SetMode(",,L", "Normal") \|     :call Open("L", "terminal", "new")<cr>
-vnoremap ,,L :call SetMode(",,L", "Visual") \| '<,'>    :call Open("L", "terminal", "new")<cr>
-tnoremap ,,L <C-\><C-n>:call SetMode(",,L", "Terminal") \|     :call Open("L", "terminal", "new")<cr>
-nnoremap <A-H> :call SetMode("\<A-H\>", "Normal") \|     :call Open("H", "buffer", "new")<cr>
-vnoremap <A-H> :call SetMode("\<A-H\>", "Visual") \| '<,'>    :call Open("H", "buffer", "new")<cr>
-tnoremap <A-H> <C-\><C-n>:call SetMode("\<A-H\>", "Terminal") \|     :call Open("H", "buffer", "new")<cr>
-nnoremap <A-J> :call SetMode("\<A-J\>", "Normal") \|     :call Open("J", "buffer", "new")<cr>
-vnoremap <A-J> :call SetMode("\<A-J\>", "Visual") \| '<,'>    :call Open("J", "buffer", "new")<cr>
-tnoremap <A-J> <C-\><C-n>:call SetMode("\<A-J\>", "Terminal") \|     :call Open("J", "buffer", "new")<cr>
-nnoremap <A-K> :call SetMode("\<A-K\>", "Normal") \|     :call Open("K", "buffer", "new")<cr>
-vnoremap <A-K> :call SetMode("\<A-K\>", "Visual") \| '<,'>    :call Open("K", "buffer", "new")<cr>
-tnoremap <A-K> <C-\><C-n>:call SetMode("\<A-K\>", "Terminal") \|     :call Open("K", "buffer", "new")<cr>
-nnoremap <A-L> :call SetMode("\<A-L\>", "Normal") \|     :call Open("L", "buffer", "new")<cr>
-vnoremap <A-L> :call SetMode("\<A-L\>", "Visual") \| '<,'>    :call Open("L", "buffer", "new")<cr>
-tnoremap <A-L> <C-\><C-n>:call SetMode("\<A-L\>", "Terminal") \|     :call Open("L", "buffer", "new")<cr>
-nnoremap <A-S-h> :call SetMode("\<A-S-h\>", "Normal") \|     :call Open("h", "terminal", "new")<cr>
-vnoremap <A-S-h> :call SetMode("\<A-S-h\>", "Visual") \| '<,'>    :call Open("h", "terminal", "new")<cr>
-tnoremap <A-S-h> <C-\><C-n>:call SetMode("\<A-S-h\>", "Terminal") \|     :call Open("h", "terminal", "new")<cr>
-nnoremap <A-S-j> :call SetMode("\<A-S-j\>", "Normal") \|     :call Open("j", "terminal", "new")<cr>
-vnoremap <A-S-j> :call SetMode("\<A-S-j\>", "Visual") \| '<,'>    :call Open("j", "terminal", "new")<cr>
-tnoremap <A-S-j> <C-\><C-n>:call SetMode("\<A-S-j\>", "Terminal") \|     :call Open("j", "terminal", "new")<cr>
-nnoremap <A-S-k> :call SetMode("\<A-S-k\>", "Normal") \|     :call Open("k", "terminal", "new")<cr>
-vnoremap <A-S-k> :call SetMode("\<A-S-k\>", "Visual") \| '<,'>    :call Open("k", "terminal", "new")<cr>
-tnoremap <A-S-k> <C-\><C-n>:call SetMode("\<A-S-k\>", "Terminal") \|     :call Open("k", "terminal", "new")<cr>
-nnoremap <A-S-l> :call SetMode("\<A-S-l\>", "Normal") \|     :call Open("l", "terminal", "new")<cr>
-vnoremap <A-S-l> :call SetMode("\<A-S-l\>", "Visual") \| '<,'>    :call Open("l", "terminal", "new")<cr>
-tnoremap <A-S-l> <C-\><C-n>:call SetMode("\<A-S-l\>", "Terminal") \|     :call Open("l", "terminal", "new")<cr>
-nnoremap <A-S-H> :call SetMode("\<A-S-H\>", "Normal") \|     :call Open("H", "terminal", "new")<cr>
-vnoremap <A-S-H> :call SetMode("\<A-S-H\>", "Visual") \| '<,'>    :call Open("H", "terminal", "new")<cr>
-tnoremap <A-S-H> <C-\><C-n>:call SetMode("\<A-S-H\>", "Terminal") \|     :call Open("H", "terminal", "new")<cr>
-nnoremap <A-S-J> :call SetMode("\<A-S-J\>", "Normal") \|     :call Open("J", "terminal", "new")<cr>
-vnoremap <A-S-J> :call SetMode("\<A-S-J\>", "Visual") \| '<,'>    :call Open("J", "terminal", "new")<cr>
-tnoremap <A-S-J> <C-\><C-n>:call SetMode("\<A-S-J\>", "Terminal") \|     :call Open("J", "terminal", "new")<cr>
-nnoremap <A-S-K> :call SetMode("\<A-S-K\>", "Normal") \|     :call Open("K", "terminal", "new")<cr>
-vnoremap <A-S-K> :call SetMode("\<A-S-K\>", "Visual") \| '<,'>    :call Open("K", "terminal", "new")<cr>
-tnoremap <A-S-K> <C-\><C-n>:call SetMode("\<A-S-K\>", "Terminal") \|     :call Open("K", "terminal", "new")<cr>
-nnoremap <A-S-L> :call SetMode("\<A-S-L\>", "Normal") \|     :call Open("L", "terminal", "new")<cr>
-vnoremap <A-S-L> :call SetMode("\<A-S-L\>", "Visual") \| '<,'>    :call Open("L", "terminal", "new")<cr>
-tnoremap <A-S-L> <C-\><C-n>:call SetMode("\<A-S-L\>", "Terminal") \|     :call Open("L", "terminal", "new")<cr>
-nnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Normal") \|     :call Open("h", "terminal", "new")<cr>
-vnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Visual") \| '<,'>    :call Open("h", "terminal", "new")<cr>
-tnoremap <A-S-Left> <C-\><C-n>:call SetMode("\<A-S-Left\>", "Terminal") \|     :call Open("h", "terminal", "new")<cr>
-nnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Normal") \|     :call Open("j", "terminal", "new")<cr>
-vnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Visual") \| '<,'>    :call Open("j", "terminal", "new")<cr>
-tnoremap <A-S-Down> <C-\><C-n>:call SetMode("\<A-S-Down\>", "Terminal") \|     :call Open("j", "terminal", "new")<cr>
-nnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Normal") \|       :call Open("k", "terminal", "new")<cr>
-vnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Visual") \| '<,'>      :call Open("k", "terminal", "new")<cr>
-tnoremap <A-S-Up> <C-\><C-n>:call SetMode("\<A-S-Up\>", "Terminal") \|       :call Open("k", "terminal", "new")<cr>
-nnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Normal") \|    :call Open("l", "terminal", "new")<cr>
-vnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Visual") \| '<,'>   :call Open("l", "terminal", "new")<cr>
-tnoremap <A-S-Right> <C-\><C-n>:call SetMode("\<A-S-Right\>", "Terminal") \|    :call Open("l", "terminal", "new")<cr>
-nnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Normal") \|     :call Open("H", "terminal", "new")<cr>
-vnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Visual") \| '<,'>    :call Open("H", "terminal", "new")<cr>
-tnoremap <A-S-Left> <C-\><C-n>:call SetMode("\<A-S-Left\>", "Terminal") \|     :call Open("H", "terminal", "new")<cr>
-nnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Normal") \|     :call Open("J", "terminal", "new")<cr>
-vnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Visual") \| '<,'>    :call Open("J", "terminal", "new")<cr>
-tnoremap <A-S-Down> <C-\><C-n>:call SetMode("\<A-S-Down\>", "Terminal") \|     :call Open("J", "terminal", "new")<cr>
-nnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Normal") \|       :call Open("K", "terminal", "new")<cr>
-vnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Visual") \| '<,'>      :call Open("K", "terminal", "new")<cr>
-tnoremap <A-S-Up> <C-\><C-n>:call SetMode("\<A-S-Up\>", "Terminal") \|       :call Open("K", "terminal", "new")<cr>
-nnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Normal") \|    :call Open("L", "terminal", "new")<cr>
-vnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Visual") \| '<,'>   :call Open("L", "terminal", "new")<cr>
-tnoremap <A-S-Right> <C-\><C-n>:call SetMode("\<A-S-Right\>", "Terminal") \|    :call Open("L", "terminal", "new")<cr>
-nnoremap <A-Left> :call SetMode("\<A-Left\>", "Normal") \|       :call Open("h", "buffer", "new")<cr>
-vnoremap <A-Left> :call SetMode("\<A-Left\>", "Visual") \| '<,'>      :call Open("h", "buffer", "new")<cr>
-tnoremap <A-Left> <C-\><C-n>:call SetMode("\<A-Left\>", "Terminal") \|       :call Open("h", "buffer", "new")<cr>
-nnoremap <A-Down> :call SetMode("\<A-Down\>", "Normal") \|       :call Open("j", "buffer", "new")<cr>
-vnoremap <A-Down> :call SetMode("\<A-Down\>", "Visual") \| '<,'>      :call Open("j", "buffer", "new")<cr>
-tnoremap <A-Down> <C-\><C-n>:call SetMode("\<A-Down\>", "Terminal") \|       :call Open("j", "buffer", "new")<cr>
-nnoremap <A-Up> :call SetMode("\<A-Up\>", "Normal") \|         :call Open("k", "buffer", "new")<cr>
-vnoremap <A-Up> :call SetMode("\<A-Up\>", "Visual") \| '<,'>        :call Open("k", "buffer", "new")<cr>
-tnoremap <A-Up> <C-\><C-n>:call SetMode("\<A-Up\>", "Terminal") \|         :call Open("k", "buffer", "new")<cr>
-nnoremap <A-Right> :call SetMode("\<A-Right\>", "Normal") \|      :call Open("l", "buffer", "new")<cr>
-vnoremap <A-Right> :call SetMode("\<A-Right\>", "Visual") \| '<,'>     :call Open("l", "buffer", "new")<cr>
-tnoremap <A-Right> <C-\><C-n>:call SetMode("\<A-Right\>", "Terminal") \|      :call Open("l", "buffer", "new")<cr>
-nnoremap <A-Left> :call SetMode("\<A-Left\>", "Normal") \|       :call Open("H", "buffer", "new")<cr>
-vnoremap <A-Left> :call SetMode("\<A-Left\>", "Visual") \| '<,'>      :call Open("H", "buffer", "new")<cr>
-tnoremap <A-Left> <C-\><C-n>:call SetMode("\<A-Left\>", "Terminal") \|       :call Open("H", "buffer", "new")<cr>
-nnoremap <A-Down> :call SetMode("\<A-Down\>", "Normal") \|       :call Open("J", "buffer", "new")<cr>
-vnoremap <A-Down> :call SetMode("\<A-Down\>", "Visual") \| '<,'>      :call Open("J", "buffer", "new")<cr>
-tnoremap <A-Down> <C-\><C-n>:call SetMode("\<A-Down\>", "Terminal") \|       :call Open("J", "buffer", "new")<cr>
-nnoremap <A-Up> :call SetMode("\<A-Up\>", "Normal") \|         :call Open("K", "buffer", "new")<cr>
-vnoremap <A-Up> :call SetMode("\<A-Up\>", "Visual") \| '<,'>        :call Open("K", "buffer", "new")<cr>
-tnoremap <A-Up> <C-\><C-n>:call SetMode("\<A-Up\>", "Terminal") \|         :call Open("K", "buffer", "new")<cr>
-nnoremap <A-Right> :call SetMode("\<A-Right\>", "Normal") \|      :call Open("L", "buffer", "new")<cr>
-vnoremap <A-Right> :call SetMode("\<A-Right\>", "Visual") \| '<,'>     :call Open("L", "buffer", "new")<cr>
-tnoremap <A-Right> <C-\><C-n>:call SetMode("\<A-Right\>", "Terminal") \|      :call Open("L", "buffer", "new")<cr>
+nnoremap ,h :call SetMode(",h", "Normal") \| :call Open("h", "buffer", "new")<cr>
+vnoremap ,h :call SetMode(",h", "Visual") \| '<,'>:call Open("h", "buffer", "new")<cr>
+tnoremap ,h <C-\><C-n>:call SetMode(",h", "Terminal") \| :call Open("h", "buffer", "new")<cr>
+nnoremap ,j :call SetMode(",j", "Normal") \| :call Open("j", "buffer", "new")<cr>
+vnoremap ,j :call SetMode(",j", "Visual") \| '<,'>:call Open("j", "buffer", "new")<cr>
+tnoremap ,j <C-\><C-n>:call SetMode(",j", "Terminal") \| :call Open("j", "buffer", "new")<cr>
+nnoremap ,k :call SetMode(",k", "Normal") \| :call Open("k", "buffer", "new")<cr>
+vnoremap ,k :call SetMode(",k", "Visual") \| '<,'>:call Open("k", "buffer", "new")<cr>
+tnoremap ,k <C-\><C-n>:call SetMode(",k", "Terminal") \| :call Open("k", "buffer", "new")<cr>
+nnoremap ,l :call SetMode(",l", "Normal") \| :call Open("l", "buffer", "new")<cr>
+vnoremap ,l :call SetMode(",l", "Visual") \| '<,'>:call Open("l", "buffer", "new")<cr>
+tnoremap ,l <C-\><C-n>:call SetMode(",l", "Terminal") \| :call Open("l", "buffer", "new")<cr>
+nnoremap ,H :call SetMode(",H", "Normal") \| :call Open("H", "buffer", "new")<cr>
+vnoremap ,H :call SetMode(",H", "Visual") \| '<,'>:call Open("H", "buffer", "new")<cr>
+tnoremap ,H <C-\><C-n>:call SetMode(",H", "Terminal") \| :call Open("H", "buffer", "new")<cr>
+nnoremap ,J :call SetMode(",J", "Normal") \| :call Open("J", "buffer", "new")<cr>
+vnoremap ,J :call SetMode(",J", "Visual") \| '<,'>:call Open("J", "buffer", "new")<cr>
+tnoremap ,J <C-\><C-n>:call SetMode(",J", "Terminal") \| :call Open("J", "buffer", "new")<cr>
+nnoremap ,K :call SetMode(",K", "Normal") \| :call Open("K", "buffer", "new")<cr>
+vnoremap ,K :call SetMode(",K", "Visual") \| '<,'>:call Open("K", "buffer", "new")<cr>
+tnoremap ,K <C-\><C-n>:call SetMode(",K", "Terminal") \| :call Open("K", "buffer", "new")<cr>
+nnoremap ,L :call SetMode(",L", "Normal") \| :call Open("L", "buffer", "new")<cr>
+vnoremap ,L :call SetMode(",L", "Visual") \| '<,'>:call Open("L", "buffer", "new")<cr>
+tnoremap ,L <C-\><C-n>:call SetMode(",L", "Terminal") \| :call Open("L", "buffer", "new")<cr>
+nnoremap ,,h :call SetMode(",,h", "Normal") \| :call Open("h", "terminal", "new")<cr>
+vnoremap ,,h :call SetMode(",,h", "Visual") \| '<,'>:call Open("h", "terminal", "new")<cr>
+tnoremap ,,h <C-\><C-n>:call SetMode(",,h", "Terminal") \| :call Open("h", "terminal", "new")<cr>
+nnoremap ,,j :call SetMode(",,j", "Normal") \| :call Open("j", "terminal", "new")<cr>
+vnoremap ,,j :call SetMode(",,j", "Visual") \| '<,'>:call Open("j", "terminal", "new")<cr>
+tnoremap ,,j <C-\><C-n>:call SetMode(",,j", "Terminal") \| :call Open("j", "terminal", "new")<cr>
+nnoremap ,,k :call SetMode(",,k", "Normal") \| :call Open("k", "terminal", "new")<cr>
+vnoremap ,,k :call SetMode(",,k", "Visual") \| '<,'>:call Open("k", "terminal", "new")<cr>
+tnoremap ,,k <C-\><C-n>:call SetMode(",,k", "Terminal") \| :call Open("k", "terminal", "new")<cr>
+nnoremap ,,l :call SetMode(",,l", "Normal") \| :call Open("l", "terminal", "new")<cr>
+vnoremap ,,l :call SetMode(",,l", "Visual") \| '<,'>:call Open("l", "terminal", "new")<cr>
+tnoremap ,,l <C-\><C-n>:call SetMode(",,l", "Terminal") \| :call Open("l", "terminal", "new")<cr>
+nnoremap ,,H :call SetMode(",,H", "Normal") \| :call Open("H", "terminal", "new")<cr>
+vnoremap ,,H :call SetMode(",,H", "Visual") \| '<,'>:call Open("H", "terminal", "new")<cr>
+tnoremap ,,H <C-\><C-n>:call SetMode(",,H", "Terminal") \| :call Open("H", "terminal", "new")<cr>
+nnoremap ,,J :call SetMode(",,J", "Normal") \| :call Open("J", "terminal", "new")<cr>
+vnoremap ,,J :call SetMode(",,J", "Visual") \| '<,'>:call Open("J", "terminal", "new")<cr>
+tnoremap ,,J <C-\><C-n>:call SetMode(",,J", "Terminal") \| :call Open("J", "terminal", "new")<cr>
+nnoremap ,,K :call SetMode(",,K", "Normal") \| :call Open("K", "terminal", "new")<cr>
+vnoremap ,,K :call SetMode(",,K", "Visual") \| '<,'>:call Open("K", "terminal", "new")<cr>
+tnoremap ,,K <C-\><C-n>:call SetMode(",,K", "Terminal") \| :call Open("K", "terminal", "new")<cr>
+nnoremap ,,L :call SetMode(",,L", "Normal") \| :call Open("L", "terminal", "new")<cr>
+vnoremap ,,L :call SetMode(",,L", "Visual") \| '<,'>:call Open("L", "terminal", "new")<cr>
+tnoremap ,,L <C-\><C-n>:call SetMode(",,L", "Terminal") \| :call Open("L", "terminal", "new")<cr>
+nnoremap <A-H> :call SetMode("\<A-H\>", "Normal") \| :call Open("H", "buffer", "new")<cr>
+vnoremap <A-H> :call SetMode("\<A-H\>", "Visual") \| '<,'>:call Open("H", "buffer", "new")<cr>
+tnoremap <A-H> <C-\><C-n>:call SetMode("\<A-H\>", "Terminal") \| :call Open("H", "buffer", "new")<cr>
+nnoremap <A-J> :call SetMode("\<A-J\>", "Normal") \| :call Open("J", "buffer", "new")<cr>
+vnoremap <A-J> :call SetMode("\<A-J\>", "Visual") \| '<,'>:call Open("J", "buffer", "new")<cr>
+tnoremap <A-J> <C-\><C-n>:call SetMode("\<A-J\>", "Terminal") \| :call Open("J", "buffer", "new")<cr>
+nnoremap <A-K> :call SetMode("\<A-K\>", "Normal") \| :call Open("K", "buffer", "new")<cr>
+vnoremap <A-K> :call SetMode("\<A-K\>", "Visual") \| '<,'>:call Open("K", "buffer", "new")<cr>
+tnoremap <A-K> <C-\><C-n>:call SetMode("\<A-K\>", "Terminal") \| :call Open("K", "buffer", "new")<cr>
+nnoremap <A-L> :call SetMode("\<A-L\>", "Normal") \| :call Open("L", "buffer", "new")<cr>
+vnoremap <A-L> :call SetMode("\<A-L\>", "Visual") \| '<,'>:call Open("L", "buffer", "new")<cr>
+tnoremap <A-L> <C-\><C-n>:call SetMode("\<A-L\>", "Terminal") \| :call Open("L", "buffer", "new")<cr>
+nnoremap <A-S-h> :call SetMode("\<A-S-h\>", "Normal") \| :call Open("h", "terminal", "new")<cr>
+vnoremap <A-S-h> :call SetMode("\<A-S-h\>", "Visual") \| '<,'>:call Open("h", "terminal", "new")<cr>
+tnoremap <A-S-h> <C-\><C-n>:call SetMode("\<A-S-h\>", "Terminal") \| :call Open("h", "terminal", "new")<cr>
+nnoremap <A-S-j> :call SetMode("\<A-S-j\>", "Normal") \| :call Open("j", "terminal", "new")<cr>
+vnoremap <A-S-j> :call SetMode("\<A-S-j\>", "Visual") \| '<,'>:call Open("j", "terminal", "new")<cr>
+tnoremap <A-S-j> <C-\><C-n>:call SetMode("\<A-S-j\>", "Terminal") \| :call Open("j", "terminal", "new")<cr>
+nnoremap <A-S-k> :call SetMode("\<A-S-k\>", "Normal") \| :call Open("k", "terminal", "new")<cr>
+vnoremap <A-S-k> :call SetMode("\<A-S-k\>", "Visual") \| '<,'>:call Open("k", "terminal", "new")<cr>
+tnoremap <A-S-k> <C-\><C-n>:call SetMode("\<A-S-k\>", "Terminal") \| :call Open("k", "terminal", "new")<cr>
+nnoremap <A-S-l> :call SetMode("\<A-S-l\>", "Normal") \| :call Open("l", "terminal", "new")<cr>
+vnoremap <A-S-l> :call SetMode("\<A-S-l\>", "Visual") \| '<,'>:call Open("l", "terminal", "new")<cr>
+tnoremap <A-S-l> <C-\><C-n>:call SetMode("\<A-S-l\>", "Terminal") \| :call Open("l", "terminal", "new")<cr>
+nnoremap <A-S-H> :call SetMode("\<A-S-H\>", "Normal") \| :call Open("H", "terminal", "new")<cr>
+vnoremap <A-S-H> :call SetMode("\<A-S-H\>", "Visual") \| '<,'>:call Open("H", "terminal", "new")<cr>
+tnoremap <A-S-H> <C-\><C-n>:call SetMode("\<A-S-H\>", "Terminal") \| :call Open("H", "terminal", "new")<cr>
+nnoremap <A-S-J> :call SetMode("\<A-S-J\>", "Normal") \| :call Open("J", "terminal", "new")<cr>
+vnoremap <A-S-J> :call SetMode("\<A-S-J\>", "Visual") \| '<,'>:call Open("J", "terminal", "new")<cr>
+tnoremap <A-S-J> <C-\><C-n>:call SetMode("\<A-S-J\>", "Terminal") \| :call Open("J", "terminal", "new")<cr>
+nnoremap <A-S-K> :call SetMode("\<A-S-K\>", "Normal") \| :call Open("K", "terminal", "new")<cr>
+vnoremap <A-S-K> :call SetMode("\<A-S-K\>", "Visual") \| '<,'>:call Open("K", "terminal", "new")<cr>
+tnoremap <A-S-K> <C-\><C-n>:call SetMode("\<A-S-K\>", "Terminal") \| :call Open("K", "terminal", "new")<cr>
+nnoremap <A-S-L> :call SetMode("\<A-S-L\>", "Normal") \| :call Open("L", "terminal", "new")<cr>
+vnoremap <A-S-L> :call SetMode("\<A-S-L\>", "Visual") \| '<,'>:call Open("L", "terminal", "new")<cr>
+tnoremap <A-S-L> <C-\><C-n>:call SetMode("\<A-S-L\>", "Terminal") \| :call Open("L", "terminal", "new")<cr>
+nnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Normal") \| :call Open("h", "terminal", "new")<cr>
+vnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Visual") \| '<,'>:call Open("h", "terminal", "new")<cr>
+tnoremap <A-S-Left> <C-\><C-n>:call SetMode("\<A-S-Left\>", "Terminal") \| :call Open("h", "terminal", "new")<cr>
+nnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Normal") \| :call Open("j", "terminal", "new")<cr>
+vnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Visual") \| '<,'>:call Open("j", "terminal", "new")<cr>
+tnoremap <A-S-Down> <C-\><C-n>:call SetMode("\<A-S-Down\>", "Terminal") \| :call Open("j", "terminal", "new")<cr>
+nnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Normal") \| :call Open("k", "terminal", "new")<cr>
+vnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Visual") \| '<,'>:call Open("k", "terminal", "new")<cr>
+tnoremap <A-S-Up> <C-\><C-n>:call SetMode("\<A-S-Up\>", "Terminal") \| :call Open("k", "terminal", "new")<cr>
+nnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Normal") \| :call Open("l", "terminal", "new")<cr>
+vnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Visual") \| '<,'>:call Open("l", "terminal", "new")<cr>
+tnoremap <A-S-Right> <C-\><C-n>:call SetMode("\<A-S-Right\>", "Terminal") \| :call Open("l", "terminal", "new")<cr>
+nnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Normal") \| :call Open("H", "terminal", "new")<cr>
+vnoremap <A-S-Left> :call SetMode("\<A-S-Left\>", "Visual") \| '<,'>:call Open("H", "terminal", "new")<cr>
+tnoremap <A-S-Left> <C-\><C-n>:call SetMode("\<A-S-Left\>", "Terminal") \| :call Open("H", "terminal", "new")<cr>
+nnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Normal") \| :call Open("J", "terminal", "new")<cr>
+vnoremap <A-S-Down> :call SetMode("\<A-S-Down\>", "Visual") \| '<,'>:call Open("J", "terminal", "new")<cr>
+tnoremap <A-S-Down> <C-\><C-n>:call SetMode("\<A-S-Down\>", "Terminal") \| :call Open("J", "terminal", "new")<cr>
+nnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Normal") \| :call Open("K", "terminal", "new")<cr>
+vnoremap <A-S-Up> :call SetMode("\<A-S-Up\>", "Visual") \| '<,'>:call Open("K", "terminal", "new")<cr>
+tnoremap <A-S-Up> <C-\><C-n>:call SetMode("\<A-S-Up\>", "Terminal") \| :call Open("K", "terminal", "new")<cr>
+nnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Normal") \| :call Open("L", "terminal", "new")<cr>
+vnoremap <A-S-Right> :call SetMode("\<A-S-Right\>", "Visual") \| '<,'>:call Open("L", "terminal", "new")<cr>
+tnoremap <A-S-Right> <C-\><C-n>:call SetMode("\<A-S-Right\>", "Terminal") \| :call Open("L", "terminal", "new")<cr>
+nnoremap <A-Left> :call SetMode("\<A-Left\>", "Normal") \| :call Open("h", "buffer", "new")<cr>
+vnoremap <A-Left> :call SetMode("\<A-Left\>", "Visual") \| '<,'>:call Open("h", "buffer", "new")<cr>
+tnoremap <A-Left> <C-\><C-n>:call SetMode("\<A-Left\>", "Terminal") \| :call Open("h", "buffer", "new")<cr>
+nnoremap <A-Down> :call SetMode("\<A-Down\>", "Normal") \| :call Open("j", "buffer", "new")<cr>
+vnoremap <A-Down> :call SetMode("\<A-Down\>", "Visual") \| '<,'>:call Open("j", "buffer", "new")<cr>
+tnoremap <A-Down> <C-\><C-n>:call SetMode("\<A-Down\>", "Terminal") \| :call Open("j", "buffer", "new")<cr>
+nnoremap <A-Up> :call SetMode("\<A-Up\>", "Normal") \| :call Open("k", "buffer", "new")<cr>
+vnoremap <A-Up> :call SetMode("\<A-Up\>", "Visual") \| '<,'>:call Open("k", "buffer", "new")<cr>
+tnoremap <A-Up> <C-\><C-n>:call SetMode("\<A-Up\>", "Terminal") \| :call Open("k", "buffer", "new")<cr>
+nnoremap <A-Right> :call SetMode("\<A-Right\>", "Normal") \| :call Open("l", "buffer", "new")<cr>
+vnoremap <A-Right> :call SetMode("\<A-Right\>", "Visual") \| '<,'>:call Open("l", "buffer", "new")<cr>
+tnoremap <A-Right> <C-\><C-n>:call SetMode("\<A-Right\>", "Terminal") \| :call Open("l", "buffer", "new")<cr>
+nnoremap <A-Left> :call SetMode("\<A-Left\>", "Normal") \| :call Open("H", "buffer", "new")<cr>
+vnoremap <A-Left> :call SetMode("\<A-Left\>", "Visual") \| '<,'>:call Open("H", "buffer", "new")<cr>
+tnoremap <A-Left> <C-\><C-n>:call SetMode("\<A-Left\>", "Terminal") \| :call Open("H", "buffer", "new")<cr>
+nnoremap <A-Down> :call SetMode("\<A-Down\>", "Normal") \| :call Open("J", "buffer", "new")<cr>
+vnoremap <A-Down> :call SetMode("\<A-Down\>", "Visual") \| '<,'>:call Open("J", "buffer", "new")<cr>
+tnoremap <A-Down> <C-\><C-n>:call SetMode("\<A-Down\>", "Terminal") \| :call Open("J", "buffer", "new")<cr>
+nnoremap <A-Up> :call SetMode("\<A-Up\>", "Normal") \| :call Open("K", "buffer", "new")<cr>
+vnoremap <A-Up> :call SetMode("\<A-Up\>", "Visual") \| '<,'>:call Open("K", "buffer", "new")<cr>
+tnoremap <A-Up> <C-\><C-n>:call SetMode("\<A-Up\>", "Terminal") \| :call Open("K", "buffer", "new")<cr>
+nnoremap <A-Right> :call SetMode("\<A-Right\>", "Normal") \| :call Open("L", "buffer", "new")<cr>
+vnoremap <A-Right> :call SetMode("\<A-Right\>", "Visual") \| '<,'>:call Open("L", "buffer", "new")<cr>
+tnoremap <A-Right> <C-\><C-n>:call SetMode("\<A-Right\>", "Terminal") \| :call Open("L", "buffer", "new")<cr>
 nnoremap <silent> <C-q> :call SetMode("\<C-q\>", "Normal") \| :if BufLength()>1 \| :bd! \| else \| :q! \| endif<cr>
 vnoremap <silent> <C-q> :call SetMode("\<C-q\>", "Visual") \| '<,'>:if BufLength()>1 \| :bd! \| else \| :q! \| endif<cr>
 tnoremap <silent> <C-q> <C-\><C-n>:call SetMode("\<C-q\>", "Terminal") \| :if BufLength()>1 \| :bd! \| else \| :q! \| endif<cr>
@@ -318,16 +318,6 @@ tnoremap <C-l> l
 tnoremap <C-h> h
 tnoremap <C-k> k
 tnoremap <C-j> j
-vnoremap <BS> :call SetMode("\<BS\>", "Visual") \| '<,'>:call backspace()<cr>
-vnoremap & :call SetMode("&", "Visual") \| '<,'>:&<cr>
-vnoremap ,F :call SetMode(",F", "Visual") \| '<,'>:echo VS()<cr>
-vnoremap ,,g :call SetMode(",,g", "Visual") \| '<,'>:call AppendToEndRange()<cr>
-vnoremap ,G :call SetMode(",G", "Visual") \| '<,'>:AppendAll<cr>
-vnoremap ,u :call SetMode(",u", "Visual") \| '<,'>:!uniq<cr>
-vnoremap <M-v> :call SetMode("\<M-v\>", "Visual") \| '<,'>:call VPaste("Visual")<cr>
-vnoremap <M-c> :call SetMode("\<M-c\>", "Visual") \| '<,'>:call VCopy("Visual")<cr>
-vnoremap <M-x> :call SetMode("\<M-x\>", "Visual") \| '<,'>:call VCut("Visual")<cr>
-tnoremap <c-o> <C-\><C-n>:call SetMode("\<c-o\>", "Terminal") \| <c-\><c-n><c-o>
 inoremap <C-l> :call SetMode("\<C-l\>", "Insert") \| <C-w>li
 inoremap <C-h> :call SetMode("\<C-h\>", "Insert") \| <C-w>hi
 inoremap <c-w><c-w> :call SetMode("\<c-w\>\<c-w\>", "Insert") \| <c-w><c-w>
@@ -345,6 +335,16 @@ tnoremap <ScrollWheelDown> <C-\><C-n>
 tnoremap <S-ScrollWheelDown> <C-\><C-n>
 tnoremap <Esc> <C-\><C-n>:call SetMode("\<Esc\>", "Terminal") \| i
 tnoremap <LeftMouse> <C-\><C-n>
+vnoremap <BS> :call SetMode("\<BS\>", "Visual") \| '<,'>:call backspace()<cr>
+vnoremap & :call SetMode("&", "Visual") \| '<,'>:&<cr>
+vnoremap ,F :call SetMode(",F", "Visual") \| '<,'>:echo VS()<cr>
+vnoremap ,,g :call SetMode(",,g", "Visual") \| '<,'>:call AppendToEndRange()<cr>
+vnoremap ,G :call SetMode(",G", "Visual") \| '<,'>:AppendAll<cr>
+vnoremap ,u :call SetMode(",u", "Visual") \| '<,'>:!uniq<cr>
+vnoremap <M-v> :call SetMode("\<M-v\>", "Visual") \| '<,'>:call VPaste("Visual")<cr>
+vnoremap <M-c> :call SetMode("\<M-c\>", "Visual") \| '<,'>:call VCopy("Visual")<cr>
+vnoremap <M-x> :call SetMode("\<M-x\>", "Visual") \| '<,'>:call VCut("Visual")<cr>
+tnoremap <c-o> <C-\><C-n>:call SetMode("\<c-o\>", "Terminal") \| <c-\><c-n><c-o>
 nnoremap ,,,m :call SetMode(",,,m", "Normal") \| :call Toggle_Set_Last_Git_Message()<cr>
 nnoremap ,,,l :call SetMode(",,,l", "Normal") \| :call ToggleLineState()<cr>
 nnoremap ,,,L :call SetMode(",,,L", "Normal") \| :call ToggleLineStateGlobal()<cr>
@@ -371,78 +371,78 @@ nnoremap <space>p :call SetMode("\<space\>p", "Normal") \| :CopyFileNameToClipbo
 nnoremap <space>P :call SetMode("\<space\>P", "Normal") \| :CopyWholePathToClipboard<cr>
 nnoremap <space>r :call SetMode("\<space\>r", "Normal") \| :InsertReceiver<cr>
 nnoremap ,dd :call SetMode(",dd", "Normal") \| :call Rewindworkdir()<cr>
-nnoremap ,<Space> :call SetMode(",\<Space\>", "Normal") \|                                         :call Files(Folder_Up(v:count, 0))<cr>
-nnoremap ,,<Space> :call SetMode(",,\<Space\>", "Normal") \|                                 :call Files(Folder_Up(v:count, 1))<cr>
-nnoremap ,,,<Space> :call SetMode(",,,\<Space\>", "Normal") \|                         :call Files(Folder_Up(v:count, 2))<cr>
-nnoremap ,,,,<Space> :call SetMode(",,,,\<Space\>", "Normal") \|                 :call Files(Folder_Up(v:count, 3))<cr>
-nnoremap ,,,,,<Space> :call SetMode(",,,,,\<Space\>", "Normal") \|         :call Files(Folder_Up(v:count, 4))<cr>
+nnoremap ,<Space> :call SetMode(",\<Space\>", "Normal") \| :call Files(Folder_Up(v:count, 0))<cr>
+nnoremap ,,<Space> :call SetMode(",,\<Space\>", "Normal") \| :call Files(Folder_Up(v:count, 1))<cr>
+nnoremap ,,,<Space> :call SetMode(",,,\<Space\>", "Normal") \| :call Files(Folder_Up(v:count, 2))<cr>
+nnoremap ,,,,<Space> :call SetMode(",,,,\<Space\>", "Normal") \| :call Files(Folder_Up(v:count, 3))<cr>
+nnoremap ,,,,,<Space> :call SetMode(",,,,,\<Space\>", "Normal") \| :call Files(Folder_Up(v:count, 4))<cr>
 nnoremap ,,,,,,<Space> :call SetMode(",,,,,,\<Space\>", "Normal") \| :call Files(Folder_Up(v:count, 5))<cr>
-nnoremap ,g :call SetMode(",g", "Normal") \|                                         :call AgIn(Folder_Up(v:count, 0))<cr>
-nnoremap ,,g :call SetMode(",,g", "Normal") \|                                 :call AgIn(Folder_Up(v:count, 1))<cr>
-nnoremap ,,,g :call SetMode(",,,g", "Normal") \|                         :call AgIn(Folder_Up(v:count, 2))<cr>
-nnoremap ,,,,g :call SetMode(",,,,g", "Normal") \|                 :call AgIn(Folder_Up(v:count, 3))<cr>
-nnoremap ,,,,,g :call SetMode(",,,,,g", "Normal") \|         :call AgIn(Folder_Up(v:count, 4))<cr>
+nnoremap ,g :call SetMode(",g", "Normal") \| :call AgIn(Folder_Up(v:count, 0))<cr>
+nnoremap ,,g :call SetMode(",,g", "Normal") \| :call AgIn(Folder_Up(v:count, 1))<cr>
+nnoremap ,,,g :call SetMode(",,,g", "Normal") \| :call AgIn(Folder_Up(v:count, 2))<cr>
+nnoremap ,,,,g :call SetMode(",,,,g", "Normal") \| :call AgIn(Folder_Up(v:count, 3))<cr>
+nnoremap ,,,,,g :call SetMode(",,,,,g", "Normal") \| :call AgIn(Folder_Up(v:count, 4))<cr>
 nnoremap ,,,,,,g :call SetMode(",,,,,,g", "Normal") \| :call AgIn(Folder_Up(v:count, 5))<cr>
 nnoremap ,vcd :call SetMode(",vcd", "Normal") \| :call CD(Vim_Advantages_Path())<cr>
-nnoremap ,p :call SetMode(",p", "Normal") \|                :call Projects()<cr>
-nnoremap ,,p :call SetMode(",,p", "Normal") \|               :call Projects()<cr>
-nnoremap ,,,p :call SetMode(",,,p", "Normal") \|              :call Projects()<cr>
-nnoremap ,,,,p :call SetMode(",,,,p", "Normal") \|             :call Projects()<cr>
-nnoremap ,,,,,p :call SetMode(",,,,,p", "Normal") \|            :call Projects()<cr>
-nnoremap ,,,,,,p :call SetMode(",,,,,,p", "Normal") \|           :call Projects()<cr>
-nnoremap <C-p> :call SetMode("\<C-p\>", "Normal") \|              :call Projects()<cr>
-nnoremap <C-S-p> :call SetMode("\<C-S-p\>", "Normal") \|            :call Projects()<cr>
-nnoremap <A-p> :call SetMode("\<A-p\>", "Normal") \|              :call Projects()<cr>
-nnoremap <A-S-p> :call SetMode("\<A-S-p\>", "Normal") \|            :call Projects()<cr>
-nnoremap <A-C-p> :call SetMode("\<A-C-p\>", "Normal") \|            :call Projects()<cr>
-nnoremap <A-S-C-p> :call SetMode("\<A-S-C-p\>", "Normal") \|          :call Projects()<cr>
-nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \|           :call BuildSystemsGitProjects()<cr>
-nnoremap <C-S-m> :call SetMode("\<C-S-m\>", "Normal") \|           :Generate<cr>
-nnoremap <C-Space> :call SetMode("\<C-Space\>", "Normal") \|              :call Commands()<cr>
-vnoremap <C-Space> :call SetMode("\<C-Space\>", "Visual") \| '<,'>             :call Commands()<cr>
-cnoremap <C-Space> :call SetMode("\<C-Space\>", "Command") \|              :call Commands()<cr>
-tnoremap <C-Space> <C-\><C-n>:call SetMode("\<C-Space\>", "Terminal") \|              :call Commands()<cr>
-inoremap <C-Space> :call SetMode("\<C-Space\>", "Insert") \|              :call Commands()<cr>
-nnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Normal") \|            :call Commands()<cr>
-vnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Visual") \| '<,'>           :call Commands()<cr>
-cnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Command") \|            :call Commands()<cr>
-tnoremap <C-S-Space> <C-\><C-n>:call SetMode("\<C-S-Space\>", "Terminal") \|            :call Commands()<cr>
-inoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Insert") \|            :call Commands()<cr>
-nnoremap <A-Space> :call SetMode("\<A-Space\>", "Normal") \|              :call Commands()<cr>
-vnoremap <A-Space> :call SetMode("\<A-Space\>", "Visual") \| '<,'>             :call Commands()<cr>
-cnoremap <A-Space> :call SetMode("\<A-Space\>", "Command") \|              :call Commands()<cr>
-tnoremap <A-Space> <C-\><C-n>:call SetMode("\<A-Space\>", "Terminal") \|              :call Commands()<cr>
-inoremap <A-Space> :call SetMode("\<A-Space\>", "Insert") \|              :call Commands()<cr>
-nnoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Normal") \|            :call Commands()<cr>
-vnoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Visual") \| '<,'>           :call Commands()<cr>
-cnoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Command") \|            :call Commands()<cr>
-tnoremap <A-S-Space> <C-\><C-n>:call SetMode("\<A-S-Space\>", "Terminal") \|            :call Commands()<cr>
-inoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Insert") \|            :call Commands()<cr>
-nnoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Normal") \|            :call Commands()<cr>
-vnoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Visual") \| '<,'>           :call Commands()<cr>
-cnoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Command") \|            :call Commands()<cr>
-tnoremap <A-C-Space> <C-\><C-n>:call SetMode("\<A-C-Space\>", "Terminal") \|            :call Commands()<cr>
-inoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Insert") \|            :call Commands()<cr>
-nnoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Normal") \|          :call Commands()<cr>
-vnoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Visual") \| '<,'>         :call Commands()<cr>
-cnoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Command") \|          :call Commands()<cr>
-tnoremap <A-S-C-Space> <C-\><C-n>:call SetMode("\<A-S-C-Space\>", "Terminal") \|          :call Commands()<cr>
-inoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Insert") \|          :call Commands()<cr>
-nnoremap <C-g> :call SetMode("\<C-g\>", "Normal") \|              :call AgIn(Folder_Project())<cr>
-nnoremap <C-S-g> :call SetMode("\<C-S-g\>", "Normal") \|            :call AgIn(Folder_Repo())<cr>
-nnoremap <A-g> :call SetMode("\<A-g\>", "Normal") \|              :call AgIn(Folder_Repo())<cr>
-nnoremap <A-S-g> :call SetMode("\<A-S-g\>", "Normal") \|            :call AgIn(Folder_Repo(1))<cr>
-nnoremap <A-C-g> :call SetMode("\<A-C-g\>", "Normal") \|            :call AgIn(Folder_Repo(1))<cr>
-nnoremap <A-S-C-g> :call SetMode("\<A-S-C-g\>", "Normal") \|          :call AgIn('/')<cr>
-nnoremap <C-m> :call SetMode("\<C-m\>", "Normal") \|              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
-nnoremap ,o :call SetMode(",o", "Normal") \|              :OpenFileCommandLineSameDir<cr>
-nnoremap ,. :call SetMode(",.", "Normal") \|              :OpenFileCommandLineCWD<cr>
-nnoremap ,,. :call SetMode(",,.", "Normal") \|      :OpenFileCommandLineSameDir<cr>
-nnoremap ,. :call SetMode(",.", "Normal") \|              :call CommandLineFiles(Folder_Up(v:count, 0))<cr>
-nnoremap ,,. :call SetMode(",,.", "Normal") \|              :call CommandLineFiles(Folder_Up(v:count, 1))<cr>
-nnoremap ,,,. :call SetMode(",,,.", "Normal") \|              :call CommandLineFiles(Folder_Up(v:count, 2))<cr>
-nnoremap ,,,,. :call SetMode(",,,,.", "Normal") \|              :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
-nnoremap ,,,,,. :call SetMode(",,,,,.", "Normal") \|              :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
+nnoremap ,p :call SetMode(",p", "Normal") \| :call Projects()<cr>
+nnoremap ,,p :call SetMode(",,p", "Normal") \| :call Projects()<cr>
+nnoremap ,,,p :call SetMode(",,,p", "Normal") \| :call Projects()<cr>
+nnoremap ,,,,p :call SetMode(",,,,p", "Normal") \| :call Projects()<cr>
+nnoremap ,,,,,p :call SetMode(",,,,,p", "Normal") \| :call Projects()<cr>
+nnoremap ,,,,,,p :call SetMode(",,,,,,p", "Normal") \| :call Projects()<cr>
+nnoremap <C-p> :call SetMode("\<C-p\>", "Normal") \| :call Projects()<cr>
+nnoremap <C-S-p> :call SetMode("\<C-S-p\>", "Normal") \| :call Projects()<cr>
+nnoremap <A-p> :call SetMode("\<A-p\>", "Normal") \| :call Projects()<cr>
+nnoremap <A-S-p> :call SetMode("\<A-S-p\>", "Normal") \| :call Projects()<cr>
+nnoremap <A-C-p> :call SetMode("\<A-C-p\>", "Normal") \| :call Projects()<cr>
+nnoremap <A-S-C-p> :call SetMode("\<A-S-C-p\>", "Normal") \| :call Projects()<cr>
+nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call BuildSystemsGitProjects()<cr>
+nnoremap <C-S-m> :call SetMode("\<C-S-m\>", "Normal") \| :Generate<cr>
+nnoremap <C-Space> :call SetMode("\<C-Space\>", "Normal") \| :call Commands()<cr>
+vnoremap <C-Space> :call SetMode("\<C-Space\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <C-Space> :call SetMode("\<C-Space\>", "Command") \| :call Commands()<cr>
+tnoremap <C-Space> <C-\><C-n>:call SetMode("\<C-Space\>", "Terminal") \| :call Commands()<cr>
+inoremap <C-Space> :call SetMode("\<C-Space\>", "Insert") \| :call Commands()<cr>
+nnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Normal") \| :call Commands()<cr>
+vnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Command") \| :call Commands()<cr>
+tnoremap <C-S-Space> <C-\><C-n>:call SetMode("\<C-S-Space\>", "Terminal") \| :call Commands()<cr>
+inoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-Space> :call SetMode("\<A-Space\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-Space> :call SetMode("\<A-Space\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-Space> :call SetMode("\<A-Space\>", "Command") \| :call Commands()<cr>
+tnoremap <A-Space> <C-\><C-n>:call SetMode("\<A-Space\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-Space> :call SetMode("\<A-Space\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Command") \| :call Commands()<cr>
+tnoremap <A-S-Space> <C-\><C-n>:call SetMode("\<A-S-Space\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-S-Space> :call SetMode("\<A-S-Space\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Command") \| :call Commands()<cr>
+tnoremap <A-C-Space> <C-\><C-n>:call SetMode("\<A-C-Space\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-C-Space> :call SetMode("\<A-C-Space\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Command") \| :call Commands()<cr>
+tnoremap <A-S-C-Space> <C-\><C-n>:call SetMode("\<A-S-C-Space\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-S-C-Space> :call SetMode("\<A-S-C-Space\>", "Insert") \| :call Commands()<cr>
+nnoremap <C-g> :call SetMode("\<C-g\>", "Normal") \| :call AgIn(Folder_Project())<cr>
+nnoremap <C-S-g> :call SetMode("\<C-S-g\>", "Normal") \| :call AgIn(Folder_Repo())<cr>
+nnoremap <A-g> :call SetMode("\<A-g\>", "Normal") \| :call AgIn(Folder_Repo())<cr>
+nnoremap <A-S-g> :call SetMode("\<A-S-g\>", "Normal") \| :call AgIn(Folder_Repo(1))<cr>
+nnoremap <A-C-g> :call SetMode("\<A-C-g\>", "Normal") \| :call AgIn(Folder_Repo(1))<cr>
+nnoremap <A-S-C-g> :call SetMode("\<A-S-C-g\>", "Normal") \| :call AgIn('/')<cr>
+nnoremap <C-m> :call SetMode("\<C-m\>", "Normal") \| :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
+nnoremap ,o :call SetMode(",o", "Normal") \| :OpenFileCommandLineSameDir<cr>
+nnoremap ,. :call SetMode(",.", "Normal") \| :OpenFileCommandLineCWD<cr>
+nnoremap ,,. :call SetMode(",,.", "Normal") \| :OpenFileCommandLineSameDir<cr>
+nnoremap ,. :call SetMode(",.", "Normal") \| :call CommandLineFiles(Folder_Up(v:count, 0))<cr>
+nnoremap ,,. :call SetMode(",,.", "Normal") \| :call CommandLineFiles(Folder_Up(v:count, 1))<cr>
+nnoremap ,,,. :call SetMode(",,,.", "Normal") \| :call CommandLineFiles(Folder_Up(v:count, 2))<cr>
+nnoremap ,,,,. :call SetMode(",,,,.", "Normal") \| :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
+nnoremap ,,,,,. :call SetMode(",,,,,.", "Normal") \| :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
 cnoremap <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
@@ -456,7 +456,7 @@ nnoremap <C-Left> :call SetMode("\<C-Left\>", "Normal") \| :call CD(WFilePrev())
 nnoremap <C-Right> :call SetMode("\<C-Right\>", "Normal") \| :call CD(WFileNext())<cr>
 nnoremap <C-,> :call SetMode("\<C-,\>", "Normal") \| :call CD(WFilePrev())<cr>
 nnoremap <C-.> :call SetMode("\<C-.\>", "Normal") \| :call CD(WFileNext())<cr>
-nnoremap ,<Tab> :call SetMode(",\<Tab\>", "Normal") \|      :JumpProjectIn<cr>
+nnoremap ,<Tab> :call SetMode(",\<Tab\>", "Normal") \| :JumpProjectIn<cr>
 nnoremap <localleader><Tab> :call SetMode("\<localleader\>\<Tab\>", "Normal") \| :JumpProjectIn<cr>
 vnoremap <F14> :call SetMode("\<F14\>", "Visual") \| '<,'>:call VS()<cr>
 nnoremap <F13> :call SetMode("\<F13\>", "Normal") \| :call VS()<cr>

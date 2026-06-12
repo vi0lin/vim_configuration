@@ -1,5 +1,8 @@
 if !exists("g:vim_advantages_got_sourced")
 
+let g:textReplace="Replace: "
+let g:textReplaceWith="Replace With: "
+
 function WordsPerLine(n) range
   call CommandInfo()
   let text=VS()
@@ -495,5 +498,139 @@ function SearchIps() range
   /\d\{1,3\}\.\d\{1,3\}\.\d\{1,3\}\.\d\{1,3\}
   " last search pattern (n and N)
 endfunction
+
+function! SubstSpacesWithOneSpace()
+  '<,'>s/\s\+/ /g
+endfunction
+command! -range -nargs=0 SubstSpacesWithOneSpace :call SubstSpacesWithOneSpace()
+
+function! SearchMoreThanOneSpace()
+  /\{2,}
+endfunction
+command! -range -nargs=0 SearchMoreThanOneSpace :call SearchMoreThanOneSpace()
+
+function! SubstWordUntilWordBoundary()
+  let word=input(g:textReplace)
+  let with=input(g:textReplaceWith)
+  " let word = escape(word, '/\')
+  let word = escape(word, '')
+  " let with = escape(with,   '/\&')
+  let with = escape(with,   '')
+  " '<,'>s/.\{-}\>//g
+  " exec "s/".word.".{-}\>/".with."/g"
+  let e = printf("'<,'>s/%s.\\{-}\\>/%s/g", word, with)
+  " echo e
+  silent exec e
+endfunction
+command! -range -nargs=0 SubstWordUntilWordBoundary :call SubstWordUntilWordBoundary()
+
+function! SubstSpacesWithOneSpaceWhenNotCommentOrIntend()
+  '<,'>s/\(".\*\)\@<!\s\+/ /g
+endfunction
+command! -range -nargs=0 SubstSpacesWithOneSpaceWhenNotCommentOrIntend :call SubstSpacesWithOneSpaceWhenNotCommentOrIntend()
+
+" Unfinished
+" Replaces Words In Comments
+function! ReplaceInComments(...)
+  let [word, with]=ParseReplaceArgs(a:000)
+  let word = escape(word, '')
+  let with = escape(with, '')
+  " let pattern="'<,'>s/\\v(^\\s*\\\")\@!%s.\\{-}\\>/%s/g"
+  " let a='\v(^\s*\")\@=.\{-}%s.\{-}\>'
+  let a='\v(^\s*\")\@=.{-}\zs%s'
+  let b='%s'
+  " let a = escape(a, '\')
+  " let b = escape(b, '\')
+  let pattern="'<,'>s/"..a.."/"..b.."/ge"
+  let e = printf(pattern, word, with)
+  " echo e
+  silent exec e
+  " silent exec e
+  " /\v(^\s*\")@!TEST.\{-}\>/replaced/g
+endfunction
+command! -range -nargs=* ReplaceInComments :call ReplaceInComments(<f-args>)
+
+" Only Comments From Beginning Of The Line Are  Skipped - Comments That Are
+" After A Expression Are Getting Replaced!
+" WARNING: Replaces Only First Match
+function! ReplaceButNotInComments(...)
+  let [word, with]=ParseReplaceArgs(a:000)
+  " let a='\v%(^\s*\".{-})\@<!\zs%s'
+  let a='\(^\s*\".\{-}\)\@<!%s'
+  let b='%s'
+  " let a = escape(a, '\')
+  " let b = escape(b, '\')
+  let pattern="'<,'>s/"..a.."/"..b.."/g"
+  let e = printf(pattern, word, with)
+  silent exec e
+endfunction
+command! -range -nargs=* ReplaceButNotInComments :call ReplaceButNotInComments(<f-args>)
+
+function ParseReplaceArgs(args)
+  if len(a:args)==0
+    let replace=input(g:textReplace)
+    let replaceWith=input(g:textReplaceWith)
+  elseif len(a:args)==1
+    let replace=a:args[0]
+    let replaceWith=input(g:textReplaceWith)
+  elseif len(a:args)==2
+    let replace=a:args[0]
+    let replaceWith=a:args[1]
+  else
+    let replace=a:args[0]
+    let replaceWith=join(a:args[1:], ' ')
+  endif
+  return [ replace, replaceWith ]
+endfunction
+
+function! Replace(...) range
+  " let a='\v%(^\s*\".{-})\@<!\zs%s'
+  let [word, with]=ParseReplaceArgs(a:000)
+  let a='%s'
+  let b='%s'
+  " let a = escape(a, '\')
+  " let b = escape(b, '\')
+  let pattern="'<,'>s/"..a.."/"..b.."/g"
+  let e = printf(pattern, word, with)
+  silent exec e
+endfunction
+command! -range -nargs=* Replace :call Replace(<f-args>)
+
+" Strong
+" Skips Comments
+" Replaces Multiple Spaces With A Single Space
+" Ignores Intendation
+function! CollapseSpaces() range
+  let start=line("'<")
+  let end=line("'>")
+  let l:save = winsaveview()
+  for l:lnum in range(start, end)
+    let l:line = getline(l:lnum)
+    " skip pure comment lines (any indent level)
+    if l:line =~ '^\s*"'
+      continue
+    endif
+    " collapse multiple spaces, but not leading indentation
+    let l:indent  = matchstr(l:line, '^\s*')
+    let l:rest     = strpart(l:line, len(l:indent))
+    let l:replaced = substitute(l:rest, '  \+', ' ', 'g')
+    call setline(l:lnum, l:indent . l:replaced)
+  endfor
+  call winrestview(l:save)
+endfunction
+command! -range -nargs=0 CollapseSpaces :call CollapseSpaces()
+
+finish
+
+" Comment! Comment! Comment!
+" Comment! Comment!
+    " Comment! Comment! Comment!
+TEST TEST TEST
+    TEST TEST
+    TEST " TEST
+    " Comment! Comment! Comment!
+    TEST TEST
+    TEST test df
+" Comment! Comment! Comment!
 
 endif

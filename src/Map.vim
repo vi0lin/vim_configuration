@@ -262,39 +262,39 @@ NewMap -v -no . :<Up><cr>
 
 " Amap <F2> :NERDTreeFind<cr>
 
-NewMap -no -v -n -t ,h     :call Open("h", "buffer", "new")<cr>
-NewMap -no -v -n -t ,j     :call Open("j", "buffer", "new")<cr>
-NewMap -no -v -n -t ,k     :call Open("k", "buffer", "new")<cr>
-NewMap -no -v -n -t ,l     :call Open("l", "buffer", "new")<cr>
-NewMap -no -v -n -t ,H     :call Open("H", "buffer", "new")<cr>
-NewMap -no -v -n -t ,J     :call Open("J", "buffer", "new")<cr>
-NewMap -no -v -n -t ,K     :call Open("K", "buffer", "new")<cr>
-NewMap -no -v -n -t ,L     :call Open("L", "buffer", "new")<cr>
-NewMap -no -v -n -t ,,h     :call Open("h", "terminal", "new")<cr>
-NewMap -no -v -n -t ,,j     :call Open("j", "terminal", "new")<cr>
-NewMap -no -v -n -t ,,k     :call Open("k", "terminal", "new")<cr>
-NewMap -no -v -n -t ,,l     :call Open("l", "terminal", "new")<cr>
-NewMap -no -v -n -t ,,H     :call Open("H", "terminal", "new")<cr>
-NewMap -no -v -n -t ,,J     :call Open("J", "terminal", "new")<cr>
-NewMap -no -v -n -t ,,K     :call Open("K", "terminal", "new")<cr>
-NewMap -no -v -n -t ,,L     :call Open("L", "terminal", "new")<cr>
+NewMap -no -v -n -t ,h :call Open("h", "buffer", "new")<cr>
+NewMap -no -v -n -t ,j :call Open("j", "buffer", "new")<cr>
+NewMap -no -v -n -t ,k :call Open("k", "buffer", "new")<cr>
+NewMap -no -v -n -t ,l :call Open("l", "buffer", "new")<cr>
+NewMap -no -v -n -t ,H :call Open("H", "buffer", "new")<cr>
+NewMap -no -v -n -t ,J :call Open("J", "buffer", "new")<cr>
+NewMap -no -v -n -t ,K :call Open("K", "buffer", "new")<cr>
+NewMap -no -v -n -t ,L :call Open("L", "buffer", "new")<cr>
+NewMap -no -v -n -t ,,h :call Open("h", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,j :call Open("j", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,k :call Open("k", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,l :call Open("l", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,H :call Open("H", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,J :call Open("J", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,K :call Open("K", "terminal", "new")<cr>
+NewMap -no -v -n -t ,,L :call Open("L", "terminal", "new")<cr>
 "
 " Amap <A-h>     :call Open("h", "buffer", "new")<cr>
 " Amap <A-j>     :call Open("j", "buffer", "new")<cr>
 " Amap <A-k>     :call Open("k", "buffer", "new")<cr>
 " Amap <A-l>     :call Open("l", "buffer", "new")<cr>
-NewMap -no -a <A-H>     :call Open("H", "buffer", "new")<cr>
-NewMap -no -a <A-J>     :call Open("J", "buffer", "new")<cr>
-NewMap -no -a <A-K>     :call Open("K", "buffer", "new")<cr>
-NewMap -no -a <A-L>     :call Open("L", "buffer", "new")<cr>
-NewMap -no -a <A-S-h>     :call Open("h", "terminal", "new")<cr>
-NewMap -no -a <A-S-j>     :call Open("j", "terminal", "new")<cr>
-NewMap -no -a <A-S-k>     :call Open("k", "terminal", "new")<cr>
-NewMap -no -a <A-S-l>     :call Open("l", "terminal", "new")<cr>
-NewMap -no -a <A-S-H>     :call Open("H", "terminal", "new")<cr>
-NewMap -no -a <A-S-J>     :call Open("J", "terminal", "new")<cr>
-NewMap -no -a <A-S-K>     :call Open("K", "terminal", "new")<cr>
-NewMap -no -a <A-S-L>     :call Open("L", "terminal", "new")<cr>
+NewMap -no -a <A-H> :call Open("H", "buffer", "new")<cr>
+NewMap -no -a <A-J> :call Open("J", "buffer", "new")<cr>
+NewMap -no -a <A-K> :call Open("K", "buffer", "new")<cr>
+NewMap -no -a <A-L> :call Open("L", "buffer", "new")<cr>
+NewMap -no -a <A-S-h> :call Open("h", "terminal", "new")<cr>
+NewMap -no -a <A-S-j> :call Open("j", "terminal", "new")<cr>
+NewMap -no -a <A-S-k> :call Open("k", "terminal", "new")<cr>
+NewMap -no -a <A-S-l> :call Open("l", "terminal", "new")<cr>
+NewMap -no -a <A-S-H> :call Open("H", "terminal", "new")<cr>
+NewMap -no -a <A-S-J> :call Open("J", "terminal", "new")<cr>
+NewMap -no -a <A-S-K> :call Open("K", "terminal", "new")<cr>
+NewMap -no -a <A-S-L> :call Open("L", "terminal", "new")<cr>
 " Amap ,<C-h> :call Open("h", "buffer", "copy")<cr>
 " Amap ,<C-j> :call Open("j", "buffer", "copy")<cr>
 " Amap ,<C-k> :call Open("k", "buffer", "copy")<cr>
@@ -304,22 +304,22 @@ NewMap -no -a <A-S-L>     :call Open("L", "terminal", "new")<cr>
 " Amap ,<C-S-k> :call Open("K", "buffer", "copy")<cr>
 " Amap ,<C-S-l> :call Open("L", "buffer", "copy")<cr>
 
-NewMap -no -a <A-S-Left>     :call Open("h", "terminal", "new")<cr>
-NewMap -no -a <A-S-Down>     :call Open("j", "terminal", "new")<cr>
-NewMap -no -a <A-S-Up>       :call Open("k", "terminal", "new")<cr>
-NewMap -no -a <A-S-Right>    :call Open("l", "terminal", "new")<cr>
-NewMap -no -a <A-S-Left>     :call Open("H", "terminal", "new")<cr>
-NewMap -no -a <A-S-Down>     :call Open("J", "terminal", "new")<cr>
-NewMap -no -a <A-S-Up>       :call Open("K", "terminal", "new")<cr>
-NewMap -no -a <A-S-Right>    :call Open("L", "terminal", "new")<cr>
-NewMap -no -a <A-Left>       :call Open("h", "buffer", "new")<cr>
-NewMap -no -a <A-Down>       :call Open("j", "buffer", "new")<cr>
-NewMap -no -a <A-Up>         :call Open("k", "buffer", "new")<cr>
-NewMap -no -a <A-Right>      :call Open("l", "buffer", "new")<cr>
-NewMap -no -a <A-Left>       :call Open("H", "buffer", "new")<cr>
-NewMap -no -a <A-Down>       :call Open("J", "buffer", "new")<cr>
-NewMap -no -a <A-Up>         :call Open("K", "buffer", "new")<cr>
-NewMap -no -a <A-Right>      :call Open("L", "buffer", "new")<cr>
+NewMap -no -a <A-S-Left> :call Open("h", "terminal", "new")<cr>
+NewMap -no -a <A-S-Down> :call Open("j", "terminal", "new")<cr>
+NewMap -no -a <A-S-Up> :call Open("k", "terminal", "new")<cr>
+NewMap -no -a <A-S-Right> :call Open("l", "terminal", "new")<cr>
+NewMap -no -a <A-S-Left> :call Open("H", "terminal", "new")<cr>
+NewMap -no -a <A-S-Down> :call Open("J", "terminal", "new")<cr>
+NewMap -no -a <A-S-Up> :call Open("K", "terminal", "new")<cr>
+NewMap -no -a <A-S-Right> :call Open("L", "terminal", "new")<cr>
+NewMap -no -a <A-Left> :call Open("h", "buffer", "new")<cr>
+NewMap -no -a <A-Down> :call Open("j", "buffer", "new")<cr>
+NewMap -no -a <A-Up> :call Open("k", "buffer", "new")<cr>
+NewMap -no -a <A-Right> :call Open("l", "buffer", "new")<cr>
+NewMap -no -a <A-Left> :call Open("H", "buffer", "new")<cr>
+NewMap -no -a <A-Down> :call Open("J", "buffer", "new")<cr>
+NewMap -no -a <A-Up> :call Open("K", "buffer", "new")<cr>
+NewMap -no -a <A-Right> :call Open("L", "buffer", "new")<cr>
 " Amap <A-<C-h>> :call Open("h", "buffer", "copy")<cr>
 " Amap <A-<C-j>> :call Open("j", "buffer", "copy")<cr>
 " Amap <A-<C-k>> :call Open("k", "buffer", "copy")<cr>
@@ -426,18 +426,6 @@ NewMap -t -un -no <C-j> j
 "" works NewMap -t -un -no <C-h> h<cr>
 "" works NewMap -t -un -no <C-k> k<cr>
 "" works NewMap -t -un -no <C-j> j<cr>
-
-NewMap -no -v <BS> :call backspace()<cr>
-NewMap -no -v & :&<cr>
-NewMap -no -v ,F :echo VS()<cr>
-NewMap -no -v ,,g :call AppendToEndRange()<cr>
-NewMap -no -v ,G :AppendAll<cr>
-NewMap -no -v ,u :!uniq<cr>
-NewMap -no -v <M-v> :call VPaste("Visual")<cr>
-NewMap -no -v <M-c> :call VCopy("Visual")<cr>
-NewMap -no -v <M-x> :call VCut("Visual")<cr>
-" NewMap -no -v <c-c> "*y
-NewMap -no -t <c-o> <c-\><c-n><c-o>
 " was imap
 NewMap -no -i <C-l> <C-w>li
 " was imap
@@ -468,7 +456,6 @@ NewMap -no -i <C-h> <C-w>hi
 """ NewMap -t -no <C-k> :wincmd k<cr>
 " C - \ C - n
 """ NewMap -t -no <C-j> :wincmd j<cr>
-
 " was imap
 NewMap -no -i <c-w><c-w> <c-w><c-w>
 NewMap -no -t  :call ExitTerminal()<cr>
@@ -493,6 +480,17 @@ NewMap -no -t -un <S-ScrollWheelDown> <C-\><C-n>
 NewMap -no -t <Esc> i
 NewMap -no -t -un <LeftMouse> <C-\><C-n>
 
+NewMap -no -v <BS> :call backspace()<cr>
+NewMap -no -v & :&<cr>
+NewMap -no -v ,F :echo VS()<cr>
+NewMap -no -v ,,g :call AppendToEndRange()<cr>
+NewMap -no -v ,G :AppendAll<cr>
+NewMap -no -v ,u :!uniq<cr>
+NewMap -no -v <M-v> :call VPaste("Visual")<cr>
+NewMap -no -v <M-c> :call VCopy("Visual")<cr>
+NewMap -no -v <M-x> :call VCut("Visual")<cr>
+" NewMap -no -v <c-c> "*y
+NewMap -no -t <c-o> <c-\><c-n><c-o>
 NewMap -no -n ,,,m :call Toggle_Set_Last_Git_Message()<cr>
 NewMap -no -n ,,,l :call ToggleLineState()<cr>
 NewMap -no -n ,,,L :call ToggleLineStateGlobal()<cr>
@@ -531,12 +529,12 @@ NewMap -no -n ,<Space> :call GetCCWD()<cr>
 " vmap <silent> <C-s> :w!<cr>
 " imap <silent> <C-s> :w!<cr>l
 
-NewMap -no -n <C-s> :SaveFile<cr>
-NewMap -no -v <C-s> :SaveFile<cr>
+NewMap -n -no <C-s> :SaveFile<cr>
+NewMap -v -no <C-s> :SaveFile<cr>
 " was imap
 " todo add silent
 " NewMap -no -i <C-s> :SaveFile<cr>
-NewMap -no -i <C-s> :SaveFile<cr>
+NewMap -i -no <C-s> :SaveFile<cr>
 
 NewMap -n -no <localleader>f :InsertFunction<cr>
 NewMap -n -no <space>f :InsertFilename<cr>
@@ -580,66 +578,66 @@ NewMap -n -no ,dd :call Rewindworkdir()<cr>
 "" nnoremap <C-A-->            :FindInFileFZFSystem<cr>
 "" " nnoremap <C-S-p>            :FindInFileFZFRepo<cr>
 
-NewMap -no -n ,<Space>                                         :call Files(Folder_Up(v:count, 0))<cr>
-NewMap -no -n ,,<Space>                                 :call Files(Folder_Up(v:count, 1))<cr>
-NewMap -no -n ,,,<Space>                         :call Files(Folder_Up(v:count, 2))<cr>
-NewMap -no -n ,,,,<Space>                 :call Files(Folder_Up(v:count, 3))<cr>
-NewMap -no -n ,,,,,<Space>         :call Files(Folder_Up(v:count, 4))<cr>
+NewMap -no -n ,<Space> :call Files(Folder_Up(v:count, 0))<cr>
+NewMap -no -n ,,<Space> :call Files(Folder_Up(v:count, 1))<cr>
+NewMap -no -n ,,,<Space> :call Files(Folder_Up(v:count, 2))<cr>
+NewMap -no -n ,,,,<Space> :call Files(Folder_Up(v:count, 3))<cr>
+NewMap -no -n ,,,,,<Space> :call Files(Folder_Up(v:count, 4))<cr>
 NewMap -no -n ,,,,,,<Space> :call Files(Folder_Up(v:count, 5))<cr>
 
-NewMap -no -n ,g                                         :call AgIn(Folder_Up(v:count, 0))<cr>
-NewMap -no -n ,,g                                 :call AgIn(Folder_Up(v:count, 1))<cr>
-NewMap -no -n ,,,g                         :call AgIn(Folder_Up(v:count, 2))<cr>
-NewMap -no -n ,,,,g                 :call AgIn(Folder_Up(v:count, 3))<cr>
-NewMap -no -n ,,,,,g         :call AgIn(Folder_Up(v:count, 4))<cr>
+NewMap -no -n ,g :call AgIn(Folder_Up(v:count, 0))<cr>
+NewMap -no -n ,,g :call AgIn(Folder_Up(v:count, 1))<cr>
+NewMap -no -n ,,,g :call AgIn(Folder_Up(v:count, 2))<cr>
+NewMap -no -n ,,,,g :call AgIn(Folder_Up(v:count, 3))<cr>
+NewMap -no -n ,,,,,g :call AgIn(Folder_Up(v:count, 4))<cr>
 NewMap -no -n ,,,,,,g :call AgIn(Folder_Up(v:count, 5))<cr>
 
 NewMap -no -n ,vcd :call CD(Vim_Advantages_Path())<cr>
 
-NewMap -no -n ,p                :call Projects()<cr>
-NewMap -no -n ,,p               :call Projects()<cr>
-NewMap -no -n ,,,p              :call Projects()<cr>
-NewMap -no -n ,,,,p             :call Projects()<cr>
-NewMap -no -n ,,,,,p            :call Projects()<cr>
-NewMap -no -n ,,,,,,p           :call Projects()<cr>
-NewMap -no <C-p>              :call Projects()<cr>
-NewMap -no <C-S-p>            :call Projects()<cr>
-NewMap -no <A-p>              :call Projects()<cr>
-NewMap -no <A-S-p>            :call Projects()<cr>
-NewMap -no <A-C-p>            :call Projects()<cr>
-NewMap -no <A-S-C-p>          :call Projects()<cr>
-NewMap -no -n ,<C-p>           :call BuildSystemsGitProjects()<cr>
+NewMap -no -n ,p :call Projects()<cr>
+NewMap -no -n ,,p :call Projects()<cr>
+NewMap -no -n ,,,p :call Projects()<cr>
+NewMap -no -n ,,,,p :call Projects()<cr>
+NewMap -no -n ,,,,,p :call Projects()<cr>
+NewMap -no -n ,,,,,,p :call Projects()<cr>
+NewMap -no <C-p> :call Projects()<cr>
+NewMap -no <C-S-p> :call Projects()<cr>
+NewMap -no <A-p> :call Projects()<cr>
+NewMap -no <A-S-p> :call Projects()<cr>
+NewMap -no <A-C-p> :call Projects()<cr>
+NewMap -no <A-S-C-p> :call Projects()<cr>
+NewMap -no -n ,<C-p> :call BuildSystemsGitProjects()<cr>
 
-NewMap -no -n <C-S-m>           :Generate<cr>
+NewMap -no -n <C-S-m> :Generate<cr>
 
 " Useful?
-" NewMap -no <C-Space>              :call Files(Folder_Project())<cr>
-" NewMap -no <C-S-Space>            :call Files(Folder_Repo())<cr>
-" NewMap -no <A-Space>              :call Files(Folder_Repo())<cr>
-" NewMap -no <A-S-Space>            :call Files(Folder_Repo(1))<cr>
-" NewMap -no <A-C-Space>            :call Files(Folder_Repo(1))<cr>
-" NewMap -no <A-S-C-Space>          :call Files('/')<cr>
+" NewMap -no <C-Space> :call Files(Folder_Project())<cr>
+" NewMap -no <C-S-Space> :call Files(Folder_Repo())<cr>
+" NewMap -no <A-Space> :call Files(Folder_Repo())<cr>
+" NewMap -no <A-S-Space> :call Files(Folder_Repo(1))<cr>
+" NewMap -no <A-C-Space> :call Files(Folder_Repo(1))<cr>
+" NewMap -no <A-S-C-Space> :call Files('/')<cr>
 
-NewMap -no -aa <C-Space>              :call Commands()<cr>
-NewMap -no -aa <C-S-Space>            :call Commands()<cr>
-NewMap -no -aa <A-Space>              :call Commands()<cr>
-NewMap -no -aa <A-S-Space>            :call Commands()<cr>
-NewMap -no -aa <A-C-Space>            :call Commands()<cr>
-NewMap -no -aa <A-S-C-Space>          :call Commands()<cr>
-" noremap <A-S-C-Space>            :call Files(Folder_System())<cr>
-" nnoremap <C-S-Space>          :OpenFileFZFRepo<cr>
+NewMap -no -aa <C-Space> :call Commands()<cr>
+NewMap -no -aa <C-S-Space> :call Commands()<cr>
+NewMap -no -aa <A-Space> :call Commands()<cr>
+NewMap -no -aa <A-S-Space> :call Commands()<cr>
+NewMap -no -aa <A-C-Space> :call Commands()<cr>
+NewMap -no -aa <A-S-C-Space> :call Commands()<cr>
+" noremap <A-S-C-Space> :call Files(Folder_System())<cr>
+" nnoremap <C-S-Space> :OpenFileFZFRepo<cr>
 "
-NewMap -no <C-g>              :call AgIn(Folder_Project())<cr>
-NewMap -no <C-S-g>            :call AgIn(Folder_Repo())<cr>
-NewMap -no <A-g>              :call AgIn(Folder_Repo())<cr>
-NewMap -no <A-S-g>            :call AgIn(Folder_Repo(1))<cr>
-NewMap -no <A-C-g>            :call AgIn(Folder_Repo(1))<cr>
-NewMap -no <A-S-C-g>          :call AgIn('/')<cr>
+NewMap -no <C-g> :call AgIn(Folder_Project())<cr>
+NewMap -no <C-S-g> :call AgIn(Folder_Repo())<cr>
+NewMap -no <A-g> :call AgIn(Folder_Repo())<cr>
+NewMap -no <A-S-g> :call AgIn(Folder_Repo(1))<cr>
+NewMap -no <A-C-g> :call AgIn(Folder_Repo(1))<cr>
+NewMap -no <A-S-C-g> :call AgIn('/')<cr>
 
 "todo GitRepoUp
 " NewMap -no <C-m>              :GitFiles<cr>
 " NewMap -no <C-m>              :call GitFiles(Folder_Repo(v:count))<cr>
-NewMap -no <C-m>              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
+NewMap -no <C-m> :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
 " noremap <A-S-C-g>            :call AgIn(Folder_System())<cr>
 "  nnoremap <C-S-p>          :OpenFileFZFRepo<cr>
 
@@ -650,14 +648,14 @@ NewMap -no <C-m>              :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:c
 " nnoremap <C-S-g>            :OpenFileCommandLineRepo<cr>
 " nnoremap <C-A-g>            :OpenFileCommandLineSystem<cr>
 
-NewMap -n -no ,o              :OpenFileCommandLineSameDir<cr>
-NewMap -n -no ,.              :OpenFileCommandLineCWD<cr>
-NewMap -n -no ,,.      :OpenFileCommandLineSameDir<cr>
-NewMap -n -no ,.              :call CommandLineFiles(Folder_Up(v:count, 0))<cr>
-NewMap -n -no ,,.              :call CommandLineFiles(Folder_Up(v:count, 1))<cr>
-NewMap -n -no ,,,.              :call CommandLineFiles(Folder_Up(v:count, 2))<cr>
-NewMap -n -no ,,,,.              :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
-NewMap -n -no ,,,,,.              :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
+NewMap -n -no ,o :OpenFileCommandLineSameDir<cr>
+NewMap -n -no ,. :OpenFileCommandLineCWD<cr>
+NewMap -n -no ,,. :OpenFileCommandLineSameDir<cr>
+NewMap -n -no ,. :call CommandLineFiles(Folder_Up(v:count, 0))<cr>
+NewMap -n -no ,,. :call CommandLineFiles(Folder_Up(v:count, 1))<cr>
+NewMap -n -no ,,,. :call CommandLineFiles(Folder_Up(v:count, 2))<cr>
+NewMap -n -no ,,,,. :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
+NewMap -n -no ,,,,,. :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
 " C - \e
 NewMap -c -no -un <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 " C - \e
@@ -740,7 +738,7 @@ NewMap -n -no <C-.> :call CD(WFileNext())<cr>
 " nnoremap ,<localleader>        :JumpProjectR<cr>
 " nnoremap <C-Up>                       :JumpProjectDump<cr>
 
-NewMap -n -no ,<Tab>      :JumpProjectIn<cr>
+NewMap -n -no ,<Tab> :JumpProjectIn<cr>
 NewMap -n -no <localleader><Tab> :JumpProjectIn<cr>
 
 " C - u
