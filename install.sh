@@ -252,7 +252,7 @@ install() {
       ;;
     "device")
       manager="apk"
-      installations="$manager add fzf ripgrep"
+      installations="$manager add fzf ripgrep the_silver_searcher foot"
       wget_plug_vim="wget -q $plugvim -P ${plugins}"
       sudo="sudo"
       ;;
