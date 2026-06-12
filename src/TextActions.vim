@@ -642,15 +642,15 @@ command! -range -nargs=0 CollapseSpaces :call CollapseSpaces()
 
 finish
 
-" test test test
-" test test
-    " test test test
+" AA AA AA
+" AA AA
+    " AA AA AA
 ASDF ASDF ASDF
     ASDF ASDF
     ASDF " ASDF
-    " test test test
+    " AA AA AA
     ASDF ASDF
-    ASDF test df
-" test test test
+    ASDF AA df
+" AA AA AA
 
 endif

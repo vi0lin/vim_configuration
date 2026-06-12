@@ -39,7 +39,7 @@ PlugInstall
 I prefer kitty terminal on my linux machine and on my rooted phone.
 Kitty causes trouble on posh - you can install foot instead. That is a fixing wrapper for kitty.
 ```
-sudo apk install foot
+sudo apk add foot fzf the_silver_searcher
 ```
 [Further Rooting Instructions](https://github.com/vi0lin/vpn_roadwarrior_configuration) are under my vpn_roadwarrior_configuration.
 
