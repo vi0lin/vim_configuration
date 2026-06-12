@@ -578,19 +578,31 @@ NewMap -n -no ,dd :call Rewindworkdir()<cr>
 "" nnoremap <C-A-->            :FindInFileFZFSystem<cr>
 "" " nnoremap <C-S-p>            :FindInFileFZFRepo<cr>
 
-NewMap -no -n ,<Space> :call Files(Folder_Up(v:count, 0))<cr>
-NewMap -no -n ,,<Space> :call Files(Folder_Up(v:count, 1))<cr>
-NewMap -no -n ,,,<Space> :call Files(Folder_Up(v:count, 2))<cr>
-NewMap -no -n ,,,,<Space> :call Files(Folder_Up(v:count, 3))<cr>
-NewMap -no -n ,,,,,<Space> :call Files(Folder_Up(v:count, 4))<cr>
-NewMap -no -n ,,,,,,<Space> :call Files(Folder_Up(v:count, 5))<cr>
+NewMap -no -n <C-Space> :call Files(Folder_Up(v:count, 0))<cr>
+NewMap -no -n ,<C-Space> :call Files(Folder_Up(v:count, 1))<cr>
+NewMap -no -n ,,<C-Space> :call Files(Folder_Up(v:count, 2))<cr>
+NewMap -no -n ,,,<C-Space> :call Files(Folder_Up(v:count, 3))<cr>
+NewMap -no -n ,,,,<C-Space> :call Files(Folder_Up(v:count, 4))<cr>
+NewMap -no -n ,,,,,<C-Space> :call Files(Folder_Up(v:count, 5))<cr>
+NewMap -no -n ,<Space> :call Files(Folder_Repo(v:count, 0))<cr>
+NewMap -no -n ,,<Space> :call Files(Folder_Repo(v:count, 1))<cr>
+NewMap -no -n ,,,<Space> :call Files(Folder_Repo(v:count, 2))<cr>
+NewMap -no -n ,,,,<Space> :call Files(Folder_Repo(v:count, 3))<cr>
+NewMap -no -n ,,,,,<Space> :call Files(Folder_Repo(v:count, 4))<cr>
+NewMap -no -n ,,,,,,<Space> :call Files(Folder_Repo(v:count, 5))<cr>
 
-NewMap -no -n ,g :call AgIn(Folder_Up(v:count, 0))<cr>
-NewMap -no -n ,,g :call AgIn(Folder_Up(v:count, 1))<cr>
-NewMap -no -n ,,,g :call AgIn(Folder_Up(v:count, 2))<cr>
-NewMap -no -n ,,,,g :call AgIn(Folder_Up(v:count, 3))<cr>
-NewMap -no -n ,,,,,g :call AgIn(Folder_Up(v:count, 4))<cr>
-NewMap -no -n ,,,,,,g :call AgIn(Folder_Up(v:count, 5))<cr>
+NewMap -no -n <C-g> :call AgIn(Folder_Repo(v:count, 0))<cr>
+NewMap -no -n ,<C-g> :call AgIn(Folder_Repo(v:count, 1))<cr>
+NewMap -no -n ,,<C-g> :call AgIn(Folder_Repo(v:count, 2))<cr>
+NewMap -no -n ,,,<C-g> :call AgIn(Folder_Repo(v:count, 3))<cr>
+NewMap -no -n ,,,,<C-g> :call AgIn(Folder_Repo(v:count, 4))<cr>
+NewMap -no -n ,,,,,<C-g> :call AgIn(Folder_Repo(v:count, 5))<cr>
+NewMap -no -n ,g :call AgIn(Folder_Repo(v:count, 0))<cr>
+NewMap -no -n ,,g :call AgIn(Folder_Repo(v:count, 1))<cr>
+NewMap -no -n ,,,g :call AgIn(Folder_Repo(v:count, 2))<cr>
+NewMap -no -n ,,,,g :call AgIn(Folder_Repo(v:count, 3))<cr>
+NewMap -no -n ,,,,,g :call AgIn(Folder_Repo(v:count, 4))<cr>
+NewMap -no -n ,,,,,,g :call AgIn(Folder_Repo(v:count, 5))<cr>
 
 NewMap -no -n ,vcd :call CD(Vim_Advantages_Path())<cr>
 
@@ -606,38 +618,38 @@ NewMap -no <A-p> :call Projects()<cr>
 NewMap -no <A-S-p> :call Projects()<cr>
 NewMap -no <A-C-p> :call Projects()<cr>
 NewMap -no <A-S-C-p> :call Projects()<cr>
-NewMap -no -n ,<C-p> :call BuildSystemsGitProjects()<cr>
+NewMap -no -n ,<C-p> :call SearchGitProjects()<cr>
 
 NewMap -no -n <C-S-m> :Generate<cr>
 
 " Useful?
 " NewMap -no <C-Space> :call Files(Folder_Project())<cr>
-" NewMap -no <C-S-Space> :call Files(Folder_Repo())<cr>
-" NewMap -no <A-Space> :call Files(Folder_Repo())<cr>
-" NewMap -no <A-S-Space> :call Files(Folder_Repo(1))<cr>
-" NewMap -no <A-C-Space> :call Files(Folder_Repo(1))<cr>
+" NewMap -no <C-S-Space> :call Files(Folder_Repo(v:count, 0))<cr>
+" NewMap -no <A-Space> :call Files(Folder_Repo(v:count, 0))<cr>
+" NewMap -no <A-S-Space> :call Files(Folder_Repo(v:count, 1))<cr>
+" NewMap -no <A-C-Space> :call Files(Folder_Repo(v:count, 1))<cr>
 " NewMap -no <A-S-C-Space> :call Files('/')<cr>
 
-NewMap -no -aa <C-Space> :call Commands()<cr>
-NewMap -no -aa <C-S-Space> :call Commands()<cr>
-NewMap -no -aa <A-Space> :call Commands()<cr>
-NewMap -no -aa <A-S-Space> :call Commands()<cr>
-NewMap -no -aa <A-C-Space> :call Commands()<cr>
-NewMap -no -aa <A-S-C-Space> :call Commands()<cr>
-" noremap <A-S-C-Space> :call Files(Folder_System())<cr>
-" nnoremap <C-S-Space> :OpenFileFZFRepo<cr>
+NewMap -no -aa <C-x> :call Commands()<cr>
+NewMap -no -aa <C-S-x> :call Commands()<cr>
+NewMap -no -aa <A-x> :call Commands()<cr>
+NewMap -no -aa <A-S-x> :call Commands()<cr>
+NewMap -no -aa <A-C-x> :call Commands()<cr>
+NewMap -no -aa <A-S-C-x> :call Commands()<cr>
+" noremap <A-S-C-x> :call Files(Folder_System())<cr>
+" nnoremap <C-S-x> :OpenFileFZFRepo<cr>
 "
 NewMap -no <C-g> :call AgIn(Folder_Project())<cr>
-NewMap -no <C-S-g> :call AgIn(Folder_Repo())<cr>
-NewMap -no <A-g> :call AgIn(Folder_Repo())<cr>
-NewMap -no <A-S-g> :call AgIn(Folder_Repo(1))<cr>
-NewMap -no <A-C-g> :call AgIn(Folder_Repo(1))<cr>
+NewMap -no <C-S-g> :call AgIn(Folder_Repo(v:count, 0))<cr>
+NewMap -no <A-g> :call AgIn(Folder_Repo(v:count, 0))<cr>
+NewMap -no <A-S-g> :call AgIn(Folder_Repo(v:count, 1))<cr>
+NewMap -no <A-C-g> :call AgIn(Folder_Repo(v:count, 1))<cr>
 NewMap -no <A-S-C-g> :call AgIn('/')<cr>
 
 "todo GitRepoUp
 " NewMap -no <C-m>              :GitFiles<cr>
-" NewMap -no <C-m>              :call GitFiles(Folder_Repo(v:count))<cr>
-NewMap -no <C-m> :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count)})<cr>
+" NewMap -no <C-m>              :call GitFiles(Folder_Repo(v:count, 0))<cr>
+NewMap -no <C-m> :call fzf#vim#gitfiles('', {'dir': Folder_Repo(v:count, 0)})<cr>
 " noremap <A-S-C-g>            :call AgIn(Folder_System())<cr>
 "  nnoremap <C-S-p>          :OpenFileFZFRepo<cr>
 

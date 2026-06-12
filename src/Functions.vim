@@ -69,17 +69,18 @@ endfunction
 
 function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
   if !filereadable(a:file)
-    call BuildSystemsGitProjects()
+    call SearchGitProjects()
   endif
   " Add Updating Logic When New Projects Were Visited Or Removed
   let g:systems_git_projects=Read(a:file)
 endfunction
 
-function! BuildSystemsGitProjects(file=g:unreleased..'/.gitprojects')
+function! SearchGitProjects(file=g:unreleased..'/.gitprojects')
   let gitprojects=systemlist("find / -name .git -type d 2>/dev/null | sed 's|/.git||'")
   " echo gitprojects
   return Write(gitprojects, a:file)
 endfunction
+command! -range -nargs=0 SearchGitProjects :call SearchGitProjects()
 
 function! Read(file)
   if CreateFileAndPathIfNotExists(a:file)
@@ -1211,24 +1212,38 @@ endfunction
 function! Folder_Project()
   return CWD()
 endfunction
-function! Folder_Repo(backwards=0)
+
+function! Folder_Repo(count, nr)
   let file = -1
-  if a:backwards==0
-    let file=w:git
-  elseif a:backwards==1
-    let file=FindGit(GetParentDir(w:git))
-  elseif a:backwards==2
-    let file=FindGit(GetParentDir(FindGit(GetParentDir(w:git))))
-  endif
+  let c=a:count+a:nr
+  let i = 0
+  let file = w:git
+  while i < c
+    let x = FindGit(GetParentDir(file))
+    if x=='0' || x==-1 || x==0
+      let file=GetParentDir(file)
+    else
+      let file=x
+    endif
+    let i += 1
+  endwhile
+  " if c==0
+  "   let file=w:git
+  " elseif c==1
+  "   let file=FindGit(GetParentDir(w:git))
+  " elseif c==2
+  "   let file=FindGit(GetParentDir(FindGit(GetParentDir(w:git))))
+  " endif
   if file == -1
     " getcwd is not userfriendly
     " consider throwing a message
-    let file=getcwd()
-    " echo "No higher Repo"
+    " let file=getcwd()
+    echo "No higher Repo"
     return
   endif
   return file
 endfunction
+
 function! Folder_System()
   return g:system_folders
 endfunction
@@ -4138,10 +4153,6 @@ function! CB_OpenFileInBuffer(m)
 endfunction
 
 function! Files(path)
-
-endfunction
-
-function! Files(path)
   let g:temporaryfix=0
   " echo a:path
   " exec ":Files" a:path
@@ -4470,7 +4481,7 @@ function! CD(path)
   if w:git!=-1
   endif
   " echo "Not A Directory"
-  let $folderrepo=Folder_Repo()
+  let $folderrepo=Folder_Repo(0, 0)
 endfunction
 
 function! UpdateGit()
@@ -4673,7 +4684,7 @@ endfunction
 
 function! OpenFileFZFRepo(backwards=0)
   let Callback=function('OpenFile_callback', ["window"])
-  let file=Folder_Repo(a:backwards)
+  let file=Folder_Repo(a:backwards, 0)
   call FZFPopup("Open file: ", "file", file, Callback)
 endfunction
 

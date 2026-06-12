@@ -41,7 +41,6 @@ Dont forget to install these binaries on your target platform. Some distros have
 sudo apt-get install -y fzf silversearcher-ag ripgrep
 ```
 
-
 # Install Foot on Posh
 I prefer kitty terminal on my linux machine and on my rooted phone.
 Kitty causes trouble on posh - you can install foot instead. That is a fixing wrapper for kitty.
