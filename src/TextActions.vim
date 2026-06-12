@@ -548,6 +548,15 @@ function! ReplaceInComments(...)
   " silent exec e
   " /\v(^\s*\")@!TEST.\{-}\>/replaced/g
 endfunction
+function! ReplaceInComments(...)
+  let [word, with]=ParseReplaceArgs(a:000)
+  let a='%s'
+  let b='%s'
+  let pattern="'<,'>g/^\\s*\"/s/"..a.."/"..b.."/g"
+  let e = printf(pattern, word, with)
+  echo e
+  silent exec e
+endfunction
 command! -range -nargs=* ReplaceInComments :call ReplaceInComments(<f-args>)
 
 " Only Comments From Beginning Of The Line Are  Skipped - Comments That Are
@@ -561,6 +570,17 @@ function! ReplaceButNotInComments(...)
   " let a = escape(a, '\')
   " let b = escape(b, '\')
   let pattern="'<,'>s/"..a.."/"..b.."/g"
+  let e = printf(pattern, word, with)
+  silent exec e
+endfunction
+function! ReplaceButNotInComments(...)
+  let [word, with]=ParseReplaceArgs(a:000)
+  " let a='\v%(^\s*\".{-})\@<!\zs%s'
+  let a='%s'
+  let b='%s'
+  " let a = escape(a, '\')
+  " let b = escape(b, '\')
+  let pattern="'<,'>v/^\\s*\"/s/"..a.."/"..b.."/g"
   let e = printf(pattern, word, with)
   silent exec e
 endfunction
@@ -622,15 +642,15 @@ command! -range -nargs=0 CollapseSpaces :call CollapseSpaces()
 
 finish
 
-" Comment! Comment! Comment!
-" Comment! Comment!
-    " Comment! Comment! Comment!
-TEST TEST TEST
-    TEST TEST
-    TEST " TEST
-    " Comment! Comment! Comment!
-    TEST TEST
-    TEST test df
-" Comment! Comment! Comment!
+" test test test
+" test test
+    " test test test
+ASDF ASDF ASDF
+    ASDF ASDF
+    ASDF " ASDF
+    " test test test
+    ASDF ASDF
+    ASDF test df
+" test test test
 
 endif
