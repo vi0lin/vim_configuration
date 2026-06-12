@@ -3939,16 +3939,18 @@ function OpenFilePopup(title, list)
   function! OpenFile_callback(file)
     let path=GetTempfileLine(a:file)
     " consider len(path)==0 || 
-    if (len(path)==1) && (path=='0' || path==0)
-      " echo "aborted"
-      " if filereadable(path)
-      "   call _openfile_andCD(path)
-      " elseif isdirectory(path)
-      "   call _openfile_andCD(path)
-      " endif
-    else
-      call _openfile_andCD(path)
-    endif
+    ""  if ( path=='-1' || path==-1 || path=='0' || path==0)
+    ""    " if filereadable(path)
+    ""    "   call _openfile_andCD(path)
+    ""    " elseif isdirectory(path)
+    ""    "   call _openfile_andCD(path)
+    ""    " endif
+    ""  else
+    ""    call _openfile_andCD(path)
+    ""  endif
+    " if path!='-1' && path!=-1 && path!='0' && path!=0
+    call _openfile_andCD(path)
+    " endif
     call _cleanCallback(a:file)
   endfunction
   let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(outfile)})}
