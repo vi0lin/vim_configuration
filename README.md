@@ -41,6 +41,7 @@ Kitty causes trouble on posh - you can install foot instead. That is a fixing wr
 ```
 sudo apk install foot
 ```
+[Further Rooting Instructions](https://github.com/vi0lin/vpn_roadwarrior_configuration) are under my vpn_roadwarrior_configuration.
 
 # Features
 <table>
