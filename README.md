@@ -90,7 +90,7 @@ cd fzf
 # Steps follows
 ```
 
-### [FZF](https://github.com/BurntSushi/ripgrep)
+### [Ripgrep](https://github.com/BurntSushi/ripgrep)
 ```
 git clone https://github.com/BurntSushi/ripgrep
 cd ripgrep
