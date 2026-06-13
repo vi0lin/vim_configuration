@@ -252,7 +252,7 @@ install() {
       manager="winget"
       installations="$manager install \"The Silver Searcher\" \"FZF\" \"RipGrep GNU\" "
       wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
-      sudo=""
+      sudo="sudo"
       ;;
     "device")
       manager="apk"

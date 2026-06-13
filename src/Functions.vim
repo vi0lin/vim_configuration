@@ -6244,6 +6244,7 @@ endfunction
 function! SaveAsRoot()
   try
     :silent w !clear; sudo tee %
+    ":w !sudo tee %
     :e! %
     :o
     :u
