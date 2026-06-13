@@ -3993,8 +3993,8 @@ function _cleanCallback(file)
   if filereadable(a:file)
     call delete(a:file)
   endif
-  execute 'bd! '.bufnr('Find')
-  " execute 'bwipeout! '.bufnr('Find')
+  " execute 'bd! '.bufnr('Find')
+  execute 'bwipeout! '.bufnr('Find')
 endfunction
 
 function! CheckOs()
@@ -4623,6 +4623,7 @@ endfunction
 
 function! UpdateGit_OnSave()
   let w:gitDiff=FindDiff(w:cwd)
+  call Statusline()
 endfunction
 
 function! SetPointer(path='')
