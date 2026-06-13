@@ -2,6 +2,8 @@
 if !exists("g:vim_advantages_got_sourced")
 let g:breakpoint=60
 let g:ST_Mode=[]
+
+" Todo: Toggle Statusline
 call add(g:ST_Mode, [ 1, {->Mode()}, {->Mode()}])
 " call add(g:ST_Mode, [ 1, {->Mode()}, {->toupper(' '..mode())..' '}])
 call add(g:ST_Mode, [ 2, {->'  '..bufnr()..' '}, ''])

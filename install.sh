@@ -320,7 +320,7 @@ install() {
       ;;
     "wsl")
       manager="apt-get"
-      installations="$manager install -y vim curl wget fzf ripgrep silversearcher-ag"
+      installations="$manager install -y vim curl wget fzf ripgrep silversearcher-ag kitty"
       wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
       # wget_plug_vim="wget -q $plugvim -o ${plugins}plug.vim"
       sudo="sudo"

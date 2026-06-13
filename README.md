@@ -43,18 +43,25 @@ Dont forget to install these binaries on your target platform. Some distros have
 
 ## Packagemanager
 
+### Windows
+* WSL
+```
+apt-get install -y vim curl wget fzf ripgrep silversearcher-ag kitty
+```
+
 ### On Linux Distros
+
 * Ubuntu / Debian
 ```
-sudo apt-get install -y fzf silversearcher-ag ripgrep
+sudo apt-get install -y fzf silversearcher-ag ripgrep kitty
 ```
 * Arch
 ```
-sudo pacman -S fzf the_silver_searcher ripgrep
+sudo pacman -S fzf the_silver_searcher ripgrep kitty
 ```
 * CentOS
 ```
-sudo yum install fzf the_silver_searcher ripgrep
+sudo yum install fzf the_silver_searcher ripgrep kitty
 ```
 
 ### macOS
