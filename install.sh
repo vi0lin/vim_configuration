@@ -48,6 +48,7 @@ create_signature() {
   for file in "$@"; do
     local path="$file"
     path="${path/#\~/$HOME}"
+    debug "sed signature" $path
     $sudo sed -i "\$a$sig_b\n$source_command\n$sig_e" $path
   done
 }
@@ -58,6 +59,7 @@ update_signature() {
     path="${path/#\~/$HOME}"
     # sed -z "s/\(^.*$signature\).*\(^.*$signature\)/\1\n\" ${date}\n\2/g" $file
     # sed "/$sig/{N; s/$sig.*$sig/\" $date/}" $file
+    debug "sed update signature" $file
     $sudo sed -i -n "/$sig_b/{:a;N;/$sig_b/!ba;N;s/.*\n/$sig_b\n$source_command\n/};p" $file
     # sed -E 's/(\d*) (.*)/\0 == \t\1-->\t\2/'
     # echo $stdin | sed -E 's/(\d*) (.*)/\0 == \t\1-->\t\2/'
@@ -70,10 +72,12 @@ update_signature() {
 remove_signature() {
   debug "Remove Signature" $@
   for file in ${files_with_signature[@]}; do
+    debug "sed remove signature" $file
     $sudo sed -i "/$sig_b/,/$sig_e/d" $file
   done
 }
 signature_exists() {
+  debug "sed signature exists" $1
   $sudo sed -n "/$sig_b/q" $1 && return 0 || return 1
 }
 
@@ -301,6 +305,7 @@ install() {
       break
     fi
   done
+  debug "sed source_command" $source_command
   source_command=$(echo $source_command | sed 's;/;\\/;g' )
   debug source_command: $source_command
 

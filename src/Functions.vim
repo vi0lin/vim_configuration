@@ -1,3 +1,5 @@
+if !exists("g:vim_advantages_got_sourced")
+
 " Avoid cdo prompt for overwiting files
 " let &t_TI = "\<Esc>[>4;2m"
 " let &t_TE = "\<Esc>[>4;m"
@@ -18,8 +20,6 @@ function CloseFind()
   bufdo | if bufname()=="Find"| bd! | endif
 endfunction
 " call CloseFind()
-
-if !exists("g:vim_advantages_got_sourced")
 
 let g:debug=0
 
@@ -1219,7 +1219,11 @@ function! Folder_Repo(count, nr)
   let i = 0
   let file = w:git
   while i < c
-    let x = FindGit(GetParentDir(file))
+    if i==0
+      let x = FindGit(file)
+    else
+      let x = FindGit(GetParentDir(file))
+    endif
     if x=='0' || x==-1 || x==0
       let file=GetParentDir(file)
     else
@@ -7600,6 +7604,8 @@ function! TEST()
   " echo VS()
   " echo "x,!"
 endfunction
+
+call _command('echo "TEST"')
 
 let g:vim_advantages_got_sourced='true'
 endif
