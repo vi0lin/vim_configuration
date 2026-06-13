@@ -37,6 +37,7 @@ get_path_windows() {
 get_path_linux() {
   USERDIR='~'
   USERHOME=`wslpath "$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r')"`
+  USERHOME=$HOME
   USERDIR="${USERDIR/#\~/$USERHOME}"
   echo $USERDIR
 }
