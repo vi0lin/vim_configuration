@@ -29,9 +29,11 @@ get_path_windows() {
   # -w Linux -> Windows
   # -m Linux -> Windows with forward slashes
   # -a Force absolute path
+  echo $USERDIR
 }
 get_path_linux() {
   USERDIR='~'
+  echo $USERDIR
 }
 
 signature="\" vim_configuration installation 2866039580"
