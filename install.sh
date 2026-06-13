@@ -37,8 +37,8 @@ get_path_linux() {
 }
 
 signature="\" vim_configuration installation 2866039580"
-sig_b=$signature" Begin"
-sig_e=$signature" End"
+# sig_b=$signature" Begin"
+# sig_e=$signature" End"
 debug sig_b $sig_b
 debug sig_e $sig_e
 get_files_with_signature() {
@@ -55,13 +55,18 @@ get_files_with_signature() {
 }
 check_signature() {
   get_files_with_signature $@
-  first_file=${@:1:1}
-  debug first_file $first_file
+  # first_file=${@:1:1}
+  for file in "$@"; do
+    if [ -f $file ]; then
+      first_valid_file=$file
+    fi
+  done
+  debug first_valid_file $first_valid_file
   len=${#files_with_signature[@]}
   debug "Files With Signature:" $len
-  [ $len -gt 1 ] && remove_signature ${files_with_signature[@]} && create_signature $first_file
+  [ $len -gt 1 ] && remove_signature ${files_with_signature[@]} && create_signature $first_valid_file
   [ $len -eq 1 ] && update_signature ${files_with_signature[@]}
-  [ $len -eq 0 ] && create_signature $first_file
+  [ $len -eq 0 ] && create_signature $first_valid_file
   # [[ $len -lt 1 ]] && update_signature $@
 }
 create_signature() {
