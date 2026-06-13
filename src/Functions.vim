@@ -3971,17 +3971,17 @@ function OpenFilePopup(title, list)
   function! OpenFile_callback(file)
     let path=GetTempfileLine(a:file)
     " consider len(path)==0 || 
-    ""  if ( path=='-1' || path==-1 || path=='0' || path==0)
+    let path=path.''
+    if !(path=="0" || path=="-1")
     ""    " if filereadable(path)
     ""    "   call _openfile_andCD(path)
     ""    " elseif isdirectory(path)
     ""    "   call _openfile_andCD(path)
     ""    " endif
-    ""  else
+      call _openfile_andCD(path)
     ""    call _openfile_andCD(path)
-    ""  endif
+    endif
     " if path!='-1' && path!=-1 && path!='0' && path!=0
-    call _openfile_andCD(path)
     " endif
     call _cleanCallback(a:file)
   endfunction
