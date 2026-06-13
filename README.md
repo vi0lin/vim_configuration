@@ -35,13 +35,69 @@ call plug#end()
 PlugInstall
 ```
 
-# Additional
+# Additional Software
 Dont forget to install these binaries on your target platform. Some distros have different packagemanager.
+
+## Packagemanager
+
+### On Linux Distros
+* Ubuntu / Debian
 ```
 sudo apt-get install -y fzf silversearcher-ag ripgrep
 ```
+* Arch
+```
+sudo pacman -S fzf the_silver_searcher ripgrep
+```
+* CentOS
+```
+sudo yum install fzf the_silver_searcher ripgrep
+```
 
-# Install Foot on Posh
+### macOS
+```
+sudo install fzf the_silver_searcher ripgrep
+```
+
+### Posh
+```
+sudo apk add fzf the_silver_searcher ripgrep foot
+```
+
+### BSD
+* FreeBSD
+```
+sudo pkg install fzf the_silver_searcher ripgrep foot
+```
+* OpenBSD/NetBSD
+```
+sudo pkg_add fzf the_silver_searcher ripgrep foot
+```
+
+## Occasionaly Build
+
+### [The Silver Searcher](https://github.com/ggreer/the_silver_searcher)
+```
+git clone https://github.com/ggreer/the_silver_searcher
+cd the_silver_searcher
+./build.sh
+```
+
+### [FZF](https://github.com/junegunn/fzf)
+```
+git clone https://github.com/junegunn/fzf
+cd fzf
+# Steps follows
+```
+
+### [FZF](https://github.com/BurntSushi/ripgrep)
+```
+git clone https://github.com/BurntSushi/ripgrep
+cd ripgrep
+# Steps follows
+```
+
+# Install A Terminal On Posh
 I prefer kitty terminal on my linux machine and on my rooted phone.
 Kitty causes trouble on posh - you can install foot instead. That is a fixing wrapper for kitty.
 ```
