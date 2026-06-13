@@ -653,13 +653,13 @@ function! Profile(...)
   let i = 0
   let arg = a:000[i]
   if arg ==# 'on'
-    profile start /tmp/profile.log
+    exec "profile start "..g:tempprofile
     profile! func *
     profile! file *
   elseif arg ==# 'off'
     profile pause
   elseif arg ==# 'show'
-    e /tmp/profile.log
+    exec "e "..g:tempprofile
   elseif arg ==# 'end'
     qa!
   endif
@@ -3935,7 +3935,6 @@ function FavoritesPopup()
 endfunction
 
 function OpenFilePopup(title, list)
-  let outfile="/tmp/outfile_fzf"
   function! OpenFile_callback(file)
     let path=GetTempfileLine(a:file)
     " consider len(path)==0 || 
@@ -3953,8 +3952,8 @@ function OpenFilePopup(title, list)
     " endif
     call _cleanCallback(a:file)
   endfunction
-  let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(outfile)})}
-  let file=Popup(a:title, 'window', a:list, Cb, outfile)
+  let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(g:outfile)})}
+  let file=Popup(a:title, 'window', a:list, Cb, g:outfile)
 endfunction
 
 function _cleanCallback(file)
@@ -3965,8 +3964,34 @@ function _cleanCallback(file)
   " execute 'bwipeout! '.bufnr('Find')
 endfunction
 
+function! CheckOs()
+  echo "win32    " has('win32')
+  echo "win64    " has('win64')
+  echo "win32unix" has('win32unix')
+  echo "mac      " has('mac')
+  echo "macunix  " has('macunix')
+  echo "osx      " has('osx')
+  echo "unix     " has('unix')
+  echo "linux    " has('linux')
+  echo "android  " has('android')
+  echo "bsd      " has('bsd')
+  echo "wsl      " has('wsl')
+endfunction
+command! -range -nargs=0 CheckOs <line1>,<line2>call CheckOs()
+
+if has('mac') || has('unix') || has('linux') || has('android')
+  let g:outfile="/tmp/outfile_fzf"
+  let g:stdin_tmp_file="/tmp/tmp_stdin_file"
+  let g:tempfile="/tmp/tempfile_fzf"
+  let g:tempprofile="/tmp/profile.log"
+else
+  let g:outfile=g:vim_configuration_path.."/outfile_fzf.unreleased"
+  let g:stdin_tmp_file=g:vim_configuration_path.."/tmp_stdin_file.unreleased"
+  let g:tempfile=g:vim_configuration_path.."/tempfile_fzf"
+  let g:tempprofile=g:vim_configuration_path.."/profile.log"
+endif
+
 function Commands()
-  let outfile="/tmp/outfile_fzf"
   function! Execute_callback(file)
     let command=GetTempfileLine(a:file)
     if command=='0' || command==0
@@ -3977,13 +4002,12 @@ function Commands()
     endif
     call _cleanCallback(a:file)
   endfunction
-  let Cb={job, status -> timer_start(0, {_ -> Execute_callback(outfile)})}
-  let file=Popup("Projects", 'window', g:commands, Cb, outfile)
+  let Cb={job, status -> timer_start(0, {_ -> Execute_callback(g:outfile)})}
+  let file=Popup("Projects", 'window', g:commands, Cb, g:outfile)
 endfunction
 
 function! Popup(title, register, list, callback, outfile)
-  let stdin_tmp_file="/tmp/tmp_stdin_file"
-  call Write(a:list, stdin_tmp_file)
+  call Write(a:list, g:stdin_tmp_file)
   " if a:register =~ 'window\|buffer\|tab\|global'
   "   let title=a:title.." ["..a:register.."]"
   " else
@@ -4018,7 +4042,7 @@ function! Popup(title, register, list, callback, outfile)
   endif
   " let cmd=call('BuildList', [ "-maxdepth "..a:maxdepth.." -type "..type,  paths])
   " let cmd="cat | fzf"
-  let cmd=['/bin/bash', '-c', 'fzf -i < '.stdin_tmp_file.' > '..a:outfile]
+  let cmd=['/bin/bash', '-c', 'fzf -i < '.g:stdin_tmp_file.' > '..a:outfile]
   let g:FileFinder_result=""
   function! OnStdout(channel, msg)
   endfunction
@@ -4045,7 +4069,7 @@ function! Popup(title, register, list, callback, outfile)
         \ }
         " \ 'exit_cb': {job, status -> OpenFile_callback(a:outfile)},
         " \ 'in_io': 'file',
-        " \ 'in_name': stdin_tmp_file,
+        " \ 'in_name': g:stdin_tmp_file,
   let tnr=term_start(cmd, opts)
   let g:tnr=tnr
   " let job=term_getjob(tnr)
@@ -4094,7 +4118,6 @@ function! Popup(title, register, list, callback, outfile)
 endfunction
 
 function! Popup_FZFBuildString(title, register, path)
-  let outfile="/tmp/outfile_fzf"
   if a:register =~ 'window\|buffer\|tab\|global'
     let title=a:title.." ["..a:register.."]"
   else
@@ -4110,13 +4133,12 @@ function! Popup_FZFBuildString(title, register, path)
   call Find_Popup(
         \ title,
         \ paths,
-        \ function('OpenFile_callback', [outfile]),
+        \ function('OpenFile_callback', [g:outfile]),
         \ "file",
         \)
 endfunction
 
 function! Changemain_repo(title, register, path)
-  let outfile="/tmp/outfile_fzf"
   if a:register =~ 'window\|buffer\|tab\|global'
     let title="Set ["..a:register[0].."]"
   else
@@ -4132,7 +4154,7 @@ function! Changemain_repo(title, register, path)
   call Find_Popup(
         \ title,
         \ paths,
-        \ function('SetProject_callback', [outfile]),
+        \ function('SetProject_callback', [g:outfile]),
         \ "directory",
         \)
 endfunction
@@ -6694,13 +6716,12 @@ function! BuildString(options, paths, tempfile="")
 endfunction
 
 function! Find_Popup(title, paths, callback, type="file", maxdepth=10, register="")
-  let tempfile="/tmp/tempfile_fzf"
   if a:type=="directory"
     let type="d"
   else
     let type="f"
   endif
-  let cmd=call('BuildString', [ "-maxdepth "..a:maxdepth.." -type "..type,  a:paths, tempfile])
+  let cmd=call('BuildString', [ "-maxdepth "..a:maxdepth.." -type "..type,  a:paths, g:tempfile])
   let title=' '..a:title..": "..join(a:paths, ' ')..' '
   let g:FileFinder_result=""
   function! OnStdout(channel, msg)
