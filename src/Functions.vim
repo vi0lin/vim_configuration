@@ -4003,7 +4003,7 @@ let g:is_wsl = has('unix') && filereadable('/proc/version') &&
 
 if g:is_wsl
   let _runtime=systemlist("wslpath \"$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r' )\"")
-  let g:SearchGitProjectsPath=expand('~').." ".._runtime
+  let g:SearchGitProjectsPath=expand('~').." ".._runtime[0]
 else
   let g:SearchGitProjectsPath="/"
 endif
