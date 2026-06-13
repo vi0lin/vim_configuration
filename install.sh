@@ -239,14 +239,14 @@ install() {
       sudo="sudo"
       ;;
     "mac")
-      manager="choc"
-      installations="$manager install -y fzf silversearcher-ag ripgrep"
+      manager="brew"
+      installations="$manager install fzf the_silver_searcher ripgrep"
       wget_plug_vim="wget -q $plugvim -o ${plugins}plug.vim"
-      sudo=""
+      sudo="sudo"
       ;;
     "win")
-      manager="pacman"
-      installations=""
+      manager="winget"
+      installations="$manager install \"The Silver Searcher\" \"FZF\" \"RipGrep GNU\" "
       wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
       sudo=""
       ;;

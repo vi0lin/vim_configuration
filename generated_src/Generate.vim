@@ -410,6 +410,11 @@ nnoremap <A-C-p> :call SetMode("\<A-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-S-C-p> :call SetMode("\<A-S-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call SearchGitProjects()<cr>
 nnoremap <C-S-m> :call SetMode("\<C-S-m\>", "Normal") \| :Generate<cr>
+nnoremap ,x :call SetMode(",x", "Normal") \| :call Commands()<cr>
+vnoremap ,x :call SetMode(",x", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap ,x :call SetMode(",x", "Command") \| :call Commands()<cr>
+tnoremap ,x <C-\><C-n>:call SetMode(",x", "Terminal") \| :call Commands()<cr>
+inoremap ,x :call SetMode(",x", "Insert") \| :call Commands()<cr>
 nnoremap <C-x> :call SetMode("\<C-x\>", "Normal") \| :call Commands()<cr>
 vnoremap <C-x> :call SetMode("\<C-x\>", "Visual") \| '<,'>:call Commands()<cr>
 cnoremap <C-x> :call SetMode("\<C-x\>", "Command") \| :call Commands()<cr>

@@ -630,6 +630,7 @@ NewMap -no -n <C-S-m> :Generate<cr>
 " NewMap -no <A-C-Space> :call Files(Folder_Repo(v:count, 1))<cr>
 " NewMap -no <A-S-C-Space> :call Files('/')<cr>
 
+NewMap -no -aa ,x :call Commands()<cr>
 NewMap -no -aa <C-x> :call Commands()<cr>
 NewMap -no -aa <C-S-x> :call Commands()<cr>
 NewMap -no -aa <A-x> :call Commands()<cr>
