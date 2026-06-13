@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 # autocmd! BufWritePost install.sh :call RedoCommandToTerm("l")
 # autocmd! BufWritePost install.sh
@@ -205,7 +204,6 @@ check_os() {
 }
 
 install() {
-  check_os
   _check_binary() {
     if [[ -z $(which $1) ]]; then
       return 1
@@ -357,5 +355,6 @@ install() {
 
 }
 
+check_os
 install "vim"
 install "nvim"
