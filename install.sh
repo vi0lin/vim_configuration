@@ -246,6 +246,7 @@ install() {
   vimgather scriptnames "echo execute('scriptnames')->split(\"\\n\")->map({_,v -> v->substitute('^\s*\d\+:\s*','','')})->join(\"\n\")"
 
   echo "here"
+  echo "$scriptnames"
   echo $scriptnames
 
   keep_existing $scriptnames
