@@ -4691,7 +4691,7 @@ function! ToggleShortenPath()
   call Statusline()
 endfunction
 
-function! PathCharwise_All(path, except=0, prependSlash=v:false, appendSlash=v:false)
+function! PathCharwise_All(path, except=0, appendslash=1, prependSlash=v:false, appendSlash=v:false)
   " let currentDir="test"..split(expand('%:p:h'), '/')[-1]
   " echo currentDir
   let except=a:except
@@ -4731,7 +4731,20 @@ function! PathCharwise_All(path, except=0, prependSlash=v:false, appendSlash=v:f
     endif
   endfor
   " return currentDir . out
-  return out
+  " bad fix
+  if &buftype == 'terminal'
+    if a:appendslash
+      return ''
+    else
+      return '/'
+    endif
+  else
+    if a:appendslash
+      return out..'/'
+    else
+      return out
+    endif
+  endif
 endfunction
 
 function! PathCharwise(path, except=0)
