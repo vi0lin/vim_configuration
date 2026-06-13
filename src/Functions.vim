@@ -118,6 +118,7 @@ function! SetUnsetFavorite()
     call add(g:favorites, expand('%:p'))
     call Write(g:favorites, g:unreleased..'/.favorites')
   endif
+  call Statusline()
 endfunction
 
 function! s:MatchesOneOfPatterns(pattern_string, term) abort
@@ -3257,6 +3258,13 @@ function! Currentmain_repoRegister()
   return "/"
 endfunction
 
+function! GitTerm_Statusline_ExecKeys()
+  return ''
+  " if exists('b:state')
+  " return b:state.exec_keys
+  " return exists('b:state.exec_keys')&&b:state.type=='terminal'?' '..b:state.exec_keys:''
+endfunction
+
 function! GetCWD_Statusline()
   if Currentmain_repoRegister()[0] =~ "[wbgt]"
     " let x=Currentmain_repoRegister()[0]
@@ -4339,6 +4347,11 @@ function! GitName()
   return b[-1]
 endfunction
 
+function! GitDiff_Text()
+  let b=w:gitDiff
+  return b
+endfunction
+
 function! GitBranch()
   let b=split(w:gitBranch, "/")
   return b[-1]
@@ -4360,12 +4373,42 @@ function! GitName_Statusline()
   endif
 endfunction
 
+function! GitName_Statusline_short()
+  if exists('w:git')
+    if w:git==-1
+      return ''
+    endif
+    return ' '..GitName()[0:5]..'…'
+  else
+    return ''
+  endif
+endfunction
+
+function! GitDiff_Statusline()
+  if exists('w:gitDiff')
+    return GitDiff_Text()
+  else
+    return ''
+  endif
+endfunction
+
 function! GitBranch_Statusline()
   if exists('w:gitBranch')
     if w:gitBranch==-1
       return ''
     endif
     return '  '..GitBranch()
+  else
+    return ''
+  endif
+endfunction
+
+function! GitBranch_Statusline_short()
+  if exists('w:gitBranch')
+    if w:gitBranch==-1
+      return ''
+    endif
+    return '  '..GitBranch()[0:2]..'…'
   else
     return ''
   endif
@@ -4382,6 +4425,17 @@ function! GitRemote_Statusline()
   endif
 endfunction
 
+function! GitRemote_Statusline_short()
+  if exists('w:gitRemote')
+    if w:gitRemote==-1
+      return ''
+    endif
+    return '  '..GitRemote()[0:2]..'…'
+  else
+    return ''
+  endif
+endfunction
+
 function! SetProject(dir)
   echo "TODO Async Backgrounded Job"
   return
@@ -4393,6 +4447,11 @@ function! AllBranches(path)
   let x=systemlist("cd "..a:path.."; git branch --list | awk {'print $2? $2 : $1'}")
   let w:gitBranchList = x
   return w:gitBranchList
+endfunction
+
+function! FindDiff(path)
+  let x = systemlist('cd '..a:path..'; git diff --stat 2>&1')[-1]
+  return ' '..substitute(substitute(substitute(substitute(substitute(substitute(substitute(x, '[^0-9+-]', ' ', 'g'), '-\{2,\}', '', 'g'), '+\{2,\}', '', 'g'), '\s\{2,\}', ' ', 'g'), '\s+', '+', ''), '\s-', '-', 'g'), '\s$', '', 'g')
 endfunction
 
 function! FindBranch(path)
@@ -4546,6 +4605,11 @@ function! UpdateGit()
   let w:gitRemote=FindRemote(cwd)
   let w:gitRemoteUrl=FindRemoteUrl(cwd)
   let w:gitRemoteList=GitGetAllRemote()
+  call UpdateGit_OnSave()
+endfunction
+
+function! UpdateGit_OnSave()
+  let w:gitDiff=FindDiff(w:cwd)
 endfunction
 
 function! SetPointer(path='')
@@ -4579,11 +4643,11 @@ endfunction
 
 function! IsFavorite()
   " let g:favorites=Read(g:unreleased..'/.favorites')
-  " if index(g:favorites, expand('%:p:h')) >= 0
-  "   return '[F] '
-  " else
-  "   return '[ ] '
-  " endif
+  if index(g:favorites, expand('%:p')) >= 0
+    return '✓ '
+  else
+    return ''
+  endif
 endfunction
 
 function! FavoriteFile()
@@ -6205,6 +6269,7 @@ if g:redefine_SaveFile || !exists('*SaveFile')
     endtry
     call Cursor_Back()
     " echo "File was saved"
+    call UpdateGit_OnSave()
   endfunction
 endif
 
