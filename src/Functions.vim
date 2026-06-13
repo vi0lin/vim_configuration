@@ -77,7 +77,7 @@ function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
 endfunction
 
 function! SearchGitProjects(file=g:unreleased..'/.gitprojects')
-  let gitprojects=systemlist("find / -name .git -type d 2>/dev/null | sed 's|/.git||'")
+  let gitprojects=systemlist("find "..g:SearchGitProjectsPath.." -name .git -type d 2>/dev/null | sed 's|/.git||'")
   " echo gitprojects
   return Write(gitprojects, a:file)
 endfunction
@@ -4000,6 +4000,13 @@ let g:is_wsl = has('unix') && filereadable('/proc/version') &&
     \ (match(readfile('/proc/version')[0], 'Microsoft') >= 0 ||
     \  match(readfile('/proc/version')[0], 'microsoft') >= 0)
 " let s:is_wsl = has('unix') && !empty(filter(readfile('/proc/version'), 'v:val =~? "microsoft"'))
+
+if g:is_wsl
+  let _runtime=systemlist("wslpath \"$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r' )\"")
+  let g:SearchGitProjectsPath=expand('~').." ".._runtime
+else
+  let g:SearchGitProjectsPath="/"
+endif
 
 if has('mac') || has('unix') || has('linux') || has('android')
   let g:outfile="/tmp/outfile_fzf"
