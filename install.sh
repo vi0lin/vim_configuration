@@ -37,8 +37,8 @@ get_path_linux() {
 }
 
 signature="\" vim_configuration installation 2866039580"
-# sig_b=$signature" Begin"
-# sig_e=$signature" End"
+sig_b=$signature" Begin"
+sig_e=$signature" End"
 debug sig_b $sig_b
 debug sig_e $sig_e
 get_files_with_signature() {
@@ -257,9 +257,13 @@ install() {
 #$scriptnames"
 
   scriptnames=$(printf "%s\n%s", "$causalfiles", "$scriptnames")
+  echo "scriptnames"
   echo "$scriptnames"
 
   keep_existing $scriptnames
+
+  echo "existing"
+  echo "$existing"
 
   # for scriptname in $scriptnames; do
   #   # echo "-> check for signature: " $scriptname
