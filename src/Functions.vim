@@ -6856,9 +6856,14 @@ function! Sourced_Plug_Vim()
   return g:Sourced_Plug_Vim
 endfunction
 
-function! Update()
+function! PlugUpdate()
   :PlugInstall
   :PlugUpdate
+endfunction
+command! -bar -range -nargs=0 PlugUpdate call PlugUpdate()
+
+function Update()
+  exec "!git -C "..g:vim_configuration_path.." pull"
 endfunction
 command! -bar -range -nargs=0 Update call Update()
 
