@@ -223,6 +223,7 @@ install() {
 
   plugvim="https://raw.githubusercontent.com/junegunn/vim-plug/refs/heads/master/plug.vim"
   datadir=(
+    $USERDIR"_vimrc"
     $USERDIR"vimfiles/autoload"
     $USERDIR".vim/autoload"
     $USERDIR".vim/autoload"
@@ -243,6 +244,9 @@ install() {
   # scriptnames=$(vimgather "redir=>variable | scriptnames | redir END")
   # vimgather scriptnames "scriptnames"
   vimgather scriptnames "echo execute('scriptnames')->split(\"\\n\")->map({_,v -> v->substitute('^\s*\d\+:\s*','','')})->join(\"\n\")"
+
+  echo "here"
+  echo $scriptnames
 
   keep_existing $scriptnames
 
