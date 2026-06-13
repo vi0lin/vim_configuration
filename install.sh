@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # autocmd! BufWritePost install.sh :call RedoCommandToTerm("l")
 # autocmd! BufWritePost install.sh
