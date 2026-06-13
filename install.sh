@@ -246,9 +246,9 @@ install() {
   vimgather scriptnames "echo execute('scriptnames')->split(\"\\n\")->map({_,v -> v->substitute('^\s*\d\+:\s*','','')})->join(\"\n\")"
 
   casualfiles=(
+    $USERDIR"/vimrc"
     $USERDIR"/_vimrc"
     $USERDIR"/.vimrc"
-    $USERDIR"/vimrc"
   )
 
   # Join Recordlists
