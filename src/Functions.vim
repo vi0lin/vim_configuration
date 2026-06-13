@@ -1984,6 +1984,7 @@ function! DecidePush(...)
   else
     GitPush
   endif
+  call Statusline()
 endfunction
 
 function! GitDeleteBranchOnRemote(...)
