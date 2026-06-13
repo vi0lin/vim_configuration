@@ -27,6 +27,7 @@ if !exists('g:vim_configuration_path')
   let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
 endif
 
+
 if !exists('g:favorites')
   let g:favorites=[]
 endif
@@ -2670,7 +2671,17 @@ function! SetEnvironment(user_dir='~', main_repo='', source_dir='', bashrc='~/.b
 endfunction
 " call EnsureEnvironment()
 call SetEnvironment()
-let runtimepath=split(&runtimepath, ",")[0]
+
+if !has('wsl')
+  let runtimepath=split(&runtimepath, ",")[0]
+else
+  let _runtime=systemlist("wslpath \"$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r' )\"")
+  let runtimepath=split(_runtime)[0]
+endif
+
+if !exists('g:plugfile')
+  let g:plugfile=g:runtimepath.."/autoload/plug.vim"
+endif
 let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/autoload/vim_configuration'
 let g:vim_configuration_src=runtimepath..'/plugged/vim_configuration/src'
 let g:vim_configuration=runtimepath..'/plugged/vim_configuration/'
@@ -6494,6 +6505,24 @@ endfunction
 function! TermLeave()
 endfunction
 
+function! InitPlug()
+  call plug#begin()
+    " Plug 'dense-analysis/ale'
+    " Plug 'junegunn/fzf'
+    " Plug 'junegunn/fzf.vim'
+    " Plug 'skywind3000/asyncrun.vim'
+    " Plug 'tpope/vim-dispatch'
+    " Plug 'prabirshrestha/vim-lsp'
+    " Plug 'mattn/vim-lsp-settings'
+    " Plug 'prabirshrestha/asyncomplete.vim'
+    " Plug 'prabirshrestha/asyncomplete-lsp.vim'
+    Plug 'vi0lin/vim_configuration'
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
+  call plug#end()
+endfunction
+
+
 function! VimEnter()
   "" " if &buftype == 'terminal'
   "" "   set wrap
@@ -6887,25 +6916,6 @@ function! AutoInstallPlug()
       exec "!wget "..httpplug.." "..g:plugfile
     endif
   endif
-endfunction
-
-let g:plugfile="~/.vim/autoload/plug.vim"
-
-function! InitPlug()
-  call plug#begin()
-    " Plug 'dense-analysis/ale'
-    " Plug 'junegunn/fzf'
-    " Plug 'junegunn/fzf.vim'
-    " Plug 'skywind3000/asyncrun.vim'
-    " Plug 'tpope/vim-dispatch'
-    " Plug 'prabirshrestha/vim-lsp'
-    " Plug 'mattn/vim-lsp-settings'
-    " Plug 'prabirshrestha/asyncomplete.vim'
-    " Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    Plug 'vi0lin/vim_configuration'
-    Plug 'junegunn/fzf'
-    Plug 'junegunn/fzf.vim'
-  call plug#end()
 endfunction
 
 if executable('clangd')
