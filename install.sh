@@ -247,6 +247,8 @@ install() {
   vimgather vimruntime "echo split(\$VIMRUNTIME, \",\")[0]"
   debug Vimruntime: $vimruntime
   plugins=$vimruntime"/plugin/"
+  plugins="${vimruntime/#\~/$USERDIR}"
+  exit
   vim_folder="$USERDIR/.vim"
   # vim_folder="${vim_folder/#\$USERDIR}"
   plugins=$vim_folder"/autoload/"
