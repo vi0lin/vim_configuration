@@ -32,7 +32,7 @@ get_path_windows() {
   # -a Force absolute path
 }
 get_path_linux() {
-  USERDIR='~/'
+  USERDIR='~'
 }
 
 signature="\" vim_configuration installation 2866039580"
@@ -166,7 +166,8 @@ check_os() {
       [1]=mac
       [2]=win
       [3]=lin
-      [4]=unknown
+      [4]=wsl
+      [5]=unknown
     )
     debug OsType: "$OSTYPE"
     _get_os() {
@@ -177,10 +178,16 @@ check_os() {
       elif [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
         echo 2
       elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        echo 3
+        if grep -qi microsoft /proc/version; then
+          # WSL
+          echo 4
+        else
+          # Native Linux
+          echo 3
+        fi
       else
         echo "Unknown operating system: $OSTYPE"
-        echo 4
+        echo 5
       fi
     }
     os=${ostype[$(_get_os)]}
@@ -191,6 +198,7 @@ check_os() {
       "mac") echo " on macintosh"; get_path_linux ;;
       "win") echo " on windows"; get_path_windows ;;
       "device") echo " on device"; get_path_linux ;;
+      "wsl") echo " on wsl"; get_path_windows;;
       "unknown"|*) echo " on unknown"; get_path_linux ;;
     esac
   fi
