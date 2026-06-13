@@ -45,14 +45,14 @@ Dont forget to install these binaries on your target platform. Some distros have
 
 > [!WARNING]
 > Dont use Vim on Windows, it's a bad idea!
-<stroke>
+<strike>
 ### Windows
 * WSL
 ```
 apt-get install -y vim curl wget fzf ripgrep silversearcher-ag kitty libwayland-cursor0 libwayland-dev libwayland-egl1dbus-x11 libegl1 libegl-mesa0 libgles2 libwayland-cursor0 libwayland-dev libwayland-egl1
 kitty
 ```
-</stroke>
+</strike>
 
 ### On Linux Distros
 
