@@ -245,12 +245,17 @@ install() {
   # vimgather scriptnames "scriptnames"
   vimgather scriptnames "echo execute('scriptnames')->split(\"\\n\")->map({_,v -> v->substitute('^\s*\d\+:\s*','','')})->join(\"\n\")"
 
-  datadir=(
+  casualfiles=(
     $USERDIR"/_vimrc"
     $USERDIR"/.vimrc"
     $USERDIR"/vimrc"
   )
-  scriptnames=( echo "$datadir" && echo "$scriptnames" )
+
+  # Join Recordlists
+  #scriptnames="$datadir
+#$scriptnames"
+
+  scriptnames=$(printf "%s\n%s, "$datadir", "$scriptnames")
   echo "$scriptnames"
 
   keep_existing $scriptnames
