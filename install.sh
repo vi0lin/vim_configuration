@@ -255,7 +255,7 @@ install() {
   #scriptnames="$datadir
 #$scriptnames"
 
-  scriptnames=$(printf "%s\n%s", "$datadir", "$scriptnames")
+  scriptnames=$(printf "%s\n%s", "$causalfiles", "$scriptnames")
   echo "$scriptnames"
 
   keep_existing $scriptnames
