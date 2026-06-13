@@ -317,7 +317,8 @@ install() {
     "wsl")
       manager="apt-get"
       installations="$manager install -y vim curl wget fzf ripgrep silversearcher-ag"
-      wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
+      # wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
+      wget_plug_vim="wget -q $plugvim -o ${plugins}plug.vim"
       sudo="sudo"
       ;;
     "device")
@@ -338,8 +339,8 @@ install() {
 
   if ! $vimplug_exists; then
     echo "Installing Vim Plug (plug.vim)"
-    debug Download Instructions: $sudo $wget_plug_vim
-    eval $sudo $wget_plug_vim
+    debug Download Instructions: $wget_plug_vim
+    eval $wget_plug_vim
   else
     echo "Plug.vim is already installed"
     echo "Implement Check For Updates"
