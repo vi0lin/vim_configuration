@@ -3998,7 +3998,6 @@ command! -range -nargs=0 CheckOs <line1>,<line2>call CheckOs()
 let g:is_wsl = has('unix') && filereadable('/proc/version') &&
     \ (match(readfile('/proc/version')[0], 'Microsoft') >= 0 ||
     \  match(readfile('/proc/version')[0], 'microsoft') >= 0)
-
 " let s:is_wsl = has('unix') && !empty(filter(readfile('/proc/version'), 'v:val =~? "microsoft"'))
 
 if has('mac') || has('unix') || has('linux') || has('android')
