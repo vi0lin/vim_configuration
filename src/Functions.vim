@@ -1984,7 +1984,15 @@ function! DecidePush(...)
   else
     GitPush
   endif
-  call Statusline()
+  call AllStatusline()
+endfunction
+
+function! AllStatusline()
+  let winnr=winnr()
+  windo call Statusline()
+  while winnr!=winnr()
+    wincmd w
+  endwhile
 endfunction
 
 function! GitDeleteBranchOnRemote(...)
