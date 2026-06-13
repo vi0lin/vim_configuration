@@ -210,12 +210,12 @@ install() {
 
   plugvim="https://raw.githubusercontent.com/junegunn/vim-plug/refs/heads/master/plug.vim"
   datadir=(
-    "~/vimfiles/autoload"
-    "~/.vim/autoload"
-    "~/.vim/autoload"
-    "~/.vim/autoload"
-    "~/.local/share/nvim/site/autoload"
-    "~/.config/nvim/autoload"
+    $USERDIR"vimfiles/autoload"
+    $USERDIR".vim/autoload"
+    $USERDIR".vim/autoload"
+    $USERDIR".vim/autoload"
+    $USERDIR".local/share/nvim/site/autoload"
+    $USERDIR".config/nvim/autoload"
     "/usr/share/vim/vimfiles"
     "/usr/share/vim/vim92"
   )
@@ -247,11 +247,14 @@ install() {
   vimgather vimruntime "echo split(\$VIMRUNTIME, \",\")[0]"
   debug Vimruntime: $vimruntime
   plugins=$vimruntime"/plugin/"
-  plugins="${vimruntime/#\~/$USERDIR}"
-  exit
+  echo $plugins
+  plugins="${vimruntime/#$USERDIR}"
+  echo $plugins
   vim_folder="$USERDIR/.vim"
+  echo $vim_folder
   # vim_folder="${vim_folder/#\$USERDIR}"
   plugins=$vim_folder"/autoload/"
+  echo $plugins
 
   vimplug_exists=$([[ -f ${plugins}plug.vim ]] && echo true || echo false)
   debug Plugins: $plugins
