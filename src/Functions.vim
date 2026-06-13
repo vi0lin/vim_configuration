@@ -4450,8 +4450,12 @@ function! AllBranches(path)
 endfunction
 
 function! FindDiff(path)
-  let x = systemlist('cd '..a:path..'; git diff --stat 2>&1')[-1]
-  return ' '..substitute(substitute(substitute(substitute(substitute(substitute(substitute(x, '[^0-9+-]', ' ', 'g'), '-\{2,\}', '', 'g'), '+\{2,\}', '', 'g'), '\s\{2,\}', ' ', 'g'), '\s+', '+', ''), '\s-', '-', 'g'), '\s$', '', 'g')
+  let x = systemlist('cd '..a:path..'; git diff --stat 2>&1')
+  if len(x)>1
+    return ' '..substitute(substitute(substitute(substitute(substitute(substitute(substitute(x[-1], '[^0-9+-]', ' ', 'g'), '-\{2,\}', '', 'g'), '+\{2,\}', '', 'g'), '\s\{2,\}', ' ', 'g'), '\s+', '+', ''), '\s-', '-', 'g'), '\s$', '', 'g')
+  else
+    return ''
+  endif
 endfunction
 
 function! FindBranch(path)
