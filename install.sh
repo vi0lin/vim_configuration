@@ -15,6 +15,25 @@ debug() {
   fi
 }
 
+get_path_windows() {
+  # Windows home dir
+  USERDIR=`wslpath "$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r')"`
+  # Windows AppData
+  # wslpath "$(cmd.exe /c echo %APPDATA% 2>/dev/null | tr -d '\r')"
+  # Any windows path to linux path
+  # wslpath "C:\\Users\\win"
+  # Reverse: linux path to windows path
+  # wslpath -w /mnt/c/Users/win
+  # wslpath flags:
+  # FlagMeaning(none)Windows -> Linux
+  # -w Linux -> Windows
+  # -m Linux -> Windows with forward slashes
+  # -a Force absolute path
+}
+get_path_linux() {
+  USERDIR='~/'
+}
+
 signature="\" vim_configuration installation 2866039580"
 sig_b=$signature" Begin"
 sig_e=$signature" End"
@@ -24,7 +43,7 @@ get_files_with_signature() {
   unset files_with_signature
   files_with_signature=()
   for path in ${@}; do
-    path="${path/#\~/$HOME}"
+    # path="${path/#\$USERDIR}"
     grep -q "$sig_b" $path && files_with_signature+=("$path")
   done
   debug "Files With Signature:" ${files_with_signature[@]}
@@ -47,7 +66,7 @@ create_signature() {
   debug "Create Signature" $@
   for file in "$@"; do
     local path="$file"
-    path="${path/#\~/$HOME}"
+    # path="${path/#\$USERDIR}"
     debug "sed signature" $path
     $sudo sed -i "\$a$sig_b\n$source_command\n$sig_e" $path
   done
@@ -56,7 +75,7 @@ update_signature() {
   debug "Update Signature" $@
   for file in ${files_with_signature[@]}; do
     local path="$file"
-    path="${path/#\~/$HOME}"
+    # path="${path/#\$USERDIR}"
     # sed -z "s/\(^.*$signature\).*\(^.*$signature\)/\1\n\" ${date}\n\2/g" $file
     # sed "/$sig/{N; s/$sig.*$sig/\" $date/}" $file
     debug "sed update signature" $file
@@ -83,7 +102,7 @@ signature_exists() {
 
 file_exists2() {
   local path="$1"
-  path="${path/#\~/$HOME}"
+  # path="${path/#\$USERDIR}"
   [[ -e "$path" ]]
 }
 
@@ -139,7 +158,45 @@ vimgather() {
   debug "Tmpfile was deleted ($tmpfile)"
 }
 
+check_os() {
+  if [ -z $os ]; then
+    ostype=(
+      [0]=device
+      [1]=mac
+      [2]=win
+      [3]=lin
+      [4]=unknown
+    )
+    debug OsType: "$OSTYPE"
+    _get_os() {
+      if [[ "$OSTYPE" == "linux-musl" ]]; then
+        echo 0
+      elif [[ "$OSTYPE" == "darwin"* ]]; then
+        echo 1
+      elif [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+        echo 2
+      elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo 3
+      else
+        echo "Unknown operating system: $OSTYPE"
+        echo 4
+      fi
+    }
+    os=${ostype[$(_get_os)]}
+    debug ShortOsType: $os
+    echo -n "Installing vim_configuration"
+    case  "$os" in
+      "lin") echo " on linux"; get_path_linux ;;
+      "mac") echo " on macintosh"; get_path_linux ;;
+      "win") echo " on windows"; get_path_windows ;;
+      "device") echo " on device"; get_path_linux ;;
+      "unknown"|*) echo " on unknown"; get_path_linux ;;
+    esac
+  fi
+}
+
 install() {
+  check_os
   _check_binary() {
     if [[ -z $(which $1) ]]; then
       return 1
@@ -189,51 +246,13 @@ install() {
   vimgather vimruntime "echo split(\$VIMRUNTIME, \",\")[0]"
   debug Vimruntime: $vimruntime
   plugins=$vimruntime"/plugin/"
-  vim_folder="~/.vim"
-  vim_folder="${vim_folder/#\~/$HOME}"
+  vim_folder="$USERDIR/.vim"
+  # vim_folder="${vim_folder/#\$USERDIR}"
   plugins=$vim_folder"/autoload/"
 
   vimplug_exists=$([[ -f ${plugins}plug.vim ]] && echo true || echo false)
   debug Plugins: $plugins
   # mkdir -p $vimruntime
-
-  ostype=(
-    [0]=device
-    [1]=mac
-    [2]=win
-    [3]=lin
-    [4]=unknown
-  )
-
-  debug OsType: "$OSTYPE"
-
-  _get_os() {
-    if [[ "$OSTYPE" == "linux-musl" ]]; then
-      echo 0
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-      echo 1
-    elif [[ "$OSTYPE" == "cygwin" || "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-      echo 2
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-      echo 3
-    else
-      echo "Unknown operating system: $OSTYPE"
-      echo 4
-    fi
-  }
-
-  os=${ostype[$(_get_os)]}
-
-  debug ShortOsType: $os
-
-  echo -n "Installing vim_configuration"
-  case  "$os" in
-    "lin") echo " on linux" ;;
-    "mac") echo " on macintosh";;
-    "win") echo " on windows";;
-    "device") echo " on device";;
-    "unknown"|*) echo " on unknown";;
-  esac
 
   case "$os" in
     "lin")
