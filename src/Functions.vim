@@ -2672,7 +2672,7 @@ endfunction
 " call EnsureEnvironment()
 call SetEnvironment()
 
-if !has('wsl')
+if !g:is_wsl
   let runtimepath=split(&runtimepath, ",")[0]
 else
   let _runtime=systemlist("wslpath \"$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r' )\"")
@@ -3993,6 +3993,13 @@ function! CheckOs()
   echo "wsl      " has('wsl')
 endfunction
 command! -range -nargs=0 CheckOs <line1>,<line2>call CheckOs()
+
+" Check if running in WSL
+let g:is_wsl = has('unix') && filereadable('/proc/version') &&
+    \ (match(readfile('/proc/version')[0], 'Microsoft') >= 0 ||
+    \  match(readfile('/proc/version')[0], 'microsoft') >= 0)
+
+" let s:is_wsl = has('unix') && !empty(filter(readfile('/proc/version'), 'v:val =~? "microsoft"'))
 
 if has('mac') || has('unix') || has('linux') || has('android')
   let g:outfile="/tmp/outfile_fzf"
