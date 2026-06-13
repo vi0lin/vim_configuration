@@ -27,7 +27,6 @@ if !exists('g:vim_configuration_path')
   let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
 endif
 
-
 if !exists('g:favorites')
   let g:favorites=[]
 endif
