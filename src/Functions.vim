@@ -2672,12 +2672,13 @@ endfunction
 " call EnsureEnvironment()
 call SetEnvironment()
 
-if !g:is_wsl
-  let runtimepath=split(&runtimepath, ",")[0]
-else
-  let _runtime=systemlist("wslpath \"$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r' )\"")
-  let runtimepath=split(_runtime)[0]
-endif
+let runtimepath=split(&runtimepath, ",")[0]
+" if !g:is_wsl
+"   let runtimepath=split(&runtimepath, ",")[0]
+" else
+"   let _runtime=systemlist("wslpath \"$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r' )\"")
+"   let runtimepath=split(_runtime)[0]
+" endif
 
 if !exists('g:plugfile')
   let g:plugfile=g:runtimepath.."/autoload/plug.vim"

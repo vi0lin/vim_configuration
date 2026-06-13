@@ -16,6 +16,8 @@ debug() {
 }
 
 get_path_windows() {
+  get_path_linux
+  return
   # Windows home dir
   USERDIR=`wslpath "$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r')"`
   # Windows AppData
