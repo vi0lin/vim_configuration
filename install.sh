@@ -303,7 +303,12 @@ install() {
     "win")
       manager="winget"
       installations="$manager install \"The Silver Searcher\" \"FZF\" \"RipGrep GNU\" "
-      installations_win_bash="apt-get install -y vim curl wget fzf ripgrep silversearcher-ag"
+      wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
+      sudo="sudo"
+      ;;
+    "wsl")
+      manager="apt-get"
+      installations="$manager install -y vim curl wget fzf ripgrep silversearcher-ag"
       wget_plug_vim="curl -fLo ${plugins}plug.vim $plugvim"
       sudo="sudo"
       ;;
@@ -322,10 +327,6 @@ install() {
   echo "Installing Additional Software"
   debug Installation Instruction: $sudo $installations
   eval $sudo $installations
-
-  if [ -z $installations_win_bash ]; then
-    eval $sudo $installations_win_bash
-  fi
 
   if ! $vimplug_exists; then
     echo "Installing Vim Plug (plug.vim)"
