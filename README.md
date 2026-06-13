@@ -15,12 +15,15 @@ wget -qO- https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/
 ```
 
 #### Windows
-> [!WARNING]
-> Windows Installation Is Broken
+* Windows WSL
 ```
-curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh
-"C:\Program Files\Git\bin\bash.exe" .\install.sh
+curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh | bash .\install.sh debug
 ```
+* Windows Git-Bash
+```
+curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh | "C:\Program Files\Git\bin\bash.exe" .\install.sh debug
+```
+* Windows Another Wsl Attempt
 ```
 curl -o install.sh -sSfL https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh wsl --install
 wsl bash install.sh
