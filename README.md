@@ -17,11 +17,11 @@ wget -qO- https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/
 #### Windows
 * Windows WSL
 ```
-curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh && bash .\install.sh debug
+curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh && bash ./install.sh debug
 ```
 * Windows Git-Bash
 ```
-curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh && "C:\Program Files\Git\bin\bash.exe" .\install.sh debug
+curl -o install.sh https://raw.githubusercontent.com/vi0lin/vim_configuration/refs/heads/main/install.sh && "C:\Program Files\Git\bin\bash.exe" ./install.sh debug
 ```
 * Windows Another Wsl Attempt
 ```
