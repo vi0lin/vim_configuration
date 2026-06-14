@@ -1243,7 +1243,7 @@ function! Folder_Repo(count, nr)
     " getcwd is not userfriendly
     " consider throwing a message
     " let file=getcwd()
-    echo "No higher Repo"
+    " echo "No higher Repo"
     return
   endif
   return file
