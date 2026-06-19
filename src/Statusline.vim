@@ -1,5 +1,11 @@
 " Statusline.vim
 if !exists("g:vim_advantages_got_sourced")
+  autocmd! BufWritePost Statusline.vim
+  " autocmd! BufWritePost Statusline.vim call C()
+  autocmd! BufWritePost Statusline.vim call C() | source % | call CB()
+endif
+
+if !exists("g:vim_advantages_got_sourced") || 1
 let g:breakpoint=60
 let g:ST_Mode=[]
 
@@ -41,9 +47,9 @@ function! Statusline()
       exe 'hi! StatusLineNC guibg=#222222 guifg=#885588'
       exe 'hi! StatusLine guibg=#55ff88 guifg=#005500'
       " buffer
-      hi User1 guifg=#2fdad8  guibg=#580c9e ctermfg=228 ctermbg=25433
-      hi User2 guifg=#828282  guibg=#080c0C ctermfg=099 ctermbg=236
-      hi User3 guifg=#292b00  guibg=#F4505C ctermfg=88 ctermbg=236
+      hi User1 guifg=#2fdad8  guibg=#580c9e ctermfg=225 ctermbg=25433
+      hi User2 guifg=#828282  guibg=#080c0C ctermfg=255 ctermbg=0
+      hi User3 guifg=#292b00  guibg=#F4505C ctermfg=255 ctermbg=0
       " term
       hi User4 guifg=#112605  guibg=#ae2e4B ctermfg=052 ctermbg=236
       hi User5 guifg=#051d00  guibg=#8d2c2d ctermfg=152 ctermbg=236
@@ -53,7 +59,7 @@ function! Statusline()
       hi User9 guifg=#ffffff  guibg=#F14025 ctermfg=152 ctermbg=236
 
       " Space Between
-      hi User0 guifg=#ffffff  guibg=#094afe ctermfg=152 ctermbg=236
+      hi User0 guifg=#ffffff  guibg=#094afe ctermfg=255 ctermbg=0
       "
       " hi User0 guifg=#000000 guibg=#d3d3d3 ctermfg=152 ctermbg=233
       " hi User0 guifg=#000000 guibg=#d3d3d3 ctermfg=255255255 ctermbg=233

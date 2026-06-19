@@ -39,7 +39,7 @@ NewMap -t -n -no <C-z> :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
 NewMap -no -n ,f :call FavoritesPopup()<cr>
 NewMap -no -n ,,f :call SetUnsetFavorite()<cr>
 " NewMap -no -n <C-8> :call Favorite()<cr>
-NewMap -no -n ,,,f :call OpenUnreleased('.favorites')<cr>
+NewMap -no -n ,,,f :call OpenUnreleased('favorites')<cr>
 
 NewMap -n -no ,s :so %<cr>
 " NewMap -no -n <C-Space> :call SelectCommand()<cr>
@@ -529,12 +529,12 @@ NewMap -no -n ,<Space> :call GetCCWD()<cr>
 " vmap <silent> <C-s> :w!<cr>
 " imap <silent> <C-s> :w!<cr>l
 
-NewMap -n -no <C-s> :SaveFile<cr>
-NewMap -v -no <C-s> :SaveFile<cr>
+NewMap -n -no <C-s> :call SaveFile()<cr>
+NewMap -v -no <C-s> :call SaveFile()<cr>
 " was imap
 " todo add silent
 " NewMap -no -i <C-s> :SaveFile<cr>
-NewMap -i -no <C-s> :SaveFile<cr>
+NewMap -i -no <C-s> :call SaveFile()<cr>
 
 NewMap -n -no <localleader>f :InsertFunction<cr>
 NewMap -n -no <space>f :InsertFilename<cr>
@@ -619,6 +619,7 @@ NewMap -no <A-S-p> :call Projects()<cr>
 NewMap -no <A-C-p> :call Projects()<cr>
 NewMap -no <A-S-C-p> :call Projects()<cr>
 NewMap -no -n ,<C-p> :call SearchGitProjects()<cr>
+NewMap -no -n ,,<C-p> :call SearchGitProjects()<cr>
 
 NewMap -no -n <C-S-m> :Generate<cr>
 

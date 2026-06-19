@@ -6,7 +6,7 @@ nnoremap <C-z> :call SetMode("\<C-z\>", "Normal") \| :if winnr('$')<=1 \| suspen
 tnoremap <C-z> <C-\><C-n>:call SetMode("\<C-z\>", "Terminal") \| :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
 nnoremap ,f :call SetMode(",f", "Normal") \| :call FavoritesPopup()<cr>
 nnoremap ,,f :call SetMode(",,f", "Normal") \| :call SetUnsetFavorite()<cr>
-nnoremap ,,,f :call SetMode(",,,f", "Normal") \| :call OpenUnreleased('.favorites')<cr>
+nnoremap ,,,f :call SetMode(",,,f", "Normal") \| :call OpenUnreleased('favorites')<cr>
 nnoremap ,s :call SetMode(",s", "Normal") \| :so %<cr>
 nnoremap ,t :call SetMode(",t", "Normal") \| :Tidy<cr>
 nnoremap <M-q> :call SetMode("\<M-q\>", "Normal") \| :q<cr>
@@ -352,9 +352,9 @@ nnoremap ,,s :call SetMode(",,s", "Normal") \| :call Statusline_TogglePath()<cr>
 nnoremap ,,d :call SetMode(",,d", "Normal") \| :echo g:debug_layout<cr>
 nnoremap ,,B :call SetMode(",,B", "Normal") \| :call Boilerplate_Test()<cr>
 nnoremap ,<Space> :call SetMode(",\<Space\>", "Normal") \| :call GetCCWD()<cr>
-nnoremap <C-s> :call SetMode("\<C-s\>", "Normal") \| :SaveFile<cr>
-vnoremap <C-s> :call SetMode("\<C-s\>", "Visual") \| '<,'>:SaveFile<cr>
-inoremap <C-s> :call SetMode("\<C-s\>", "Insert") \| :SaveFile<cr>
+nnoremap <C-s> :call SetMode("\<C-s\>", "Normal") \| :call SaveFile()<cr>
+vnoremap <C-s> :call SetMode("\<C-s\>", "Visual") \| '<,'>:call SaveFile()<cr>
+inoremap <C-s> :call SetMode("\<C-s\>", "Insert") \| :call SaveFile()<cr>
 nnoremap <localleader>f :call SetMode("\<localleader\>f", "Normal") \| :InsertFunction<cr>
 nnoremap <space>f :call SetMode("\<space\>f", "Normal") \| :InsertFilename<cr>
 nnoremap ,<Space> :call SetMode(",\<Space\>", "Normal") \| :call ToggleZoom()<cr>
@@ -409,6 +409,7 @@ nnoremap <A-S-p> :call SetMode("\<A-S-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-C-p> :call SetMode("\<A-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-S-C-p> :call SetMode("\<A-S-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call SearchGitProjects()<cr>
+nnoremap ,,<C-p> :call SetMode(",,\<C-p\>", "Normal") \| :call SearchGitProjects()<cr>
 nnoremap <C-S-m> :call SetMode("\<C-S-m\>", "Normal") \| :Generate<cr>
 nnoremap ,x :call SetMode(",x", "Normal") \| :call Commands()<cr>
 vnoremap ,x :call SetMode(",x", "Visual") \| '<,'>:call Commands()<cr>

@@ -42,11 +42,11 @@ get_path_linux() {
   echo $USERDIR
 }
 
-signature="\" vim_configuration installation 2866039580"
+signature="vim_configuration installation 2866039580"
 sig_b=$signature" Begin"
 sig_e=$signature" End"
-debug sig_b $sig_b
-debug sig_e $sig_e
+# debug sig_b $sig_b
+# debug sig_e $sig_e
 get_files_with_signature() {
   unset files_with_signature
   files_with_signature=()
@@ -81,7 +81,12 @@ create_signature() {
     local path="$file"
     # path="${path/#\$USERDIR}"
     debug "sed signature" $path
-    $sudo sed -i "\$a$sig_b\n$source_command\n$sig_e" $path
+    if [ $(cat $path | grep -E "^vim9script" | wc -l) -gt 0 ]; then
+      comment_sign="\#"
+    else
+      comment_sign="\""
+    fi
+    $sudo sed -i "\$a$comment_sign $sig_b\n$source_command\n$sig_e" $path
   done
 }
 update_signature() {

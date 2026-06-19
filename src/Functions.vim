@@ -3,6 +3,7 @@ if !exists("g:vim_advantages_got_sourced")
 " Avoid cdo prompt for overwiting files
 " let &t_TI = "\<Esc>[>4;2m"
 " let &t_TE = "\<Esc>[>4;m"
+
 " let &t_TI = [=1;1u
 " let &t_TE = [>4;m[=0;1u
 
@@ -27,9 +28,25 @@ if !exists('g:vim_configuration_path')
   let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
 endif
 
-if !exists('g:favorites')
-  let g:favorites=[]
-endif
+let g:preservedLists=[ 'favorites', 'projectPocket' ]
+let g:preservedListsFolders=[ 'favorites' ]
+
+function PreservedListsInit()
+  for pl in g:preservedLists
+    let varname="g:"..pl
+    if !exists(varname)
+      exec "let "..varname.."=[]"
+    endif
+  endfor
+  for plf in g:preservedListsFoldersOnly
+    let varname="g:"..pl.."_folders"
+    if !exists(varname)
+      exec "let "..varname.."=[]"
+    endif
+  endfor
+endfunction
+
+call PreservedListsInit()
 
 if !exists('g:unreleased')
   let g:unreleased=g:vim_configuration_path..'/.unreleased'
@@ -53,18 +70,14 @@ function! CreateFileAndPathIfNotExists(file)
 endfunction
 
 function OpenUnreleased(file)
-  let file=g:unreleased..'/'..a:file
+  let file=g:unreleased..'/.'..a:file
   if filereadable(file)
-    exec "e "g:unreleased..'/'..a:file
+    exec "e "g:unreleased..'/.'..a:file
   endif
 endfunction
 
-function! GetSystemsServices(file=g:unreleased..'/.services')
-  return Read(a:file)
-endfunction
-
-function! ReadFavorites(file=g:unreleased..'/.favorites')
-  return Read(a:file)
+function! ReadUnreleased(file)
+  return Read(g:unreleased..'/'..a:file)
 endfunction
 
 function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
@@ -73,12 +86,33 @@ function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
   endif
   " Add Updating Logic When New Projects Were Visited Or Removed
   let g:systems_git_projects=Read(a:file)
+  let g:favorites_folders=GetFavoritesFolders()
+  call extend(g:systems_git_projects, g:favorites_folders)
+endfunction
+
+function! GetFavoritesFolders()
+  let x=[]
+  for f in g:favorites
+    if isdirectory(f) && indexof(x, f)==-1
+      call add(x, f)
+    endif
+  endfor
+  return x
+endfunction
+
+function! GetProjectFolders()
+  let x=[]
+  for p in g:projectfolders
+    call add(x, p)
+  endfor
+  return x
 endfunction
 
 function! SearchGitProjects(file=g:unreleased..'/.gitprojects')
   let gitprojects=systemlist("find "..g:SearchGitProjectsPath.." -name .git -type d 2>/dev/null | sed 's|/.git||'")
   " echo gitprojects
   return Write(gitprojects, a:file)
+  echo "Done"
 endfunction
 command! -range -nargs=0 SearchGitProjects :call SearchGitProjects()
 
@@ -97,25 +131,43 @@ function! Write(data, file, append='b')
   endif
 endfunction
 
-function! ToggleFavorite(n)
-endfunction
-
 function! ClearUnreachableFavorite()
 endfunction
 
-function! SaveFavorites()
-    call Write(g:favorites, g:unreleased..'/.favorites')
+function! WriteUnreleased(list, file)
+    call Write(a:list, g:unreleased..'/.'..a:file)
+endfunction
+
+if !exists('g:sessionfile')
+  let g:sessionfile=g:unreleased..'/.session'
+endif
+
+function! WriteSession()
+  exec "mksession!" g:sessionfile
+endfunction
+command! -range -nargs=0 WriteSession :call WriteSession()
+
+function! ReadSession()
+  if exists(g:sessionfile)
+    exec "source" g:sessionfile
+  endif
+endfunction
+command! -range -nargs=0 ReadSession :call ReadSession()
+
+function! SetUnsetProjectPocket()
+  let g:projectPockets=ReadUnreleased('projectPockets')
 endfunction
 
 function! SetUnsetFavorite()
-  let g:favorites=ReadFavorites()
+  let g:favorites=ReadUnreleased('favorites')
+  let g:favorites_folders=call GetFavoritesFolders()
   let index=index(g:favorites, expand('%:p'))
   if index>=0
     call remove(g:favorites, index)
-    call Write(g:favorites, g:unreleased..'/.favorites')
+    call WriteUnreleased(g:favorites, 'favorites')
   else
     call add(g:favorites, expand('%:p'))
-    call Write(g:favorites, g:unreleased..'/.favorites')
+    call WriteUnreleased(g:favorites, 'favorites')
   endif
   call Statusline()
 endfunction
@@ -3956,17 +4008,18 @@ function! AgFile(title, register, path)
   echo "AG"
 endfunction
 
-function Projects()
+function! Projects()
   call GetSystemsGitProjects()
   call OpenFilePopup("Projects", g:systems_git_projects)
 endfunction
 
-function FavoritesPopup()
-  let g:favorites=ReadFavorites()
+function! FavoritesPopup()
+  let g:favorites=ReadUnreleased('favorites')
+  let g:favorites_folders=GetFavoritesFolders()
   call OpenFilePopup("Favorites", g:favorites)
 endfunction
 
-function OpenFilePopup(title, list)
+function! OpenFilePopup(title, list)
   function! OpenFile_callback(file)
     let path=GetTempfileLine(a:file)
     " consider len(path)==0 || 
@@ -4655,7 +4708,6 @@ function! PathLast(path)
 endfunction
 
 function! IsFavorite()
-  " let g:favorites=Read(g:unreleased..'/.favorites')
   if index(g:favorites, expand('%:p')) >= 0
     return '✓ '
   else
@@ -5157,13 +5209,15 @@ function! WinBufSwap_Back()
   exec  lastwin . " wincmd w" ."|". "buffer ". thisbuf ."|". thiswin ." wincmd w" ."|". "buffer ". lastbuf
 endfunction
 
-function! Cursor_Prep()
+function! C() abort
   let g:cursorpos=getcurpos()
 endfunction
+command! -range -nargs=0 C call C()
 
-function! Cursor_Back()
+function! CB() abort
   call cursor(g:cursorpos[1], g:cursorpos[2])
 endfunction
+command! -range -nargs=0 CB call CB()
 
 function! TabSwap_Prep()
   let g:lasttab=tabpagenr()
@@ -5618,6 +5672,8 @@ function! SendCommandToTerm(direction) range
   " Bug (VS in normalmode sometimes results in the last selected line)
   " let vs=StripComments(VS())
   let vs=VS()
+  echo vs
+  return
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, vs)
 endfunction
@@ -6287,13 +6343,13 @@ endfunction
 let redefine_SaveFile= 1
 if g:redefine_SaveFile || !exists('*SaveFile')
   function! SaveFile()
-    call Cursor_Prep()
+    call C()
     try
       w!
     catch
       silent call SaveAsRoot()
     endtry
-    call Cursor_Back()
+    call CB()
     " echo "File was saved"
     call UpdateGit_OnSave()
   endfunction
