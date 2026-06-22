@@ -28,7 +28,7 @@ if !exists('g:vim_configuration_path')
   let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
 endif
 
-let g:preservedLists=[ 'favorites', 'projectPocket' ]
+let g:preservedLists=[ 'favorites', 'multiprojectholder', 'projectholder', 'projectholder_projects', 'multiprojectholder_projects', 'projects']
 let g:preservedListsFolders=[ 'favorites' ]
 
 function PreservedListsInit()
@@ -38,14 +38,13 @@ function PreservedListsInit()
       exec "let "..varname.."=[]"
     endif
   endfor
-  for plf in g:preservedListsFoldersOnly
+  for plf in g:preservedListsFolders
     let varname="g:"..pl.."_folders"
     if !exists(varname)
       exec "let "..varname.."=[]"
     endif
   endfor
 endfunction
-
 call PreservedListsInit()
 
 if !exists('g:unreleased')
@@ -76,18 +75,41 @@ function OpenUnreleased(file)
   endif
 endfunction
 
-function! ReadUnreleased(file)
-  return Read(g:unreleased..'/'..a:file)
+function Refresh(name, functionname)
+  exec 'let g:'..a:name..'='a:functionname
 endfunction
 
-function! GetSystemsGitProjects(file=g:unreleased..'/.gitprojects')
+function UnreleasedVariable(name)
+  exec 'let g:'..a:name..'=ReadUnreleased("'..a:name..'")'
+endfunction
+
+function! ReadUnreleased(file)
+  return Read(g:unreleased..'/.'..a:file)
+endfunction
+
+function! GetGitprojects(file=g:unreleased..'/.gitprojects')
   if !filereadable(a:file)
     call SearchGitProjects()
   endif
   " Add Updating Logic When New Projects Were Visited Or Removed
-  let g:systems_git_projects=Read(a:file)
-  let g:favorites_folders=GetFavoritesFolders()
-  call extend(g:systems_git_projects, g:favorites_folders)
+  let g:gitprojects=Read(a:file)
+  return g:gitprojects
+endfunction
+
+function GetProjects()
+  call Refresh('multiprojectholder', 'GetMultiprojectholder()')
+  call Refresh('projectholder', 'GetProjectholder()')
+  call Refresh('gitprojects', 'GetGitprojects()')
+  call Refresh('favorites_folders', 'GetFavoritesFolders()')
+  return Merge(g:gitprojects, g:favorites_folders, g:multiprojectholder_projects, g:projectholder_projects)
+endfunction
+
+function! GetFoldersFolders(name)
+  call UnreleasedVariable(a:name)
+  exec 'echo g:'..a:name
+  exec 'for folder in g:'..a:name
+    echo folder
+  endfor
 endfunction
 
 function! GetFavoritesFolders()
@@ -138,9 +160,7 @@ function! WriteUnreleased(list, file)
     call Write(a:list, g:unreleased..'/.'..a:file)
 endfunction
 
-if !exists('g:sessionfile')
-  let g:sessionfile=g:unreleased..'/.session'
-endif
+let g:sessionfile=g:unreleased..'/.session'
 
 function! WriteSession()
   exec "mksession!" g:sessionfile
@@ -148,28 +168,115 @@ endfunction
 command! -range -nargs=0 WriteSession :call WriteSession()
 
 function! ReadSession()
-  if exists(g:sessionfile)
-    exec "source" g:sessionfile
-  endif
+  echo g:sessionfile
+  " if exists(g:sessionfile)
+  exec "source" g:sessionfile
+  " endif
 endfunction
 command! -range -nargs=0 ReadSession :call ReadSession()
 
-function! SetUnsetProjectPocket()
-  let g:projectPockets=ReadUnreleased('projectPockets')
+command! -range -nargs=0 Projekt :call SetUnset('projekt', expand("%:p"))
+
+command! -range -nargs=0 MultiprojectHolder :call SetUnset('multiprojectholder', expand("%:p"))
+
+command! -range -nargs=0 ProjectHolder :call SetUnset('projectholder', expand("%:p"))
+
+function! GetProjectholder()
+  call UnreleasedVariable('projectholder')
+  call GetProjectholder_Projects()
+  return g:projectholder
 endfunction
 
-function! SetUnsetFavorite()
-  let g:favorites=ReadUnreleased('favorites')
-  let g:favorites_folders=call GetFavoritesFolders()
-  let index=index(g:favorites, expand('%:p'))
-  if index>=0
-    call remove(g:favorites, index)
-    call WriteUnreleased(g:favorites, 'favorites')
+function! GetProjectholder_Projects()
+  let p=[]
+  for path in g:projectholder
+    let dirs=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
+    call extend(p, dirs)
+  endfor
+  call ForceSet('projectholder_projects', p)
+  return g:projectholder_projects
+endfunction
+
+function! GetMultiprojectholder()
+  call UnreleasedVariable('multiprojectholder')
+  call GetMultiprojectholder_Projects()
+  return g:multiprojectholder
+endfunction
+
+function! GetMultiprojectholder_Projects()
+  let p=[]
+  for path in g:multiprojectholder
+    let subpaths=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
+    for path2 in subpaths
+      call extend(p, filter(globpath(path2, "*", 0, 1), 'isdirectory(v:val)'))
+    endfor
+  endfor
+  call ForceSet('projectholder_projects', p)
+  return g:projectholder_projects
+endfunction
+
+function EchoP()
+  echo "g:projectholder"
+  echo g:projectholder
+  echo "g:projectholder_projects"
+  echo g:projectholder_projects
+  echo "g:multiprojectholder"
+  echo g:multiprojectholder
+  echo "g:multiprojectholder_projects"
+  echo g:multiprojectholder_projects
+  echo "g:gitprojects"
+  echo g:gitprojects
+endfunction
+
+function! SetUnset(name, value)
+  " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+  exec "call UnreleasedVariable('"..a:name.."')"
+  let x=[]
+  if type(a:value)==3
+    call extend(x, a:value)
   else
-    call add(g:favorites, expand('%:p'))
-    call WriteUnreleased(g:favorites, 'favorites')
+    call extend(x, [a:value])
   endif
-  call Statusline()
+  for y in x
+    exec "let index=index(g:"..a:name..", '"..y.."')"
+    if index>=0
+      exec "call remove(g:"..a:name..", index)"
+      exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
+    else
+      exec "call add(g:"..a:name..", '"..y.."')"
+      exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
+    endif
+  endfor
+  " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+  exec "call UnreleasedVariable('"..a:name.."')"
+endfunction
+
+function! ForceSet(name, value)
+  exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+  let x=[]
+  call extend(x, a:value)
+  for y in x
+    exec "let index=index(g:"..a:name..", '"..y.."')"
+    if index==-1
+      exec "call add(g:"..a:name..", '"..y.."')"
+    endif
+  endfor
+  exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
+  call UnreleasedVariable(a:name)
+endfunction
+
+function! ForceUnset(name, value)
+  exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+  let x=[]
+  call extend(x, a:value)
+  for y in x
+    exec "let index=index(g:"..a:name..", '"..y.."')"
+    if index>=0
+      exec "call remove(g:"..a:name..", index)"
+    endif
+  endfor
+  exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
+  call UnreleasedVariable(a:name)
 endfunction
 
 function! s:MatchesOneOfPatterns(pattern_string, term) abort
@@ -4008,21 +4115,48 @@ function! AgFile(title, register, path)
   echo "AG"
 endfunction
 
-function! Projects()
-  call GetSystemsGitProjects()
-  call OpenFilePopup("Projects", g:systems_git_projects)
+function! Merge(...)
+  let f = []
+  for x in a:000
+    call extend(f, x)
+  endfor
+  return f
 endfunction
 
+function! Projects()
+  call Refresh('projects', 'GetProjects()')
+  call OpenFilePopup("Projects", g:projects)
+endfunction
+
+function! FilesInProjects()
+  let allfiles=[]
+  " for p in g:projects
+  "   call extend(allfiles, [globpath(p, "**")])
+  " endfor
+  " call Refresh('projects', 'GetProjects()')
+  " call OpenFilePopup("Files In Projects", allfiles)
+  call Popup_FZFBuildString("Files In Projects", g:projects)
+endfunction
+
+" function! PopupList(listname)
+"   let title=toupper(a:listname[0])+""+a:listname[1:]
+"   let list=ReadUnreleased(listname)
+"   call OpenFilePopup(title, list)
+" endfunction
+
 function! FavoritesPopup()
-  let g:favorites=ReadUnreleased('favorites')
-  let g:favorites_folders=GetFavoritesFolders()
-  call OpenFilePopup("Favorites", g:favorites)
+  call Refresh('favorites', 'ReadUnreleased("favorites")')
+  call Refresh('favorites_folders', 'GetFavoritesFolders()')
+  let f=[]
+  call extend(f, g:favorites)
+  call extend(f, g:favorites_folders)
+  call OpenFilePopup("Favorites", f)
 endfunction
 
 function! OpenFilePopup(title, list)
   function! OpenFile_callback(file)
     let path=GetTempfileLine(a:file)
-    " consider len(path)==0 || 
+    " consider len(path)==0 ||
     let path=path.''
     if !(path=="0" || path=="-1")
     ""    " if filereadable(path)
@@ -4215,23 +4349,43 @@ function! Popup(title, register, list, callback, outfile)
   endtry
 endfunction
 
-function! Popup_FZFBuildString(title, register, path)
-  if a:register =~ 'window\|buffer\|tab\|global'
-    let title=a:title.." ["..a:register.."]"
-  else
-    let title=a:title
-  endif
-  let path=a:path
-  let type=type(path)
+" function! Popup_FZFBuildString(title, register, paths)
+function! Popup_FZFBuildString(title, paths)
+  " if a:register =~ 'window\|buffer\|tab\|global'
+  "   let title=a:title.." ["..a:register.."]"
+  " else
+  "   let title=a:title
+  " endif
+  function! OpenFile_callback(file)
+    let path=GetTempfileLine(a:file)
+    " consider len(path)==0 ||
+    let path=path.''
+    if !(path=="0" || path=="-1")
+    ""    " if filereadable(path)
+    ""    "   call _openfile_andCD(path)
+    ""    " elseif isdirectory(path)
+    ""    "   call _openfile_andCD(path)
+    ""    " endif
+      call _openfile_andCD(path)
+    ""    call _openfile_andCD(path)
+    endif
+    " if path!='-1' && path!=-1 && path!='0' && path!=0
+    " endif
+    call _cleanCallback(a:file)
+  endfunction
+  let Cb={job, status -> timer_start(0, {_ -> OpenFile_callback(g:outfile)})}
+  let paths=a:paths
+  let type=type(paths)
   if type==1
-    let paths=[path]
+    let paths=[paths]
   else
-    let paths=path
+    let paths=paths
   endif
-  call Find_Popup(
-        \ title,
+  " \ function('OpenFile_callback', [g:outfile]),
+  call Buildstring_Popup(
+        \ a:title,
         \ paths,
-        \ function('OpenFile_callback', [g:outfile]),
+        \ Cb,
         \ "file",
         \)
 endfunction
@@ -4249,7 +4403,7 @@ function! Changemain_repo(title, register, path)
   else
     let paths=path
   endif
-  call Find_Popup(
+  call Buildstring_Popup(
         \ title,
         \ paths,
         \ function('SetProject_callback', [g:outfile]),
@@ -4723,7 +4877,7 @@ endfunction
 
 function! Favorite()
   let list=systemlist("ls -al")
-  call Find_Popup(
+  call Buildstring_Popup(
         \ "Favorites",
         \ list,
         \ "file",
@@ -4851,7 +5005,7 @@ function! FZFPopup(title, type, path, callback)
   "   echo "TEST Bestandend"
   " endif
   " return
-  call Find_Popup(
+  call Buildstring_Popup(
         \ a:title,
         \ paths,
         \ a:callback,
@@ -6888,15 +7042,15 @@ function! Vim(args)
 endfunction
 
 " Customizable FZF Integration
-function! BuildString(options, paths, tempfile="")
+function! BuildString(options, paths)
   let fzf="fzf --multi -i --no-sort --tiebreak=length,begin,index"
   let fzf="fzf --multi -i --tiebreak=begin,length"
   let m = a:paths
   let len=len(m)-1
   let string=""
   let prefix='bash -c " ( '
-  if a:tempfile!=""
-    let suffix=' ) | '.fzf.' > '.a:tempfile.'"'
+  if g:outfile!=""
+    let suffix=' ) | '.fzf.' > '.g:outfile.'"'
   else
     let suffix=' ) | '.fzf.' > "'
   endif
@@ -6910,13 +7064,13 @@ function! BuildString(options, paths, tempfile="")
   return string
 endfunction
 
-function! Find_Popup(title, paths, callback, type="file", maxdepth=10, register="")
+function! Buildstring_Popup(title, paths, callback, type="file", maxdepth=10, register="")
   if a:type=="directory"
     let type="d"
   else
     let type="f"
   endif
-  let cmd=call('BuildString', [ "-maxdepth "..a:maxdepth.." -type "..type,  a:paths, g:tempfile])
+  let cmd=call('BuildString', [ "-maxdepth "..a:maxdepth.." -type "..type,  a:paths])
   let title=' '..a:title..": "..join(a:paths, ' ')..' '
   let g:FileFinder_result=""
   function! OnStdout(channel, msg)

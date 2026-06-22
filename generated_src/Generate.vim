@@ -4,9 +4,12 @@ nnoremap <C-S-z> :call SetMode("\<C-S-z\>", "Normal") \| :suspend<cr>
 tnoremap <C-S-z> <C-\><C-n>:call SetMode("\<C-S-z\>", "Terminal") \| :suspend<cr>
 nnoremap <C-z> :call SetMode("\<C-z\>", "Normal") \| :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
 tnoremap <C-z> <C-\><C-n>:call SetMode("\<C-z\>", "Terminal") \| :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
+nnoremap <C-/> :call SetMode("\<C-/\>", "Normal") \| :e .<cr>
+nnoremap ,/ :call SetMode(",/", "Normal") \| :e .<cr>
+nnoremap ,,,,f :call SetMode(",,,,f", "Normal") \| :call SetUnset("projectPocket", w:cwd)<cr>
 nnoremap ,f :call SetMode(",f", "Normal") \| :call FavoritesPopup()<cr>
-nnoremap ,,f :call SetMode(",,f", "Normal") \| :call SetUnsetFavorite()<cr>
-nnoremap ,,,f :call SetMode(",,,f", "Normal") \| :call OpenUnreleased('favorites')<cr>
+nnoremap ,,f :call SetMode(",,f", "Normal") \| :call SetUnset("favorites", expand('%:p')) \| :call Refresh('favorites_folders', 'GetFavoritesFolders()')<cr>
+nnoremap ,,,f :call SetMode(",,,f", "Normal") \| :call OpenUnreleased("favorites")<cr>
 nnoremap ,s :call SetMode(",s", "Normal") \| :so %<cr>
 nnoremap ,t :call SetMode(",t", "Normal") \| :Tidy<cr>
 nnoremap <M-q> :call SetMode("\<M-q\>", "Normal") \| :q<cr>
@@ -397,11 +400,7 @@ nnoremap ,,,,,g :call SetMode(",,,,,g", "Normal") \| :call AgIn(Folder_Repo(v:co
 nnoremap ,,,,,,g :call SetMode(",,,,,,g", "Normal") \| :call AgIn(Folder_Repo(v:count, 5))<cr>
 nnoremap ,vcd :call SetMode(",vcd", "Normal") \| :call CD(Vim_Advantages_Path())<cr>
 nnoremap ,p :call SetMode(",p", "Normal") \| :call Projects()<cr>
-nnoremap ,,p :call SetMode(",,p", "Normal") \| :call Projects()<cr>
-nnoremap ,,,p :call SetMode(",,,p", "Normal") \| :call Projects()<cr>
-nnoremap ,,,,p :call SetMode(",,,,p", "Normal") \| :call Projects()<cr>
-nnoremap ,,,,,p :call SetMode(",,,,,p", "Normal") \| :call Projects()<cr>
-nnoremap ,,,,,,p :call SetMode(",,,,,,p", "Normal") \| :call Projects()<cr>
+nnoremap ,,p :call SetMode(",,p", "Normal") \| :call FilesInProjects()<cr>
 nnoremap <C-p> :call SetMode("\<C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <C-S-p> :call SetMode("\<C-S-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-p> :call SetMode("\<A-p\>", "Normal") \| :call Projects()<cr>

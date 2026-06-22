@@ -36,10 +36,13 @@ NewMap -t -n -no <C-z> :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
 " NewMap -v -no <C-s> <Nop>
 " unmap <C-s>
 
+NewMap -n -no <C-/> :e .<cr>
+NewMap -n -no ,/ :e .<cr>
+NewMap -no -n ,,,,f :call SetUnset("projectPocket", w:cwd)<cr>
 NewMap -no -n ,f :call FavoritesPopup()<cr>
-NewMap -no -n ,,f :call SetUnsetFavorite()<cr>
+NewMap -no -n ,,f :call SetUnset("favorites", expand('%:p')) \| :call Refresh('favorites_folders', 'GetFavoritesFolders()')<cr>
 " NewMap -no -n <C-8> :call Favorite()<cr>
-NewMap -no -n ,,,f :call OpenUnreleased('favorites')<cr>
+NewMap -no -n ,,,f :call OpenUnreleased("favorites")<cr>
 
 NewMap -n -no ,s :so %<cr>
 " NewMap -no -n <C-Space> :call SelectCommand()<cr>
@@ -53,7 +56,7 @@ let mapping={
   \ "global": 1,
   \ "executor": 0,
   \ "navigator": 0,
-  \ "diary": 0,
+  \ "diary": 0
   \ }
 
 " cmap <F9> <C-R>I
@@ -607,11 +610,7 @@ NewMap -no -n ,,,,,,g :call AgIn(Folder_Repo(v:count, 5))<cr>
 NewMap -no -n ,vcd :call CD(Vim_Advantages_Path())<cr>
 
 NewMap -no -n ,p :call Projects()<cr>
-NewMap -no -n ,,p :call Projects()<cr>
-NewMap -no -n ,,,p :call Projects()<cr>
-NewMap -no -n ,,,,p :call Projects()<cr>
-NewMap -no -n ,,,,,p :call Projects()<cr>
-NewMap -no -n ,,,,,,p :call Projects()<cr>
+NewMap -no -n ,,p :call FilesInProjects()<cr>
 NewMap -no <C-p> :call Projects()<cr>
 NewMap -no <C-S-p> :call Projects()<cr>
 NewMap -no <A-p> :call Projects()<cr>
