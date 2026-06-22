@@ -24,6 +24,7 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! BufEnter * :call BufEnter()
   autocmd! BufEnter * :call Statusline()
   autocmd! WinResized	* :call Statusline()
+
   " autocmd VimLeave * if :WriteSession
   " autocmd! FileType fzf tnoremap <Esc> <C-c>
   " autocmd! FileType fzf autocmd BufLeave <buffer> bdelete!
@@ -32,7 +33,8 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   " [!IMPORTANT]
   " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders
   " autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter *
-  autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
+  " this
+  " autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
 
   " function! s:ShouldRun() abort
   "   return &filetype !=# 'fzf'

@@ -5144,6 +5144,7 @@ function! Open(direction, type="buffer", mode="copy", file="")
   " call WinSwapBuf_Prep()
   call WinSwap_Prep()
   let projectpath=CWD()
+  let g:saved_cwd=CWD()
   let previous_bufname = bufname('%')
   let previous_win = winnr('$')
   let h=0 | let j=0 | let k=0 | let l=0
@@ -5183,6 +5184,7 @@ function! Open(direction, type="buffer", mode="copy", file="")
     " let b:termpid=system('echo $$')
   endif
   let post=""
+  let w:saved_cwd = getcwd()
   if vertical && buffer
     let pre="vsplit \|"
   elseif vertical && terminal
@@ -5206,7 +5208,10 @@ function! Open(direction, type="buffer", mode="copy", file="")
     let arg="enew"
   endif
   exec pre arg file
-  exec post
+  echo pre arg file
+  " echo pre arg file
+  " return
+  " exec post
   let win = winnr()
   " exec previous_win "wincmd w"
   " if buffer
@@ -5261,6 +5266,8 @@ function! Open(direction, type="buffer", mode="copy", file="")
   endif
   " call WinSwapBuf_Back()
   if !terminal
+    call CD(projectpath)
+  else
     call CD(projectpath)
   endif
   if !insert && terminal
