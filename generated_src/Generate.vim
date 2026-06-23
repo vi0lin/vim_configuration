@@ -14,102 +14,102 @@ nnoremap ,s :call SetMode(",s", "Normal") \| :so %<cr>
 nnoremap ,t :call SetMode(",t", "Normal") \| :Tidy<cr>
 nnoremap <M-q> :call SetMode("\<M-q\>", "Normal") \| :q<cr>
 tnoremap <M-q> <C-\><C-n>:call SetMode("\<M-q\>", "Terminal") \| <c-\><c-n>:q<cr>
-vnoremap <F5> :call SetMode("\<F5\>", "Visual") \| '<,'>:call VSRewriteCommand("h")<cr>
-vnoremap <F6> :call SetMode("\<F6\>", "Visual") \| '<,'>:call VSRewriteCommand("j")<cr>
-vnoremap <F7> :call SetMode("\<F7\>", "Visual") \| '<,'>:call VSRewriteCommand("k")<cr>
-vnoremap <F8> :call SetMode("\<F8\>", "Visual") \| '<,'>:call VSRewriteCommand("l")<cr>
-inoremap <F5> :call SetMode("\<F5\>", "Insert") \| :call SavedCommandToTerm("h")<cr>
-inoremap <F6> :call SetMode("\<F6\>", "Insert") \| :call SavedCommandToTerm("j")<cr>
-inoremap <F7> :call SetMode("\<F7\>", "Insert") \| :call SavedCommandToTerm("k")<cr>
-inoremap <F8> :call SetMode("\<F8\>", "Insert") \| :call SavedCommandToTerm("l")<cr>
-nnoremap <F5> :call SetMode("\<F5\>", "Normal") \| :call SavedCommandToTerm("h")<cr>
-cnoremap <F5> :call SetMode("\<F5\>", "Command") \| :call SavedCommandToTerm("h")<cr>
-nnoremap <F6> :call SetMode("\<F6\>", "Normal") \| :call SavedCommandToTerm("j")<cr>
-cnoremap <F6> :call SetMode("\<F6\>", "Command") \| :call SavedCommandToTerm("j")<cr>
-nnoremap <F7> :call SetMode("\<F7\>", "Normal") \| :call SavedCommandToTerm("k")<cr>
-cnoremap <F7> :call SetMode("\<F7\>", "Command") \| :call SavedCommandToTerm("k")<cr>
-nnoremap <F8> :call SetMode("\<F8\>", "Normal") \| :call SavedCommandToTerm("l")<cr>
-cnoremap <F8> :call SetMode("\<F8\>", "Command") \| :call SavedCommandToTerm("l")<cr>
-tnoremap <F5> <C-\><C-n>:call SetMode("\<F5\>", "Terminal") \| :call SavedCommandToTerm("h")<cr>
-tnoremap <F6> <C-\><C-n>:call SetMode("\<F6\>", "Terminal") \| :call SavedCommandToTerm("j")<cr>
-tnoremap <F7> <C-\><C-n>:call SetMode("\<F7\>", "Terminal") \| :call SavedCommandToTerm("k")<cr>
-tnoremap <F8> <C-\><C-n>:call SetMode("\<F8\>", "Terminal") \| :call SavedCommandToTerm("l")<cr>
-nmap ,<F5> :call SetMode(",\<F5\>", "Normal") \| :call MapCommand("h")<cr>
-nmap ,<F6> :call SetMode(",\<F6\>", "Normal") \| :call MapCommand("j")<cr>
-nmap ,<F7> :call SetMode(",\<F7\>", "Normal") \| :call MapCommand("k")<cr>
-nmap ,<F8> :call SetMode(",\<F8\>", "Normal") \| :call MapCommand("l")<cr>
-nmap ,,<F5> :call SetMode(",,\<F5\>", "Normal") \| :call DirectionMapSmart('h')<cr>
-nmap ,,<F6> :call SetMode(",,\<F6\>", "Normal") \| :call DirectionMapSmart('j')<cr>
-nmap ,,<F7> :call SetMode(",,\<F7\>", "Normal") \| :call DirectionMapSmart('k')<cr>
-nmap ,,<F8> :call SetMode(",,\<F8\>", "Normal") \| :call DirectionMapSmart('l')<cr>
-nmap ,,,<F5> :call SetMode(",,,\<F5\>", "Normal") \| :call MapCommand("x")<cr>
-nmap ,,,<F6> :call SetMode(",,,\<F6\>", "Normal") \| :call MapCommand("x")<cr>
-nmap ,,,<F7> :call SetMode(",,,\<F7\>", "Normal") \| :call MapCommand("x")<cr>
-nmap ,,,<F8> :call SetMode(",,,\<F8\>", "Normal") \| :call MapCommand("x")<cr>
-nnoremap ,,,<F5> :call SetMode(",,,\<F5\>", "Normal") \| :call FixTargetTerm('F5')<cr>
-nnoremap ,,,<F6> :call SetMode(",,,\<F6\>", "Normal") \| :call FixTargetTerm('F6')<cr>
-nnoremap ,,,<F7> :call SetMode(",,,\<F7\>", "Normal") \| :call FixTargetTerm('F7')<cr>
-nnoremap ,,,<F8> :call SetMode(",,,\<F8\>", "Normal") \| :call FixTargetTerm('F8')<cr>
-vnoremap <C-F5> :call SetMode("\<C-F5\>", "Visual") \| '<,'>:call RedoCommandToTermWithSigTerm("h")<cr>
-vnoremap <C-F6> :call SetMode("\<C-F6\>", "Visual") \| '<,'>:call RedoCommandToTermWithSigTerm("j")<cr>
-vnoremap <C-F7> :call SetMode("\<C-F7\>", "Visual") \| '<,'>:call RedoCommandToTermWithSigTerm("k")<cr>
-vnoremap <C-F8> :call SetMode("\<C-F8\>", "Visual") \| '<,'>:call RedoCommandToTermWithSigTerm("l")<cr>
-inoremap <C-F5> :call SetMode("\<C-F5\>", "Insert") \| :call RedoCommandToTermWithSigTerm("h")<cr>
-inoremap <C-F6> :call SetMode("\<C-F6\>", "Insert") \| :call RedoCommandToTermWithSigTerm("j")<cr>
-inoremap <C-F7> :call SetMode("\<C-F7\>", "Insert") \| :call RedoCommandToTermWithSigTerm("k")<cr>
-inoremap <C-F8> :call SetMode("\<C-F8\>", "Insert") \| :call RedoCommandToTermWithSigTerm("l")<cr>
-nnoremap <C-F5> :call SetMode("\<C-F5\>", "Normal") \| :call RedoCommandToTermWithSigTerm("h")<cr>
-cnoremap <C-F5> :call SetMode("\<C-F5\>", "Command") \| :call RedoCommandToTermWithSigTerm("h")<cr>
-nnoremap <C-F6> :call SetMode("\<C-F6\>", "Normal") \| :call RedoCommandToTermWithSigTerm("j")<cr>
-cnoremap <C-F6> :call SetMode("\<C-F6\>", "Command") \| :call RedoCommandToTermWithSigTerm("j")<cr>
-nnoremap <C-F7> :call SetMode("\<C-F7\>", "Normal") \| :call RedoCommandToTermWithSigTerm("k")<cr>
-cnoremap <C-F7> :call SetMode("\<C-F7\>", "Command") \| :call RedoCommandToTermWithSigTerm("k")<cr>
-nnoremap <C-F8> :call SetMode("\<C-F8\>", "Normal") \| :call RedoCommandToTermWithSigTerm("l")<cr>
-cnoremap <C-F8> :call SetMode("\<C-F8\>", "Command") \| :call RedoCommandToTermWithSigTerm("l")<cr>
-tnoremap <C-F5> <C-\><C-n>:call SetMode("\<C-F5\>", "Terminal") \| :call RedoCommandToTermWithSigTerm("h")<cr>
-tnoremap <C-F6> <C-\><C-n>:call SetMode("\<C-F6\>", "Terminal") \| :call RedoCommandToTermWithSigTerm("j")<cr>
-tnoremap <C-F7> <C-\><C-n>:call SetMode("\<C-F7\>", "Terminal") \| :call RedoCommandToTermWithSigTerm("k")<cr>
-tnoremap <C-F8> <C-\><C-n>:call SetMode("\<C-F8\>", "Terminal") \| :call RedoCommandToTermWithSigTerm("l")<cr>
-vnoremap <S-F5> :call SetMode("\<S-F5\>", "Visual") \| '<,'>:call RedoCommandToTerm("h")<cr>
-vnoremap <S-F6> :call SetMode("\<S-F6\>", "Visual") \| '<,'>:call RedoCommandToTerm("j")<cr>
-vnoremap <S-F7> :call SetMode("\<S-F7\>", "Visual") \| '<,'>:call RedoCommandToTerm("k")<cr>
-vnoremap <S-F8> :call SetMode("\<S-F8\>", "Visual") \| '<,'>:call RedoCommandToTerm("l")<cr>
-inoremap <S-F5> :call SetMode("\<S-F5\>", "Insert") \| :call RedoCommandToTerm("h")<cr>
-inoremap <S-F6> :call SetMode("\<S-F6\>", "Insert") \| :call RedoCommandToTerm("j")<cr>
-inoremap <S-F7> :call SetMode("\<S-F7\>", "Insert") \| :call RedoCommandToTerm("k")<cr>
-inoremap <S-F8> :call SetMode("\<S-F8\>", "Insert") \| :call RedoCommandToTerm("l")<cr>
-nnoremap <S-F5> :call SetMode("\<S-F5\>", "Normal") \| :call RedoCommandToTerm("h")<cr>
-cnoremap <S-F5> :call SetMode("\<S-F5\>", "Command") \| :call RedoCommandToTerm("h")<cr>
-nnoremap <S-F6> :call SetMode("\<S-F6\>", "Normal") \| :call RedoCommandToTerm("j")<cr>
-cnoremap <S-F6> :call SetMode("\<S-F6\>", "Command") \| :call RedoCommandToTerm("j")<cr>
-nnoremap <S-F7> :call SetMode("\<S-F7\>", "Normal") \| :call RedoCommandToTerm("k")<cr>
-cnoremap <S-F7> :call SetMode("\<S-F7\>", "Command") \| :call RedoCommandToTerm("k")<cr>
-nnoremap <S-F8> :call SetMode("\<S-F8\>", "Normal") \| :call RedoCommandToTerm("l")<cr>
-cnoremap <S-F8> :call SetMode("\<S-F8\>", "Command") \| :call RedoCommandToTerm("l")<cr>
-tnoremap <S-F5> <C-\><C-n>:call SetMode("\<S-F5\>", "Terminal") \| :call RedoCommandToTerm("h")<cr>
-tnoremap <S-F6> <C-\><C-n>:call SetMode("\<S-F6\>", "Terminal") \| :call RedoCommandToTerm("j")<cr>
-tnoremap <S-F7> <C-\><C-n>:call SetMode("\<S-F7\>", "Terminal") \| :call RedoCommandToTerm("k")<cr>
-tnoremap <S-F8> <C-\><C-n>:call SetMode("\<S-F8\>", "Terminal") \| :call RedoCommandToTerm("l")<cr>
-vnoremap <C-S-F5> :call SetMode("\<C-S-F5\>", "Visual") \| '<,'>:call SigTermToTerm("h")<cr>
-vnoremap <C-S-F6> :call SetMode("\<C-S-F6\>", "Visual") \| '<,'>:call SigTermToTerm("j")<cr>
-vnoremap <C-S-F7> :call SetMode("\<C-S-F7\>", "Visual") \| '<,'>:call SigTermToTerm("k")<cr>
-vnoremap <C-S-F8> :call SetMode("\<C-S-F8\>", "Visual") \| '<,'>:call SigTermToTerm("l")<cr>
-inoremap <C-S-F5> :call SetMode("\<C-S-F5\>", "Insert") \| :call SigTermToTerm("h")<cr>
-inoremap <C-S-F6> :call SetMode("\<C-S-F6\>", "Insert") \| :call SigTermToTerm("j")<cr>
-inoremap <C-S-F7> :call SetMode("\<C-S-F7\>", "Insert") \| :call SigTermToTerm("k")<cr>
-inoremap <C-S-F8> :call SetMode("\<C-S-F8\>", "Insert") \| :call SigTermToTerm("l")<cr>
-nnoremap <C-S-F5> :call SetMode("\<C-S-F5\>", "Normal") \| :call SigTermToTerm("h")<cr>
-cnoremap <C-S-F5> :call SetMode("\<C-S-F5\>", "Command") \| :call SigTermToTerm("h")<cr>
-nnoremap <C-S-F6> :call SetMode("\<C-S-F6\>", "Normal") \| :call SigTermToTerm("j")<cr>
-cnoremap <C-S-F6> :call SetMode("\<C-S-F6\>", "Command") \| :call SigTermToTerm("j")<cr>
-nnoremap <C-S-F7> :call SetMode("\<C-S-F7\>", "Normal") \| :call SigTermToTerm("k")<cr>
-cnoremap <C-S-F7> :call SetMode("\<C-S-F7\>", "Command") \| :call SigTermToTerm("k")<cr>
-nnoremap <C-S-F8> :call SetMode("\<C-S-F8\>", "Normal") \| :call SigTermToTerm("l")<cr>
-cnoremap <C-S-F8> :call SetMode("\<C-S-F8\>", "Command") \| :call SigTermToTerm("l")<cr>
-tnoremap <C-S-F5> <C-\><C-n>:call SetMode("\<C-S-F5\>", "Terminal") \| :call SigTermToTerm("h")<cr>
-tnoremap <C-S-F6> <C-\><C-n>:call SetMode("\<C-S-F6\>", "Terminal") \| :call SigTermToTerm("j")<cr>
-tnoremap <C-S-F7> <C-\><C-n>:call SetMode("\<C-S-F7\>", "Terminal") \| :call SigTermToTerm("k")<cr>
-tnoremap <C-S-F8> <C-\><C-n>:call SetMode("\<C-S-F8\>", "Terminal") \| :call SigTermToTerm("l")<cr>
+nnoremap <F5> :call SetMode("\<F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <F5> :call SetMode("\<F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <F5> :call SetMode("\<F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <A-F5> :call SetMode("\<A-F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <A-F5> :call SetMode("\<A-F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <A-F5> :call SetMode("\<A-F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-F5> :call SetMode("\<S-F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-F5> :call SetMode("\<S-F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-F5> :call SetMode("\<S-F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-A-F5> :call SetMode("\<S-A-F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-A-F5> :call SetMode("\<S-A-F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-A-F5> :call SetMode("\<S-A-F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-F5> :call SetMode("\<C-F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-F5> :call SetMode("\<C-F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-F5> :call SetMode("\<C-F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-A-F5> :call SetMode("\<C-A-F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-A-F5> :call SetMode("\<C-A-F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-A-F5> :call SetMode("\<C-A-F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-F5> :call SetMode("\<C-S-F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-F5> :call SetMode("\<C-S-F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-F5> :call SetMode("\<C-S-F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-A-F5> :call SetMode("\<C-S-A-F5\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-A-F5> :call SetMode("\<C-S-A-F5\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-A-F5> :call SetMode("\<C-S-A-F5\>", "Command") \| :call Eexec()<cr>
+nnoremap <F6> :call SetMode("\<F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <F6> :call SetMode("\<F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <F6> :call SetMode("\<F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <A-F6> :call SetMode("\<A-F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <A-F6> :call SetMode("\<A-F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <A-F6> :call SetMode("\<A-F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-F6> :call SetMode("\<S-F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-F6> :call SetMode("\<S-F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-F6> :call SetMode("\<S-F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-A-F6> :call SetMode("\<S-A-F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-A-F6> :call SetMode("\<S-A-F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-A-F6> :call SetMode("\<S-A-F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-F6> :call SetMode("\<C-F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-F6> :call SetMode("\<C-F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-F6> :call SetMode("\<C-F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-A-F6> :call SetMode("\<C-A-F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-A-F6> :call SetMode("\<C-A-F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-A-F6> :call SetMode("\<C-A-F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-F6> :call SetMode("\<C-S-F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-F6> :call SetMode("\<C-S-F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-F6> :call SetMode("\<C-S-F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-A-F6> :call SetMode("\<C-S-A-F6\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-A-F6> :call SetMode("\<C-S-A-F6\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-A-F6> :call SetMode("\<C-S-A-F6\>", "Command") \| :call Eexec()<cr>
+nnoremap <F7> :call SetMode("\<F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <F7> :call SetMode("\<F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <F7> :call SetMode("\<F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <A-F7> :call SetMode("\<A-F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <A-F7> :call SetMode("\<A-F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <A-F7> :call SetMode("\<A-F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-F7> :call SetMode("\<S-F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-F7> :call SetMode("\<S-F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-F7> :call SetMode("\<S-F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-A-F7> :call SetMode("\<S-A-F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-A-F7> :call SetMode("\<S-A-F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-A-F7> :call SetMode("\<S-A-F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-F7> :call SetMode("\<C-F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-F7> :call SetMode("\<C-F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-F7> :call SetMode("\<C-F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-A-F7> :call SetMode("\<C-A-F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-A-F7> :call SetMode("\<C-A-F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-A-F7> :call SetMode("\<C-A-F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-F7> :call SetMode("\<C-S-F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-F7> :call SetMode("\<C-S-F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-F7> :call SetMode("\<C-S-F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-A-F7> :call SetMode("\<C-S-A-F7\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-A-F7> :call SetMode("\<C-S-A-F7\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-A-F7> :call SetMode("\<C-S-A-F7\>", "Command") \| :call Eexec()<cr>
+nnoremap <F8> :call SetMode("\<F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <F8> :call SetMode("\<F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <F8> :call SetMode("\<F8\>", "Command") \| :call Eexec()<cr>
+nnoremap <A-F8> :call SetMode("\<A-F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <A-F8> :call SetMode("\<A-F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <A-F8> :call SetMode("\<A-F8\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-F8> :call SetMode("\<S-F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-F8> :call SetMode("\<S-F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-F8> :call SetMode("\<S-F8\>", "Command") \| :call Eexec()<cr>
+nnoremap <S-A-F8> :call SetMode("\<S-A-F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <S-A-F8> :call SetMode("\<S-A-F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <S-A-F8> :call SetMode("\<S-A-F8\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-F8> :call SetMode("\<C-F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-F8> :call SetMode("\<C-F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-F8> :call SetMode("\<C-F8\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-A-F8> :call SetMode("\<C-A-F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-A-F8> :call SetMode("\<C-A-F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-A-F8> :call SetMode("\<C-A-F8\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-F8> :call SetMode("\<C-S-F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-F8> :call SetMode("\<C-S-F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-F8> :call SetMode("\<C-S-F8\>", "Command") \| :call Eexec()<cr>
+nnoremap <C-S-A-F8> :call SetMode("\<C-S-A-F8\>", "Normal") \| :call Eexec()<cr>
+vnoremap <C-S-A-F8> :call SetMode("\<C-S-A-F8\>", "Visual") \| '<,'>:call Eexec()<cr>
+cnoremap <C-S-A-F8> :call SetMode("\<C-S-A-F8\>", "Command") \| :call Eexec()<cr>
 vnoremap . :call SetMode(".", "Visual") \| '<,'>:<Up><cr>
 nnoremap ,h :call SetMode(",h", "Normal") \| :call Open("h", "buffer", "new")<cr>
 vnoremap ,h :call SetMode(",h", "Visual") \| '<,'>:call Open("h", "buffer", "new")<cr>
@@ -302,6 +302,16 @@ vnoremap <C-h> :call SetMode("\<C-h\>", "Visual") \| '<,'>:call SmartWincmd('h')
 cnoremap <C-h> :call SetMode("\<C-h\>", "Command") \| :call SmartWincmd('h')<cr>
 tnoremap <C-h> <C-\><C-n>:call SetMode("\<C-h\>", "Terminal") \| :call SmartWincmd('h')<cr>
 inoremap <C-h> :call SetMode("\<C-h\>", "Insert") \| :call SmartWincmd('h')<cr>
+nnoremap <C-h> :call SetMode("\<C-h\>", "Normal") \| :call SmartWincmd('h')<cr>
+vnoremap <C-h> :call SetMode("\<C-h\>", "Visual") \| '<,'>:call SmartWincmd('h')<cr>
+cnoremap <C-h> :call SetMode("\<C-h\>", "Command") \| :call SmartWincmd('h')<cr>
+tnoremap <C-h> <C-\><C-n>:call SetMode("\<C-h\>", "Terminal") \| :call SmartWincmd('h')<cr>
+inoremap <C-h> :call SetMode("\<C-h\>", "Insert") \| :call SmartWincmd('h')<cr>
+nnoremap <C-j> :call SetMode("\<C-j\>", "Normal") \| :call SmartWincmd('j')<cr>
+vnoremap <C-j> :call SetMode("\<C-j\>", "Visual") \| '<,'>:call SmartWincmd('j')<cr>
+cnoremap <C-j> :call SetMode("\<C-j\>", "Command") \| :call SmartWincmd('j')<cr>
+tnoremap <C-j> <C-\><C-n>:call SetMode("\<C-j\>", "Terminal") \| :call SmartWincmd('j')<cr>
+inoremap <C-j> :call SetMode("\<C-j\>", "Insert") \| :call SmartWincmd('j')<cr>
 nnoremap <C-j> :call SetMode("\<C-j\>", "Normal") \| :call SmartWincmd('j')<cr>
 vnoremap <C-j> :call SetMode("\<C-j\>", "Visual") \| '<,'>:call SmartWincmd('j')<cr>
 cnoremap <C-j> :call SetMode("\<C-j\>", "Command") \| :call SmartWincmd('j')<cr>
@@ -312,6 +322,16 @@ vnoremap <C-k> :call SetMode("\<C-k\>", "Visual") \| '<,'>:call SmartWincmd('k')
 cnoremap <C-k> :call SetMode("\<C-k\>", "Command") \| :call SmartWincmd('k')<cr>
 tnoremap <C-k> <C-\><C-n>:call SetMode("\<C-k\>", "Terminal") \| :call SmartWincmd('k')<cr>
 inoremap <C-k> :call SetMode("\<C-k\>", "Insert") \| :call SmartWincmd('k')<cr>
+nnoremap <C-k> :call SetMode("\<C-k\>", "Normal") \| :call SmartWincmd('k')<cr>
+vnoremap <C-k> :call SetMode("\<C-k\>", "Visual") \| '<,'>:call SmartWincmd('k')<cr>
+cnoremap <C-k> :call SetMode("\<C-k\>", "Command") \| :call SmartWincmd('k')<cr>
+tnoremap <C-k> <C-\><C-n>:call SetMode("\<C-k\>", "Terminal") \| :call SmartWincmd('k')<cr>
+inoremap <C-k> :call SetMode("\<C-k\>", "Insert") \| :call SmartWincmd('k')<cr>
+nnoremap <C-l> :call SetMode("\<C-l\>", "Normal") \| :call SmartWincmd('l')<cr>
+vnoremap <C-l> :call SetMode("\<C-l\>", "Visual") \| '<,'>:call SmartWincmd('l')<cr>
+cnoremap <C-l> :call SetMode("\<C-l\>", "Command") \| :call SmartWincmd('l')<cr>
+tnoremap <C-l> <C-\><C-n>:call SetMode("\<C-l\>", "Terminal") \| :call SmartWincmd('l')<cr>
+inoremap <C-l> :call SetMode("\<C-l\>", "Insert") \| :call SmartWincmd('l')<cr>
 nnoremap <C-l> :call SetMode("\<C-l\>", "Normal") \| :call SmartWincmd('l')<cr>
 vnoremap <C-l> :call SetMode("\<C-l\>", "Visual") \| '<,'>:call SmartWincmd('l')<cr>
 cnoremap <C-l> :call SetMode("\<C-l\>", "Command") \| :call SmartWincmd('l')<cr>
@@ -366,10 +386,18 @@ nnoremap ,b :call SetMode(",b", "Normal") \| :call BASH(VS())<cr>
 nnoremap ,b :call SetMode(",b", "Normal") \| :call Bash(VS())<cr>
 nnoremap ,b :call SetMode(",b", "Normal") \| :Buffers<cr>
 nnoremap ,b :call SetMode(",b", "Normal") \| :Buffers<cr>
-nnoremap <localleader>iv :call SetMode("\<localleader\>iv", "Normal") \| :call VIM(input("vimscript: "), 'exec_input_vs')<cr>
-nnoremap <localleader>ib :call SetMode("\<localleader\>ib", "Normal") \| :call BASH(input("bash: "), 'exec_input_vs')<cr>
-nnoremap <localleader>ip :call SetMode("\<localleader\>ip", "Normal") \| :call PYTHON(input("python: "), 'exec_input_vs')<cr>
-nnoremap <localleader>ir :call SetMode("\<localleader\>ir", "Normal") \| :call RUST(input("rust: "), 'exec_input_vs')<cr>
+nnoremap ,,iv :call SetMode(",,iv", "Normal") \| :call VIM(input("vimscript: "), 'exec_input_vs')<cr>
+nnoremap ,,ib :call SetMode(",,ib", "Normal") \| :call BASH(input("bash: "), 'exec_input_vs')<cr>
+nnoremap ,,ip :call SetMode(",,ip", "Normal") \| :call PYTHON(input("python: "), 'exec_input_vs')<cr>
+nnoremap ,,ir :call SetMode(",,ir", "Normal") \| :call RUST(input("rust: "), 'exec_input_vs')<cr>
+nnoremap ,iv :call SetMode(",iv", "Normal") \| :call VIM('', 'exec_input_vs')<cr>
+vnoremap ,iv :call SetMode(",iv", "Visual") \| '<,'>:call VIM('', 'exec_input_vs')<cr>
+nnoremap ,ib :call SetMode(",ib", "Normal") \| :call BASH('', 'exec_input_vs')<cr>
+vnoremap ,ib :call SetMode(",ib", "Visual") \| '<,'>:call BASH('', 'exec_input_vs')<cr>
+nnoremap ,ip :call SetMode(",ip", "Normal") \| :call PYTHON('', 'exec_input_vs')<cr>
+vnoremap ,ip :call SetMode(",ip", "Visual") \| '<,'>:call PYTHON('', 'exec_input_vs')<cr>
+nnoremap ,ir :call SetMode(",ir", "Normal") \| :call RUST('', 'exec_input_vs')<cr>
+vnoremap ,ir :call SetMode(",ir", "Visual") \| '<,'>:call RUST('', 'exec_input_vs')<cr>
 nnoremap <space>p :call SetMode("\<space\>p", "Normal") \| :CopyFileNameToClipboard<cr>
 nnoremap <space>P :call SetMode("\<space\>P", "Normal") \| :CopyWholePathToClipboard<cr>
 nnoremap <space>r :call SetMode("\<space\>r", "Normal") \| :InsertReceiver<cr>
@@ -415,6 +443,16 @@ vnoremap ,x :call SetMode(",x", "Visual") \| '<,'>:call Commands()<cr>
 cnoremap ,x :call SetMode(",x", "Command") \| :call Commands()<cr>
 tnoremap ,x <C-\><C-n>:call SetMode(",x", "Terminal") \| :call Commands()<cr>
 inoremap ,x :call SetMode(",x", "Insert") \| :call Commands()<cr>
+nnoremap ,x :call SetMode(",x", "Normal") \| :call Commands()<cr>
+vnoremap ,x :call SetMode(",x", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap ,x :call SetMode(",x", "Command") \| :call Commands()<cr>
+tnoremap ,x <C-\><C-n>:call SetMode(",x", "Terminal") \| :call Commands()<cr>
+inoremap ,x :call SetMode(",x", "Insert") \| :call Commands()<cr>
+nnoremap <C-x> :call SetMode("\<C-x\>", "Normal") \| :call Commands()<cr>
+vnoremap <C-x> :call SetMode("\<C-x\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <C-x> :call SetMode("\<C-x\>", "Command") \| :call Commands()<cr>
+tnoremap <C-x> <C-\><C-n>:call SetMode("\<C-x\>", "Terminal") \| :call Commands()<cr>
+inoremap <C-x> :call SetMode("\<C-x\>", "Insert") \| :call Commands()<cr>
 nnoremap <C-x> :call SetMode("\<C-x\>", "Normal") \| :call Commands()<cr>
 vnoremap <C-x> :call SetMode("\<C-x\>", "Visual") \| '<,'>:call Commands()<cr>
 cnoremap <C-x> :call SetMode("\<C-x\>", "Command") \| :call Commands()<cr>
@@ -425,6 +463,16 @@ vnoremap <C-S-x> :call SetMode("\<C-S-x\>", "Visual") \| '<,'>:call Commands()<c
 cnoremap <C-S-x> :call SetMode("\<C-S-x\>", "Command") \| :call Commands()<cr>
 tnoremap <C-S-x> <C-\><C-n>:call SetMode("\<C-S-x\>", "Terminal") \| :call Commands()<cr>
 inoremap <C-S-x> :call SetMode("\<C-S-x\>", "Insert") \| :call Commands()<cr>
+nnoremap <C-S-x> :call SetMode("\<C-S-x\>", "Normal") \| :call Commands()<cr>
+vnoremap <C-S-x> :call SetMode("\<C-S-x\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <C-S-x> :call SetMode("\<C-S-x\>", "Command") \| :call Commands()<cr>
+tnoremap <C-S-x> <C-\><C-n>:call SetMode("\<C-S-x\>", "Terminal") \| :call Commands()<cr>
+inoremap <C-S-x> :call SetMode("\<C-S-x\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-x> :call SetMode("\<A-x\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-x> :call SetMode("\<A-x\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-x> :call SetMode("\<A-x\>", "Command") \| :call Commands()<cr>
+tnoremap <A-x> <C-\><C-n>:call SetMode("\<A-x\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-x> :call SetMode("\<A-x\>", "Insert") \| :call Commands()<cr>
 nnoremap <A-x> :call SetMode("\<A-x\>", "Normal") \| :call Commands()<cr>
 vnoremap <A-x> :call SetMode("\<A-x\>", "Visual") \| '<,'>:call Commands()<cr>
 cnoremap <A-x> :call SetMode("\<A-x\>", "Command") \| :call Commands()<cr>
@@ -435,11 +483,26 @@ vnoremap <A-S-x> :call SetMode("\<A-S-x\>", "Visual") \| '<,'>:call Commands()<c
 cnoremap <A-S-x> :call SetMode("\<A-S-x\>", "Command") \| :call Commands()<cr>
 tnoremap <A-S-x> <C-\><C-n>:call SetMode("\<A-S-x\>", "Terminal") \| :call Commands()<cr>
 inoremap <A-S-x> :call SetMode("\<A-S-x\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-S-x> :call SetMode("\<A-S-x\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-S-x> :call SetMode("\<A-S-x\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-S-x> :call SetMode("\<A-S-x\>", "Command") \| :call Commands()<cr>
+tnoremap <A-S-x> <C-\><C-n>:call SetMode("\<A-S-x\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-S-x> :call SetMode("\<A-S-x\>", "Insert") \| :call Commands()<cr>
 nnoremap <A-C-x> :call SetMode("\<A-C-x\>", "Normal") \| :call Commands()<cr>
 vnoremap <A-C-x> :call SetMode("\<A-C-x\>", "Visual") \| '<,'>:call Commands()<cr>
 cnoremap <A-C-x> :call SetMode("\<A-C-x\>", "Command") \| :call Commands()<cr>
 tnoremap <A-C-x> <C-\><C-n>:call SetMode("\<A-C-x\>", "Terminal") \| :call Commands()<cr>
 inoremap <A-C-x> :call SetMode("\<A-C-x\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-C-x> :call SetMode("\<A-C-x\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-C-x> :call SetMode("\<A-C-x\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-C-x> :call SetMode("\<A-C-x\>", "Command") \| :call Commands()<cr>
+tnoremap <A-C-x> <C-\><C-n>:call SetMode("\<A-C-x\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-C-x> :call SetMode("\<A-C-x\>", "Insert") \| :call Commands()<cr>
+nnoremap <A-S-C-x> :call SetMode("\<A-S-C-x\>", "Normal") \| :call Commands()<cr>
+vnoremap <A-S-C-x> :call SetMode("\<A-S-C-x\>", "Visual") \| '<,'>:call Commands()<cr>
+cnoremap <A-S-C-x> :call SetMode("\<A-S-C-x\>", "Command") \| :call Commands()<cr>
+tnoremap <A-S-C-x> <C-\><C-n>:call SetMode("\<A-S-C-x\>", "Terminal") \| :call Commands()<cr>
+inoremap <A-S-C-x> :call SetMode("\<A-S-C-x\>", "Insert") \| :call Commands()<cr>
 nnoremap <A-S-C-x> :call SetMode("\<A-S-C-x\>", "Normal") \| :call Commands()<cr>
 vnoremap <A-S-C-x> :call SetMode("\<A-S-C-x\>", "Visual") \| '<,'>:call Commands()<cr>
 cnoremap <A-S-C-x> :call SetMode("\<A-S-C-x\>", "Command") \| :call Commands()<cr>
@@ -461,12 +524,20 @@ nnoremap ,,,. :call SetMode(",,,.", "Normal") \| :call CommandLineFiles(Folder_U
 nnoremap ,,,,. :call SetMode(",,,,.", "Normal") \| :call CommandLineFiles(Folder_Up(v:count, 3))<cr>
 nnoremap ,,,,,. :call SetMode(",,,,,.", "Normal") \| :call CommandLineFiles(Folder_Up(v:count, 4))<cr>
 cnoremap <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+cnoremap <C-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+cnoremap <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <M-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+cnoremap <S-,> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+cnoremap <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <C-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+cnoremap <M-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
+cnoremap <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <S-BS> <C-\>egetcmdline()[:strridx(getcmdline()[:getcmdpos()-3], '/')]<cr>
 cnoremap <C-,> :call SetMode("\<C-,\>", "Command") \| <Backspace>
+cnoremap <C-,> :call SetMode("\<C-,\>", "Command") \| <Backspace>
+cnoremap <C-.> :call SetMode("\<C-.\>", "Command") \| <Backspace>
 cnoremap <C-.> :call SetMode("\<C-.\>", "Command") \| <Backspace>
 nnoremap ,cd :call SetMode(",cd", "Normal") \| :call MakeDirCurrentCWD(bufnr())<cr>
 nnoremap <C-Left> :call SetMode("\<C-Left\>", "Normal") \| :call CD(WFilePrev())<cr>
@@ -478,6 +549,7 @@ nnoremap <localleader><Tab> :call SetMode("\<localleader\>\<Tab\>", "Normal") \|
 vnoremap <F14> :call SetMode("\<F14\>", "Visual") \| '<,'>:call VS()<cr>
 nnoremap <F13> :call SetMode("\<F13\>", "Normal") \| :call VS()<cr>
 inoremap <F13> :call SetMode("\<F13\>", "Insert") \| :call VS()<cr>
+cnoremap <F13> :call SetMode("\<F13\>", "Command") \| :call VS('c')<cr>
 cnoremap <F13> :call SetMode("\<F13\>", "Command") \| :call VS('c')<cr>
 tnoremap <F13> <C-\><C-n>:call SetMode("\<F13\>", "Terminal") \| :call VS('t')<cr>
 nnoremap <M-v> :call SetMode("\<M-v\>", "Normal") \| :call FuncPaste("Normal")<cr>
@@ -491,11 +563,18 @@ nnoremap <c-l> :call SetMode("\<c-l\>", "Normal") \| :wincmd l<cr>
 vnoremap p :call SetMode("p", "Visual") \| '<,'>:let vlcb = getpos("'<")[1:2] \| let vlce = getpos("'>")[1:2] \| call ClipboardPaste("v")<cr>p
 nnoremap <BS> :call SetMode("\<BS\>", "Normal") \| :call backspaceN()<cr>
 cnoremap <A-'> :call SetMode("\<A-'\>", "Command") \| ä
+cnoremap <A-'> :call SetMode("\<A-'\>", "Command") \| ä
+cnoremap <A-"> :call SetMode("\<A-"\>", "Command") \| Ä
 cnoremap <A-"> :call SetMode("\<A-"\>", "Command") \| Ä
 cnoremap <A-;> :call SetMode("\<A-;\>", "Command") \| ö
+cnoremap <A-;> :call SetMode("\<A-;\>", "Command") \| ö
+cnoremap <A-:> :call SetMode("\<A-:\>", "Command") \| Ö
 cnoremap <A-:> :call SetMode("\<A-:\>", "Command") \| Ö
 cnoremap <A-[> :call SetMode("\<A-[\>", "Command") \| ü
+cnoremap <A-[> :call SetMode("\<A-[\>", "Command") \| ü
 cnoremap <A-{> :call SetMode("\<A-{\>", "Command") \| Ü
+cnoremap <A-{> :call SetMode("\<A-{\>", "Command") \| Ü
+cnoremap <A--> :call SetMode("\<A--\>", "Command") \| ß
 cnoremap <A--> :call SetMode("\<A--\>", "Command") \| ß
 nnoremap ,F :call SetMode(",F", "Normal") \| :echo VS()<cr>
 nnoremap ,e :call SetMode(",e", "Normal") \| :call AppendToEndNormal()<cr>

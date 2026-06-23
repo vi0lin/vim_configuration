@@ -3,10 +3,8 @@ if !exists("g:vim_advantages_got_sourced")
 " Avoid cdo prompt for overwiting files
 " let &t_TI = "\<Esc>[>4;2m"
 " let &t_TE = "\<Esc>[>4;m"
-
 " let &t_TI = [=1;1u
 " let &t_TE = [>4;m[=0;1u
-
 " let &t_TI = "\<Esc>[>4;2m"
 " let &t_TE = "\<Esc>[>4;0m"
 " set <M-q>=\eq
@@ -30,6 +28,63 @@ endif
 
 let g:preservedLists=[ 'favorites', 'multiprojectholder', 'projectholder', 'projectholder_projects', 'multiprojectholder_projects', 'projects']
 let g:preservedListsFolders=[ 'favorites' ]
+
+function! Eexec() range
+  " echo a:nr
+  echo g:mode
+  echo g:keymap
+endfunction
+
+function! CommandDictInit()
+  let b:commands={'pages': []}
+  return CommandDictAddPage(CommandDictInitPage())
+endfunction
+
+function! CommandDictInitPage()
+  return {
+        \ '<F5>': "",
+        \ '<F6>': "",
+        \ '<F7>': "",
+        \ '<F8>': "",
+        \ '<C-F5>': "",
+        \ '<C-F6>': "",
+        \ '<C-F7>': "",
+        \ '<C-F8>': "",
+        \ '<S-F5>': "",
+        \ '<S-F6>': "",
+        \ '<S-F7>': "",
+        \ '<S-F8>': "",
+        \ '<C-S-F5>': "",
+        \ '<C-S-F6>': "",
+        \ '<C-S-F7>': "",
+        \ '<C-S-F8>': ""
+        \ }
+endfunction
+
+function! CommandDictAddPage(page)
+  call extend(b:commands['pages'], [a:page])
+  return b:commands
+endfunction
+
+function! CheckAllCommandVimConfigurationFiles()
+  let filename='.commands_vim_configuration'
+  let cwd=CWD()
+  let finish=0
+  let paths=[]
+  while 1
+    let file=globpath(cwd, filename)
+    if !empty(file)
+      call extend(paths, [file])
+    endif
+    if cwd=='/'
+      break
+    endif
+    let cwd=GetParentDir(cwd)
+  endwhile
+  for x in reverse(paths)
+    exec "source" x
+  endfor
+endfunction
 
 function PreservedListsInit()
   for pl in g:preservedLists
@@ -228,15 +283,20 @@ function EchoP()
   echo g:gitprojects
 endfunction
 
-function! SetUnset(name, value)
-  " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
-  exec "call UnreleasedVariable('"..a:name.."')"
+function! EnsureArr(value)
   let x=[]
   if type(a:value)==3
     call extend(x, a:value)
   else
     call extend(x, [a:value])
   endif
+  return x
+endfunction
+
+function! SetUnset(name, value)
+  " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+  exec "call UnreleasedVariable('"..a:name.."')"
+  let x = EnsureArr(a:value)
   for y in x
     exec "let index=index(g:"..a:name..", '"..y.."')"
     if index>=0
@@ -5216,7 +5276,7 @@ function! Open(direction, type="buffer", mode="copy", file="")
     let arg="enew"
   endif
   exec pre arg file
-  echo pre arg file
+  " echo pre arg file
   " echo pre arg file
   " return
   " exec post
@@ -5725,7 +5785,7 @@ function! MapCommand(direction) range
   let data = VS()
   call InitMapCommand(a:direction)
   if a:direction=='x'
-    echo b:MapCommands
+    " echo b:MapCommands
     return
   endif
   let direction=a:direction
@@ -5834,6 +5894,7 @@ function! SavedCommandToTerm(direction) range
    " let buf=winbufnr(winnr(a:direction))
    call TERM(term.buf, com)
   endif
+  return
   let b:MapCommands[a:direction..'t']
 endfunction
 
@@ -6994,15 +7055,20 @@ function! VIM(arg='') range
 endfunction
 
 function! BASH(cmd='', mode='exec_vs') range
-  let vs=VS()
-  let cmd = EnsureArr(a:cmd)
-  let c = join(cmd, '\n')
-  if a:mode == 'exec_vs'
-    let m = systemlist(g:bashrc_source.";".c)
-  elseif a:mode == 'exec_input_vs'
-    let m = systemlist(g:bashrc_source.";".c, vs)
+  if a:cmd==''
+    let x=VS()
+  else
+    let x = EnsureArr(a:cmd)
   endif
-  call PUTT(m)
+  let c = join(x, '\n')
+  let m = systemlist(g:bashrc_source.";".c)
+  " if a:mode == 'exec_vs'
+  "   let m = systemlist(g:bashrc_source.";".c)
+  " elseif a:mode == 'exec_input_vs'
+  "   let m = systemlist(g:bashrc_source.";".c, vs)
+  " endif
+  " call PUTT(m)
+  put=m
 endfunction
 
 function! PYTHON(arg='')

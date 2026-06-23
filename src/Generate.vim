@@ -106,12 +106,12 @@ let g:newmap_optschema = [
   \ [ 'aa', 'AA|aa', 0],
   \ [ 'aaa', 'AAA|aaa', 0],
   \ [ 'all', 'all|All|ALL', 1],
-  \ [ 'normal', 'N|n|normal|Normal', 0],
-  \ [ 'visual', 'V|v|visual|Visual', 0],
+  \ [ 'normal', 'N|n', 0],
+  \ [ 'visual', 'V|v', 0],
   \ [ 'x', 'X|x', 0],
   \ [ 's', 'S|s', 0],
-  \ [ 'command', 'C|c|command|command', 0],
-  \ [ 'terminal', 'T|t|terminal|Terminal', 0],
+  \ [ 'command', 'C|c', 0],
+  \ [ 'terminal', 'T|t', 0],
   \ [ 'o', 'O|o', 0],
   \ [ 'insert', 'I|i', 0],
   \ [ 'l', 'L|l', 0],
@@ -124,6 +124,9 @@ let g:newmap_optschema = [
   \ [ 'key', 'k|key', 1],
   \ [ 'vs', 'vs', 1],
   \ [ 'unchanged', 'un|unchanged', 0],
+  \ [ 'command', 'command', 0],
+  \ [ 'shift', 'shift', 0],
+  \ [ 'alt', 'alt|meta', 0],
   \ ]
 
 function! NewMap(args)
@@ -188,7 +191,50 @@ function! NewMap(args)
   "   let opts.o=1
   "   let opts.l=1
   " endif
-  call extend(g:newmap_buildfile, _map(opts))
+  " let opts={'command': -1, 'shift': -1, 'alt': -1}
+  " let opts.command=1
+  " let opts.shift=1
+  " let opts.alt=1
+  let bitmask=[0, 0, 0]
+  if opts.command
+    let bitmask[0]=1
+  endif
+  if opts.shift
+    let bitmask[1]=1
+  endif
+  if opts.alt
+    let bitmask[2]=1
+  endif
+  let modifiers=[]
+  let n=float2nr(pow(2,3))
+  let [x,y,z]=[0,0,0]
+  for i in range(0,n-1)
+    let bin=printf('%03b', i)
+    let bin=split(bin, '\zs')
+    let x=""
+    if bin[0]&&bitmask[0]
+      let x.="C-"
+    endif
+    if bin[1]&&bitmask[1]
+      let x.="S-"
+    endif
+    if bin[2]&&bitmask[2]
+      let x.="A-"
+    endif
+    if index(modifiers, x)==-1
+      call extend(modifiers, [x])
+    endif
+  endfor
+  " exec "for n in range("..opts.nr..")"
+  for a in modifiers
+    let obj=copy(opts)
+    " echo obj
+    let obj.key=substitute(obj.key, '{modifiers}', a, 'g')
+    let obj.default=substitute(obj.default, '{modifiers}', a, 'g')
+    call extend(g:newmap_buildfile, _map(obj))
+  endfor
+  " echo g:newmap_buildfile
+  " endfor
   endif
 endfunction
 command! -range -nargs=+ NewMap call NewMap(<q-args>)

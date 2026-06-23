@@ -87,122 +87,128 @@ command -range -nargs=* Inc :call Inc(<f-args>)
 " y=20
 " x-y
 " print("TEST!")
+"
+" NewMap -v -n -no -command -shift -alt -nr 5,8 <{modifiers}F5> :call Eexec({nr})<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F5> :call Eexec()<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F6> :call Eexec()<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F7> :call Eexec()<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F8> :call Eexec()<cr>
 
-" Todo
-" When A Visual Selection Is Set
-" Either Use As Input
-" Or Use As Redefine And Fire Command
-NewMap -v -no <F5> :call VSRewriteCommand("h")<cr>
-NewMap -v -no <F6> :call VSRewriteCommand("j")<cr>
-NewMap -v -no <F7> :call VSRewriteCommand("k")<cr>
-NewMap -v -no <F8> :call VSRewriteCommand("l")<cr>
-NewMap -i -no <F5> :call SavedCommandToTerm("h")<cr>
-NewMap -i -no <F6> :call SavedCommandToTerm("j")<cr>
-NewMap -i -no <F7> :call SavedCommandToTerm("k")<cr>
-NewMap -i -no <F8> :call SavedCommandToTerm("l")<cr>
-NewMap -c -n -no <F5> :call SavedCommandToTerm("h")<cr>
-NewMap -c -n -no <F6> :call SavedCommandToTerm("j")<cr>
-NewMap -c -n -no <F7> :call SavedCommandToTerm("k")<cr>
-NewMap -c -n -no <F8> :call SavedCommandToTerm("l")<cr>
-" C - \ C - n
-NewMap -t -no <F5> :call SavedCommandToTerm("h")<cr>
-NewMap -t -no <F6> :call SavedCommandToTerm("j")<cr>
-NewMap -t -no <F7> :call SavedCommandToTerm("k")<cr>
-NewMap -t -no <F8> :call SavedCommandToTerm("l")<cr>
-
-NewMap -all -no ,<F5> :call MapCommand("h")<cr>
-NewMap -all -no ,<F6> :call MapCommand("j")<cr>
-NewMap -all -no ,<F7> :call MapCommand("k")<cr>
-NewMap -all -no ,<F8> :call MapCommand("l")<cr>
-
-" NewMap -all -no ,,<F5> :call DirectionMapCommand("h")<cr>
-" NewMap -all -no ,,<F6> :call DirectionMapCommand("j")<cr>
-" NewMap -all -no ,,<F7> :call DirectionMapCommand("k")<cr>
-" NewMap -all -no ,,<F8> :call DirectionMapCommand("l")<cr>
-" NewMap -all -no ,,<F5> :call DirectionAllMapCommand("h")<cr>
-" NewMap -all -no ,,<F6> :call DirectionAllMapCommand("j")<cr>
-" NewMap -all -no ,,<F7> :call DirectionAllMapCommand("k")<cr>
-" NewMap -all -no ,,<F8> :call DirectionAllMapCommand("l")<cr>
-
-NewMap -all -no ,,<F5> :call DirectionMapSmart('h')<cr>
-NewMap -all -no ,,<F6> :call DirectionMapSmart('j')<cr>
-NewMap -all -no ,,<F7> :call DirectionMapSmart('k')<cr>
-NewMap -all -no ,,<F8> :call DirectionMapSmart('l')<cr>
-
-NewMap -all -no ,,,<F5> :call MapCommand("x")<cr>
-NewMap -all -no ,,,<F6> :call MapCommand("x")<cr>
-NewMap -all -no ,,,<F7> :call MapCommand("x")<cr>
-NewMap -all -no ,,,<F8> :call MapCommand("x")<cr>
-
-" map ,<F5> :call RegisterTerminal()<cr>
-" map ,<F6> :call RegisterTerminal()<cr>
-" map ,<F7> :call RegisterTerminal()<cr>
-" map ,<F8> :call RegisterTerminal()<cr>
-
-NewMap -no -n ,,,<F5> :call FixTargetTerm('F5')<cr>
-NewMap -no -n ,,,<F6> :call FixTargetTerm('F6')<cr>
-NewMap -no -n ,,,<F7> :call FixTargetTerm('F7')<cr>
-NewMap -no -n ,,,<F8> :call FixTargetTerm('F8')<cr>
-
-" C - u
-NewMap -v -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
-NewMap -v -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
-NewMap -v -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
-NewMap -v -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
-" C - o
-NewMap -i -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
-NewMap -i -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
-NewMap -i -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
-NewMap -i -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
-NewMap -c -n -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
-NewMap -c -n -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
-NewMap -c -n -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
-NewMap -c -n -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
-" C - \ C - n
-NewMap -t -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
-NewMap -t -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
-NewMap -t -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
-NewMap -t -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
-
-" C - u
-NewMap -v -no <S-F5> :call RedoCommandToTerm("h")<cr>
-NewMap -v -no <S-F6> :call RedoCommandToTerm("j")<cr>
-NewMap -v -no <S-F7> :call RedoCommandToTerm("k")<cr>
-NewMap -v -no <S-F8> :call RedoCommandToTerm("l")<cr>
-" C - o
-NewMap -i -no <S-F5> :call RedoCommandToTerm("h")<cr>
-NewMap -i -no <S-F6> :call RedoCommandToTerm("j")<cr>
-NewMap -i -no <S-F7> :call RedoCommandToTerm("k")<cr>
-NewMap -i -no <S-F8> :call RedoCommandToTerm("l")<cr>
-NewMap -c -n -no <S-F5> :call RedoCommandToTerm("h")<cr>
-NewMap -c -n -no <S-F6> :call RedoCommandToTerm("j")<cr>
-NewMap -c -n -no <S-F7> :call RedoCommandToTerm("k")<cr>
-NewMap -c -n -no <S-F8> :call RedoCommandToTerm("l")<cr>
-" C - \ C - n
-NewMap -t -no <S-F5> :call RedoCommandToTerm("h")<cr>
-NewMap -t -no <S-F6> :call RedoCommandToTerm("j")<cr>
-NewMap -t -no <S-F7> :call RedoCommandToTerm("k")<cr>
-NewMap -t -no <S-F8> :call RedoCommandToTerm("l")<cr>
-
-" C - u
-NewMap -v -no <C-S-F5> :call SigTermToTerm("h")<cr>
-NewMap -v -no <C-S-F6> :call SigTermToTerm("j")<cr>
-NewMap -v -no <C-S-F7> :call SigTermToTerm("k")<cr>
-NewMap -v -no <C-S-F8> :call SigTermToTerm("l")<cr>
-" C - o
-NewMap -i -no <C-S-F5> :call SigTermToTerm("h")<cr>
-NewMap -i -no <C-S-F6> :call SigTermToTerm("j")<cr>
-NewMap -i -no <C-S-F7> :call SigTermToTerm("k")<cr>
-NewMap -i -no <C-S-F8> :call SigTermToTerm("l")<cr>
-NewMap -c -n -no <C-S-F5> :call SigTermToTerm("h")<cr>
-NewMap -c -n -no <C-S-F6> :call SigTermToTerm("j")<cr>
-NewMap -c -n -no <C-S-F7> :call SigTermToTerm("k")<cr>
-NewMap -c -n -no <C-S-F8> :call SigTermToTerm("l")<cr>
-" C - \ C - n
-NewMap -t -no <C-S-F5> :call SigTermToTerm("h")<cr>
-NewMap -t -no <C-S-F6> :call SigTermToTerm("j")<cr>
-NewMap -t -no <C-S-F7> :call SigTermToTerm("k")<cr>
-NewMap -t -no <C-S-F8> :call SigTermToTerm("l")<cr>
+"""" old command mappings " Todo
+"""" old command mappings " When A Visual Selection Is Set
+"""" old command mappings " Either Use As Input
+"""" old command mappings " Or Use As Redefine And Fire Command
+"""" old command mappings NewMap -v -no <F5> :call VSRewriteCommand("h")<cr>
+"""" old command mappings NewMap -v -no <F6> :call VSRewriteCommand("j")<cr>
+"""" old command mappings NewMap -v -no <F7> :call VSRewriteCommand("k")<cr>
+"""" old command mappings NewMap -v -no <F8> :call VSRewriteCommand("l")<cr>
+"""" old command mappings NewMap -i -no <F5> :call SavedCommandToTerm("h")<cr>
+"""" old command mappings NewMap -i -no <F6> :call SavedCommandToTerm("j")<cr>
+"""" old command mappings NewMap -i -no <F7> :call SavedCommandToTerm("k")<cr>
+"""" old command mappings NewMap -i -no <F8> :call SavedCommandToTerm("l")<cr>
+"""" old command mappings NewMap -c -n -no <F5> :call SavedCommandToTerm("h")<cr>
+"""" old command mappings NewMap -c -n -no <F6> :call SavedCommandToTerm("j")<cr>
+"""" old command mappings NewMap -c -n -no <F7> :call SavedCommandToTerm("k")<cr>
+"""" old command mappings NewMap -c -n -no <F8> :call SavedCommandToTerm("l")<cr>
+"""" old command mappings " C - \ C - n
+"""" old command mappings NewMap -t -no <F5> :call SavedCommandToTerm("h")<cr>
+"""" old command mappings NewMap -t -no <F6> :call SavedCommandToTerm("j")<cr>
+"""" old command mappings NewMap -t -no <F7> :call SavedCommandToTerm("k")<cr>
+"""" old command mappings NewMap -t -no <F8> :call SavedCommandToTerm("l")<cr>
+"""" old command mappings 
+"""" old command mappings NewMap -all -no ,<F5> :call MapCommand("h")<cr>
+"""" old command mappings NewMap -all -no ,<F6> :call MapCommand("j")<cr>
+"""" old command mappings NewMap -all -no ,<F7> :call MapCommand("k")<cr>
+"""" old command mappings NewMap -all -no ,<F8> :call MapCommand("l")<cr>
+"""" old command mappings 
+"""" old command mappings " NewMap -all -no ,,<F5> :call DirectionMapCommand("h")<cr>
+"""" old command mappings " NewMap -all -no ,,<F6> :call DirectionMapCommand("j")<cr>
+"""" old command mappings " NewMap -all -no ,,<F7> :call DirectionMapCommand("k")<cr>
+"""" old command mappings " NewMap -all -no ,,<F8> :call DirectionMapCommand("l")<cr>
+"""" old command mappings " NewMap -all -no ,,<F5> :call DirectionAllMapCommand("h")<cr>
+"""" old command mappings " NewMap -all -no ,,<F6> :call DirectionAllMapCommand("j")<cr>
+"""" old command mappings " NewMap -all -no ,,<F7> :call DirectionAllMapCommand("k")<cr>
+"""" old command mappings " NewMap -all -no ,,<F8> :call DirectionAllMapCommand("l")<cr>
+"""" old command mappings 
+"""" old command mappings NewMap -all -no ,,<F5> :call DirectionMapSmart('h')<cr>
+"""" old command mappings NewMap -all -no ,,<F6> :call DirectionMapSmart('j')<cr>
+"""" old command mappings NewMap -all -no ,,<F7> :call DirectionMapSmart('k')<cr>
+"""" old command mappings NewMap -all -no ,,<F8> :call DirectionMapSmart('l')<cr>
+"""" old command mappings 
+"""" old command mappings NewMap -all -no ,,,<F5> :call MapCommand("x")<cr>
+"""" old command mappings NewMap -all -no ,,,<F6> :call MapCommand("x")<cr>
+"""" old command mappings NewMap -all -no ,,,<F7> :call MapCommand("x")<cr>
+"""" old command mappings NewMap -all -no ,,,<F8> :call MapCommand("x")<cr>
+"""" old command mappings 
+"""" old command mappings " map ,<F5> :call RegisterTerminal()<cr>
+"""" old command mappings " map ,<F6> :call RegisterTerminal()<cr>
+"""" old command mappings " map ,<F7> :call RegisterTerminal()<cr>
+"""" old command mappings " map ,<F8> :call RegisterTerminal()<cr>
+"""" old command mappings 
+"""" old command mappings NewMap -no -n ,,,<F5> :call FixTargetTerm('F5')<cr>
+"""" old command mappings NewMap -no -n ,,,<F6> :call FixTargetTerm('F6')<cr>
+"""" old command mappings NewMap -no -n ,,,<F7> :call FixTargetTerm('F7')<cr>
+"""" old command mappings NewMap -no -n ,,,<F8> :call FixTargetTerm('F8')<cr>
+"""" old command mappings 
+"""" old command mappings " C - u
+"""" old command mappings NewMap -v -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+"""" old command mappings NewMap -v -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+"""" old command mappings NewMap -v -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+"""" old command mappings NewMap -v -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
+"""" old command mappings " C - o
+"""" old command mappings NewMap -i -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+"""" old command mappings NewMap -i -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+"""" old command mappings NewMap -i -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+"""" old command mappings NewMap -i -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
+"""" old command mappings NewMap -c -n -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+"""" old command mappings NewMap -c -n -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+"""" old command mappings NewMap -c -n -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+"""" old command mappings NewMap -c -n -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
+"""" old command mappings " C - \ C - n
+"""" old command mappings NewMap -t -no <C-F5> :call RedoCommandToTermWithSigTerm("h")<cr>
+"""" old command mappings NewMap -t -no <C-F6> :call RedoCommandToTermWithSigTerm("j")<cr>
+"""" old command mappings NewMap -t -no <C-F7> :call RedoCommandToTermWithSigTerm("k")<cr>
+"""" old command mappings NewMap -t -no <C-F8> :call RedoCommandToTermWithSigTerm("l")<cr>
+"""" old command mappings 
+"""" old command mappings " C - u
+"""" old command mappings NewMap -v -no <S-F5> :call RedoCommandToTerm("h")<cr>
+"""" old command mappings NewMap -v -no <S-F6> :call RedoCommandToTerm("j")<cr>
+"""" old command mappings NewMap -v -no <S-F7> :call RedoCommandToTerm("k")<cr>
+"""" old command mappings NewMap -v -no <S-F8> :call RedoCommandToTerm("l")<cr>
+"""" old command mappings " C - o
+"""" old command mappings NewMap -i -no <S-F5> :call RedoCommandToTerm("h")<cr>
+"""" old command mappings NewMap -i -no <S-F6> :call RedoCommandToTerm("j")<cr>
+"""" old command mappings NewMap -i -no <S-F7> :call RedoCommandToTerm("k")<cr>
+"""" old command mappings NewMap -i -no <S-F8> :call RedoCommandToTerm("l")<cr>
+"""" old command mappings NewMap -c -n -no <S-F5> :call RedoCommandToTerm("h")<cr>
+"""" old command mappings NewMap -c -n -no <S-F6> :call RedoCommandToTerm("j")<cr>
+"""" old command mappings NewMap -c -n -no <S-F7> :call RedoCommandToTerm("k")<cr>
+"""" old command mappings NewMap -c -n -no <S-F8> :call RedoCommandToTerm("l")<cr>
+"""" old command mappings " C - \ C - n
+"""" old command mappings NewMap -t -no <S-F5> :call RedoCommandToTerm("h")<cr>
+"""" old command mappings NewMap -t -no <S-F6> :call RedoCommandToTerm("j")<cr>
+"""" old command mappings NewMap -t -no <S-F7> :call RedoCommandToTerm("k")<cr>
+"""" old command mappings NewMap -t -no <S-F8> :call RedoCommandToTerm("l")<cr>
+"""" old command mappings 
+"""" old command mappings " C - u
+"""" old command mappings NewMap -v -no <C-S-F5> :call SigTermToTerm("h")<cr>
+"""" old command mappings NewMap -v -no <C-S-F6> :call SigTermToTerm("j")<cr>
+"""" old command mappings NewMap -v -no <C-S-F7> :call SigTermToTerm("k")<cr>
+"""" old command mappings NewMap -v -no <C-S-F8> :call SigTermToTerm("l")<cr>
+"""" old command mappings " C - o
+"""" old command mappings NewMap -i -no <C-S-F5> :call SigTermToTerm("h")<cr>
+"""" old command mappings NewMap -i -no <C-S-F6> :call SigTermToTerm("j")<cr>
+"""" old command mappings NewMap -i -no <C-S-F7> :call SigTermToTerm("k")<cr>
+"""" old command mappings NewMap -i -no <C-S-F8> :call SigTermToTerm("l")<cr>
+"""" old command mappings NewMap -c -n -no <C-S-F5> :call SigTermToTerm("h")<cr>
+"""" old command mappings NewMap -c -n -no <C-S-F6> :call SigTermToTerm("j")<cr>
+"""" old command mappings NewMap -c -n -no <C-S-F7> :call SigTermToTerm("k")<cr>
+"""" old command mappings NewMap -c -n -no <C-S-F8> :call SigTermToTerm("l")<cr>
+"""" old command mappings " C - \ C - n
+"""" old command mappings NewMap -t -no <C-S-F5> :call SigTermToTerm("h")<cr>
+"""" old command mappings NewMap -t -no <C-S-F6> :call SigTermToTerm("j")<cr>
+"""" old command mappings NewMap -t -no <C-S-F7> :call SigTermToTerm("k")<cr>
+"""" old command mappings NewMap -t -no <C-S-F8> :call SigTermToTerm("l")<cr>
 
 " todo With Leader / Register As Target To A Specified Key
 
@@ -558,10 +564,15 @@ NewMap -no -n ,b :call Bash(VS())<cr>
 NewMap -no -n ,b :Buffers<cr>
 NewMap -no -n ,b :Buffers<cr>
 
-NewMap -no -n <localleader>iv :call VIM(input("vimscript: "), 'exec_input_vs')<cr>
-NewMap -no -n <localleader>ib :call BASH(input("bash: "), 'exec_input_vs')<cr>
-NewMap -no -n <localleader>ip :call PYTHON(input("python: "), 'exec_input_vs')<cr>
-NewMap -no -n <localleader>ir :call RUST(input("rust: "), 'exec_input_vs')<cr>
+NewMap -no -n ,,iv :call VIM(input("vimscript: "), 'exec_input_vs')<cr>
+NewMap -no -n ,,ib :call BASH(input("bash: "), 'exec_input_vs')<cr>
+NewMap -no -n ,,ip :call PYTHON(input("python: "), 'exec_input_vs')<cr>
+NewMap -no -n ,,ir :call RUST(input("rust: "), 'exec_input_vs')<cr>
+
+NewMap -no -n -v ,iv :call VIM('', 'exec_input_vs')<cr>
+NewMap -no -n -v ,ib :call BASH('', 'exec_input_vs')<cr>
+NewMap -no -n -v ,ip :call PYTHON('', 'exec_input_vs')<cr>
+NewMap -no -n -v ,ir :call RUST('', 'exec_input_vs')<cr>
 
 NewMap -n -no <space>p :CopyFileNameToClipboard<cr>
 NewMap -n -no <space>P :CopyWholePathToClipboard<cr>
