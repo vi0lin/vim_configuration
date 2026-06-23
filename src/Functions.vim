@@ -1373,6 +1373,8 @@ function! Folder_Project()
   return CWD()
 endfunction
 
+" TODO Also Consider g:projects to check agains if its a "repo" not only .git
+" containing folders
 function! Folder_Repo(count, nr)
   let file = -1
   let c=a:count+a:nr
@@ -4166,7 +4168,10 @@ function! OpenFilePopup(title, list)
     ""    " endif
       call _openfile_andCD(path)
     ""    call _openfile_andCD(path)
+    else
+      let g:fzfabort=1
     endif
+
     " if path!='-1' && path!=-1 && path!='0' && path!=0
     " endif
     call _cleanCallback(a:file)
@@ -4368,7 +4373,10 @@ function! Popup_FZFBuildString(title, paths)
     ""    " endif
       call _openfile_andCD(path)
     ""    call _openfile_andCD(path)
+    else
+      let g:fzfabort=1
     endif
+
     " if path!='-1' && path!=-1 && path!='0' && path!=0
     " endif
     call _cleanCallback(a:file)
@@ -7086,11 +7094,14 @@ function! Buildstring_Popup(title, paths, callback, type="file", maxdepth=10, re
   endfunction
   function! OnExitTerm(bufname, job, code)
   endfunction
+  function! s:FzfClose(job, status) abort
+  endfunction
   let opts={
         \ 'hidden': 1,
         \ 'err_cb': 'OnError',
         \ 'term_name': 'Find',
         \ 'term_finish': 'close',
+        \ 'exit_cb': function('s:FzfClose'),
         \ }
   let tnr=term_start(cmd, opts)
   let g:tnr=tnr

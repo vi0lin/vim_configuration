@@ -34,6 +34,11 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   " Need To Fix This This Line Does Make It Impossibile For FZF To Use Different Folders
   " autocmd! BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter *
   " this
+  "
+  " autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * if !exists('g:fzfabort') | call MakeDirCurrentCWD('<abuf>') | else |  unlet g:fzfabort | endif
+  autocmd BufAdd,BufNew,BufReadPost,BufFilePost * if !exists('g:fzfabort') | call MakeDirCurrentCWD('<abuf>') | else |  unlet g:fzfabort | endif
+  " autocmd BufAdd,BufNew,BufReadPost,BufFilePost * call MakeDirCurrentCWD(expand('<abuf>'))
+
   " autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
 
   " function! s:ShouldRun() abort
