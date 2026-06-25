@@ -24,6 +24,11 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! BufEnter * :call BufEnter()
   autocmd! BufEnter * :call Statusline()
   autocmd! WinResized	* :call Statusline()
+  autocmd! BufReadPost * :call BufReadPost()
+  " autocmd! BufNew,DirChanged,BufAdd,BufReadPost * :call  BufCreateCommandInit()
+  autocmd! BufEnter,BufWinEnter,BufReadPost * :call BufCreateCommandInit()
+  " autocmd FileType vim setlocal indentexpr=
+  autocmd FileType vim setlocal nosmartindent noautoindent indentexpr=
 
   " autocmd VimLeave * if :WriteSession
   " autocmd! FileType fzf tnoremap <Esc> <C-c>
@@ -75,7 +80,6 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   "" autocmd! TabNew * :call F.TabNew()
   "" autocmd! WinNew * :call F.WinNew()
 
-  " autocmd! BufReadPost * :call BufReadPost()
   " autocmd! BufReadPre * :call BufReadPre()
 
   " autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,BufLeave,WinEnter,BufWinEnter,BufUnload *

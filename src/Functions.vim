@@ -15,8 +15,6 @@ if !exists("g:vim_advantages_got_sourced")
 " let &t_TE = "\<Esc>[>4;0m"
 " set <M-q>=\eq
 
-set nomore
-
 function BufLength()
   return len(filter(range(1, bufnr('$')), 'buflisted(v:val)'))
 endfunction
@@ -33,6 +31,13 @@ if !exists('g:vim_configuration_path')
 endif
 
 let g:preservedLists=[ 'favorites', 'multiprojectholder', 'projectholder', 'projectholder_projects', 'multiprojectholder_projects', 'projects']
+" let g:temporarily={
+"   'favorites': { 'holder': 0, 'multiproject': 0, 'extend': 'favorites' },
+"   'ph': { 'holder': 1, 'multiproject': 0, 'extend': 'projects' },
+"   'mph': { 'holder': 0, 'multiproject': 1, 'extend': 'projects' },
+"   'projectsholder': { 'holder': 1, 'multiproject': 0, 'extend': 'projects' },
+"   'projects': { 'holder': 0, 'multiproject': 0, 'extend': 'projects' },
+"   \ }
 let g:preservedListsFolders=[ 'favorites' ]
 
 function PreservedListsInit()
@@ -102,7 +107,7 @@ endfunction
 
 function GetProjects()
   call Refresh('multiprojectholder', 'GetMultiprojectholder()')
-  call Refresh('projectholder', 'GetProjectholder()')
+  call Refresh('projectholder', 'GetProjectHolder()')
   call Refresh('gitprojects', 'GetGitprojects()')
   call Refresh('favorites_folders', 'GetFavoritesFolders()')
   return Merge(g:gitprojects, g:favorites_folders, g:multiprojectholder_projects, g:projectholder_projects)
@@ -185,19 +190,21 @@ command! -range -nargs=0 MultiprojectHolder :call SetUnset('multiprojectholder',
 
 command! -range -nargs=0 ProjectHolder :call SetUnset('projectholder', expand("%:p"))
 
-function! GetProjectholder()
+function! GetProjectHolder()
   call UnreleasedVariable('projectholder')
-  call GetProjectholder_Projects()
+  call GetProjectHolder_Projects()
   return g:projectholder
 endfunction
 
-function! GetProjectholder_Projects()
+function! GetProjectHolder_Projects()
   let p=[]
   for path in g:projectholder
     let dirs=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
     call extend(p, dirs)
   endfor
-  call ForceSet('projectholder_projects', p)
+  echo p
+  " call ForceSet('projectholder_projects', p)
+  call WriteUnreleased(p, 'projectholder_projects')
   return g:projectholder_projects
 endfunction
 
@@ -215,7 +222,8 @@ function! GetMultiprojectholder_Projects()
       call extend(p, filter(globpath(path2, "*", 0, 1), 'isdirectory(v:val)'))
     endfor
   endfor
-  call ForceSet('projectholder_projects', p)
+  " call ForceSet('projectholder_projects', p)
+  call WriteUnreleased(p, 'projectholder_projects')
   return g:projectholder_projects
 endfunction
 
@@ -846,13 +854,6 @@ function! Vim_Advantages_Path()
   return split(&runtimepath, ",")[1]
 endfunction
 
-set hidden
-" set shortmess+=FIcs
-" set shortmess=FIcs
-set wildmenu
-set wildmode=longest:full,full
-set wildignore+=*/.git/*,*/node_modules/*,*/dist/*,*.o,*.pyc
-
 let s:hidden_all=0
 function! ToggleHiddenAll()
   if s:hidden_all==0
@@ -1382,6 +1383,56 @@ function! Folder_Project()
   return CWD()
 endfunction
 
+function! Folder_Repo_Or_Project()
+  let cwd=CWD()
+  let finish=0
+  let paths=[]
+  while 1
+    let isgit=globpath(cwd, '.git')
+    let isproject=index(g:projects, cwd)
+    if !empty(isgit) || isproject>-1
+      return cwd
+    endif
+    if cwd=='/'
+      break
+    endif
+    let cwd=GetParentDir(cwd)
+  endwhile
+  return -1
+  " let file = -1
+  " let c=a:count+a:nr
+  " let i = 0
+  " let file = w:git
+  " while i < c
+  "   if i==0
+  "     let x = FindGit(file)
+  "   else
+  "     let x = FindGit(GetParentDir(file))
+  "   endif
+  "   if x=='0' || x==-1 || x==0
+  "     let file=GetParentDir(file)
+  "   else
+  "     let file=x
+  "   endif
+  "   let i += 1
+  " endwhile
+  " " if c==0
+  " "   let file=w:git
+  " " elseif c==1
+  " "   let file=FindGit(GetParentDir(w:git))
+  " " elseif c==2
+  " "   let file=FindGit(GetParentDir(FindGit(GetParentDir(w:git))))
+  " " endif
+  " if file == -1
+  "   " getcwd is not userfriendly
+  "   " consider throwing a message
+  "   " let file=getcwd()
+  "   " echo "No higher Repo"
+  "   return
+  " endif
+  " return file
+endfunction
+
 " TODO Also Consider g:projects to check agains if its a "repo" not only .git
 " containing folders
 function! Folder_Repo(count, nr)
@@ -1628,58 +1679,43 @@ function! FindProjects()
   echo list
 endfunction
 
-" Does Not Dissolve Arrays
-function! PrettyNested(dict, indent=2,surround_with_brackets=1)
-  if a:surround_with_brackets==1
-    let output="{\n"
+function! Pretty(x, ...) abort
+  let indent = get(a:000, 0, 0)
+  let pad    = repeat(' ', indent)
+  let pad2   = repeat(' ', indent + 2)
+  if type(a:x) == v:t_dict
+    if empty(a:x)
+      return '{}'
+    endif
+    let lines = []
+    for [key, val] in items(a:x)
+      call add(lines, pad2 . string(key) . ': ' . Pretty(val, indent + 2))
+    endfor
+    return "{\n" . join(lines, ",\n") . "\n" . pad . "}"
+  elseif type(a:x) == v:t_list
+    if empty(a:x)
+      return '[]'
+    endif
+    let lines = []
+    for val in a:x
+      call add(lines, pad2 . Pretty(val, indent + 2))
+    endfor
+    return "[\n" . join(lines, ",\n") . "\n" . pad . "]"
+  elseif type(a:x) == v:t_string
+    " Escape control chars so the cmdline can't misinterpret them
+    let s = a:x
+    let s = substitute(s, "\r", '\\r', 'g')
+    let s = substitute(s, "\n", '\\n', 'g')
+    let s = substitute(s, "\t", '\\t', 'g')
+    return string(s)
   else
-    let output=""
+    " number, float, bool, funcref, etc.
+    return string(a:x)
   endif
-  for [key, value] in items(a:dict)
-    let indent=repeat(' ', a:indent+1)
-    if type(value) == v:t_dict
-      let output.=indent.string(key).': '.PrettyNested(value, a:indent+1, 1).",\n"
-    elseif type(value) == v:t_list
-      let output.='[ '.PrettyNested(value, a:indent+1, 1)." ],\n"
-    else
-      let output.=indent.string(key).': '.string(value).",\n"
-    endif
-  endfor
-  let output.=repeat(' ', a:indent)
-  if a:surround_with_brackets==1
-    let output.='}'
-  endif
-  return output
-endfunction
-
-function! PrettyDictNested2(dict, indent=2)
-  let output="{\n"
-  for [key, value] in items(a:dict)
-    let indent=repeat(' ', a:indent+1)
-    if type(value) == v:t_dict
-      let output.=indent.string(key).': '.PrettyDictNested2(value, a:indent+1).",\n"
-    else
-      let output.=indent.string(key).': '.string(value).",\n"
-    endif
-  endfor
-  let output.=repeat(' ', a:indent).'}'
-  return output
-endfunction
-
-function! Pretty(x)
-  return PrettyNested(a:x)
 endfunction
 
 function! P(x)
-  return PrettyNested(a:x)
-endfunction
-
-function! Format(x)
-  return PrettyNested(a:x, 2)
-endfunction
-
-function! Format2(x)
-  return PrettyDictNested2(a:x, 2)
+  echo Pretty(a:x)
 endfunction
 
 function! J(x)
@@ -2932,27 +2968,8 @@ let exec_types=[ "Default", "Vim", "Bash", "Python", "Rust" ]
 exec 'source '.g:vim_configuration_src.'/Statusline.vim'
 exec 'source '.g:vim_configuration_src.'/TextActions.vim'
 exec 'source '.g:vim_configuration_src.'/Autocommands.vim'
+
 syntax on
-set tabpagemax=50
-" set tabstop=2
-" filetype on
-" set nu
-" set ruler
-" set mouse=a
-" set list
-" set number
-" set expandtab
-" set autoindent
-" set softtabstop=2
-" set shiftwidth=2
-" set tabstop=2
-" "Enable mouse click for nvim
-" set mouse=a
-" "Fix cursor replacement after closing nvim
-" set guicursor=
-" "Shift + Tab does inverse tab
-" inoremap <S-Tab> <C-d>
-" set whichwrap+=<,>,[,]
 
 " function! s:disable_statusline(bn)
 "   if a:bn == bufname('%')
@@ -3017,8 +3034,35 @@ function! PathCompletion()
 endfunction
 " call PathCompletion()
 " PathCompletion Built In
+"
+set nomore
+set hidden
+" set shortmess+=FIcs
+" set shortmess=FIcs
 set wildmenu
-
+set wildmode=longest:full,full
+set wildignore+=*/.git/*,*/node_modules/*,*/dist/*,*.o,*.pyc
+set tabpagemax=50
+" set tabstop=2
+" filetype on
+" set nu
+" set ruler
+" set mouse=a
+" set list
+" set number
+" set expandtab
+" set autoindent
+" set softtabstop=2
+" set shiftwidth=2
+" set tabstop=2
+" "Enable mouse click for nvim
+" set mouse=a
+" "Fix cursor replacement after closing nvim
+" set guicursor=
+" "Shift + Tab does inverse tab
+" inoremap <S-Tab> <C-d>
+" set whichwrap+=<,>,[,]
+set wildmenu
 set noswapfile
 set verbose=0 " 0-9?
 set encoding=utf-8
@@ -3044,8 +3088,15 @@ set shiftwidth=2
 set expandtab
 set listchars=eol:$,
 set listchars=eol:$,space:·,tab:→\ ,trail:·,nbsp:␣,extends:»,precedes:«
+
+" set autoindent " copies indent from previous line, nothing fancier
 set noautoindent
-set nosmartindent
+" fancier
+set smartindent
+" set nosmartindent
+" set cindent " cindent
+set nocindent
+
 set omnifunc=syntaxcomplete#Complete
 set list
 " set list!
@@ -5646,21 +5697,109 @@ function! EchoSafely(msg, ms=700) abort
 endfunction
 command! -nargs=1 EchoSafely call EchoSafely(<q-args>)
 
-" Command Mapping
-function! Eexec()
-  " let b = printf("%s %s %s", g:mode, g:keymap, CheckAllCommands())
-  " call EchoSafely(join([b, b, b, b], " "))
-
-  call EchoSafely(printf("%s %s %s", g:mode, g:keymap, CheckAllCommands()), 1500)
-endfunction
-
 function! CommandDictInit()
   let b:commands={'pages': []}
   let b:commands=CommandDictAddPage(CommandDictInitPage())
+  call CheckAllCommands()
   return b:commands
 endfunction
 
-function! Command_map_init()
+function! EmptyCommand()
+  " direction: hjkl
+  " directionMode: HJKL, neighbor, foremost
+  " directionSkipping: 0 1 2 3
+  " commandOrigin: /path/to/.command.vim_configuration
+  " commandMode: term buffer newbuffer
+  " commandModeSession: -1 / none / bashsession / pythonsession
+  " commandInterpreter: bash / vim / python
+  " commandTargetBuffer: bufnr()
+  " commandTargetWindow: winnr()
+  " commandInput: vs() data file
+  " commandOutputMode: put sendtoterm file clist commandline
+  " command: 'ls -al; date'
+  let command={
+    \ "direction": -1,
+    \ "directionMode": -1,
+    \ "directionSkipping": -1,
+    \ "commandOrigin": -1,
+    \ "commandMode": -1,
+    \ "commandModeSession": -1,
+    \ "commandInterpreter": -1,
+    \ "commandTargetBuffer": -1,
+    \ "commandTargetWindow": -1,
+    \ "commandInput": -1,
+    \ "commandOutputMode": -1,
+    \ "command": -1
+    \ }
+  return command
+endfunction
+
+function! CommandExample()
+  let c=EmptyCommand()
+  let c['direction']='j'
+  let c['directionMode']='foremost'
+  let c['commandOrigin']=Vim_Advantages_Path()..'/src/.command_vim_configuration'
+  let c['commandMode']='term'
+  let c['commandModeSession']='none'
+  let c['commandInterpreter']='term'
+  let c['commandTargetBuffer']='-1'
+  let c['commandTargetWindow']='-1'
+  let c['commandInput']='-1'
+  let c['commandOutputMode']='sendtoterm'
+  let c['command']=['', 'ls -al', '']
+  return c
+endfunction
+
+function! CommandPageInit()
+  " if !exists('b:commands')
+  call CommandPageExample()
+  " endif
+endfunction
+
+function! CommandPageExample()
+  let c=CommandExample()
+  let c['command']=['date']
+  let b:commands['pages'][0]['<F5>']=copy(c)
+  let c['command']=['ls -al']
+  let b:commands['pages'][0]['<F6>']=copy(c)
+  let c['command']=['activate']
+  let b:commands['pages'][0]['<F7>']=copy(c)
+  let c['command']=['deactivate']
+  let b:commands['pages'][0]['<F8>']=copy(c)
+endfunction
+
+" Command Mapping
+function! Eexec()
+  call CommandPageInit()
+  let c=b:commands['pages'][0][g:keymap]
+  call EEexec(c)
+endfunction
+
+function! SaveCommands()
+  let folder = Folder_Repo_Or_Project()
+  if folder != -1
+    call Write(g:commands, folder.."/.commands_vim_configuration.unreleased")
+  else
+    call EchoSafely("No Project Or Repo Found In Path Hierarchy")
+  endif
+endfunction
+
+function! EEexec(command)
+  call CommandPageInit()
+  call CheckAllCommands()
+  let c=a:command
+  " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, CheckAllCommands()), 1500)
+  " call EchoSafely(Pretty(c), 1500)
+  " echo g:keymap type(c)
+  if type(c)==0 && c['command'] != -1
+    call EchoSafely("Command Not Send\n"..Pretty(c), 5000)
+  elseif type(c)!=3
+    " call EchoSafely(Pretty(c), 700)
+    " call EchoSafely("Command Send\n"..Pretty(c), 5000)
+    call SendCommandToTerm(c['direction'], c['command'])
+  else
+    call EchoSafely(Pretty("What A Type"), 700)
+  endif
 endfunction
 
 function! CommandDictInitPage()
@@ -5714,7 +5853,6 @@ function! CheckCommands(filename='.commands_vim_configuration')
   endfor
   return b:commands
 endfunction
-
 
 function! SigTermToTerm(direction)
   let x=['']
@@ -5947,14 +6085,17 @@ function! SavedCommandToTerm(direction) range
   let b:MapCommands[a:direction..'t']
 endfunction
 
-function! SendCommandToTerm(direction) range
+function! SendVSToTerm(direction) range
   " Bug (VS in normalmode sometimes results in the last selected line)
   " let vs=StripComments(VS())
   let vs=VS()
-  echo vs
-  return
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, vs)
+endfunction
+
+function! SendCommandToTerm(direction, cmd) range
+  let buf=winbufnr(winnr(a:direction))
+  call TERM(buf, a:cmd)
 endfunction
 
 function! SendCommandToThisTerm(command) range
@@ -5984,7 +6125,7 @@ function! SendCustomCommandToTerm_win(win, command)
   call TERM(a:win, x)
 endfunction
 
-function! SendCommandToTerm_win(win) range
+function! SendVSToTerm_win(win) range
   call TERM(a:win, vs)
 endfunction
 
@@ -6796,8 +6937,14 @@ endfunction
 function! UpdateAutoCMD()
 endfunction
 
-" function! BufReadPost()
-" endfunction
+function! BufReadPost()
+endfunction
+
+function BufCreateCommandInit()
+  " if !exists('b:commands')
+    call CommandDictInit()
+  " endif
+endfunction
 
 function! BufReadPre()
 endfunction
@@ -6813,10 +6960,10 @@ function! BufWinEnter()
 endfunction
 
 function! BufEnter()
-  if !exists('b:commands')
-    call CommandDictInit()
-  endif
   call Statusline()
+  call CD(expand('%:p'))
+  " call DebugPaths()
+  " call Statusline()
 endfunction
 
 function! BufNew()
@@ -6836,6 +6983,98 @@ function! BufAdd()
   " call BufferSetup()
   " call TabBuffers('bufenter')
   " call MakeDirCurrentCWD(bufnr())
+endfunction
+
+function! BufDelete()
+  " let nr = (bufnr('#') == -1 ? bufnr('%') : bufnr('#'))
+  " call input(nr.." delete")
+endfunction
+
+function! BufWipeout()
+  " call input(bufnr().." wipeout")
+endfunction
+
+function! TabNew()
+  " if exists("g:lastmain_repo")
+  "   call CD(g:lastmain_repo)
+  " endif
+endfunction
+
+function! VimLeave()
+  redraw!
+endfunction
+
+function! FocusLost()
+endfunction
+
+function! TermLeave()
+endfunction
+
+function! VimEnter()
+  call Refresh('projects', 'GetProjects()')
+  "" " if &buftype == 'terminal'
+  "" "   set wrap
+  "" " elseif &buftype == 'buffer'
+  "" "   set nowrap
+  "" " endif
+  "" call InitLineState()
+  "" " call system("bash", g:bashset_restore)
+  "" call Statusline()
+  "" " call SetProject(getcwd())
+  "" " call Layout_Vim()
+  "" " redraw!
+  "" call AutoInstallPlug()
+  call InitPlug()
+endfunction
+
+function! TabClose()
+  try
+    tabclose
+  catch
+    qa!
+  finally
+  endtry
+endfunction
+
+function! WinEnter()
+  call SetLineState(1)
+  "" " StaticWin --deal-focus
+  "" " StaticWin get Information --text expand('%')
+  "" " if getbufvar(bufnr(), '&buftype') == 'terminal'
+  "" " if win_gettype(winnr()) == ""
+  "" "     endif
+  "" " exec "set tags="..CWD().."/tags"
+  "" " echo "set tags="..CWD().."/tags"
+  "" " if HasState()
+  "" " endif
+  "" call Statusline()
+  "" call SetLineState(g:linestate)
+  "" " exec "cd "..CWD()
+  "" " call REFRESH_CWD()
+  "" " Simpliest solution for now.
+  "" " Visual Selection gets losts
+  "" call InsertIfTerminal()
+  "" " if BufIsTerminal()
+  "" "   startinsert
+  "" " endif
+  "" " call InitLineState()
+  "" " let parent=CWD()
+  "" " if isdirectory(parent)
+  "" "   exec "cd "..parent
+  "" " endif
+endfunction
+
+function! WinLeave()
+  let g:lastmain_repo=CWD()
+  call SetLineState(0)
+endfunction
+
+function! BufLeave()
+	let last_buffer = bufnr("$")
+  let last_winid = bufwinid(last_buffer)
+  let g:lastmain_repo=getwinvar(last_winid, "main_repo")
+  " if IsTermWin()
+  " endif
 endfunction
 
 function! TabBuffers(method)
@@ -6916,36 +7155,12 @@ function! TabBuffers_Delete(bufnr)
 endfunction
 call TabBuffers('init')
 
-function! BufDelete()
-  " let nr = (bufnr('#') == -1 ? bufnr('%') : bufnr('#'))
-  " call input(nr.." delete")
-endfunction
-
-function! BufWipeout()
-  " call input(bufnr().." wipeout")
-endfunction
-
-function! TabNew()
-  " if exists("g:lastmain_repo")
-  "   call CD(g:lastmain_repo)
-  " endif
-endfunction
 
 function! InitLineState()
   " Implement " LineState Global And BufferWise
   if IsTermWin()
     call InsertIfTerminal()
   endif
-endfunction
-
-function! VimLeave()
-  redraw!
-endfunction
-
-function! FocusLost()
-endfunction
-
-function! TermLeave()
 endfunction
 
 function! InitPlug()
@@ -6964,80 +7179,6 @@ function! InitPlug()
     Plug 'junegunn/fzf.vim'
   call plug#end()
 endfunction
-
-
-function! VimEnter()
-  "" " if &buftype == 'terminal'
-  "" "   set wrap
-  "" " elseif &buftype == 'buffer'
-  "" "   set nowrap
-  "" " endif
-  "" call InitLineState()
-  "" " call system("bash", g:bashset_restore)
-  "" call Statusline()
-  "" " call SetProject(getcwd())
-  "" " call Layout_Vim()
-  "" " redraw!
-  "" call AutoInstallPlug()
-  call InitPlug()
-endfunction
-
-function! BufEnter()
-  call CD(expand('%:p'))
-  " call DebugPaths()
-  " call Statusline()
-endfunction
-
-function! TabClose()
-  try
-    tabclose
-  catch
-    qa!
-  finally
-  endtry
-endfunction
-
-function! WinEnter()
-  call SetLineState(1)
-  "" " StaticWin --deal-focus
-  "" " StaticWin get Information --text expand('%')
-  "" " if getbufvar(bufnr(), '&buftype') == 'terminal'
-  "" " if win_gettype(winnr()) == ""
-  "" "     endif
-  "" " exec "set tags="..CWD().."/tags"
-  "" " echo "set tags="..CWD().."/tags"
-  "" " if HasState()
-  "" " endif
-  "" call Statusline()
-  "" call SetLineState(g:linestate)
-  "" " exec "cd "..CWD()
-  "" " call REFRESH_CWD()
-  "" " Simpliest solution for now.
-  "" " Visual Selection gets losts
-  "" call InsertIfTerminal()
-  "" " if BufIsTerminal()
-  "" "   startinsert
-  "" " endif
-  "" " call InitLineState()
-  "" " let parent=CWD()
-  "" " if isdirectory(parent)
-  "" "   exec "cd "..parent
-  "" " endif
-endfunction
-
-function! WinLeave()
-  let g:lastmain_repo=CWD()
-  call SetLineState(0)
-endfunction
-
-function! BufLeave()
-	let last_buffer = bufnr("$")
-  let last_winid = bufwinid(last_buffer)
-  let g:lastmain_repo=getwinvar(last_winid, "main_repo")
-  " if IsTermWin()
-  " endif
-endfunction
-
 " Execute In File
 
 function! PyExec(keymap) range
