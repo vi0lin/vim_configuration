@@ -3042,10 +3042,15 @@ set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 set expandtab
+set listchars=eol:$,
+set listchars=eol:$,space:·,tab:→\ ,trail:·,nbsp:␣,extends:»,precedes:«
 set noautoindent
 set nosmartindent
 set omnifunc=syntaxcomplete#Complete
-set nolist
+set list
+" set list!
+" set nolist!
+" set nolist
 set splitright
 set splitbelow
 set clipboard=unnamed
@@ -5625,7 +5630,7 @@ function! NeededCmdHeight(msg) abort
   return lines
 endfunction
 
-function! EchoSafely(msg) abort
+function! EchoSafely(msg, ms=700) abort
   let needed = NeededCmdHeight(a:msg)
   let save_ch = &cmdheight
   if needed > &cmdheight
@@ -5636,16 +5641,17 @@ function! EchoSafely(msg) abort
     call setbufvar(a:buf, '&cmdheight', 1)
   endfunction
   " let s:timer_id = timer_start(100, function('Shrink'))
-  let s:timer_id = timer_start(700, {_ -> Shrink(bufnr())})
+  let s:timer_id = timer_start(a:ms, {_ -> Shrink(bufnr())})
   " call timer_stop(s:timer_id)
 endfunction
 command! -nargs=1 EchoSafely call EchoSafely(<q-args>)
 
 " Command Mapping
 function! Eexec()
-  let b = printf("%s %s %s", g:mode, g:keymap, CheckAllCommands())
-  call EchoSafely(join([b, b, b, b], " "))
-  " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, CheckAllCommands()))
+  " let b = printf("%s %s %s", g:mode, g:keymap, CheckAllCommands())
+  " call EchoSafely(join([b, b, b, b], " "))
+
+  call EchoSafely(printf("%s %s %s", g:mode, g:keymap, CheckAllCommands()), 1500)
 endfunction
 
 function! CommandDictInit()
@@ -5654,24 +5660,27 @@ function! CommandDictInit()
   return b:commands
 endfunction
 
+function! Command_map_init()
+endfunction
+
 function! CommandDictInitPage()
   return {
-        \ '<F5>': "",
-        \ '<F6>': "",
-        \ '<F7>': "",
-        \ '<F8>': "",
-        \ '<C-F5>': "",
-        \ '<C-F6>': "",
-        \ '<C-F7>': "",
-        \ '<C-F8>': "",
-        \ '<S-F5>': "",
-        \ '<S-F6>': "",
-        \ '<S-F7>': "",
-        \ '<S-F8>': "",
-        \ '<C-S-F5>': "",
-        \ '<C-S-F6>': "",
-        \ '<C-S-F7>': "",
-        \ '<C-S-F8>': ""
+        \ '<F5>': -1,
+        \ '<F6>': -1,
+        \ '<F7>': -1,
+        \ '<F8>': -1,
+        \ '<C-F5>': -1,
+        \ '<C-F6>': -1,
+        \ '<C-F7>': -1,
+        \ '<C-F8>': -1,
+        \ '<S-F5>': -1,
+        \ '<S-F6>': -1,
+        \ '<S-F7>': -1,
+        \ '<S-F8>': -1,
+        \ '<C-S-F5>': -1,
+        \ '<C-S-F6>': -1,
+        \ '<C-S-F7>': -1,
+        \ '<C-S-F8>': -1
         \ }
 endfunction
 
@@ -6989,6 +6998,7 @@ function! TabClose()
 endfunction
 
 function! WinEnter()
+  call SetLineState(1)
   "" " StaticWin --deal-focus
   "" " StaticWin get Information --text expand('%')
   "" " if getbufvar(bufnr(), '&buftype') == 'terminal'
@@ -7017,6 +7027,7 @@ endfunction
 
 function! WinLeave()
   let g:lastmain_repo=CWD()
+  call SetLineState(0)
 endfunction
 
 function! BufLeave()
@@ -7025,7 +7036,6 @@ function! BufLeave()
   let g:lastmain_repo=getwinvar(last_winid, "main_repo")
   " if IsTermWin()
   " endif
-  call SetLineState(0)
 endfunction
 
 " Execute In File
