@@ -598,12 +598,12 @@ NewMap -no -n ,,<C-Space> :call Files(Folder_Up(v:count, 2))<cr>
 NewMap -no -n ,,,<C-Space> :call Files(Folder_Up(v:count, 3))<cr>
 NewMap -no -n ,,,,<C-Space> :call Files(Folder_Up(v:count, 4))<cr>
 NewMap -no -n ,,,,,<C-Space> :call Files(Folder_Up(v:count, 5))<cr>
-NewMap -no -n ,<Space> :call Files(Folder_Repo(v:count, 0))<cr>
-NewMap -no -n ,,<Space> :call Files(Folder_Repo(v:count, 1))<cr>
-NewMap -no -n ,,,<Space> :call Files(Folder_Repo(v:count, 2))<cr>
-NewMap -no -n ,,,,<Space> :call Files(Folder_Repo(v:count, 3))<cr>
-NewMap -no -n ,,,,,<Space> :call Files(Folder_Repo(v:count, 4))<cr>
-NewMap -no -n ,,,,,,<Space> :call Files(Folder_Repo(v:count, 5))<cr>
+NewMap -no -n ,<Space> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
+NewMap -no -n ,,<Space> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
+NewMap -no -n ,,,<Space> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
+NewMap -no -n ,,,,<Space> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
+NewMap -no -n ,,,,,<Space> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
+NewMap -no -n ,,,,,,<Space> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
 
 NewMap -no -n <C-g> :call AgIn(Folder_Repo(v:count, 0))<cr>
 NewMap -no -n ,<C-g> :call AgIn(Folder_Repo(v:count, 1))<cr>

@@ -1383,7 +1383,7 @@ function! Folder_Project()
   return CWD()
 endfunction
 
-function! Folder_Repo_Or_Project()
+function! Folder_Repo_Or_Project_Only()
   let cwd=CWD()
   let finish=0
   let paths=[]
@@ -1431,6 +1431,79 @@ function! Folder_Repo_Or_Project()
   "   return
   " endif
   " return file
+endfunction
+
+function! Folder(cwd, count)
+  let cwd=a:cwd
+  let finish=0
+  let paths=[]
+  let x=0
+  while x<a:count
+    if cwd=='/'
+      break
+    endif
+    let x+=1
+    let cwd=GetParentDir(cwd)
+  endwhile
+  return cwd
+endfunction
+
+function! Folder_Repo_Or_Project(count, nr)
+  call Refresh('projects', 'GetProjects()')
+  let cwd=CWD()
+  let finish=0
+  let paths=[]
+  let x=a:count+a:nr
+  echo x
+  let y=0
+  let scwd=cwd
+  let z=0
+  while 1
+    let isgit=globpath(cwd, '.git')
+    let isproject=index(g:projects, cwd)
+    if !empty(isgit) || isproject>-1
+      " this is a project or repo
+      echo "Is Git Project " .. x .. " " .. y
+      let scwd=cwd
+      if x==y
+        return cwd
+      endif
+      let y+=1
+    endif
+    if cwd=='/'
+      break
+    endif
+    let cwd=GetParentDir(cwd)
+    let z+=1
+  endwhile
+  " Folder_Up(cwd)
+  " return '/'
+  " return -1
+  " todo return Folder
+  " call input(Folder(scwd, x-y+1).." "..string(x-y+1))
+  " echo Folder(scwd, x-y+1)
+  return Folder(scwd, x-y+1)
+endfunction
+
+function! Folder_Repo_Or_Project_notright(count, nr)
+  let cwd=CWD()
+  let finish=0
+  let paths=[]
+  while 1
+    let isgit=globpath(cwd, '.git')
+    let isproject=index(g:projects, cwd)
+    if !empty(isgit) || isproject>-1
+      return cwd
+    endif
+    if cwd=='/'
+      break
+    endif
+    let cwd=GetParentDir(cwd)
+  endwhile
+  return -1
+  " Folder_Up(cwd)
+  " return '/'
+  return Folder(cwd, a:nr)
 endfunction
 
 " TODO Also Consider g:projects to check agains if its a "repo" not only .git
@@ -5775,7 +5848,7 @@ function! Eexec()
 endfunction
 
 function! BuildCommandLines() abort
-  let folder = Folder_Repo_Or_Project()
+  let folder = Folder_Repo_Or_Project_Only()
   let lines = []
   for page_idx in range(len(b:commands['pages']))
     let page = b:commands['pages'][page_idx]
@@ -5803,7 +5876,7 @@ function! SaveCommands()
 endfunction
 
 function! SaveCommands()
-  let folder = Folder_Repo_Or_Project()
+  let folder = Folder_Repo_Or_Project_Only()
   " echo folder
   " call Write(b:commands, folder . ".commands_vim_configuration.unreleased")
   if folder != -1
@@ -5868,7 +5941,7 @@ endfunction
 function LoadAllCommands()
   call CommandDictInit()
   call LoadCommands()
-  call LoadCommands(Folder_Repo_Or_Project()..'/.commands_vim_configuration.unreleased')
+  call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
   " for c in b:commands['pages']
   "   echo c['<F5>']['command']
   " endfor
@@ -6986,6 +7059,7 @@ function BufCreateCommandInit()
     call CommandDictInit()
   endif
   call LoadAllCommands()
+  call MakeDirCurrentCWD(bufnr())
 endfunction
 
 function! BufReadPre()
