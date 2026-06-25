@@ -1,3 +1,9 @@
+" unstage a specific file:
+" git reset <filename>
+" all files:
+" git reset --soft
+" git reset --soft <filename>
+
 if !exists("g:vim_advantages_got_sourced")
 
 " Avoid cdo prompt for overwiting files
@@ -28,63 +34,6 @@ endif
 
 let g:preservedLists=[ 'favorites', 'multiprojectholder', 'projectholder', 'projectholder_projects', 'multiprojectholder_projects', 'projects']
 let g:preservedListsFolders=[ 'favorites' ]
-
-function! Eexec() range
-  " echo a:nr
-  echo g:mode
-  echo g:keymap
-endfunction
-
-function! CommandDictInit()
-  let b:commands={'pages': []}
-  return CommandDictAddPage(CommandDictInitPage())
-endfunction
-
-function! CommandDictInitPage()
-  return {
-        \ '<F5>': "",
-        \ '<F6>': "",
-        \ '<F7>': "",
-        \ '<F8>': "",
-        \ '<C-F5>': "",
-        \ '<C-F6>': "",
-        \ '<C-F7>': "",
-        \ '<C-F8>': "",
-        \ '<S-F5>': "",
-        \ '<S-F6>': "",
-        \ '<S-F7>': "",
-        \ '<S-F8>': "",
-        \ '<C-S-F5>': "",
-        \ '<C-S-F6>': "",
-        \ '<C-S-F7>': "",
-        \ '<C-S-F8>': ""
-        \ }
-endfunction
-
-function! CommandDictAddPage(page)
-  call extend(b:commands['pages'], [a:page])
-  return b:commands
-endfunction
-
-function! CheckAllCommandVimConfigurationFiles()
-  let filename='.commands_vim_configuration'
-  let cwd=CWD()
-  let finish=0
-  let paths=[]
-  while 1
-    let file=globpath(cwd, filename)
-    if !empty(file)
-      call extend(paths, [file])
-    endif
-    if cwd=='/'
-      break
-    endif
-    let cwd=GetParentDir(cwd)
-  endwhile
-  for x in reverse(paths)
-    exec "source" x
-  endfor
-endfunction
 
 function PreservedListsInit()
   for pl in g:preservedLists
@@ -5667,6 +5616,97 @@ function! InsertIfTerminal()
   endtry
 endfunction
 
+function! NeededCmdHeight(msg) abort
+  let width = &columns
+  let lines = 0
+  for line in split(a:msg, "\n", 1)
+    let lines += max([1, (strdisplaywidth(line) + width - 1) / width])
+  endfor
+  return lines
+endfunction
+
+function! EchoSafely(msg) abort
+  let needed = NeededCmdHeight(a:msg)
+  let save_ch = &cmdheight
+  if needed > &cmdheight
+    let &cmdheight = needed
+  endif
+  echo a:msg
+  function! Shrink(buf) closure
+    call setbufvar(a:buf, '&cmdheight', 1)
+  endfunction
+  " let s:timer_id = timer_start(100, function('Shrink'))
+  let s:timer_id = timer_start(700, {_ -> Shrink(bufnr())})
+  " call timer_stop(s:timer_id)
+endfunction
+command! -nargs=1 EchoSafely call EchoSafely(<q-args>)
+
+" Command Mapping
+function! Eexec()
+  let b = printf("%s %s %s", g:mode, g:keymap, CheckAllCommands())
+  call EchoSafely(join([b, b, b, b], " "))
+  " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, CheckAllCommands()))
+endfunction
+
+function! CommandDictInit()
+  let b:commands={'pages': []}
+  let b:commands=CommandDictAddPage(CommandDictInitPage())
+  return b:commands
+endfunction
+
+function! CommandDictInitPage()
+  return {
+        \ '<F5>': "",
+        \ '<F6>': "",
+        \ '<F7>': "",
+        \ '<F8>': "",
+        \ '<C-F5>': "",
+        \ '<C-F6>': "",
+        \ '<C-F7>': "",
+        \ '<C-F8>': "",
+        \ '<S-F5>': "",
+        \ '<S-F6>': "",
+        \ '<S-F7>': "",
+        \ '<S-F8>': "",
+        \ '<C-S-F5>': "",
+        \ '<C-S-F6>': "",
+        \ '<C-S-F7>': "",
+        \ '<C-S-F8>': ""
+        \ }
+endfunction
+
+function! CommandDictAddPage(page)
+  call extend(b:commands['pages'], [a:page])
+  return b:commands
+endfunction
+
+function CheckAllCommands()
+  call CheckCommands()
+  call CheckCommands('.commands_vim_configuration.unreleased')
+  return b:commands
+endfunction
+
+function! CheckCommands(filename='.commands_vim_configuration')
+  let cwd=CWD()
+  let finish=0
+  let paths=[]
+  while 1
+    let file=globpath(cwd, a:filename)
+    if !empty(file)
+      call extend(paths, [file])
+    endif
+    if cwd=='/'
+      break
+    endif
+    let cwd=GetParentDir(cwd)
+  endwhile
+  for x in reverse(paths)
+    exec "source" x
+  endfor
+  return b:commands
+endfunction
+
+
 function! SigTermToTerm(direction)
   let x=['']
   let buf=winbufnr(winnr(a:direction))
@@ -6764,6 +6804,9 @@ function! BufWinEnter()
 endfunction
 
 function! BufEnter()
+  if !exists('b:commands')
+    call CommandDictInit()
+  endif
   call Statusline()
 endfunction
 
