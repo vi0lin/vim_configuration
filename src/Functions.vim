@@ -5700,7 +5700,6 @@ command! -nargs=1 EchoSafely call EchoSafely(<q-args>)
 function! CommandDictInit()
   let b:commands={'pages': []}
   let b:commands=CommandDictAddPage(CommandDictInitPage())
-  call CheckAllCommands()
   return b:commands
 endfunction
 
@@ -5738,7 +5737,7 @@ function! CommandExample()
   let c=EmptyCommand()
   let c['direction']='j'
   let c['directionMode']='foremost'
-  let c['commandOrigin']=Vim_Advantages_Path()..'/src/.command_vim_configuration'
+  let c['commandOrigin']=Vim_Advantages_Path()
   let c['commandMode']='term'
   let c['commandModeSession']='none'
   let c['commandInterpreter']='term'
@@ -5770,27 +5769,65 @@ endfunction
 
 " Command Mapping
 function! Eexec()
-  call CommandPageInit()
+  " call CommandPageInit()
   let c=b:commands['pages'][0][g:keymap]
   call EEexec(c)
 endfunction
 
+function! BuildCommandLines() abort
+  let folder = Folder_Repo_Or_Project()
+  let lines = []
+  for page_idx in range(len(b:commands['pages']))
+    let page = b:commands['pages'][page_idx]
+    for key in keys(page)
+      let data = page[key]
+      " skip unset / cleared entries
+      if data is# -1
+        continue
+      endif
+      " skip entries not belonging to this dict
+      if type(data) != v:t_dict || !has_key(data, 'commandOrigin')
+        continue
+      endif
+      if data['commandOrigin'] != folder
+        continue
+      endif
+      let line = "let b:commands['pages'][" . page_idx . "]['" . key . "']=" . string(data)
+      call add(lines, line)
+    endfor
+  endfor
+  return lines
+endfunction
+
+function! SaveCommands()
+endfunction
+
 function! SaveCommands()
   let folder = Folder_Repo_Or_Project()
+  " echo folder
+  " call Write(b:commands, folder . ".commands_vim_configuration.unreleased")
   if folder != -1
-    call Write(g:commands, folder.."/.commands_vim_configuration.unreleased")
+    let source_commands_script = BuildCommandLines()
+    call Write(source_commands_script, folder.."/.commands_vim_configuration.unreleased")
   else
     call EchoSafely("No Project Or Repo Found In Path Hierarchy")
   endif
 endfunction
 
 function! EEexec(command)
-  call CommandPageInit()
-  call CheckAllCommands()
-  let c=a:command
-  " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, CheckAllCommands()), 1500)
+  " call CommandPageInit()
+  call LoadAllCommands()
+  " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadAllCommands()), 1500)
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
+  if g:mode=='visual'
+    let c=CommandExample()
+    let c['command']=VS()
+    let b:commands['pages'][0][g:keymap]=c
+    call SaveCommands()
+  else
+    let c=a:command
+  endif
   if type(c)==0 && c['command'] != -1
     call EchoSafely("Command Not Send\n"..Pretty(c), 5000)
   elseif type(c)!=3
@@ -5828,13 +5865,17 @@ function! CommandDictAddPage(page)
   return b:commands
 endfunction
 
-function CheckAllCommands()
-  call CheckCommands()
-  call CheckCommands('.commands_vim_configuration.unreleased')
+function LoadAllCommands()
+  call CommandDictInit()
+  call LoadCommands()
+  call LoadCommands(Folder_Repo_Or_Project()..'/.commands_vim_configuration.unreleased')
+  " for c in b:commands['pages']
+  "   echo c['<F5>']['command']
+  " endfor
   return b:commands
 endfunction
 
-function! CheckCommands(filename='.commands_vim_configuration')
+function! LoadCommands(filename='.commands_vim_configuration')
   let cwd=CWD()
   let finish=0
   let paths=[]
@@ -6941,9 +6982,10 @@ function! BufReadPost()
 endfunction
 
 function BufCreateCommandInit()
-  " if !exists('b:commands')
+  if !exists('b:commands')
     call CommandDictInit()
-  " endif
+  endif
+  call LoadAllCommands()
 endfunction
 
 function! BufReadPre()
@@ -6957,6 +6999,7 @@ function! BufWinEnter()
   " call CD(expand('%:p:h'))
   " call InitLineState()
   " echo "BufReadPost"
+  call LoadAllCommands()
 endfunction
 
 function! BufEnter()
