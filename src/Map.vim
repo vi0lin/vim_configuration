@@ -621,6 +621,7 @@ NewMap -no -n ,,,,,,g :call AgIn(Folder_Repo(v:count, 5))<cr>
 NewMap -no -n ,vcd :call CD(Vim_Advantages_Path())<cr>
 
 NewMap -no -n ,p :call Projects()<cr>
+" NewMap -no -n ,,p :call FilesInProjects()<cr>
 NewMap -no -n ,,p :call FilesInProjects()<cr>
 NewMap -no <C-p> :call Projects()<cr>
 NewMap -no <C-S-p> :call Projects()<cr>
@@ -641,7 +642,8 @@ NewMap -no -n <C-S-m> :Generate<cr>
 " NewMap -no <A-C-Space> :call Files(Folder_Repo(v:count, 1))<cr>
 " NewMap -no <A-S-C-Space> :call Files('/')<cr>
 
-NewMap -no -aa ,x :call Commands()<cr>
+" NewMap -no -aa ,x :call Commands()<cr>
+" iunmap ,x
 NewMap -no -aa <C-x> :call Commands()<cr>
 NewMap -no -aa <C-S-x> :call Commands()<cr>
 NewMap -no -aa <A-x> :call Commands()<cr>
@@ -1191,5 +1193,8 @@ NewMap -t -no -un <C-v> <C-\><C-n>
 NewMap -v -no i <C-c>i
 "  C - c
 NewMap -no -v <C-c> :call CommandInfo()<cr>
+
+NewMap -no -n -v <S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
+NewMap -no -n -v <F3> :diffthis<cr>
 
 endif

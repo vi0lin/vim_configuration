@@ -30,7 +30,17 @@ if !exists('g:vim_configuration_path')
   let g:vim_configuration_path=resolve(expand('<sfile>:p:h')..'/../')
 endif
 
-let g:preservedLists=[ 'favorites', 'multiprojectholder', 'projectholder', 'projectholder_projects', 'multiprojectholder_projects', 'projects']
+let g:preservedLists=[ 'favorites', 'multiprojectholder', 'projectholder', 'projectholder_projects', 'multiprojectholder_projects', 'projects', 'favoritefolders', 'favoritefolders_recursively', 'favoritefolders_files', 'favoritefolders_glob', 'favoritefolders_glob_files', 'favoritefolders_files_recursively', 'pathsoffavorites']
+
+function! BuildCommandData(dict_or_array) abort
+  let lines = []
+  for data in a:dict_or_array
+    let line ="call extend(b:favoritefolders_glob, [" . string(data[0]) . ", " . string(data[1]) . "])"
+    call add(lines, line)
+  endfor
+  return lines
+endfunction
+
 " let g:temporarily={
 "   'favorites': { 'holder': 0, 'multiproject': 0, 'extend': 'favorites' },
 "   'ph': { 'holder': 1, 'multiproject': 0, 'extend': 'projects' },
@@ -96,6 +106,62 @@ function! ReadUnreleased(file)
   return Read(g:unreleased..'/.'..a:file)
 endfunction
 
+function! GetFavoriteFolders()
+  call UnreleasedVariable('favoritefolders')
+  return g:favoritefolders
+endfunction
+
+function! GetFavoriteFolders_Recursively()
+  call UnreleasedVariable('favoritefolders_recursively')
+  return g:favoritefolders_recursively
+endfunction
+
+function! SaveFavoriteFolders_Glob()
+  let test=[
+    \ [ '/', '**/*' ],
+    \ [ './src', '**' ],
+    \ [ './', '*' ]
+    \ ]
+  let script = BuildCommandData(test)
+  call WriteUnreleased(script, "favoritefolders_glob.unreleased")
+endfunction
+
+function! GetFavoriteFolders_Glob()
+  let g:favoritefolders_glob=ReadUnreleased("favoritefolders_glob.unreleased")
+endfunction
+
+function! GetFavoriteFolders_Files()
+  let x = []
+  for path in g:favoritefolders
+    let dirs=filter(globpath(path, "*", 0, 1), 'isfilereadable(v:val)')
+    call extend(x, dirs)
+  endfor
+  call WriteUnreleased(x, 'favoritefolders_files')
+  call UnreleasedVariable('favoritefolders_files')
+  return g:favoritefolders_files
+endfunction
+
+function! GetPathsOfFavorites()
+  let x=[]
+  for f in g:favorites
+    if isdirectory(f) && indexof(x, f)==-1
+      call add(x, f)
+    endif
+  endfor
+  return x
+endfunction
+
+function! GetFavoriteFolders_Files_Recursively()
+  let x = []
+  for path in g:favoritefolders
+    let dirs=filter(globpath(path, "**", 0, 1), 'isfilereadable(v:val)')
+    call extend(x, dirs)
+  endfor
+  call WriteUnreleased(x, 'favoritefolders_files_recursively')
+  call UnreleasedVariable('favoritefolders_files_recursively')
+  return g:favoritefolders_files_recursively
+endfunction
+
 function! GetGitprojects(file=g:unreleased..'/.gitprojects')
   if !filereadable(a:file)
     call SearchGitProjects()
@@ -105,12 +171,63 @@ function! GetGitprojects(file=g:unreleased..'/.gitprojects')
   return g:gitprojects
 endfunction
 
+if 0
+  function FN
+endif
+
+function FN(...)
+  echo expand('----')
+  echo expand('<sfile>')
+  echo expand('----')
+
+  let g:newmap_optschema = [
+    \ [ 'a', 'A|a', 0]
+    \ ]
+  echo substitute(expand('<sfile>'), '.*\.\.|\s', '', '')
+  echo substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1',  '')
+  let x="function SFN[2]..FunctionName"
+  echo substitute(expand('<sfile>'), 'function (.*)\[\d\]\.\..*', '\1' , '')
+  echo expand('<file>')
+  function! GetCurrentFunctionName()
+    let line = getline(search('^[[:alpha:]$_]', 'bcnW'))
+    echo matchstr(line, '\w\+')
+  endfunction
+  echo GetCurrentFunctionName()
+
+  echohl argsMsg
+  let m1=search('^[^ \t#/]\\{2}.*[^:]\s*$', 'bWn')
+  echo m1
+  let firstline=getline(m1)
+  echo firstline
+
+  echohl None
+  let m2=search('^[[:alpha:]$_]', 'bcnW')
+  echo m2
+  let lastline=getline(m2)
+  echo lastline
+
+  let m3=search('^[[:alpha:]$_]', 'bcnW')
+  echo m3
+  echo substitute(getline(m3), '', '', '')
+  put=expand('<sfile>')
+  let x = expand('<sfile>')
+  echo substitute(x, '.*\s\(.*\)\[\d\].*', '\1', '')
+  " NewMap -n -no <f1> :FunctionName 3<cr>:FunctionName 1<cr>
+endfunction
+" call FN()
+
+map <F2> :echo FN()<cr>
+map <F4> :exec "echo g:"..expand('<cword>')<cr>
+map <F3> exec ""
+
 function GetProjects()
-  call Refresh('multiprojectholder', 'GetMultiprojectholder()')
+  call Refresh('multiprojectholder', 'GetMultiprojectHolder()')
   call Refresh('projectholder', 'GetProjectHolder()')
   call Refresh('gitprojects', 'GetGitprojects()')
-  call Refresh('favorites_folders', 'GetFavoritesFolders()')
-  return Merge(g:gitprojects, g:favorites_folders, g:multiprojectholder_projects, g:projectholder_projects)
+  call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
+  call Refresh('favoritefolders_files_recursively', 'GetFavoriteFolders_Files_Recursively()')
+  call Refresh('pathsoffavorites', 'GetPathsOfFavorites()')
+  return Merge(g:gitprojects, g:favoritefolders_files, g:multiprojectholder_projects, g:projectholder_projects, g:pathsoffavorites)
 endfunction
 
 function! GetFoldersFolders(name)
@@ -119,16 +236,6 @@ function! GetFoldersFolders(name)
   exec 'for folder in g:'..a:name
     echo folder
   endfor
-endfunction
-
-function! GetFavoritesFolders()
-  let x=[]
-  for f in g:favorites
-    if isdirectory(f) && indexof(x, f)==-1
-      call add(x, f)
-    endif
-  endfor
-  return x
 endfunction
 
 function! GetProjectFolders()
@@ -183,11 +290,10 @@ function! ReadSession()
   " endif
 endfunction
 command! -range -nargs=0 ReadSession :call ReadSession()
-
 command! -range -nargs=0 Projekt :call SetUnset('projekt', expand("%:p"))
-
 command! -range -nargs=0 MultiprojectHolder :call SetUnset('multiprojectholder', expand("%:p"))
-
+command! -range -nargs=0 FavoriteFolder :call SetUnset('favoritefolders', expand("%:p"))
+command! -range -nargs=0 FavoriteFolderRecursively :call SetUnset('favoritefolders_recursively', expand("%:p"))
 command! -range -nargs=0 ProjectHolder :call SetUnset('projectholder', expand("%:p"))
 
 function! GetProjectHolder()
@@ -202,29 +308,30 @@ function! GetProjectHolder_Projects()
     let dirs=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
     call extend(p, dirs)
   endfor
-  echo p
   " call ForceSet('projectholder_projects', p)
   call WriteUnreleased(p, 'projectholder_projects')
   return g:projectholder_projects
 endfunction
 
-function! GetMultiprojectholder()
+function! GetMultiprojectHolder()
   call UnreleasedVariable('multiprojectholder')
-  call GetMultiprojectholder_Projects()
+  call GetMultiprojectHolder_Projects()
   return g:multiprojectholder
 endfunction
 
-function! GetMultiprojectholder_Projects()
+function! GetMultiprojectHolder_Projects()
   let p=[]
   for path in g:multiprojectholder
     let subpaths=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
     for path2 in subpaths
-      call extend(p, filter(globpath(path2, "*", 0, 1), 'isdirectory(v:val)'))
+       let pp=filter(globpath(path2, "*", 0, 1), 'isdirectory(v:val)')
+      call extend(p, pp)
     endfor
   endfor
   " call ForceSet('projectholder_projects', p)
-  call WriteUnreleased(p, 'projectholder_projects')
-  return g:projectholder_projects
+  call WriteUnreleased(p, 'multiprojectholder_projects')
+  call UnreleasedVariable('multiprojectholder_projects')
+  return g:multiprojectholder_projects
 endfunction
 
 function EchoP()
@@ -3159,8 +3266,9 @@ set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 set expandtab
-set listchars=eol:$,
 set listchars=eol:$,space:·,tab:→\ ,trail:·,nbsp:␣,extends:»,precedes:«
+set listchars=eol:$,
+set listchars=
 
 " set autoindent " copies indent from previous line, nothing fancier
 set noautoindent
@@ -4268,6 +4376,8 @@ function! Projects()
   call OpenFilePopup("Projects", g:projects)
 endfunction
 
+" fzf buildstring find in projects
+" why file exists 3 times in the list?
 function! FilesInProjects()
   let allfiles=[]
   " for p in g:projects
@@ -4286,10 +4396,15 @@ endfunction
 
 function! FavoritesPopup()
   call Refresh('favorites', 'ReadUnreleased("favorites")')
-  call Refresh('favorites_folders', 'GetFavoritesFolders()')
+  call Refresh('favoritefolders', 'GetFavoriteFolders()')
+  call Refresh('favoritefolders_recursively', 'GetFavoriteFolders_Recursively()')
+  call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
+  call Refresh('favoritefolders_files_recursively', 'GetFavoriteFolders_Files_Recursively()')
+  call Refresh('favoritefolders_glob', 'GetFavoriteFolders_Glob()')
   let f=[]
   call extend(f, g:favorites)
-  call extend(f, g:favorites_folders)
+  call extend(f, g:favoritefolders_files)
+  call extend(f, g:favoritefolders_files_recursively)
   call OpenFilePopup("Favorites", f)
 endfunction
 
@@ -4367,18 +4482,25 @@ else
 endif
 
 function Commands()
-  function! Execute_callback(file)
+  function! Execute_callback(job, status, file)
+    " let cj=ch_getjob(a:job)
+    " let tj=term_getjob(a:job)
+    " call input(a:job.." "..a:status)
+      " ch_info({handle})
     let command=GetTempfileLine(a:file)
-    if command=='0' || command==0
-      call TERM(bufnr(), [ command ])
-      norm i
+    " call input(command)
+    " if command=='0' || command==0
+      " call TERM(bufnr(), [ command ])
+    "  norm i
     else
       echo "Errorhandling"
     endif
     call _cleanCallback(a:file)
   endfunction
-  let Cb={job, status -> timer_start(0, {_ -> Execute_callback(g:outfile)})}
-  let file=Popup("Projects", 'window', g:commands, Cb, g:outfile)
+  let Cb={job, status -> timer_start(0, {_ -> Execute_callback(job, status, g:outfile)})}
+  echo g:commandlist
+  let command_list=map(copy(g:commandlist), 'v:val[0].." -> "..v:val[1]')
+  let file=Popup("Commands", 'window', command_list, Cb, g:outfile)
 endfunction
 
 function! Popup(title, register, list, callback, outfile)
@@ -5508,6 +5630,14 @@ function! IntegrateIn(direction)
   call win_splitmove(this_id, target_id, {'vertical': result.type == 'row'})
 endfunction
 
+function! CDLastWinProjectCWD()
+  let lw=winnr('#')
+  let lb=winbufnr(winnr('#'))
+  " let cwd=getbufvar(lb, 'CWD()')
+  let cwd=getwinvar(lw, 'cwd')
+  echo cwd
+endfunction
+
 function! WinBufSwap_Back()
   let thiswin = winnr()
   let thisbuf = bufnr("%")
@@ -5545,6 +5675,19 @@ endfunction
 function! WinSwapBuf_Prep()
   let g:lastwin= winnr()
   let g:lastbuf= bufnr()
+endfunction
+
+function! BufPrep()
+  let g:bufprep=bufnr()
+endfunction
+
+function! DiffOff()
+  :windo diffoff
+  :bufdo diffoff
+endfunction
+
+function! BufBack()
+  exec "e" g:bufprep
 endfunction
 
 function! WinSwapBuf_Back()
@@ -5790,6 +5933,8 @@ function! EmptyCommand()
   " commandOutputMode: put sendtoterm file clist commandline
   " command: 'ls -al; date'
   let command={
+    \ "hash": -1,
+    \ "name": -1,
     \ "direction": -1,
     \ "directionMode": -1,
     \ "directionSkipping": -1,
@@ -5870,9 +6015,6 @@ function! BuildCommandLines() abort
     endfor
   endfor
   return lines
-endfunction
-
-function! SaveCommands()
 endfunction
 
 function! SaveCommands()
@@ -7154,7 +7296,7 @@ function! TabClose()
 endfunction
 
 function! WinEnter()
-  call SetLineState(1)
+  call SetLineState(g:linestate)
   "" " StaticWin --deal-focus
   "" " StaticWin get Information --text expand('%')
   "" " if getbufvar(bufnr(), '&buftype') == 'terminal'
@@ -8325,8 +8467,6 @@ function! TEST()
   " echo VS()
   " echo "x,!"
 endfunction
-
-call _command('echo "TEST"')
 
 let g:vim_advantages_got_sourced='true'
 endif

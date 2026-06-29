@@ -1,12 +1,12 @@
 " Todo - Unify noremap and map commands
 if !exists("g:vim_advantages_got_sourced")
 
-if !exists('g:commands')
-  let g:commands=[]
+if !exists('g:commandlist')
+  let g:commandlist=[]
 endif
 
-function! _command(args) range
-  call add(g:commands, a:args)
+function! _command(...) range
+  call add(g:commandlist, a:000)
 endfunction
 
 " visual :<C-u>
