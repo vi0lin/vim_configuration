@@ -4488,19 +4488,32 @@ function Commands()
     " call input(a:job.." "..a:status)
       " ch_info({handle})
     let command=GetTempfileLine(a:file)
+    let hash=split(command, ' ')[0]
+    let exec=filter(copy(g:commandlist), 'v:val.hash=~"'..hash..'"')[0]
     " call input(command)
-    " if command=='0' || command==0
+    if command != -1 && command != 0
+      exec exec.command
       " call TERM(bufnr(), [ command ])
-    "  norm i
+      "  norm i
     else
       echo "Errorhandling"
     endif
     call _cleanCallback(a:file)
   endfunction
   let Cb={job, status -> timer_start(0, {_ -> Execute_callback(job, status, g:outfile)})}
-  echo g:commandlist
-  let command_list=map(copy(g:commandlist), 'v:val[0].." -> "..v:val[1]')
+  let command_list=map(copy(g:commandlist), 'v:val.hash.." : "..v:val.name..GenSpaces(v:val.name)..v:val.command')
+  " echo P(command_list)
   let file=Popup("Commands", 'window', command_list, Cb, g:outfile)
+endfunction
+
+function! GenSpaces(name)
+  let sorted=sort(copy(g:commandlist), {a,b->len(b.name)-len(a.name)})
+  let diff=len(sorted[0].name)-len(a:name)
+  let out=""
+  for d in range(0, diff)
+    let out.=" "
+  endfor
+  return out
 endfunction
 
 function! Popup(title, register, list, callback, outfile)
@@ -5951,8 +5964,29 @@ function! EmptyCommand()
   return command
 endfunction
 
+function! VimCommand(command='')
+  let c=EmptyCommand()
+  let c['hash']=NewUUID()
+  let c['name']='unnamed'
+  let c['commandMode']='vim'
+  let c['commandInterpreter']='vim'
+  let c['commandOutputMode']='put'
+  let c['command']=a:command
+  return c
+endfunction
+
+function! TermCommand(command='')
+  let c=EmptyCommand()
+  let c['hash']=NewUUID()
+  let c['name']='unnamed'
+  let c['command']=a:command
+  return c
+endfunction
+
 function! CommandExample()
   let c=EmptyCommand()
+  let c['hash']='empty'
+  let c['name']='unnamed'
   let c['direction']='j'
   let c['directionMode']='foremost'
   let c['commandOrigin']=Vim_Advantages_Path()

@@ -5,9 +5,28 @@ if !exists('g:commandlist')
   let g:commandlist=[]
 endif
 
-function! _command(...) range
-  call add(g:commandlist, a:000)
+function! _command(command) range
+  call add(g:commandlist, a:command)
 endfunction
+
+let gc=TermCommand()
+let gc['command']='echo "TEST"'
+call _command(gc)
+
+let gc=TermCommand()
+let gc['name']='Simple Command'
+let gc['command']='echo "TEST"'
+call _command(gc)
+
+" Maybe Like This?
+" COMMAND Simp Command
+" echo "Test"
+" ENDCOMMAND
+
+let gc=VimCommand()
+let gc['name']='Echo'
+let gc['command']='echo "TEST"'
+call _command(gc)
 
 " visual :<C-u>
 " insert :<C-o>
@@ -232,6 +251,8 @@ function! NewMap(args)
     let obj.key=substitute(obj.key, '{modifiers}', a, 'g')
     let obj.default=substitute(obj.default, '{modifiers}', a, 'g')
     call extend(g:newmap_buildfile, _map(obj))
+    let gc=VimCommand()
+    call _command(gc)
   endfor
   " echo g:newmap_buildfile
   " endfor

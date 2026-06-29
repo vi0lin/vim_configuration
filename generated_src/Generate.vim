@@ -666,3 +666,5 @@ nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :call BufPrep() \| :call 
 vnoremap <S-F3> :call SetMode("\<S-F3\>", "Visual") \| '<,'>:call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :diffthis<cr>
 vnoremap <F3> :call SetMode("\<F3\>", "Visual") \| '<,'>:diffthis<cr>
+nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
+vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>

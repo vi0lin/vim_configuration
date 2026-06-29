@@ -1197,4 +1197,6 @@ NewMap -no -v <C-c> :call CommandInfo()<cr>
 NewMap -no -n -v <S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 NewMap -no -n -v <F3> :diffthis<cr>
 
+NewMap -no -n -v <C-S-.> :@:<cr>
+
 endif
