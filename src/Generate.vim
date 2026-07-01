@@ -9,25 +9,6 @@ function! _command(command) range
   call add(g:commandlist, a:command)
 endfunction
 
-let gc=TermCommand()
-let gc['command']='echo "TEST"'
-call _command(gc)
-
-let gc=TermCommand()
-let gc['name']='Simple Command'
-let gc['command']='echo "TEST"'
-call _command(gc)
-
-" Maybe Like This?
-" COMMAND Simp Command
-" echo "Test"
-" ENDCOMMAND
-
-let gc=VimCommand()
-let gc['name']='Echo'
-let gc['command']='echo "TEST"'
-call _command(gc)
-
 " visual :<C-u>
 " insert :<C-o>
 function! _map(opts) range
@@ -320,5 +301,99 @@ function! Generate()
   echo "Done"
 endfunction
 command! -range -nargs=0 Generate call Generate()
+
+function! CommandDictInit()
+  let b:commands={'pages': []}
+  let b:commands=CommandDictAddPage(CommandDictInitPage())
+  return b:commands
+endfunction
+
+function! EmptyCommand()
+  " direction: hjkl
+  " directionMode: HJKL, neighbor, foremost
+  " directionSkipping: 0 1 2 3
+  " commandOrigin: /path/to/.command.vim_configuration
+  " commandMode: term buffer newbuffer
+  " commandModeSession: -1 / none / bashsession / pythonsession
+  " commandInterpreter: bash / vim / python
+  " commandTargetBuffer: bufnr()
+  " commandTargetWindow: winnr()
+  " commandInput: vs() data file
+  " commandOutputMode: put sendtoterm file clist commandline
+  " command: 'ls -al; date'
+  let command={
+    \ "hash": -1,
+    \ "name": -1,
+    \ "direction": -1,
+    \ "directionMode": -1,
+    \ "directionSkipping": -1,
+    \ "commandOrigin": -1,
+    \ "commandMode": -1,
+    \ "commandModeSession": -1,
+    \ "commandInterpreter": -1,
+    \ "commandTargetBuffer": -1,
+    \ "commandTargetWindow": -1,
+    \ "commandInput": -1,
+    \ "commandOutputMode": -1,
+    \ "command": -1
+    \ }
+  return command
+endfunction
+
+function! VimCommand(command='')
+  let c=EmptyCommand()
+  let c['hash']=NewUUID()
+  let c['name']='unnamed'
+  let c['commandMode']='vim'
+  let c['commandInterpreter']='vim'
+  let c['commandOutputMode']='put'
+  let c['command']=a:command
+  return c
+endfunction
+
+function! TermCommand(command='')
+  let c=EmptyCommand()
+  let c['hash']=NewUUID()
+  let c['name']='unnamed'
+  let c['command']=a:command
+  return c
+endfunction
+
+function! CommandExample()
+  let c=EmptyCommand()
+  let c['hash']='empty'
+  let c['name']='unnamed'
+  let c['direction']='j'
+  let c['directionMode']='foremost'
+  let c['commandOrigin']=Vim_Advantages_Path()
+  let c['commandMode']='term'
+  let c['commandModeSession']='none'
+  let c['commandInterpreter']='term'
+  let c['commandTargetBuffer']='-1'
+  let c['commandTargetWindow']='-1'
+  let c['commandInput']='-1'
+  let c['commandOutputMode']='sendtoterm'
+  let c['command']=['', 'ls -al', '']
+  return c
+endfunction
+
+function! CommandPageInit()
+  " if !exists('b:commands')
+  call CommandPageExample()
+  " endif
+endfunction
+
+function! CommandPageExample()
+  let c=CommandExample()
+  let c['command']=['date']
+  let b:commands['pages'][0]['<F5>']=copy(c)
+  let c['command']=['ls -al']
+  let b:commands['pages'][0]['<F6>']=copy(c)
+  let c['command']=['activate']
+  let b:commands['pages'][0]['<F7>']=copy(c)
+  let c['command']=['deactivate']
+  let b:commands['pages'][0]['<F8>']=copy(c)
+endfunction
+
 
 endif
