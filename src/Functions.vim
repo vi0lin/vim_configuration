@@ -4,15 +4,13 @@ functio! Spare()
     let path=GetTempfileLine(a:file)
     let path=path.''
     if !(path=="0" || path=="-1")
-      let files = globpath(a:root, "*", 0, 1)
-      " call input(join(files, " "))
+      let files = filter(globpath(a:root, "*", 0, 1), 'v:val!~".*.zip"')
       for x in files
         tabnew
         let filename=split(x, "/")[-1]
         " let path=Folder_Repo_Or_Project_Only()
-        " shortest path
+        " path with smallest depth / or split all matches vertically
         let file=filter(globpath(path, "**", 0, 1), 'filereadable(v:val)&&split(v:val, "/")[-1]=="'..filename..'"')
-        " echo file
         enew
         if len(file)>0
           exec "e" file[0]
