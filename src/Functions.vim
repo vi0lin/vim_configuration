@@ -1,3 +1,36 @@
+functio! Spare()
+  let root=input("for files in folder: ")
+  function! DiffFiles_callback(file, root)
+    let path=GetTempfileLine(a:file)
+    let path=path.''
+    if !(path=="0" || path=="-1")
+      let files = globpath(a:root, "*", 0, 1)
+      " call input(join(files, " "))
+      for x in files
+        tabnew
+        let filename=split(x, "/")[-1]
+        " let path=Folder_Repo_Or_Project_Only()
+        " shortest path
+        let file=filter(globpath(path, "**", 0, 1), 'filereadable(v:val)&&split(v:val, "/")[-1]=="'..filename..'"')
+        " echo file
+        enew
+        if len(file)>0
+          exec "e" file[0]
+        endif
+        vs
+        exec "e" x
+        windo diffthis
+      endfor
+    else
+      let g:fzfabort=1
+    endif
+    call _cleanCallback(a:file)
+  endfunction
+  let Cb={job, status -> timer_start(0, {_ -> DiffFiles_callback(g:outfile, root)})}
+  let comparePath=Popup("Choose Destiny Project", 'window', g:projects, Cb, g:outfile)
+endfunction
+command! -range -nargs=0 Spare :call Spare()
+
 " unstage a specific file:
 " git reset <filename>
 " all files:
@@ -133,7 +166,7 @@ endfunction
 function! GetFavoriteFolders_Files()
   let x = []
   for path in g:favoritefolders
-    let dirs=filter(globpath(path, "*", 0, 1), 'isfilereadable(v:val)')
+    let dirs=filter(globpath(path, "*", 0, 1), 'filereadable(v:val)')
     call extend(x, dirs)
   endfor
   call WriteUnreleased(x, 'favoritefolders_files')
@@ -154,7 +187,7 @@ endfunction
 function! GetFavoriteFolders_Files_Recursively()
   let x = []
   for path in g:favoritefolders
-    let dirs=filter(globpath(path, "**", 0, 1), 'isfilereadable(v:val)')
+    let dirs=filter(globpath(path, "**", 0, 1), 'filereadable(v:val)')
     call extend(x, dirs)
   endfor
   call WriteUnreleased(x, 'favoritefolders_files_recursively')
@@ -4944,7 +4977,7 @@ function! GitRemote_Statusline_short()
 endfunction
 
 function! SetProject(dir)
-  echo "TODO Async Backgrounded Job"
+  " echo "TODO Async Backgrounded Job"
   return
   call system("curl http://localhost:8000/SetProject?project="..a:dir)
 endfunction

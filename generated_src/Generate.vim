@@ -274,7 +274,17 @@ nnoremap <A-m> :call SetMode("\<A-m\>", "Normal") \| 12<C-w>-
 nnoremap <A-u> :call SetMode("\<A-u\>", "Normal") \| 12<C-w><
 nnoremap <A-i> :call SetMode("\<A-i\>", "Normal") \| 12<C-w>>
 nnoremap <A-h> :call SetMode("\<A-h\>", "Normal") \| :call TabH()<cr>
+cnoremap <A-h> :call SetMode("\<A-h\>", "Command") \| :call TabH()<cr>
+tnoremap <A-h> <C-\><C-n>:call SetMode("\<A-h\>", "Terminal") \| :call TabH()<cr>
+nnoremap <A-h> :call SetMode("\<A-h\>", "Normal") \| :call TabH()<cr>
+cnoremap <A-h> :call SetMode("\<A-h\>", "Command") \| :call TabH()<cr>
+tnoremap <A-h> <C-\><C-n>:call SetMode("\<A-h\>", "Terminal") \| :call TabH()<cr>
 nnoremap <A-l> :call SetMode("\<A-l\>", "Normal") \| :call TabL()<cr>
+cnoremap <A-l> :call SetMode("\<A-l\>", "Command") \| :call TabL()<cr>
+tnoremap <A-l> <C-\><C-n>:call SetMode("\<A-l\>", "Terminal") \| :call TabL()<cr>
+nnoremap <A-l> :call SetMode("\<A-l\>", "Normal") \| :call TabL()<cr>
+cnoremap <A-l> :call SetMode("\<A-l\>", "Command") \| :call TabL()<cr>
+tnoremap <A-l> <C-\><C-n>:call SetMode("\<A-l\>", "Terminal") \| :call TabL()<cr>
 nnoremap <C-S-M-h> :call SetMode("\<C-S-M-h\>", "Normal") \| :wincmd H<cr>
 nnoremap <C-S-M-j> :call SetMode("\<C-S-M-j\>", "Normal") \| :wincmd J<cr>
 nnoremap <C-S-M-k> :call SetMode("\<C-S-M-k\>", "Normal") \| :wincmd K<cr>
@@ -579,8 +589,6 @@ nnoremap < <<
 nnoremap > >>
 vnoremap < :call SetMode("\<", "Visual") \| '<,'><gv
 vnoremap > :call SetMode("\>", "Visual") \| '<,'>>gv
-nnoremap ,dt :call SetMode(",dt", "Normal") \| :diffthis<cr>
-nnoremap ,do :call SetMode(",do", "Normal") \| :diffoff<cr>
 nnoremap ,0 :call SetMode(",0", "Normal") \| :wincmd =<cr>
 inoremap <C-Space> :call SetMode("\<C-Space\>", "Insert") \| <C-x><C-f>
 inoremap <C-S-v> :call SetMode("\<C-S-v\>", "Insert") \| <c-r>+
@@ -662,9 +670,17 @@ nnoremap <S-F4> :call SetMode("\<S-F4\>", "Normal") \| :call GitStashPop()<cr>
 tnoremap <C-v> <C-\><C-n>
 vnoremap i :call SetMode("i", "Visual") \| '<,'><C-c>i
 vnoremap <C-c> :call SetMode("\<C-c\>", "Visual") \| '<,'>:call CommandInfo()<cr>
-nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
-vnoremap <S-F3> :call SetMode("\<S-F3\>", "Visual") \| '<,'>:call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
+nnoremap ,dt :call SetMode(",dt", "Normal") \| :diffthis<cr>
+nnoremap ,do :call SetMode(",do", "Normal") \| :diffoff<cr>
 nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :diffthis<cr>
 vnoremap <F3> :call SetMode("\<F3\>", "Visual") \| '<,'>:diffthis<cr>
+nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :diffoff<cr>
+vnoremap <S-F3> :call SetMode("\<S-F3\>", "Visual") \| '<,'>:diffoff<cr>
+nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :call WinSwap_Prep() \| :windo diffthis \| :call WinSwap_Back()<cr>
+vnoremap <S-F3> :call SetMode("\<S-F3\>", "Visual") \| '<,'>:call WinSwap_Prep() \| :windo diffthis \| :call WinSwap_Back()<cr>
+nnoremap <C-F3> :call SetMode("\<C-F3\>", "Normal") \| :call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
+vnoremap <C-F3> :call SetMode("\<C-F3\>", "Visual") \| '<,'>:call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
+nnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Normal") \| :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
+vnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Visual") \| '<,'>:call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
 vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>

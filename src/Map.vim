@@ -379,8 +379,8 @@ NewMap -no -n <A-i> 12<C-w>>
 " map ,t :call TabL()<cr>
 " map ,g :call TabH()<cr>
 " map ,h :call TabL()<cr>
-NewMap -no -n <A-h> :call TabH()<cr>
-NewMap -no -n <A-l> :call TabL()<cr>
+NewMap -no -n -t -c <A-h> :call TabH()<cr>
+NewMap -no -n -t -c <A-l> :call TabL()<cr>
 " NewMap -no -n <C-Tab> :tabn<cr>
 " NewMap -no -n <C-S-Tab> :tabp<cr>
 NewMap -no -n <C-S-M-h> :wincmd H<cr>
@@ -840,9 +840,6 @@ NewMap -un -no > >>
 NewMap -v -no < <gv
 NewMap -v -no > >gv
 
-NewMap -no -n ,dt :diffthis<cr>
-NewMap -no -n ,do :diffoff<cr>
-
 NewMap -no -n ,0 :wincmd =<cr>
 
 NewMap -i -no <C-Space> <C-x><C-f>
@@ -1194,8 +1191,13 @@ NewMap -v -no i <C-c>i
 "  C - c
 NewMap -no -v <C-c> :call CommandInfo()<cr>
 
-NewMap -no -n -v <S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
+NewMap -no -n ,dt :diffthis<cr>
+NewMap -no -n ,do :diffoff<cr>
 NewMap -no -n -v <F3> :diffthis<cr>
+NewMap -no -n -v <S-F3> :diffoff<cr>
+NewMap -no -n -v <S-F3> :call WinSwap_Prep() \| :windo diffthis \| :call WinSwap_Back()<cr>
+NewMap -no -n -v <C-F3> :call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
+NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 
 NewMap -no -n -v <C-S-.> :@:<cr>
 
