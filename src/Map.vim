@@ -381,6 +381,8 @@ NewMap -no -n <A-i> 12<C-w>>
 " map ,h :call TabL()<cr>
 NewMap -no -n -t -c <A-h> :call TabH()<cr>
 NewMap -no -n -t -c <A-l> :call TabL()<cr>
+NewMap -no -n -t -c <S-A-h> :call TabHMove()<cr>
+NewMap -no -n -t -c <S-A-l> :call TabLMove()<cr>
 " NewMap -no -n <C-Tab> :tabn<cr>
 " NewMap -no -n <C-S-Tab> :tabp<cr>
 NewMap -no -n <C-S-M-h> :wincmd H<cr>
@@ -393,10 +395,15 @@ NewMap -no -n <C-S-h> :call SwapWin("h")<cr>
 NewMap -no -n <C-S-j> :call SwapWin("j")<cr>
 NewMap -no -n <C-S-k> :call SwapWin("k")<cr>
 NewMap -no -n <C-S-l> :call SwapWin("l")<cr>
+
 NewMap -t -no <C-S-h> <c-\><c-n>:call SwapWin("h")<cr>
 NewMap -t -no <C-S-j> <c-\><c-n>:call SwapWin("j")<cr>
 NewMap -t -no <C-S-k> <c-\><c-n>:call SwapWin("k")<cr>
 NewMap -t -no <C-S-l> <c-\><c-n>:call SwapWin("l")<cr>
+
+" todo SwapWin
+" nice vertical and horizontal split arranging
+
 " NewMap -no -n <A-h> :call IntegrateIn('h')<cr>
 " NewMap -no -n <A-j> :call IntegrateIn('j')<cr>
 " NewMap -no -n <A-k> :call IntegrateIn('k')<cr>
@@ -790,6 +797,11 @@ NewMap -no -n <c-h> :wincmd h<cr>
 NewMap -no -n <c-j> :wincmd j<cr>
 NewMap -no -n <c-k> :wincmd k<cr>
 NewMap -no -n <c-l> :wincmd l<cr>
+augroup NewtrCustomBindings
+  autocmd!
+  autocmd FileType netrw nnoremap <buffer> <C-l> :wincmd l<cr>
+augroup END
+
 " menu Actions.SED :call NvimStudioSubstitution()<cr>
 " noremap ,v :normal viW"ay<cr>:echo <c-r>a<cr>
 

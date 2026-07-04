@@ -322,7 +322,7 @@ function! EmptyCommand()
   " commandOutputMode: put sendtoterm file clist commandline
   " command: 'ls -al; date'
   let command={
-    \ "hash": -1,
+    \ "hash": NewUUID(),
     \ "name": -1,
     \ "direction": -1,
     \ "directionMode": -1,
@@ -353,15 +353,15 @@ endfunction
 
 function! TermCommand(command='')
   let c=EmptyCommand()
-  let c['hash']=NewUUID()
   let c['name']='unnamed'
+  let c['commandMode']='term'
+  let c['commandInterpreter']='term'
   let c['command']=a:command
   return c
 endfunction
 
 function! CommandExample()
   let c=EmptyCommand()
-  let c['hash']='empty'
   let c['name']='unnamed'
   let c['direction']='j'
   let c['directionMode']='foremost'

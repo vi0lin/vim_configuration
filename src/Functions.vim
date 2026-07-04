@@ -109,10 +109,11 @@ function! CreateFileAndPathIfNotExists(file)
   let dir = fnamemodify(a:file, ':h')
   if !isdirectory(dir)
     if !filereadable(dir)
-      call mkdir(dir, 'p')
+      call MkDir(dir)
     endif
   endif
   if !filereadable(a:file)
+    call input(a:file)
     call writefile([], a:file)
   endif
   return filereadable(a:file)
@@ -4263,7 +4264,10 @@ endfunction
 
 function! MkDir(path)
     " silent exec "!mkdir -p "..path
-    call mkdir(a:path, 'p')
+    if !isdirectory(expand(a:path)) && !filereadable(expand(a:path))
+      call input(a:path)
+      call mkdir(a:path, 'p')
+    endif
 endfunction
 
 function! _newfile_andCD(path)
@@ -4534,7 +4538,13 @@ function Commands()
     let exec=filter(copy(g:commandlist), 'v:val.hash=~"'..hash..'"')[0]
     " call input(command)
     if command != -1 && command != 0
-      exec exec.command
+      " call input(exec.commandMode)
+      if exec.commandMode=='term'
+        call SendCommandToThisTerm([exec.command])
+        norm i
+      else
+        exec exec.command
+      endif
       " call TERM(bufnr(), [ command ])
       "  norm i
     else
@@ -5604,6 +5614,14 @@ function! Open(direction, type="buffer", mode="copy", file="")
   endif
 endfunction
 
+function! TabHMove()
+  tabmove -
+endfunction
+
+function! TabLMove()
+  tabmove +
+endfunction
+
 function! TabH()
   let nr=tabpagenr()
   let len=tabpagenr('$')
@@ -5624,6 +5642,7 @@ function! TabL()
     tabnext
   endif
 endfunction
+
 
 function! SwapWin(direction)
   let l:current_win=winnr()
@@ -6330,6 +6349,11 @@ function! SendVSToTerm(direction) range
   let vs=VS()
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, vs)
+endfunction
+
+function! SendCommandToThisTerm(cmd) range
+  let buf=winbufnr(winnr())
+  call TERM(buf, a:cmd)
 endfunction
 
 function! SendCommandToTerm(direction, cmd) range
