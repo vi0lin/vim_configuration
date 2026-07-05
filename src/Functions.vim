@@ -8482,5 +8482,11 @@ let gc['name']='Echo'
 let gc['command']='echo "TEST"'
 call _command(gc)
 
+" todo Add Fix To NewMap (generated_src/...) Or Source Outside Of Generate.src
+augroup NewtrCustomBindings
+  autocmd!
+  autocmd FileType netrw nnoremap <buffer> <C-l> :wincmd l<cr>
+augroup END
+
 let g:vim_advantages_got_sourced='true'
 endif
