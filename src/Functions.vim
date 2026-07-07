@@ -1,4 +1,26 @@
-functio! Spare()
+function! Rec(nr=1)
+  let nr=a:nr
+  let x=systemlist("source "..g:bashrc.."; r "..nr)
+  put=x
+  redraw!
+endfunction
+command! -range -nargs=? Rec :call Rec(<q-args>)
+
+function! Split(args)
+  exec "args" a:args
+  if len(filter(argv(), 'v:val=~".*.zip"'))>0
+    argdelete *.zip
+  endif
+  if len(argv())>0
+    tabnew
+    sall
+  else
+    echo "No files were found."
+  endif
+endfunction
+command! -range -nargs=* Split :call Split(<q-args>)
+
+function! Spare()
   let root=input("for files in folder: ")
   function! DiffFiles_callback(file, root)
     let path=GetTempfileLine(a:file)
@@ -4265,7 +4287,7 @@ endfunction
 function! MkDir(path)
     " silent exec "!mkdir -p "..path
     if !isdirectory(expand(a:path)) && !filereadable(expand(a:path))
-      call input(a:path)
+      " call input(a:path)
       call mkdir(a:path, 'p')
     endif
 endfunction
@@ -4379,8 +4401,14 @@ function! MakeDirCurrentCWD(bufnr)
     " let w:pointer=expand('%')
     let p1=expand("%:p:h")
     let p2=expand('%:p')
-    call CD(p1)
-    call SetPointer(p2)
+    if isdirectory(p1)
+      call CD(p1)
+    else
+      echo "Dir does not exist" p1
+    endif
+    if filereadable(p2)
+      call SetPointer(p2)
+    endif
     " call SetProject(expand("%:p:h"))
     call cursor(y, x)
   endif
@@ -4484,7 +4512,14 @@ function _cleanCallback(file)
     call delete(a:file)
   endif
   " execute 'bd! '.bufnr('Find')
-  execute 'bwipeout! '.bufnr('Find')
+  " execute 'bwipeout! '.bufnr('Find')
+  let g:popup_bufnr= winbufnr(g:pnr)
+  if g:popup_bufnr>-1
+    execute 'bwipeout! '.g:popup_bufnr
+  else
+    echo "Todo: check g:popup_bufnr"
+  endif
+  " call setbufline(bufnr, 2, 'second line')
 endfunction
 
 function! CheckOs()
@@ -4672,6 +4707,8 @@ function! Popup(title, register, list, callback, outfile)
     \ zindex: 200,
     \ callback: a:callback,
     \ })
+  let g:popup_bufnr= winbufnr(g:pnr)
+  " call setbufline(bufnr, 2, 'second line')
     " \ callback: function('OpenFile_callback', [a:outfile]),
     " \ callback: function('OpenFile_callback', [a:outfile]),
   catch

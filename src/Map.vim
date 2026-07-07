@@ -379,10 +379,16 @@ NewMap -no -n <A-i> 12<C-w>>
 " map ,t :call TabL()<cr>
 " map ,g :call TabH()<cr>
 " map ,h :call TabL()<cr>
-NewMap -no -n -t -c <A-h> :call TabH()<cr>
-NewMap -no -n -t -c <A-l> :call TabL()<cr>
+NewMap -no -n -t -c <A-h> :call TabHToggle()<cr>
+NewMap -no -n -t -c <A-l> :call TabLToggle()<cr>
+NewMap -no -n -t -c <A-S-h> :call TabHCreateNew()<cr>
+NewMap -no -n -t -c <A-S-l> :call TabLCreateNew()<cr>
 NewMap -no -n -t -c <S-A-h> :call TabHMove()<cr>
 NewMap -no -n -t -c <S-A-l> :call TabLMove()<cr>
+"todo remove this two
+NewMap -no -n -t -c <A-h> :call TabH()<cr>
+NewMap -no -n -t -c <A-l> :call TabL()<cr>
+
 " NewMap -no -n <C-Tab> :tabn<cr>
 " NewMap -no -n <C-S-Tab> :tabp<cr>
 NewMap -no -n <C-S-M-h> :wincmd H<cr>
@@ -970,7 +976,10 @@ endfunction
 
 
 NewMap -no -n ,rm :call DeleteFile()<cr>
-NewMap -no -n ,n :call NewFile()<cr>
+NewMap -no -n ,N :call NewFile()<cr>
+
+NewMap -no -n -v ,- :prev<cr>
+NewMap -no -n -v ,= :next<cr>
 
 " map ,< :norm d\<C-w>lGopG\<C-w>h
 " map ,< :execute 'normal! \<C-w>l'<cr>

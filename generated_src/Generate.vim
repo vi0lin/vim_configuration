@@ -605,7 +605,11 @@ nnoremap ,0 :call SetMode(",0", "Normal") \| :wincmd =<cr>
 inoremap <C-Space> :call SetMode("\<C-Space\>", "Insert") \| <C-x><C-f>
 inoremap <C-S-v> :call SetMode("\<C-S-v\>", "Insert") \| <c-r>+
 nnoremap ,rm :call SetMode(",rm", "Normal") \| :call DeleteFile()<cr>
-nnoremap ,n :call SetMode(",n", "Normal") \| :call NewFile()<cr>
+nnoremap ,N :call SetMode(",N", "Normal") \| :call NewFile()<cr>
+nnoremap ,- :call SetMode(",-", "Normal") \| :prev<cr>
+vnoremap ,- :call SetMode(",-", "Visual") \| '<,'>:prev<cr>
+nnoremap ,= :call SetMode(",=", "Normal") \| :next<cr>
+vnoremap ,= :call SetMode(",=", "Visual") \| '<,'>:next<cr>
 nnoremap ,< :call SetMode(",\<", "Normal") \| :norm yy<cr>:norm dd<cr>:wincmd l<cr>:norm gp<cr>:wincmd h<cr>
 vnoremap ,< :call SetMode(",\<", "Visual") \| '<,'>:norm gvy<cr>:norm gvd<cr>:wincmd l<cr>:norm gp<cr>:wincmd h<cr>
 nnoremap <C-S-M-h> :call SetMode("\<C-S-M-h\>", "Normal") \| :echo JoinSplits("h")<cr>
