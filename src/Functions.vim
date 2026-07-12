@@ -1,3 +1,8 @@
+
+if !exists("g:vim_advantages_got_sourced")
+
+let g:default_direction='j'
+
 function! Rec(nr=1)
   let nr=a:nr
   let x=systemlist("source "..g:bashrc.."; r "..nr)
@@ -56,8 +61,6 @@ command! -range -nargs=0 Spare :call Spare()
 " all files:
 " git reset --soft
 " git reset --soft <filename>
-
-if !exists("g:vim_advantages_got_sourced")
 
 " Avoid cdo prompt for overwiting files
 " let &t_TI = "\<Esc>[>4;2m"
@@ -1957,10 +1960,6 @@ function! Pretty(x, ...) abort
     " number, float, bool, funcref, etc.
     return string(a:x)
   endif
-endfunction
-
-function! P(x)
-  echo Pretty(a:x)
 endfunction
 
 function! J(x)
@@ -4738,7 +4737,6 @@ function! Popup_FZFBuildString(title, paths)
     else
       let g:fzfabort=1
     endif
-
     " if path!='-1' && path!=-1 && path!='0' && path!=0
     " endif
     call _cleanCallback(a:file)
@@ -6023,130 +6021,190 @@ function! EchoSafely(msg, ms=700) abort
   " call timer_stop(s:timer_id)
 endfunction
 command! -nargs=1 EchoSafely call EchoSafely(<q-args>)
-"
-" Command Mapping
-function! Eexec()
-  " call CommandPageInit()
-  let c=b:commands['pages'][0][g:keymap]
-  call EEexec(c)
-endfunction
 
-function! BuildCommandLines() abort
-  let folder = Folder_Repo_Or_Project_Only()
-  let lines = []
-  for page_idx in range(len(b:commands['pages']))
-    let page = b:commands['pages'][page_idx]
-    for key in keys(page)
-      let data = page[key]
-      " skip unset / cleared entries
-      if data is# -1
-        continue
-      endif
-      " skip entries not belonging to this dict
-      if type(data) != v:t_dict || !has_key(data, 'commandOrigin')
-        continue
-      endif
-      if data['commandOrigin'] != folder
-        continue
-      endif
-      let line = "let b:commands['pages'][" . page_idx . "]['" . key . "']=" . string(data)
-      call add(lines, line)
-    endfor
-  endfor
-  return lines
-endfunction
-
-function! SaveCommands()
-  let folder = Folder_Repo_Or_Project_Only()
-  " echo folder
-  " call Write(b:commands, folder . ".commands_vim_configuration.unreleased")
-  if folder != -1
-    let source_commands_script = BuildCommandLines()
-    call Write(source_commands_script, folder.."/.commands_vim_configuration.unreleased")
-  else
-    call EchoSafely("No Project Or Repo Found In Path Hierarchy")
+function FixBufNr(c)
+  let c=a:c
+  if !bufexists(c['bufnr'])
+    let c['bufnr']=-1
+  endif
+  if c['bufnr']==-1
+    " let buf=term
+    let c['bufnr']=GetBufDirectionIfTerm(c['direction'])
+    if c['bufnr']==-1
+      let [c['direction'],c['bufnr']]=FindSomeTerm()
+    endif
+    if c['bufnr']==-1
+      call Open('J', "terminal", "new")
+      let [c['direction'],c['bufnr']]=FindSomeTerm()
+    endif
+  elseif !bufexists(c['bufnr'])
+    call Open('J', "terminal", "new")
+    let [c['direction'],c['bufnr']]=FindSomeTerm()
+  elseif BufExistsAndAlive(bufnr())
+    echo "Try To ReOpen"
+    " call Open('J', "terminal", buf)
   endif
 endfunction
 
-function! EEexec(command)
+" Command Mapping
+function! Command() range
+  let vs=VS()
+  call DebugBuf(g:keymap, 1)
+  let b:commands=LoadAllCommands()
+  " call DebugBuf(b:commands)
   " call CommandPageInit()
-  call LoadAllCommands()
+  let cmd=b:commands['pages'][0][g:keymap]
+  call DebugBuf(cmd)
+  " call CommandPageInit()
+  " call DebugBuf(P(b:commands))
+  " call DebugBuf(P(allcommands))
   " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadAllCommands()), 1500)
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
   if g:mode=='visual'
-    let c=CommandExample()
-    let c['command']=VS()
+    let c=TermCommand()
+    let c['commandOrigin']=expand('%:p')
+    let c['commandOriginType']='buffer'
+    let c['command']=vs
+    let c['page']=0
+    let c['key']=g:keymap
+    let c['direction']=g:default_direction
     let b:commands['pages'][0][g:keymap]=c
+    call filter(g:commands, '!(v:val["commandOriginType"]==c["commandOriginType"]&&v:val["commandOrigin"]==c["commandOrigin"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
+    call DebugBuf(vs)
+    " let g:commands=[]
+    " let g:commands=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
+    " echo g:commands
+    " let asdf="<F6>"
+    " call filter(g:commands, 'v:val["key"]!=asdf')
+    call add(g:commands, copy(c))
+    call DebugBuf(g:commands)
+    " call DebugBuf(b:commands)
     call SaveCommands()
   else
-    let c=a:command
+    let c=cmd
   endif
+  call DebugBuf(c)
   if type(c)==0 && c['command'] != -1
-    call EchoSafely("Command Not Send\n"..Pretty(c), 5000)
+    call DebugBuf("Command Not Send\n"..Pretty(c))
   elseif type(c)!=3
     " call EchoSafely(Pretty(c), 700)
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
-    call SendCommandToTerm(c['direction'], c['command'])
+    " call DebugBuf(Pretty(c['command']))
+    if c['bufnr']==-1 || !BufVisibileInCurrentTab(c['bufnr'])
+      call FixBufNr(c)
+    endif
+    " let b:MapCommand[c['direction']..'t']={'bufnr': buf, 'dir': dir }
+    " let buf=GetBufDirectionIfTerm(c['direction'])
+    " let buf=winbufnr(win)
+    if c['bufnr']!=-1
+      " let buf=winbufnr(winnr(c['direction']))
+      " call TERM(c['bufnr'], c['command'])
+      call SendCommandToTermByBuf(c['bufnr'], c['command'])
+      call DebugBuf("Command Send")
+    else
+      call DebugBuf("Command Not Send")
+    endif
   else
-    call EchoSafely(Pretty("What A Type"), 700)
+    call DebugBuf(Pretty("What A Type"))
   endif
 endfunction
 
-function! CommandDictInitPage()
-  return {
-        \ '<F5>': -1,
-        \ '<F6>': -1,
-        \ '<F7>': -1,
-        \ '<F8>': -1,
-        \ '<C-F5>': -1,
-        \ '<C-F6>': -1,
-        \ '<C-F7>': -1,
-        \ '<C-F8>': -1,
-        \ '<S-F5>': -1,
-        \ '<S-F6>': -1,
-        \ '<S-F7>': -1,
-        \ '<S-F8>': -1,
-        \ '<C-S-F5>': -1,
-        \ '<C-S-F6>': -1,
-        \ '<C-S-F7>': -1,
-        \ '<C-S-F8>': -1
-        \ }
-endfunction
-
-function! CommandDictAddPage(page)
-  call extend(b:commands['pages'], [a:page])
-  return b:commands
-endfunction
-
-function LoadAllCommands()
-  call CommandDictInit()
-  call LoadCommands()
-  call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
-  " for c in b:commands['pages']
-  "   echo c['<F5>']['command']
-  " endfor
-  return b:commands
-endfunction
-
-function! LoadCommands(filename='.commands_vim_configuration')
-  let cwd=CWD()
-  let finish=0
-  let paths=[]
-  while 1
-    let file=globpath(cwd, a:filename)
-    if !empty(file)
-      call extend(paths, [file])
+function! DebugBuf(data, clear=0, checkbuf=0)
+  if a:checkbuf==1 || !exists('t:debugbuf')
+    " Prep
+    let save_win = win_getid()
+    if !exists("t:debugbuf")
+      " Not Existent
+      " create
+      vertical new
+      wincmd J
+      exec "resize 5"
+      let t:debugbuf=bufnr()
+    else
+      " Exists
+      let isvisibile=BufVisibileInCurrentTab(t:debugbuf)
+      if !isvisibile
+        " show
+        vertical new
+        exec "b" t:debugbuf
+        wincmd J
+        exec "resize 5"
+      else
+        " push far right
+        call win_gotoid(t:debugbuf)
+        call EnsureRightmost(t:debugbuf)
+      endif
+      " Clear
+      if a:clear==1
+        call deletebufline(t:debugbuf, 1, '$')
+      endif
+    " Text
+    call appendbufline(t:debugbuf, '$', split(a:data, ''))
     endif
-    if cwd=='/'
-      break
+    call win_gotoid(save_win)
+  else
+    if a:clear==1
+      call deletebufline(t:debugbuf, 1, '$')
     endif
-    let cwd=GetParentDir(cwd)
-  endwhile
-  for x in reverse(paths)
-    exec "source" x
-  endfor
-  return b:commands
+    " let data=split(J(a:data), '\%x0')
+    " let data=split(a:data, '\%x0')
+    call appendbufline(t:debugbuf, '$', a:data)
+  endif
+endfunction
+
+function! ExecuteInWin(winid, cmd)
+  let save_win = win_getid()
+  call win_gotoid(a:winid)
+  execute a:cmd
+  call win_gotoid(save_win)
+endfunction
+
+function! CountRightNeighbors(windid)
+  let save = win_getid()
+  call win_gotoid(a:winid)
+  let current=winnr()
+  let total = winnr('$')
+  let right = total - current
+  call win_gotoid(save)
+  return right
+endfunction
+
+function! IsBufferVisibile(bufnr)
+  return bufwinid(a:bufnr)
+endfunction
+
+function! IsRightmost(bufnr)
+  let winid=bufwinid(a:bufnr)
+  if winid==0
+    return 0
+  endif
+  let save = win_getid()
+  call win_gotoid(winid)
+  let is_rightmost=(winnr() == winnr('$'))
+  call win_gotoid(save)
+  return is_rightmost
+endfunction
+
+function! PushWindowRight(winid)
+  let save = win_getid()
+  call win_gotoid(a:winid)
+  wincmd L
+  call win_gotoid(save)
+endfunction
+
+function! EnsureRightmost(bufnr)
+  let winid=bufwinid(a:bufnr)
+  if winid==0
+    " echo "Buffer not visibile"
+    return
+  endif
+  if IsRightmost(a:bufnr)
+    " echo "Already Rightmost"
+    return
+  endif
+  call PushWindowRight(winid)
+  " echo "Pushed buffer " . a:bufnr . " to right"
 endfunction
 
 function! SigTermToTerm(direction)
@@ -6315,6 +6373,15 @@ function! BufVisibileInCurrentTab(bufnr) abort
   return 0
 endfunction
 
+function! BufVisibileInCurrentTab_Winnr(bufnr) abort
+  for l:winnr in range(1, winnr('$'))
+    if winbufnr(l:winnr) == a:bufnr
+      return l:winnr
+    endif
+  endfor
+  return 0
+endfunction
+
 function! BufVisibileAndAlive(bufnr) abort
   for l:winnr in range(1, winnr('$'))
     if winbufnr(l:winnr) == a:bufnr
@@ -6393,7 +6460,11 @@ function! SendCommandToThisTerm(cmd) range
   call TERM(buf, a:cmd)
 endfunction
 
-function! SendCommandToTerm(direction, cmd) range
+function! SendCommandToTermByBuf(buf, cmd) range
+  call TERM(a:buf, a:cmd)
+endfunction
+
+function! SendCommandToTermByDirection(direction, cmd) range
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, a:cmd)
 endfunction
@@ -7229,9 +7300,7 @@ function! BufReadPost()
 endfunction
 
 function BufCreateCommandInit()
-  if !exists('b:commands')
-    call CommandDictInit()
-  endif
+  call CommandDictInit()
   call LoadAllCommands()
   call MakeDirCurrentCWD(bufnr())
 endfunction

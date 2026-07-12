@@ -89,10 +89,10 @@ command -range -nargs=* Inc :call Inc(<f-args>)
 " print("TEST!")
 "
 " NewMap -v -n -no -command -shift -alt -nr 5,8 <{modifiers}F5> :call Eexec({nr})<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F5> :call Eexec()<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F6> :call Eexec()<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F7> :call Eexec()<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F8> :call Eexec()<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F5> :call Command()<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F6> :call Command()<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F7> :call Command()<cr>
+NewMap -v -n -no -command -shift -alt <{modifiers}F8> :call Command()<cr>
 
 """" old command mappings " Todo
 """" old command mappings " When A Visual Selection Is Set
@@ -1198,8 +1198,8 @@ NewMap -no <S-F3> :call SelectBranch(-1)<cr>
 NewMap -no ,<F3> :call GitRenameBranch()<cr>
 NewMap -no ,,<F3> :call GitNewBranch()<cr>
 
-NewMap -no <F4> :call GitStashPush()<cr>
-NewMap -no <S-F4> :call GitStashPop()<cr>
+NewMap -no <S-F4> :call GitStashPush()<cr>
+NewMap -no <C-F4> :call GitStashPop()<cr>
 NewCommand command! -range -nargs=* RenameRemote call GitRenameRemote(<f-args>)
 NewCommand command! -range -nargs=* SetRemote call GitSetRemote(<f-args>)
 NewCommand command! -range -nargs=* RenameBranch call GitRenameBranch(<f-args>)
@@ -1221,5 +1221,7 @@ NewMap -no -n -v <C-F3> :call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_
 NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 
 NewMap -no -n -v <C-S-.> :@:<cr>
+
+NewMap -no <F4> :call ToggleBCommand()<cr>
 
 endif
