@@ -429,6 +429,8 @@ NewMap -no -n <F2> :F
 NewMap -no -v <F2> :F<cr>
 NewMap -no -n <C-F2> :IF  
 NewMap -no -v <C-F2> :IF<cr>
+NewMap -no -n -v <C-S-F2> :CDo<cr>
+NewMap -no -n -v <C-S-M-F2> :CFDo<cr>
 NewMap -no -n ,,,w :call ToggleWrap()<cr>
 NewMap -no -n ,in :call Intend()<cr>
 NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
@@ -443,8 +445,6 @@ NewMap -t -un -no <C-l> l
 NewMap -t -un -no <C-h> h
 NewMap -t -un -no <C-k> k
 NewMap -t -un -no <C-j> j
-
-" TestFunction
 
 " Unnessecary
 " NewMap -t -un <C-l> <C-w>l
@@ -1232,4 +1232,5 @@ NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<
 NewMap -no -n -v <C-S-.> :@:<cr>
 
 NewMap -no <F4> :call ToggleBCommand()<cr>
+
 endif

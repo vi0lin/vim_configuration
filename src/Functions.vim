@@ -58,7 +58,7 @@ command! -range -nargs=* {name} :call {name}(<f-args>)
 command! -range -nargs=* {shortname} :call {name}(<f-args>)
 EOD
   if key!=""
-    let abc2 =["NewMap -no -v "..key.." :"..shortname.."<CR>"]
+    let abc2 =["NewMap -no -v -n "..key.." :"..shortname.."<CR>"]
     call extend(abc, abc2)
   endif
   " put=abc
@@ -1111,26 +1111,27 @@ function! VimConfiguration()
 endfunction
 
 function! IF(...)
-  let term=""
+  let search=""
   if g:mode=="Visual"
-    " let term=VS()
+    " let search=VS()
     let i=":call SetMode(\"\\<C-F2\\>\", \"Normal\") \| :F "..join(VS(), ' ')..' '
     call UnsetMode()
     call feedkeys(i, 'n')
     return
   else
     if len(a:000)==1
-      let term=join(a:000, ' ')
+      let search=join(a:000, ' ')
     elseif len(a:000)>1
-      let term=join(a:000[:-1], ' ')
+      let search=join(a:000[:-1], ' ')
     endif
   endif
+  let g:last_search=''..search
   if len(a:000)==1
-    if term==""
+    if search==""
     endif
     " search
     let winid=win_getid()
-    silent exec "vimgrep "..term..' %'
+    silent exec "vimgrep "..search..' %'
     redraw!
     " vsplit
     vertical copen
@@ -1138,15 +1139,32 @@ function! IF(...)
   elseif len(a:000)>1
     " search
     let winid=win_getid()
-    silent exec "vimgrep "..term..' '..a:000[-1]
+    silent exec "vimgrep "..search..' '..a:000[-1]
     redraw!
     " vsplit
     vertical copen
     call win_gotoid(winid)
   else
   endif
+  redraw!
 endfunction
 command! -range -nargs=* IF <line1>,<line2>:call IF(<f-args>)
+
+function! CDo(...)
+  let searchterm=split(g:last_search, ' ')[:-2]
+  let searchterm=join(searchterm, ' ')
+  let i=":call SetMode(\"\\<C-F2\\>\", \"Normal\") \| :cdo \| s/"..searchterm..'//g'
+  call feedkeys(i, 'n')
+endfunction
+command! -range -nargs=* CDo :call CDo(<f-args>)
+
+function! CFDo(...)
+  let searchterm=split(g:last_search, ' ')[:-2]
+  let searchterm=join(searchterm, ' ')
+  let i=":call SetMode(\"\\<C-F2\\>\", \"Normal\") \| :cfdo \| %s/"..searchterm..'//g'
+  call feedkeys(i, 'n')
+endfunction
+command! -range -nargs=* CFDo :call CFDo(<f-args>)
 
 function! COpen()
   let winid=win_getid()
@@ -1188,6 +1206,7 @@ function! F(...)
   " exec "resize 15"
   " call win_gotoid(winid)
   call COpen()
+  redraw!
 endfunction
 command! -range -nargs=* F <line1>,<line2>:call F(<f-args>)
 

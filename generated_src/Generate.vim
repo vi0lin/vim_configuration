@@ -345,6 +345,10 @@ nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :F
 vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:F<cr>
 nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :IF 
 vnoremap <C-F2> :call SetMode("\<C-F2\>", "Visual") \| '<,'>:IF<cr>
+nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :CDo<cr>
+vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:CDo<cr>
+nnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Normal") \| :CFDo<cr>
+vnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Visual") \| '<,'>:CFDo<cr>
 nnoremap ,,,w :call SetMode(",,,w", "Normal") \| :call ToggleWrap()<cr>
 nnoremap ,in :call SetMode(",in", "Normal") \| :call Intend()<cr>
 nnoremap ,,,<space> :call SetMode(",,,\<space\>", "Normal") \| :IntelligentSelecting<cr>
