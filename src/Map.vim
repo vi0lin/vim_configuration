@@ -424,13 +424,6 @@ NewMap -no -n ,,<F4> :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.
 NewMap -no -n <C-S-F9> :call PreviewBuffer()<cr>
 " map <M-F12> :call Info()<cr>
 NewMap -no -n <C-F2> :call ToggleWrap()<cr>
-NewMap -no -n -v <C-S-F2> :RF<cr>
-NewMap -no -n <F2> :F  
-NewMap -no -v <F2> :F<cr>
-NewMap -no -n <C-F2> :IF  
-NewMap -no -v <C-F2> :IF<cr>
-NewMap -no -n -v <C-S-F2> :CDo<cr>
-NewMap -no -n -v <C-S-M-F2> :CFDo<cr>
 NewMap -no -n ,,,w :call ToggleWrap()<cr>
 NewMap -no -n ,in :call Intend()<cr>
 NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
@@ -1232,5 +1225,12 @@ NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<
 NewMap -no -n -v <C-S-.> :@:<cr>
 
 NewMap -no <F4> :call ToggleBCommand()<cr>
+
+NewMap -no -n <F2> :F  
+NewMap -no -v <F2> :F<cr>
+NewMap -no -n <C-F2> :IF  
+NewMap -no -v <C-F2> :IF<cr>
+NewMap -no -n -v <C-S-F2> :CDo<cr>
+NewMap -no -n -v <C-S-M-F2> :CFDo<cr>
 
 endif
