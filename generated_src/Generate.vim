@@ -339,16 +339,6 @@ nnoremap <m-;> :call SetMode("\<m-;\>", "Normal") \| :call ToggleOverviewRight()
 nnoremap ,,<F4> :call SetMode(",,\<F4\>", "Normal") \| :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.bashrc; git_selector "TEST"
 nnoremap <C-S-F9> :call SetMode("\<C-S-F9\>", "Normal") \| :call PreviewBuffer()<cr>
 nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :call ToggleWrap()<cr>
-nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :RF<cr>
-vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:RF<cr>
-nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :F 
-vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:F<cr>
-nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :IF 
-vnoremap <C-F2> :call SetMode("\<C-F2\>", "Visual") \| '<,'>:IF<cr>
-nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :CDo<cr>
-vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:CDo<cr>
-nnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Normal") \| :CFDo<cr>
-vnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Visual") \| '<,'>:CFDo<cr>
 nnoremap ,,,w :call SetMode(",,,w", "Normal") \| :call ToggleWrap()<cr>
 nnoremap ,in :call SetMode(",in", "Normal") \| :call Intend()<cr>
 nnoremap ,,,<space> :call SetMode(",,,\<space\>", "Normal") \| :IntelligentSelecting<cr>
@@ -736,3 +726,11 @@ vnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Visual") \| '<,'>:call BufPrep() 
 nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
 vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>
 nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call ToggleBCommand()<cr>
+nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :F 
+vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:F<cr>
+nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :IF 
+vnoremap <C-F2> :call SetMode("\<C-F2\>", "Visual") \| '<,'>:IF<cr>
+nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :CDo<cr>
+vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:CDo<cr>
+nnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Normal") \| :CFDo<cr>
+vnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Visual") \| '<,'>:CFDo<cr>
