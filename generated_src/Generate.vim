@@ -339,6 +339,12 @@ nnoremap <m-;> :call SetMode("\<m-;\>", "Normal") \| :call ToggleOverviewRight()
 nnoremap ,,<F4> :call SetMode(",,\<F4\>", "Normal") \| :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.bashrc; git_selector "TEST"
 nnoremap <C-S-F9> :call SetMode("\<C-S-F9\>", "Normal") \| :call PreviewBuffer()<cr>
 nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :call ToggleWrap()<cr>
+nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :RF<cr>
+vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:RF<cr>
+nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :F 
+vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:F<cr>
+nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :IF 
+vnoremap <C-F2> :call SetMode("\<C-F2\>", "Visual") \| '<,'>:IF<cr>
 nnoremap ,,,w :call SetMode(",,,w", "Normal") \| :call ToggleWrap()<cr>
 nnoremap ,in :call SetMode(",in", "Normal") \| :call Intend()<cr>
 nnoremap ,,,<space> :call SetMode(",,,\<space\>", "Normal") \| :IntelligentSelecting<cr>
@@ -472,7 +478,7 @@ nnoremap ,,,g :call SetMode(",,,g", "Normal") \| :call AgIn(Folder_Repo(v:count,
 nnoremap ,,,,g :call SetMode(",,,,g", "Normal") \| :call AgIn(Folder_Repo(v:count, 3))<cr>
 nnoremap ,,,,,g :call SetMode(",,,,,g", "Normal") \| :call AgIn(Folder_Repo(v:count, 4))<cr>
 nnoremap ,,,,,,g :call SetMode(",,,,,,g", "Normal") \| :call AgIn(Folder_Repo(v:count, 5))<cr>
-nnoremap ,vcd :call SetMode(",vcd", "Normal") \| :call CD(Vim_Advantages_Path())<cr>
+nnoremap ,vcd :call SetMode(",vcd", "Normal") \| :call CD(VimConfiguration())<cr>
 nnoremap ,p :call SetMode(",p", "Normal") \| :call Projects()<cr>
 nnoremap ,,p :call SetMode(",,p", "Normal") \| :call FilesInProjects()<cr>
 nnoremap <C-p> :call SetMode("\<C-p\>", "Normal") \| :call Projects()<cr>
@@ -653,7 +659,8 @@ nnoremap ,s :call SetMode(",s", "Normal") \| :call ExecVS()<cr>
 vnoremap ,s :call SetMode(",s", "Visual") \| '<,'>:call ExecVS()<cr>
 nnoremap ,S :call SetMode(",S", "Normal") \| :Re \| :%source \| :ReEnd<cr>
 nnoremap ,rd :call SetMode(",rd", "Normal") \| :call RedoLeaderS()<cr>
-nnoremap ,c :call SetMode(",c", "Normal") \| :call ToggleComment()<cr>
+nnoremap <C-7> :call SetMode("\<C-7\>", "Normal") \| :call ToggleComment()<cr>
+nnoremap ,cf :call SetMode(",cf", "Normal") \| :CF 
 vnoremap <F1> :call SetMode("\<F1\>", "Visual") \| '<,'>J
 nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :call GetKeys()<cr>
 nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :call FindKeyPerform()<cr>
@@ -668,7 +675,7 @@ nnoremap <M-a> :call SetMode("\<M-a\>", "Normal") \| :Lines<cr>
 nnoremap <S-Down> :call SetMode("\<S-Down\>", "Normal") \| :call VimGrep(v:count)<cr>
 nnoremap <C-S-Up> :call SetMode("\<C-S-Up\>", "Normal") \| :vimgrep "todo" $folderrepo/**/*<cr>
 nnoremap <Left> :call SetMode("\<Left\>", "Normal") \| :cclose<cr>
-nnoremap <Right> :call SetMode("\<Right\>", "Normal") \| :copen<cr>
+nnoremap <Right> :call SetMode("\<Right\>", "Normal") \| :call COpen()<cr>
 nnoremap <Up> :call SetMode("\<Up\>", "Normal") \| :cprev<cr>
 nnoremap <Down> :call SetMode("\<Down\>", "Normal") \| :cnext<cr>
 nnoremap <F9> :call SetMode("\<F9\>", "Normal") \| :Pull<cr>

@@ -424,6 +424,11 @@ NewMap -no -n ,,<F4> :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.
 NewMap -no -n <C-S-F9> :call PreviewBuffer()<cr>
 " map <M-F12> :call Info()<cr>
 NewMap -no -n <C-F2> :call ToggleWrap()<cr>
+NewMap -no -n -v <C-S-F2> :RF<cr>
+NewMap -no -n <F2> :F  
+NewMap -no -v <F2> :F<cr>
+NewMap -no -n <C-F2> :IF  
+NewMap -no -v <C-F2> :IF<cr>
 NewMap -no -n ,,,w :call ToggleWrap()<cr>
 NewMap -no -n ,in :call Intend()<cr>
 NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
@@ -438,6 +443,8 @@ NewMap -t -un -no <C-l> l
 NewMap -t -un -no <C-h> h
 NewMap -t -un -no <C-k> k
 NewMap -t -un -no <C-j> j
+
+" TestFunction
 
 " Unnessecary
 " NewMap -t -un <C-l> <C-w>l
@@ -631,7 +638,7 @@ NewMap -no -n ,,,,g :call AgIn(Folder_Repo(v:count, 3))<cr>
 NewMap -no -n ,,,,,g :call AgIn(Folder_Repo(v:count, 4))<cr>
 NewMap -no -n ,,,,,,g :call AgIn(Folder_Repo(v:count, 5))<cr>
 
-NewMap -no -n ,vcd :call CD(Vim_Advantages_Path())<cr>
+NewMap -no -n ,vcd :call CD(VimConfiguration())<cr>
 
 NewMap -no -n ,p :call Projects()<cr>
 " NewMap -no -n ,,p :call FilesInProjects()<cr>
@@ -1050,7 +1057,9 @@ NewMap -no -n -key ,rd :call RedoLeaderS()<cr>
 " NewMap -no <F7> :autocmd! BufEnter * :call F.Buffer.Find(bufnr()).Print()<cr>
 " NewMap -no <F8> :call Display()<cr>
 
-NewMap -no ,c :call ToggleComment()<cr>
+" NewMap -no ,c :call ToggleComment()<cr>
+NewMap -no <C-7> :call ToggleComment()<cr>
+NewMap -no -n ,cf :CF  
 
 NewMap -no -v <F1> J
 NewMap -no -n <F2> :call GetKeys()<cr>
@@ -1112,7 +1121,7 @@ NewMap -no -n <C-S-Up> :vimgrep "todo" $folderrepo/**/*<cr>
 " NewMap -no -n [A :cprev<cr>
 " NewMap -no -n [B :cnext<cr>
 NewMap -no -n <Left> :cclose<cr>
-NewMap -no -n <Right> :copen<cr>
+NewMap -no -n <Right> :call COpen()<cr>
 NewMap -no -n <Up> :cprev<cr>
 NewMap -no -n <Down> :cnext<cr>
 
@@ -1223,5 +1232,4 @@ NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<
 NewMap -no -n -v <C-S-.> :@:<cr>
 
 NewMap -no <F4> :call ToggleBCommand()<cr>
-
 endif

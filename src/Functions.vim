@@ -1,4 +1,3 @@
-
 if !exists("g:vim_advantages_got_sourced")
 
 let g:default_direction='j'
@@ -24,6 +23,99 @@ function! Split(args)
   endif
 endfunction
 command! -range -nargs=* Split :call Split(<q-args>)
+
+function! RemoveFile(...)
+  let file=expand('%:p')
+  let yes=input('remove '..file..'? [yY]')
+  if yes==#"y"
+    call system('rm '..file)
+  endif
+endfunction
+command! -range -nargs=* RemoveFile :call RemoveFile(<f-args>)
+command! -range -nargs=* RF :call RemoveFile(<f-args>)
+
+function! CreateFunction(...)
+  set noignorecase
+  if len(a:000)==1
+    let name=a:000[0]
+    let shortname=substitute(name, '[a-z]', '', 'g')
+    let key=""
+  elseif len(a:000)==2
+    let name=a:000[0]
+    let key=a:000[1]
+    let shortname=substitute(name, '[a-z]', '', 'gi')
+  else
+    let name="Name"
+    let shortname="N"
+    let key=""
+  endif
+  echo name
+  let abc =<< eval EOD
+function! {name}(...)
+  
+endfunction
+command! -range -nargs=* {name} :call {name}(<f-args>)
+command! -range -nargs=* {shortname} :call {name}(<f-args>)
+EOD
+  if key!=""
+    let abc2 =["NewMap -no -v "..key.." :"..shortname.."<CR>"]
+    call extend(abc, abc2)
+  endif
+  " put=abc
+  call append(line('.'), abc)
+  norm jjA
+endfunction
+  set ignorecase
+command! -range -nargs=* CF :call CreateFunction(<f-args>)
+" let v ??= 'test'
+
+function! DiffFolders(...)
+  let folder1=a:000[0]
+  let folder2=a:000[1]
+  let files1=map(globpath(folder1, "**", 0, 1), 'substitute(v:val, "^'.folder1.'/", "", "")')
+  let files2=map(globpath(folder2, "**", 0, 1), 'substitute(v:val, "^'.folder2.'/", "", "")')
+  let files_only_left=[]
+  let files_only_right=[]
+  let files_diff=[]
+  let files_equal=[]
+  let intersectioin=filter(copy(files2), {_, v ->index(files1, v)>=0})
+  " let seen={}
+  " let intersection=filter(copy(files2), {_, v->
+  "   \ index(files1, v)>=0 && !has_key(seen,v) ? (seen[v]=1):0})
+  " let files_equal=[]
+  " if cmp --silent -- "$file1" "$file2";
+  let s1={}
+  for x in files1 | let s1[x]=x | endfor
+  let s2={}
+  for x in files2 | let s2[x]=x | endfor
+  let files2=[]
+  let tmp = filter(copy(files2), {_, v ->
+    \ has_key(files1, v)
+    \ ? (add(files_equal, v), 0)
+    \ : (add(files_only_right, v), 0)
+    \ })
+  for p in files2
+    if has_key(s1, p)
+      if s1[p] ==# s2[p]
+        if index(files_equal, p) < 0 | call add(files_equal, p) | endif
+      else
+        call add(files_diff, p)
+      endif
+    endif
+  endfor
+  for p in files1
+    if !has_key(s2, p)
+      call add(files_only_left, p)
+    endif
+  endfor
+  echo files1
+  echo files2
+  echo files_only_left
+  echo files_only_right
+  echo files_diff
+  echo files_equal
+endfunction
+command! -range -nargs=* DiffFolders :call DiffFolders(<f-args>)
 
 function! Spare()
   let root=input("for files in folder: ")
@@ -1014,9 +1106,90 @@ command! -range -nargs=* Profile <line1>,<line2>:call Profile(<q-args>)
 "   echo argv(-1)
 " endfunction
 
-function! Vim_Advantages_Path()
+function! VimConfiguration()
   return split(&runtimepath, ",")[1]
 endfunction
+
+function! IF(...)
+  let term=""
+  if g:mode=="Visual"
+    " let term=VS()
+    let i=":call SetMode(\"\\<C-F2\\>\", \"Normal\") \| :F "..join(VS(), ' ')..' '
+    call UnsetMode()
+    call feedkeys(i, 'n')
+    return
+  else
+    if len(a:000)==1
+      let term=join(a:000, ' ')
+    elseif len(a:000)>1
+      let term=join(a:000[:-1], ' ')
+    endif
+  endif
+  if len(a:000)==1
+    if term==""
+    endif
+    " search
+    let winid=win_getid()
+    silent exec "vimgrep "..term..' %'
+    redraw!
+    " vsplit
+    vertical copen
+    call win_gotoid(winid)
+  elseif len(a:000)>1
+    " search
+    let winid=win_getid()
+    silent exec "vimgrep "..term..' '..a:000[-1]
+    redraw!
+    " vsplit
+    vertical copen
+    call win_gotoid(winid)
+  else
+  endif
+endfunction
+command! -range -nargs=* IF <line1>,<line2>:call IF(<f-args>)
+
+function! COpen()
+  let winid=win_getid()
+  vertical copen
+  vertical resize 45
+  call win_gotoid(winid)
+endfunction
+
+function! R(...)
+  if join(a:000, ' ')==''
+    let x='r 1'
+  else
+    let x='r '..join(a:000, ' ')
+  endif
+  put=systemlist('source '..g:bashrc..'; '..x)
+endfunction
+command! -range -nargs=* R <line1>,<line2>:call R(<f-args>)
+
+function! F(...)
+  if join(a:000, ' ')==''
+    let x=Folder_Repo_Or_Project_Only()..'/**'
+  else
+    let x=join(a:000, ' ')
+  endif
+  " search
+  " let winid=win_getid()
+  " silent "cex system('rg --vimgrep "..join(a:000, ' ')..")"
+  " redraw!
+  "cexpr map(glob(Folder_Repo_Or_Project_Only()..'/**', 0, 1), '{"filename": v:val}')
+  " cexpr map(glob(x, 0, 1), '{"filename": v:val}')
+  " call setqflist(
+  "       \ systemlist('find . -maxdepth 1 -type f'),
+  "       \  {_, f -> {'filename': f[2:], 'lnum': 1}}
+  "       \ )
+  "       \  " glob(x, 0, 1),
+  call setqflist(map(glob(x, 0, 1), {_, f -> {'filename': f, 'lnum': 1, 'text': f}}))
+  " vsplit
+  " vertical copen
+  " exec "resize 15"
+  " call win_gotoid(winid)
+  call COpen()
+endfunction
+command! -range -nargs=* F <line1>,<line2>:call F(<f-args>)
 
 let s:hidden_all=0
 function! ToggleHiddenAll()
@@ -4602,6 +4775,71 @@ function! GenSpaces(name)
   return out
 endfunction
 
+function! TestFunction(bufnr)
+  if &modifiable == 0 && &buftype!='terminal' && &buftype!='buffer'
+    call setbufline(a:bufnr, 2, 'second line')
+  endif
+endfunction
+
+function! TermPopup(title, termbuf, callback, outfile)
+  let title=a:title
+  let type='file'
+  if type=="directory"
+    let type="d"
+  else
+    let type="f"
+  endif
+  let g:FileFinder_result=""
+  function! OnStdout(channel, msg)
+  endfunction
+  function! OnError(...)
+    call popup_close(g:pnr) closure
+    exec "bd "..a:termbuf
+  endfunction
+  function! OnExitTerm(bufname, job, code) closure
+    call popup_close(g:pnr)
+    exec "bd "..a:termbuf
+  endfunction
+  function! s:TermClose(job, status) abort
+  endfunction
+  let opts={
+    \ 'hidden': 1,
+    \ 'err_cb': 'OnError',
+    \ 'term_name': 'Find',
+    \ 'term_finish': 'close',
+    \ 'exit_cb': function('s:TermClose'),
+    \ }
+  function! MyFilter(winid, key)
+    echo a:key
+    if a:key=='q'
+      call popup_close(a:winid)
+      " call OnPopupClose(a:winid, 'User pressed q')
+      return 1
+    endif
+    return 0
+  endfunction
+  try
+  let g:pnr=popup_create(a:termbuf, #{
+    \ title: title,
+    \ pos: 'center',
+    \ minwidth: 80,
+    \ minheight: 20,
+    \ maxheight: 80,
+    \ border: [1, 1, 1, 1],
+    \ borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+    \ highlight: 'Pmenu',
+    \ term_cols: 40,
+    \ cursorline: 1,
+    \ zindex: 200,
+    \ filter: 'MyFilter',
+    \ callback: a:callback,
+    \ })
+  let g:popup_bufnr= winbufnr(g:pnr)
+  catch
+  finally
+  endtry
+endfunction
+
 function! Popup(title, register, list, callback, outfile)
   call Write(a:list, g:stdin_tmp_file)
   " if a:register =~ 'window\|buffer\|tab\|global'
@@ -6045,9 +6283,13 @@ function FixBufNr(c)
     " call Open('J', "terminal", buf)
   endif
 endfunction
-
+"
 " Command Mapping
+"
+" tnoremap <C-w>q <C-w>:call popup_close(win_getid())<cr>
 function! Command() range
+  call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
+  return
   let vs=VS()
   call DebugBuf(g:keymap, 1)
   let b:commands=LoadAllCommands()
@@ -8048,6 +8290,13 @@ function! SetMode(keymap, mode)
   " if a:keymap!=""
   "   let [ key, leaders, fkey, vs ] = UtilHelper(a:keymap)
   " endif
+endfunction
+
+function! UnsetMode()
+  unlet g:mode
+  unlet g:keymap
+  let g:mode="Normal"
+  let g:keymap=""
 endfunction
 
 function! GetMode()

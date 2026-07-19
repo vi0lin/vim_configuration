@@ -303,12 +303,13 @@ endfunction
 command! -range -nargs=0 Generate call Generate()
 
 function! SaveCommands()
-  let folder = Folder_Repo_Or_Project_Only()
+  " let folder = Folder_Repo_Or_Project_Only()
+  let folder = VimConfiguration()
   " echo folder
   " call Write(b:commands, folder . ".commands_vim_configuration.unreleased")
   if folder != -1
     let source_commands_script = BuildCommandLines()
-    call Write(source_commands_script, folder.."/.commands_vim_configuration.unreleased")
+    call Write(source_commands_script, folder.."/.commands.unreleased")
   else
     call EchoSafely("No Project Or Repo Found In Path Hierarchy")
   endif
@@ -552,7 +553,7 @@ function! CommandExample()
   let c['name']='unnamed'
   let c['direction']=g:default_direction
   let c['directionMode']='foremost'
-  let c['commandOrigin']=Vim_Advantages_Path()
+  let c['commandOrigin']=VimConfiguration()
   let c['commandOriginType']='global'
   let c['commandMode']='term'
   let c['commandModeSession']='none'
@@ -599,7 +600,8 @@ function! LoadAllCommands()
   call CommandDictInit()
   " endif
   call LoadCommands()
-  call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
+  " call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
+  call LoadCommands(VimConfiguration()..'/.commands.unreleased')
   "" for page in copy(b:commands['pages'])
   ""   call DebugBuf(copy(page), '"Command: "..P(v:val)')
   "" endfor
@@ -609,7 +611,7 @@ function! LoadAllCommands()
   return b:commands
 endfunction
 
-function! LoadCommands(filename='.commands_vim_configuration')
+function! LoadCommands(filename='.commands')
   let cwd=CWD()
   let finish=0
   let paths=[]
