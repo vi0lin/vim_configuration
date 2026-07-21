@@ -2911,6 +2911,15 @@ function! Enable()
 endfunction
 command! -range -nargs=0 Enable :call Enable()
 
+function! ReloadFile()
+  try
+    silent e %
+  catch
+  finally
+  endtry
+endfunction
+command! -range -nargs=0 Rel :call ReloadFile()
+
 function! SystemctlReload()
   !reload_services() {
   \ sudo systemctl daemon-reload;

@@ -742,3 +742,5 @@ nnoremap <C-]> :call SetMode("\<C-]\>", "Normal") \| :OR 1<CR>
 vnoremap <C-]> :call SetMode("\<C-]\>", "Visual") \| '<,'>:OR 1<CR>
 nnoremap <C-\> :call SetMode("\<C-\\>", "Normal") \| :OR -1<CR>
 vnoremap <C-\> :call SetMode("\<C-\\>", "Visual") \| '<,'>:OR -1<CR>
+nnoremap ,<F5> :call SetMode(",\<F5\>", "Normal") \| :Rel<cr>
+vnoremap ,<F5> :call SetMode(",\<F5\>", "Visual") \| '<,'>:Rel<cr>
