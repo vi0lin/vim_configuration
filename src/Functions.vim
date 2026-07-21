@@ -424,18 +424,19 @@ function! Read(file)
   return []
 endfunction
 
-function! Write(data, file, append='b')
+function! WriteStructure(data, file, append='b')
   if CreateFileAndPathIfNotExists(a:file)
-    " if type(a:data)==3
-    "   let data=string(a:data)
-    " echo type(a:data)
-    if type(a:data)==4
+    if type(a:data)==4&&type(a:data)==3
       call writefile([json_encode(a:data)], a:file, a:append)
-    elseif type(a:data)==3
-      call writefile(a:data, a:file, a:append)
     else
       call writefile(a:data, a:file, a:append)
     endif
+  endif
+endfunction
+
+function! Write(data, file, append='b')
+  if CreateFileAndPathIfNotExists(a:file)
+    call writefile(a:data, a:file, a:append)
   endif
 endfunction
 
@@ -3317,7 +3318,7 @@ function! SaveCommands()
       let postfix=".unreleased"
     endif
     if !empty(filtered) && len(filtered)>0
-      call Write(filtered, a:filepath.."/.commands"..postfix)
+      call WriteStructure(filtered, a:filepath.."/.commands"..postfix)
     endif
   endfunction
   call _save_helper("samedir", "yes", expand('%:p:h'))
