@@ -1233,4 +1233,7 @@ NewMap -no -v <C-F2> :IF<cr>
 NewMap -no -n -v <C-S-F2> :CDo<cr>
 NewMap -no -n -v <C-S-M-F2> :CFDo<cr>
 
+NewMap -no -v -n <C-]> :OR 1<CR>
+NewMap -no -v -n <C-\> :OR -1<CR>
+
 endif

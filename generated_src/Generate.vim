@@ -734,3 +734,7 @@ nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :CDo<cr>
 vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:CDo<cr>
 nnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Normal") \| :CFDo<cr>
 vnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Visual") \| '<,'>:CFDo<cr>
+nnoremap <C-]> :call SetMode("\<C-]\>", "Normal") \| :OR 1<CR>
+vnoremap <C-]> :call SetMode("\<C-]\>", "Visual") \| '<,'>:OR 1<CR>
+nnoremap <C-\> :call SetMode("\<C-\\>", "Normal") \| :OR -1<CR>
+vnoremap <C-\> :call SetMode("\<C-\\>", "Visual") \| '<,'>:OR -1<CR>
