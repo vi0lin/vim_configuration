@@ -482,8 +482,8 @@ nnoremap ,,,,,<C-p> :call SetMode(",,,,,\<C-p\>", "Normal") \| :call Files(Folde
 nnoremap ,p :call SetMode(",p", "Normal") \| :call Projects()<cr>
 nnoremap ,,p :call SetMode(",,p", "Normal") \| :call FilesInProjects()<cr>
 nnoremap <C-S-p> :call SetMode("\<C-S-p\>", "Normal") \| :call Projects()<cr>
-nnoremap <A-p> :call SetMode("\<A-p\>", "Normal") \| :call ToggleTroughProjects()<cr>
-nnoremap <A-S-p> :call SetMode("\<A-S-p\>", "Normal") \| :call Projects()<cr>
+nnoremap <A-p> :call SetMode("\<A-p\>", "Normal") \| :call ToggleTroughOpenedProjects()<cr>
+nnoremap <A-S-p> :call SetMode("\<A-S-p\>", "Normal") \| :call ToggleTroughOpenedProjects(-1)<cr>
 nnoremap <A-C-p> :call SetMode("\<A-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-S-C-p> :call SetMode("\<A-S-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call SearchGitProjects()<cr>

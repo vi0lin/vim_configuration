@@ -643,8 +643,8 @@ NewMap -no -n ,p :call Projects()<cr>
 NewMap -no -n ,,p :call FilesInProjects()<cr>
 " NewMap -no -n ,,p :call FilesInProjects()<cr>
 NewMap -no <C-S-p> :call Projects()<cr>
-NewMap -no <A-p> :call ToggleTroughProjects()<cr>
-NewMap -no <A-S-p> :call Projects()<cr>
+NewMap -no <A-p> :call ToggleTroughOpenedProjects()<cr>
+NewMap -no <A-S-p> :call ToggleTroughOpenedProjects(-1)<cr>
 NewMap -no <A-C-p> :call Projects()<cr>
 NewMap -no <A-S-C-p> :call Projects()<cr>
 NewMap -no -n ,<C-p> :call SearchGitProjects()<cr>
