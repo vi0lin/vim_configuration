@@ -3601,8 +3601,10 @@ function! LoadCommands()
   call add(commandfiles, VimConfiguration()..'/.unreleased/.commands')
   " saved_in_samedir *folder*
   call add(commandfiles, expand('%:p:h')..'/.commands')
+  call add(commandfiles, expand('%:p:h')..'/.commands.unreleased')
   " saved_in_repo
   call add(commandfiles, Folder_Repo_Or_Project_Only()..'/.commands')
+  call add(commandfiles, Folder_Repo_Or_Project_Only()..'/.commands.unreleased')
   " saved_in_buffer
   " unimplemented / extract from file
   " let file=globpath(cwd, a:filename)
@@ -3618,7 +3620,7 @@ function! LoadCommands()
   "   let cwd=GetParentDir(cwd)
   " endwhile
   " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'), 0)
-  call DebugBuf("Muhaha", 1, 1)
+  call DebugBuf("Commands", 1, 1)
   for cf in commandfiles
     call DebugBuf("Loading: "..cf, 0, 1)
     if filereadable(cf)
