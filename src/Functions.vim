@@ -419,8 +419,7 @@ command! -range -nargs=0 SearchGitProjects :call SearchGitProjects()
 function! Read(file)
   if CreateFileAndPathIfNotExists(a:file)
     " put =readfile(a:file)
-    let array=readfile(a:file)
-  return array
+    return readfile(a:file)
   endif
   return []
 endfunction
@@ -3286,16 +3285,23 @@ endfunction
 command! -range -nargs=* GithubCreateProject <line1>,<line2>:call GithubCreateProject(<f-args>)
 
 function! SaveCommands()
-  " let folder = Folder_Repo_Or_Project_Only()
-  let folder = VimConfiguration()
-  " echo folder
-  " call Write(b:commands, folder . ".commands_vim_configuration.unreleased")
-  if folder != -1
-    let source_commands_script = BuildCommandLines()
-    call Write(source_commands_script, folder.."/.commands.unreleased")
-  else
-    call EchoSafely("No Project Or Repo Found In Path Hierarchy")
-  endif
+  let savein_samedir=filter(copy(g:commands), 'v:val["savein"]=="samedir"&&v:val["released"]=="yes"')
+  call Write(savein_samedir, expand('%:p').."/.commands")
+
+  let savein_samedir=filter(copy(g:commands), 'v:val["savein"]=="samedir"&&v:val["released"]=="no"')
+  call Write(savein_samedir, expand('%:p').."/.commands.unreleased")
+
+  let savein_repo=filter(copy(g:commands), 'v:val["savein"]=="repo"&&v:val["released"]=="yes"')
+  call Write(savein_repo, Folder_Repo_Or_Project_Only().."/.commands")
+
+  let savein_repo=filter(copy(g:commands), 'v:val["savein"]=="repo"&&v:val["released"]=="no"')
+  call Write(savein_repo, Folder_Repo_Or_Project_Only().."/.commands.unreleased")
+
+  let savein_vimconfiguration=filter(copy(g:commands), 'v:val["savein"]=="vimconfiguration"&&v:val["released"]=="yes"')
+  call Write(savein_vimconfiguration, VimConfiguration().."/.commands")
+
+  let savein_vimconfiguration=filter(copy(g:commands), 'v:val["savein"]=="vimconfiguration"&&v:val["released"]=="no"')
+  call Write(savein_vimconfiguration, VimConfiguration().."/.commands.unreleased")
 endfunction
 
 " function! BuildCommandLines() abort
@@ -3310,10 +3316,10 @@ endfunction
 "         continue
 "       endif
 "       " skip entries not belonging to this dict
-"       if type(data) != v:t_dict || !has_key(data, 'commandOrigin')
+"       if type(data) != v:t_dict || !has_key(data, 'commandFile')
 "         continue
 "       endif
-"       if data['commandOrigin'] != folder
+"       if data['commandFile'] != folder
 "         continue
 "       endif
 "       let line = "let b:commands['pages'][" . page_idx . "]['" . key . "']=" . string(data)
@@ -3325,9 +3331,10 @@ endfunction
 
 function! BuildCommandLines() abort
   let folder = Folder_Repo_Or_Project_Only()
-  let lines = []
+  " let lines = []
+  let data=json_encode(g:commands)
   for command in g:commands
-    " if data['commandOrigin'] != folder
+    " if data['commandFile'] != folder
     "   continue
     " endif
     let line = "BCommandInit"
@@ -3343,7 +3350,7 @@ function! BuildCommandLines() abort
         continue
       endif
       " skip entries not belonging to this dict
-      " if type(data) != v:t_dict || !has_key(key, 'commandOrigin')
+      " if type(data) != v:t_dict || !has_key(key, 'commandFile')
       "   continue
       " endif
       if type(key)=='command' || type(data)==4 || type(data)==3
@@ -3363,8 +3370,8 @@ function! BuildCommandLines() abort
     let line = "BCommandFinish " . command['page'] . " " . command['key']
     call add(lines, line)
   endfor
-  call DebugBuf("saved")
-  return lines
+  " call DebugBuf("saved")
+  " return lines
 endfunction
 
 function! BCommandInit(...)
@@ -3402,29 +3409,29 @@ command! -range -nargs=* ToggleBCommand <line1>,<line2>call ToggleBCommand()
 function! BCommandFinish(...)
   let page=a:000[0]
   let key=a:000[1]
-  let str_finish=b:loading_command['commandOriginType']
+  let str_finish=b:loading_command['commandFileType']
   let str_finish.=' '.key
   let str_finish.=' '.string(b:loading_command['command'])
-  let str_finish.=' '.b:loading_command['commandOrigin']
+  let str_finish.=' '.b:loading_command['commandFile']
   let str_finish.=' '.expand('%:p')
   call DebugBuf(str_finish)
   call add(g:commands, copy(b:loading_command))
-  if b:loading_command['commandOriginType']=='buffer' && b:loading_command['commandOrigin']==expand('%:p')
+  if b:loading_command['commandSpectrum']=='buffer' && b:loading_command['commandFile']==expand('%:p')
     call DebugBuf("loaded buffer command")
     let b:commands['pages'][page][key]=copy(b:loading_command)
     return
   endif
-  if b:loading_command['commandOriginType']=='folder' && b:loading_command['commandOrigin']==expand('%:p:h')
+  if b:loading_command['commandSpectrum']=='folder' && b:loading_command['commandFile']==expand('%:p:h')
     call DebugBuf("loaded folder command")
     let b:commands['pages'][page][key]=copy(b:loading_command)
     return
   endif
-  if b:loading_command['commandOriginType']=='repo' && b:loading_command['commandOrigin']==Folder_Repo_Or_Project_Only()
+  if b:loading_command['commandSpectrum']=='repo' && b:loading_command['commandFile']==Folder_Repo_Or_Project_Only()
     call DebugBuf("loaded repo command")
     let b:commands['pages'][page][key]=copy(b:loading_command)
     return
   endif
-  if b:loading_command['commandOriginType']=='global'
+  if b:loading_command['commandSpectrum']=='global'
     call DebugBuf("loaded global command")
     let b:commands['pages'][page][key]=copy(b:loading_command)
     return
@@ -3440,43 +3447,43 @@ function! BCommand(...)
 endfunction
 command! -range -nargs=* BCommand <line1>,<line2>call BCommand(<f-args>)
 
-function! CommandDictInit()
-  " if !exists('b:commands')
-  let b:commands={'pages': []}
-  let b:commands=CommandDictAddPage(CommandDictInitPage())
-  " if !exists('g:commands')
-  let g:commands=[]
-  " endif
-  return b:commands
-  " endif
-endfunction
+" function! CommandDictInit()
+"   " if !exists('b:commands')
+"   let b:commands={'pages': []}
+"   let b:commands=CommandDictAddPage(CommandDictInitPage())
+"   " if !exists('g:commands')
+"   let g:commands=[]
+"   " endif
+"   return b:commands
+"   " endif
+" endfunction
 
-function! CommandDictInitPage()
-  return {
-        \ '<F5>': -1,
-        \ '<F6>': -1,
-        \ '<F7>': -1,
-        \ '<F8>': -1,
-        \ '<C-F5>': -1,
-        \ '<C-F6>': -1,
-        \ '<C-F7>': -1,
-        \ '<C-F8>': -1,
-        \ '<S-F5>': -1,
-        \ '<S-F6>': -1,
-        \ '<S-F7>': -1,
-        \ '<S-F8>': -1,
-        \ '<C-S-F5>': -1,
-        \ '<C-S-F6>': -1,
-        \ '<C-S-F7>': -1,
-        \ '<C-S-F8>': -1
-        \ }
-endfunction
+" function! CommandDictInitPage()
+"   return {
+"         \ '<F5>': -1,
+"         \ '<F6>': -1,
+"         \ '<F7>': -1,
+"         \ '<F8>': -1,
+"         \ '<C-F5>': -1,
+"         \ '<C-F6>': -1,
+"         \ '<C-F7>': -1,
+"         \ '<C-F8>': -1,
+"         \ '<S-F5>': -1,
+"         \ '<S-F6>': -1,
+"         \ '<S-F7>': -1,
+"         \ '<S-F8>': -1,
+"         \ '<C-S-F5>': -1,
+"         \ '<C-S-F6>': -1,
+"         \ '<C-S-F7>': -1,
+"         \ '<C-S-F8>': -1
+"         \ }
+" endfunction
 
 function! EmptyCommand()
   " direction: hjkl
   " directionMode: HJKL, neighbor, foremost
   " directionSkipping: 0 1 2 3
-  " commandOrigin: /path/to/.command.vim_configuration
+  " commandFile: /path/to/.command.vim_configuration
   " commandMode: term buffer newbuffer
   " commandModeSession: -1 / none / bashsession / pythonsession
   " commandInterpreter: bash / vim / python
@@ -3494,8 +3501,9 @@ function! EmptyCommand()
     \ "bufnr": -1,
     \ "directionMode": -1,
     \ "directionSkipping": -1,
-    \ "commandOriginType": -1,
-    \ "commandOrigin": -1,
+    \ "commandSpectrum": -1,
+    \ "savein": -1
+    \ "commandFile": -1,
     \ "commandMode": -1,
     \ "commandModeSession": -1,
     \ "commandInterpreter": -1,
@@ -3513,7 +3521,9 @@ function! VimCommand(command='')
   let c['hash']=NewUUID()
   let c['name']='unnamed'
   let c['commandMode']='vim'
-  let c['commandOriginType']='buffer'
+  let c['commandSpectrum']='buffer'
+  let c['savein']=b:savein
+  let c['released']=b:released
   let c['commandInterpreter']='vim'
   let c['commandOutputMode']='put'
   let c['command']=a:command
@@ -3536,8 +3546,10 @@ function! CommandExample()
   let c['name']='unnamed'
   let c['direction']=g:default_direction
   let c['directionMode']='foremost'
-  let c['commandOrigin']=VimConfiguration()
-  let c['commandOriginType']='global'
+  let c['commandFile']=VimConfiguration()
+  let c['commandSpectrum']='global'
+  let c['savein']=b:savein
+  let c['released']=b:released
   let c['commandMode']='term'
   let c['commandModeSession']='none'
   let c['commandInterpreter']='term'
@@ -3550,71 +3562,98 @@ function! CommandExample()
   return c
 endfunction
 
-function! CommandPageInit()
-  " if !exists('b:commands')
-  call CommandPageExample()
-  " endif
-endfunction
+" function! CommandPageInit()
+"   " if !exists('b:commands')
+"   call CommandPageExample()
+"   " endif
+" endfunction
 
-function! CommandPageExample()
-  let c=CommandExample()
-  let c['page']=0
-  let c['command']=['date']
-  let c['key']='<F5>'
-  let b:commands['pages'][0]['<F5>']=copy(c)
-  let c['command']=['ls -al']
-  let c['key']='<F6>'
-  let b:commands['pages'][0]['<F6>']=copy(c)
-  let c['command']=['activate']
-  let c['key']='<F7>'
-  let b:commands['pages'][0]['<F7>']=copy(c)
-  let c['command']=['deactivate']
-  let c['key']='<F8>'
-  let b:commands['pages'][0]['<F8>']=copy(c)
-endfunction
+" function! CommandPageExample()
+"   let c=CommandExample()
+"   let c['page']=0
+"   let c['command']=['date']
+"   let c['key']='<F5>'
+"   let b:commands['pages'][0]['<F5>']=copy(c)
+"   let c['command']=['ls -al']
+"   let c['key']='<F6>'
+"   let b:commands['pages'][0]['<F6>']=copy(c)
+"   let c['command']=['activate']
+"   let c['key']='<F7>'
+"   let b:commands['pages'][0]['<F7>']=copy(c)
+"   let c['command']=['deactivate']
+"   let c['key']='<F8>'
+"   let b:commands['pages'][0]['<F8>']=copy(c)
+" endfunction
 
 function! CommandDictAddPage(page)
   call extend(b:commands['pages'], [a:page])
   return b:commands
 endfunction
 
-function! LoadAllCommands()
+function! LoadCommands()
   " if !exists('b:commands')
-  call CommandDictInit()
+  " call CommandDictInit()
+  let g:commands=[]
+  let b:commands={}
   " endif
-  call LoadCommands()
+  let commandfiles=[]
+  " saved_in_vimconfiguration
+  call add(commandfiles, VimConfiguration()..'/.unreleased/.commands')
+  " saved_in_samedir *folder*
+  call add(commandfiles, expand('%:p:h')..'/.commands')
+  " saved_in_repo
+  call add(commandfiles, Folder_Repo_Or_Project_Only()..'/.commands')
+  " saved_in_buffer
+  " unimplemented / extract from file
+  " let file=globpath(cwd, a:filename)
+  " echo file
+  " while 1
+  "   let file=globpath(cwd, a:filename)
+  "   if !empty(file)
+  "     call extend(paths, [file])
+  "   endif
+  "   if cwd=='/'
+  "     break
+  "   endif
+  "   let cwd=GetParentDir(cwd)
+  " endwhile
+  " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'), 0)
+  call DebugBuf("Muhaha", 1, 1)
+  for cf in commandfiles
+    call DebugBuf("Loading: "..cf, 0, 1)
+    if filereadable(cf)
+      try
+        let d=join(Read(cf), '')
+        let data=json_decode(d)
+      catch
+        call DebugBuf("Error Parsing File: "..cf, 0, 1)
+      finally
+        call add(g:commands, data)
+        call DebugBuf(printf("Added %s commands", len(d)), 0, 1)
+      endtry
+    endif
+  endfor
+  return g:commands
   " call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
-  call LoadCommands(VimConfiguration()..'/.commands.unreleased')
   "" for page in copy(b:commands['pages'])
   ""   call DebugBuf(copy(page), '"Command: "..P(v:val)')
   "" endfor
   " for c in b:commands['pages']
   "   echo c['<F5>']['command']
   " endfor
-  return b:commands
+  " echo filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandFile"]=="'..expand('%:p')..'"')
+  " let b:commands['buffer']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandFile"]=="'..expand('%:p')..'"')
+  " let b:commands['folder']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="folder"&&v:val["commandFile"]=="'..expand('%:p:h')..'"')
+  " let b:commands['repo']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="repo"&&v:val["commandFile"]=="'..Folder_Repo_Or_Project_Only()..'"')
+  " let b:commands['global']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="global"&&v:val["commandFile"]=="'..VimConfiguration()..'/.unreleased/.commands"')
+  "   " call DebugBuf(b:commands)
+  " return [ g:commands,
+  "       \ b:commands['buffer'],
+  "       \ b:commands['folder'],
+  "       \ b:commands['repo'],
+  "       \ b:commands['global']
+  "       \ ]
 endfunction
-
-function! LoadCommands(filename='.commands')
-  let cwd=CWD()
-  let finish=0
-  let paths=[]
-  while 1
-    let file=globpath(cwd, a:filename)
-    if !empty(file)
-      call extend(paths, [file])
-    endif
-    if cwd=='/'
-      break
-    endif
-    let cwd=GetParentDir(cwd)
-  endwhile
-  " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'), 0)
-  for x in reverse(paths)
-    exec "source" x
-  endfor
-endfunction
-
-
 
 function! QuickYank(args='', flags='') range
   let vs=VS()
@@ -6645,36 +6684,35 @@ function FixBufNr(c)
     " call Open('J', "terminal", buf)
   endif
 endfunction
-"
+
+" let g:commands=[]
+" date
+
 " Command Mapping
-"
 " tnoremap <C-w>q <C-w>:call popup_close(win_getid())<cr>
 function! Command() range
-  call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
-  return
+  " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
+  " return
   let vs=VS()
   call DebugBuf(g:keymap, 1)
-  let b:commands=LoadAllCommands()
-  " call DebugBuf(b:commands)
   " call CommandPageInit()
-  let cmd=b:commands['pages'][0][g:keymap]
-  call DebugBuf(cmd)
   " call CommandPageInit()
   " call DebugBuf(P(b:commands))
   " call DebugBuf(P(allcommands))
-  " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadAllCommands()), 1500)
+  " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadCommands()), 1500)
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
   if g:mode=='visual'
     let c=TermCommand()
-    let c['commandOrigin']=expand('%:p')
-    let c['commandOriginType']='buffer'
+    let c['commandFile']=expand('%:p')
+    let c['commandSpectrum']='buffer'
+    let c['commandRepo']='buffer'
     let c['command']=vs
     let c['page']=0
     let c['key']=g:keymap
     let c['direction']=g:default_direction
-    let b:commands['pages'][0][g:keymap]=c
-    call filter(g:commands, '!(v:val["commandOriginType"]==c["commandOriginType"]&&v:val["commandOrigin"]==c["commandOrigin"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
+    " let b:commands['pages'][0][g:keymap]=c
+    " call filter(copy(g:commands), '!(v:val["commandSpectrum"]==c["commandSpectrum"]&&v:val["commandFile"]==c["commandFile"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
     call DebugBuf(vs)
     " let g:commands=[]
     " let g:commands=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
@@ -6686,9 +6724,25 @@ function! Command() range
     " call DebugBuf(b:commands)
     call SaveCommands()
   else
-    let c=cmd
+    let c=''
+    let val = filter(b:commands_global, 'v:val["key"]=='..g:keymap)
+    let c=empty(val)?c:val
+    let val = filter(b:commands_repo, 'v:val["key"]=='..g:keymap)
+    let c=empty(val)?c:val
+    let val = filter(b:commands_folder, 'v:val["key"]=='..g:keymap)
+    let c=empty(val)?c:val
+    let val = filter(b:commands_buffer, 'v:val["key"]=='..g:keymap)
+    let c=empty(val)?c:val
+    if c!=''
+      let b:savein=c['savein']
+      let b:released=c['released']
+      call DebugBuf(cmd)
+    else
+      call DebugBuf('No Command Found under '..g:keymap)
+    endif
+    " let cmd=g:commands['pages'][0][g:keymap]
   endif
-  call DebugBuf(c)
+  " call DebugBuf(c)
   if type(c)==0 && c['command'] != -1
     call DebugBuf("Command Not Send\n"..Pretty(c))
   elseif type(c)!=3
@@ -7904,8 +7958,8 @@ function! BufReadPost()
 endfunction
 
 function BufCreateCommandInit()
-  call CommandDictInit()
-  call LoadAllCommands()
+   "call CommandDictInit()
+  call LoadCommands()
   call MakeDirCurrentCWD(bufnr())
 endfunction
 
@@ -7920,7 +7974,7 @@ function! BufWinEnter()
   " call CD(expand('%:p:h'))
   " call InitLineState()
   " echo "BufReadPost"
-  call LoadAllCommands()
+  call LoadCommands()
 endfunction
 
 function! BufEnter()
