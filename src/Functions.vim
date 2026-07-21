@@ -5026,6 +5026,10 @@ function! Projects()
   call OpenFilePopup("Projects", g:projects)
 endfunction
 
+function! ToggleTroughProjects()
+  echo "Implement"
+endfunction
+
 " fzf buildstring find in projects
 " why file exists 3 times in the list?
 function! FilesInProjects()

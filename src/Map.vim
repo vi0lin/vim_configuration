@@ -633,12 +633,17 @@ NewMap -no -n ,,,,,,g :call AgIn(Folder_Repo(v:count, 5))<cr>
 
 NewMap -no -n ,vcd :call CD(VimConfiguration())<cr>
 
+NewMap -no <C-p> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
+NewMap -no ,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
+NewMap -no ,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
+NewMap -no ,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
+NewMap -no ,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
+NewMap -no ,,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
 NewMap -no -n ,p :call Projects()<cr>
-" NewMap -no -n ,,p :call FilesInProjects()<cr>
 NewMap -no -n ,,p :call FilesInProjects()<cr>
-NewMap -no <C-p> :call Projects()<cr>
+" NewMap -no -n ,,p :call FilesInProjects()<cr>
 NewMap -no <C-S-p> :call Projects()<cr>
-NewMap -no <A-p> :call Projects()<cr>
+NewMap -no <A-p> :call ToggleTroughProjects()<cr>
 NewMap -no <A-S-p> :call Projects()<cr>
 NewMap -no <A-C-p> :call Projects()<cr>
 NewMap -no <A-S-C-p> :call Projects()<cr>
@@ -657,12 +662,12 @@ NewMap -no -n <C-S-m> :Generate<cr>
 
 " NewMap -no -aa ,x :call Commands()<cr>
 " iunmap ,x
-NewMap -no -aa <C-x> :call Commands()<cr>
-NewMap -no -aa <C-S-x> :call Commands()<cr>
-NewMap -no -aa <A-x> :call Commands()<cr>
-NewMap -no -aa <A-S-x> :call Commands()<cr>
-NewMap -no -aa <A-C-x> :call Commands()<cr>
-NewMap -no -aa <A-S-C-x> :call Commands()<cr>
+NewMap -no -aa <C-F12> :call Commands()<cr>
+NewMap -no -aa <C-S-F12> :call Commands()<cr>
+NewMap -no -aa <A-F12> :call Commands()<cr>
+NewMap -no -aa <A-S-F12> :call Commands()<cr>
+NewMap -no -aa <A-C-F12> :call Commands()<cr>
+NewMap -no -aa <A-S-C-F12> :call Commands()<cr>
 " noremap <A-S-C-x> :call Files(Folder_System())<cr>
 " nnoremap <C-S-x> :OpenFileFZFRepo<cr>
 "
@@ -1162,7 +1167,7 @@ NewMap -no -n <C-F11> :GitAdd<cr>
 NewMap -no -n <C-S-F11> :GitAddCWD<cr>
 
 NewMap -no -n <F12> :PushCWD  
-NewMap -no -n <C-F12> :DecidePush<cr>
+" NewMap -no -n <C-F12> :DecidePush<cr>
 NewMap -no -n ,qcc :!git rebase --continue<cr>
 NewMap -no -n ,qcs :!git rebase --skip<cr>
 NewMap -no -n ,qca :!git rebase --abort<cr>
