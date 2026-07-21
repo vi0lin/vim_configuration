@@ -243,7 +243,7 @@ function! CreateFileAndPathIfNotExists(file)
     endif
   endif
   if !filereadable(a:file)
-    call input(a:file)
+    " call input(a:file)
     call writefile([], a:file)
   endif
   return filereadable(a:file)
