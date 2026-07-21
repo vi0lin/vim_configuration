@@ -382,7 +382,7 @@ map <F2> :echo FN()<cr>
 map <F4> :exec "echo g:"..expand('<cword>')<cr>
 map <F3> exec ""
 
-function GetProjects()
+function! GetProjects()
   call Refresh('multiprojectholder', 'GetMultiprojectHolder()')
   call Refresh('projectholder', 'GetProjectHolder()')
   call Refresh('gitprojects', 'GetGitprojects()')
@@ -429,8 +429,10 @@ function! Write(data, file, append='b')
     " if type(a:data)==3
     "   let data=string(a:data)
     " echo type(a:data)
-    if type(a:data)==4||type(a:data)==3
+    if type(a:data)==4
       call writefile([json_encode(a:data)], a:file, a:append)
+    elseif type(a:data)==3
+      call writefile(a:data, a:file, a:append)
     else
       call writefile(a:data, a:file, a:append)
     endif
@@ -1840,7 +1842,7 @@ function! Folder_Repo_Or_Project(count, nr)
   let finish=0
   let paths=[]
   let x=a:count+a:nr
-  echo x
+  " echo x
   let y=0
   let scwd=cwd
   let z=0
@@ -3291,6 +3293,18 @@ endfor
 endfunction
 command! -range -nargs=* GithubCreateProject <line1>,<line2>:call GithubCreateProject(<f-args>)
 
+function! InitCommands()
+  if !exists('b:released')
+    let b:released="no"
+  endif
+  if !exists('b:spectrum')
+    let b:spectrum="buffer"
+  endif
+  if !exists('b:savein')
+    let b:savein="vimconfiguration"
+  endif
+endfunction
+
 function! SaveCommands()
   function! _save_helper(spectrum, released, filepath, )
     let filtered=filter(copy(g:commands), { i,v ->
@@ -3599,6 +3613,7 @@ function! EmptyCommand()
 endfunction
 
 function! VimCommand(command='')
+  call InitCommands()
   let c=EmptyCommand()
   let c['hash']=NewUUID()
   let c['name']='unnamed'
@@ -5110,8 +5125,7 @@ function _cleanCallback(file)
   endif
   " execute 'bd! '.bufnr('Find')
   " execute 'bwipeout! '.bufnr('Find')
-  let g:popup_bufnr= winbufnr(g:pnr)
-  if g:popup_bufnr>-1
+  if exists('g:popup_bufnr') && g:popup_bufnr>-1
     execute 'bwipeout! '.g:popup_bufnr
   else
     echo "Todo: check g:popup_bufnr"
@@ -5259,7 +5273,7 @@ function! TermPopup(title, termbuf, callback, outfile)
     \ filter: 'MyFilter',
     \ callback: a:callback,
     \ })
-  let g:popup_bufnr= winbufnr(g:pnr)
+  let g:popup_bufnr=winbufnr(g:pnr)
   catch
   finally
   endtry
@@ -5369,7 +5383,7 @@ function! Popup(title, register, list, callback, outfile)
     \ zindex: 200,
     \ callback: a:callback,
     \ })
-  let g:popup_bufnr= winbufnr(g:pnr)
+  let g:popup_bufnr=winbufnr(g:pnr)
   " call setbufline(bufnr, 2, 'second line')
     " \ callback: function('OpenFile_callback', [a:outfile]),
     " \ callback: function('OpenFile_callback', [a:outfile]),
@@ -6727,6 +6741,21 @@ endfunction
 " commandSpectrum
 " commandExpansion
 " commandOrigin
+"
+" g:commands has all commands
+" save_spot (VimConfiguration/ProjectRoot/SameDir/InFile)
+" command_expansion_to_all_buffers_in_same_tab (yes/no)
+" released (yes/no) (saved in *.released file)
+" commandSpectrum (global/repo/folder/buffer)
+  " Finding The Right Command
+    " when a command has global flag *(1)
+    " then, when a command has repo flag / load them (when you are inside the repo) *(1)
+    " then when a command has folder flag / load them (when cwd or editing file are in the same folder) *(1)
+    " and finally when a command has buffer flag / load them, when you are editing the corrosponding buffer *(1)
+    " consider g:available_commands per key
+  " when 2 commands conflict at one key, make them selectable with repeatd keypressing (reverse order)
+  " (1) load them anyways when in vimconfiguration / sometimes, when in projectroot / samedir or infile
+
 function! Command() range
   " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
   " return
@@ -8052,15 +8081,8 @@ endfunction
 function! BufEnter()
   call Statusline()
   call CD(expand('%:p'))
-  if !exists('b:released')
-    let b:released="no"
-  endif
-  if !exists('b:spectrum')
-    let b:spectrum="buffer"
-  endif
-  if !exists('b:savein')
-    let b:savein="vimconfiguration"
-  endif
+
+  call InitCommands()
   " call DebugPaths()
   " call Statusline()
 endfunction
@@ -8110,6 +8132,7 @@ function! TermLeave()
 endfunction
 
 function! VimEnter()
+  call InitCommands()
   call Refresh('projects', 'GetProjects()')
   "" " if &buftype == 'terminal'
   "" "   set wrap
@@ -8487,6 +8510,7 @@ function! Buildstring_Popup(title, paths, callback, type="file", maxdepth=10, re
     \ zindex: 200,
     \ callback: a:callback,
     \ })
+  let g:popup_bufnr=winbufnr(g:pnr)
   catch
   finally
   endtry
@@ -8528,6 +8552,7 @@ function! Execution_Popup(title, list, callback)
     \ zindex: 200,
     \ callback: a:callback,
     \ })
+  let g:popup_bufnr=winbufnr(g:pnr)
 endfunction
 
 function! GetTempfileLine(file)
