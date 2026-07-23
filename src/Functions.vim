@@ -426,11 +426,7 @@ endfunction
 
 function! WriteStructure(data, file, append='b')
   if CreateFileAndPathIfNotExists(a:file)
-    if type(a:data)==4&&type(a:data)==3
-      call writefile([json_encode(a:data)], a:file, a:append)
-    else
-      call writefile(a:data, a:file, a:append)
-    endif
+    call writefile([json_encode(a:data)], a:file, a:append)
   endif
 endfunction
 
@@ -2198,6 +2194,16 @@ function! DirectionBufWin(direction)
   return winbufnr(winnr(a:direction))
 endfunction
 
+function! GetBufDirectionIfTermDirect(direction)
+  let win=DirectionBufWin(a:direction)
+  if BufIsTerminal(win)
+    return win
+  " return [win, BufIsTerminal(win)]
+  else
+    return -1
+  endif
+endfunction
+
 function! GetBufDirectionIfTerm(direction)
   for i in range(0, CountWindowsInDirection(a:direction))
     let win=DirectionBufWin(i+1..a:direction)
@@ -3344,15 +3350,22 @@ function! LoadCommands()
   let g:commands=[]
   let b:commands={}
   " endif
-  let commandfiles=[]
+  let commandorigins=[]
+  function! _add(path) closure
+    if index(commandorigins, a:path)==-1
+      call add(commandorigins, a:path)
+    endif
+  endfunction
   " saved_in_vimconfiguration
-  call add(commandfiles, VimConfiguration()..'/.unreleased/.commands')
+  call _add(VimConfiguration()..'/.unreleased/.commands')
+  call _add(VimConfiguration()..'/.commands')
+  call _add(VimConfiguration()..'/.commands.unreleased')
   " saved_in_samedir *folder*
-  call add(commandfiles, expand('%:p:h')..'/.commands')
-  call add(commandfiles, expand('%:p:h')..'/.commands.unreleased')
+  call _add(expand('%:p:h')..'/.commands')
+  call _add(expand('%:p:h')..'/.commands.unreleased')
   " saved_in_repo
-  call add(commandfiles, Folder_Repo_Or_Project_Only()..'/.commands')
-  call add(commandfiles, Folder_Repo_Or_Project_Only()..'/.commands.unreleased')
+  call _add(Folder_Repo_Or_Project_Only()..'/.commands')
+  call _add(Folder_Repo_Or_Project_Only()..'/.commands.unreleased')
   " saved_in_buffer
   " unimplemented / extract from file
   " let file=globpath(cwd, a:filename)
@@ -3369,7 +3382,7 @@ function! LoadCommands()
   " endwhile
   " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'), 0)
   call DebugBuf("Commands", 1, 1)
-  for cf in commandfiles
+  for cf in commandorigins
     if filereadable(cf)
       call DebugBuf("Loading: "..cf, 0, 1)
       try
@@ -3386,6 +3399,9 @@ function! LoadCommands()
       endtry
     endif
   endfor
+  call DebugBuf(join(map(copy(g:commands),
+        \ {_, v -> {"buffer": v['bufferFile'], "key": v['key']}}
+    \ ), "\n"),0 , 1)
   return g:commands
   " call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
   "" for page in copy(b:commands['pages'])
@@ -3394,11 +3410,11 @@ function! LoadCommands()
   " for c in b:commands['pages']
   "   echo c['<F5>']['command']
   " endfor
-  " echo filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandFile"]=="'..expand('%:p')..'"')
-  " let b:commands['buffer']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandFile"]=="'..expand('%:p')..'"')
-  " let b:commands['folder']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="folder"&&v:val["commandFile"]=="'..expand('%:p:h')..'"')
-  " let b:commands['repo']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="repo"&&v:val["commandFile"]=="'..Folder_Repo_Or_Project_Only()..'"')
-  " let b:commands['global']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="global"&&v:val["commandFile"]=="'..VimConfiguration()..'/.unreleased/.commands"')
+  " echo filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandOrigin"]=="'..expand('%:p')..'"')
+  " let b:commands['buffer']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandOrigin"]=="'..expand('%:p')..'"')
+  " let b:commands['folder']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="folder"&&v:val["commandOrigin"]=="'..expand('%:p:h')..'"')
+  " let b:commands['repo']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="repo"&&v:val["commandOrigin"]=="'..Folder_Repo_Or_Project_Only()..'"')
+  " let b:commands['global']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="global"&&v:val["commandOrigin"]=="'..VimConfiguration()..'/.unreleased/.commands"')
   "   " call DebugBuf(b:commands)
   " return [ g:commands,
   "       \ b:commands['buffer'],
@@ -3421,10 +3437,10 @@ endfunction
 "         continue
 "       endif
 "       " skip entries not belonging to this dict
-"       if type(data) != v:t_dict || !has_key(data, 'commandFile')
+"       if type(data) != v:t_dict || !has_key(data, 'commandOrigin')
 "         continue
 "       endif
-"       if data['commandFile'] != folder
+"       if data['commandOrigin'] != folder
 "         continue
 "       endif
 "       let line = "let b:commands['pages'][" . page_idx . "]['" . key . "']=" . string(data)
@@ -3439,7 +3455,7 @@ function! BuildCommandLines() abort
   " let lines = []
   let data=json_encode(g:commands)
   for command in g:commands
-    " if data['commandFile'] != folder
+    " if data['commandOrigin'] != folder
     "   continue
     " endif
     let line = "BCommandInit"
@@ -3455,7 +3471,7 @@ function! BuildCommandLines() abort
         continue
       endif
       " skip entries not belonging to this dict
-      " if type(data) != v:t_dict || !has_key(key, 'commandFile')
+      " if type(data) != v:t_dict || !has_key(key, 'commandOrigin')
       "   continue
       " endif
       if type(key)=='command' || type(data)==4 || type(data)==3
@@ -3514,24 +3530,24 @@ command! -range -nargs=* ToggleBCommand <line1>,<line2>call ToggleBCommand()
 function! BCommandFinish(...)
   let page=a:000[0]
   let key=a:000[1]
-  let str_finish=b:loading_command['commandFileType']
+  let str_finish=b:loading_command['commandOriginType']
   let str_finish.=' '.key
   let str_finish.=' '.string(b:loading_command['command'])
-  let str_finish.=' '.b:loading_command['commandFile']
+  let str_finish.=' '.b:loading_command['commandOrigin']
   let str_finish.=' '.expand('%:p')
   call DebugBuf(str_finish)
   call add(g:commands, copy(b:loading_command))
-  if b:loading_command['commandSpectrum']=='buffer' && b:loading_command['commandFile']==expand('%:p')
+  if b:loading_command['commandSpectrum']=='buffer' && b:loading_command['commandOrigin']==expand('%:p')
     call DebugBuf("loaded buffer command")
     let b:commands['pages'][page][key]=copy(b:loading_command)
     return
   endif
-  if b:loading_command['commandSpectrum']=='folder' && b:loading_command['commandFile']==expand('%:p:h')
+  if b:loading_command['commandSpectrum']=='folder' && b:loading_command['commandOrigin']==expand('%:p:h')
     call DebugBuf("loaded folder command")
     let b:commands['pages'][page][key]=copy(b:loading_command)
     return
   endif
-  if b:loading_command['commandSpectrum']=='repo' && b:loading_command['commandFile']==Folder_Repo_Or_Project_Only()
+  if b:loading_command['commandSpectrum']=='repo' && b:loading_command['commandOrigin']==Folder_Repo_Or_Project_Only()
     call DebugBuf("loaded repo command")
     let b:commands['pages'][page][key]=copy(b:loading_command)
     return
@@ -3588,7 +3604,7 @@ function! EmptyCommand()
   " direction: hjkl
   " directionMode: HJKL, neighbor, foremost
   " directionSkipping: 0 1 2 3
-  " commandFile: /path/to/.command.vim_configuration
+  " commandOrigin: /path/to/.command.vim_configuration
   " commandMode: term buffer newbuffer
   " commandModeSession: -1 / none / bashsession / pythonsession
   " commandInterpreter: bash / vim / python
@@ -3609,7 +3625,7 @@ function! EmptyCommand()
     \ "commandSpectrum": -1,
     \ "savein": -1,
     \ "released": -1,
-    \ "commandFile": -1,
+    \ "commandOrigin": -1,
     \ "commandMode": -1,
     \ "commandModeSession": -1,
     \ "commandInterpreter": -1,
@@ -3631,6 +3647,8 @@ function! VimCommand(command='')
   let c['commandSpectrum']='buffer'
   let c['savein']=b:savein
   let c['released']=b:released
+  let c['decision_mode']="check_direct"
+  let c['decision_algorithm']="check_only_one_direction"
   let c['bufferFile']=''
   let c['commandInterpreter']='vim'
   let c['commandOutputMode']='put'
@@ -3654,10 +3672,12 @@ function! CommandExample()
   let c['name']='unnamed'
   let c['direction']=g:default_direction
   let c['directionMode']='foremost'
-  let c['commandFile']=VimConfiguration()
+  let c['commandOrigin']=VimConfiguration()
   let c['commandSpectrum']='global'
   let c['savein']=b:savein
   let c['released']=b:released
+  let c['decision_mode']="check_direct"
+  let c['decision_algorithm']="check_only_one_direction"
   let c['bufferFile']=''
   let c['commandMode']='term'
   let c['commandModeSession']='none'
@@ -6708,31 +6728,112 @@ function! EchoSafely(msg, ms=700) abort
 endfunction
 command! -nargs=1 EchoSafely call EchoSafely(<q-args>)
 
-function FixBufNr(c)
-  let c=a:c
-  if !bufexists(c['bufnr'])
-    let c['bufnr']=-1
-  endif
-  if c['bufnr']==-1
-    " let buf=term
-    let c['bufnr']=GetBufDirectionIfTerm(c['direction'])
-    if c['bufnr']==-1
-      let [c['direction'],c['bufnr']]=FindSomeTerm()
+" function FixBufNr(c, mode='right')
+"   let c=a:c
+"   if !bufexists(c['bufnr'])
+"     let c['bufnr']=-1
+"   endif
+"   if c['bufnr']==-1
+"     " let buf=term
+"     let c['bufnr']=GetBufDirectionIfTerm(c['direction'])
+"     if c['bufnr']==-1
+"       let [c['direction'],c['bufnr']]=FindSomeTerm()
+"     endif
+"     if c['bufnr']==-1
+"       call Open('J', "terminal", "new")
+"       let [c['direction'],c['bufnr']]=FindSomeTerm()
+"     endif
+"   elseif !bufexists(c['bufnr'])
+"     call Open('J', "terminal", "new")
+"     let [c['direction'],c['bufnr']]=FindSomeTerm()
+"   elseif BufExistsAndAlive(bufnr())
+"     echo "Try To ReOpen"
+"     " call Open('J', "terminal", buf)
+"   endif
+" endfunction
+let FixBufNr_decision_mode = [
+  \ "check_direct",
+  \ "check_faraway",
+  \]
+let FixBufNr_decision_algorithm = [
+  \ "check_clockwise",
+  \ "check_only_one_direction",
+  \ "check_multiple_directions",
+  \]
+function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
+  fun! _not_implemented()
+    echo "FixBufNr: Not Implemented"
+  endfun
+  "
+  fun! _check_direct() closure
+    return GetBufDirectionIfTermDirect(d)
+  endfun
+  fun! _check_faraway() closure
+    return GetBufDirectionIfTerm(d)
+  endfun
+  let F_decision_mode_fun=a:decision_mode=="check_direct"?{ -> _check_direct()}:a:decision_mode=="check_faraway"?{ -> _check_faraway()}:{ -> _not_implemented()}
+  "
+  let d='l'
+  fun! _check_clockwise()  closure
+    let dirs=['l','j','h','k']
+    for d in dirs
+      let x = F_decision_mode_fun(d)
+      if x!=-1 | return x | endif
+    endfor
+  endfun
+  fun! _check_only_one_direction()  closure
+    return F_decision_mode_fun(d)
+  endfun
+  fun! _check_multiple_directions() closure
+    let dirs=['l','h']
+    for d in dirs
+      let x = F_decision_mode_fun(d)
+      if x!=-1 | return x | endif
+    endfor
+  endfun
+  let F_decision_algorithm_fun=a:decision_algorithm=="check_clockwise"?{ -> _check_clockwise()}:a:decision_algorithm=="check_only_one_direction"?{ -> _check_only_one_direction()}:a:decision_algorithm=="check_multiple_directions"?{ -> _check_multiple_directions()}:{ -> _not_implemented()}
+  " return
+  let buf=F_decision_algorithm_fun()
+  call DebugBuf("Fixing Buf Nr: "..buf)
+  let save_win = win_getid()
+  if !bufexists(buf)
+    " if d==-1 | let d="l" | endif
+    call DebugBuf("In This Case, A Command Gets Send To A Term That Has Not Finished Being Created")
+    call Open(d, "terminal", "new")
+  else
+    if GetBufDirectionIfTermDirect(d)==-1
+      call DebugBuf("Try To ReOpen " .. d)
+    call DebugBuf("In This Case, A Command Gets Send To A Term That Has Not Finished Being Created")
+      call Open(d, "terminal", buf)
     endif
-    if c['bufnr']==-1
-      call Open('J', "terminal", "new")
-      let [c['direction'],c['bufnr']]=FindSomeTerm()
-    endif
-  elseif !bufexists(c['bufnr'])
-    call Open('J', "terminal", "new")
-    let [c['direction'],c['bufnr']]=FindSomeTerm()
-  elseif BufExistsAndAlive(bufnr())
-    echo "Try To ReOpen"
-    " call Open('J', "terminal", buf)
   endif
+  call win_gotoid(save_win)
+  return buf
+  "
+  " let c=a:c
+  " if !bufexists(c['bufnr'])
+  "   let c['bufnr']=-1
+  " endif
+  " if c['bufnr']==-1
+  "   " let buf=term
+  "   let c['bufnr']=GetBufDirectionIfTerm(c['direction'])
+  "   if c['bufnr']==-1
+  "     let [c['direction'],c['bufnr']]=FindSomeTerm()
+  "   endif
+  "   if c['bufnr']==-1
+  "     call Open('J', "terminal", "new")
+  "     let [c['direction'],c['bufnr']]=FindSomeTerm()
+  "   endif
+  " elseif !bufexists(c['bufnr'])
+  "   call Open('J', "terminal", "new")
+  "   let [c['direction'],c['bufnr']]=FindSomeTerm()
+  " elseif BufExistsAndAlive(bufnr())
+  "   echo "Try To ReOpen"
+  "   " call Open('J', "terminal", buf)
+  " endif
 endfunction
 
-function! DetermineCommandFile()
+function! DetermineCommandOrigin()
   if b:savein=="samedir"
     return expand('%:p:h')
   elseif b:savein=="repo"
@@ -6766,11 +6867,41 @@ endfunction
   " when 2 commands conflict at one key, make them selectable with repeatd keypressing (reverse order)
   " (1) load them anyways when in vimconfiguration / sometimes, when in projectroot / samedir or infile
 
+function! GetMatchingCommand()
+  let c = ''
+  let val = filter(copy(g:commands), { i,v ->
+    \ v:val["key"]==g:keymap
+    \ && v:val["commandSpectrum"]=="buffer"
+    \ && v:val["bufferFile"]==expand('%:p')
+    \ })
+  let c=empty(val)?c:empty(val)?c:val[0]
+  "
+  let val = filter(copy(g:commands), { i,v ->
+    \ v:val["key"]==g:keymap
+    \ && v:val["commandSpectrum"]=="folder"
+    \ })
+  let c=empty(c)?c:empty(val)?c:val[0]
+  "
+  let val = filter(copy(g:commands), { i,v ->
+    \ v:val["key"]==g:keymap
+    \ && v:val["commandSpectrum"]=="repo"
+    \ })
+  let c=empty(c)?c:empty(val)?c:val[0]
+  "
+  let val = filter(copy(g:commands), { i,v ->
+    \ v:val["key"]==g:keymap
+    \ && v:val["commandSpectrum"]=="global"
+    \ })
+  let c=empty(c)?c:empty(val)?c:val[0]
+  return c
+endfunction
+
 function! Command() range
+  call InitCommands()
   " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
   " return
   let vs=VS()
-  call DebugBuf(g:keymap, 1)
+  call DebugBuf(g:keymap, 1, 1)
   " call CommandPageInit()
   " call CommandPageInit()
   " call DebugBuf(P(b:commands))
@@ -6780,9 +6911,11 @@ function! Command() range
   " echo g:keymap type(c)
   if g:mode=='visual'
     let c=TermCommand()
-    let c['commandFile']=DetermineCommandFile()
+    let c['commandOrigin']=DetermineCommandOrigin()
     let c['savein']=b:savein
     let c['released']=b:released
+    let c['decision_mode']="check_direct"
+    let c['decision_algorithm']="check_only_one_direction"
     let c['bufferFile']=b:spectrum=='buffer'?expand('%:p'):''
     let c['commandSpectrum']=b:spectrum
     let c['command']=vs
@@ -6790,8 +6923,8 @@ function! Command() range
     let c['key']=g:keymap
     let c['direction']=g:default_direction
     " let b:commands['pages'][0][g:keymap]=c
-    " call filter(copy(g:commands), '!(v:val["commandSpectrum"]==c["commandSpectrum"]&&v:val["commandFile"]==c["commandFile"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
-    call DebugBuf(vs)
+    " call filter(copy(g:commands), '!(v:val["commandSpectrum"]==c["commandSpectrum"]&&v:val["commandOrigin"]==c["commandOrigin"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
+    " call DebugBuf(vs)
     " let g:commands=[]
     " let g:commands=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
     " echo g:commands
@@ -6800,82 +6933,61 @@ function! Command() range
     let found_index=indexof(copy(g:commands), { i,v->
       \    v:val["key"]==c["key"]
       \ && v:val["commandSpectrum"]==c["commandSpectrum"]
+      \ && v:val["bufferFile"]==c["bufferFile"]
       \ && v:val["page"]==c["page"]
       \ })
     " echo found_index
     if found_index>-1
       " remove(g:commands, found_index)
-      " echo "overwriting"
+      call DebugBuf("overwriting")
       let g:commands[found_index]=c
     else
-      " echo "notoverwriting"
+      call DebugBuf("notoverwriting")
       " echo c
       call add(g:commands, c)
     endif
-    call DebugBuf(g:commands)
-    " call DebugBuf(b:commands)
     call SaveCommands()
   else
     let c=''
-    "
-    let val = filter(copy(g:commands), { i,v ->
-      \ v:val["key"]==g:keymap
-      \ && v:val["commandSpectrum"]=="buffer"
-      \ })
-    let c=empty(val)?c:empty(val)?c:val[0]
-    "
-    let val = filter(copy(g:commands), { i,v ->
-      \ v:val["key"]==g:keymap
-      \ && v:val["commandSpectrum"]=="folder"
-      \ })
-    let c=empty(c)?c:empty(val)?c:val[0]
-    "
-    let val = filter(copy(g:commands), { i,v ->
-      \ v:val["key"]==g:keymap
-      \ && v:val["commandSpectrum"]=="repo"
-      \ })
-    let c=empty(c)?c:empty(val)?c:val[0]
-    "
-    let val = filter(copy(g:commands), { i,v ->
-      \ v:val["key"]==g:keymap
-      \ && v:val["commandSpectrum"]=="global"
-      \ })
-    let c=empty(c)?c:empty(val)?c:val[0]
-    "
+    let c=GetMatchingCommand()
     if !empty(c)
       let b:savein=c['savein']
       let b:released=c['released']
       let b:spectrum=c['commandSpectrum']
-      call DebugBuf(c)
+      " call DebugBuf(c)
     else
       call DebugBuf('No Command Found under '..g:keymap)
+      return
     endif
     "
     " let c=g:commands['pages'][0][g:keymap]
   endif
-  " call DebugBuf(c)
   if type(c)==0 && c['command'] != -1
+    call DebugBuf(c)
     call DebugBuf("Command Not Send\n"..Pretty(c))
   elseif type(c)!=3
     " call EchoSafely(Pretty(c), 700)
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
-    " call DebugBuf(Pretty(c['command']))
-    if c['bufnr']==-1 || !BufVisibileInCurrentTab(c['bufnr'])
-      call FixBufNr(c)
+    "
+    " Find Buffer
+    let target_term_buffer=FixBufNr(c['decision_mode'], c['decision_algorithm'])
+    if target_term_buffer==-1 || !BufVisibileInCurrentTab(target_term_buffer)
+      call DebugBuf("BufNr: "..target_term_buffer)
     endif
     " let b:MapCommand[c['direction']..'t']={'bufnr': buf, 'dir': dir }
     " let buf=GetBufDirectionIfTerm(c['direction'])
     " let buf=winbufnr(win)
-    if c['bufnr']!=-1
+    if target_term_buffer!=-1
       " let buf=winbufnr(winnr(c['direction']))
-      " call TERM(c['bufnr'], c['command'])
-      call SendCommandToTermByBuf(c['bufnr'], c['command'])
+      " call TERM(target_term_buffer, c['command'])
+      call SendCommandToTermByBuf(target_term_buffer, c['command'])
       call DebugBuf("Command Send")
     else
+      call DebugBuf(c)
       call DebugBuf("Command Not Send")
     endif
   else
-    call DebugBuf(Pretty("What A Type"))
+    call DebugBuf(Pretty("Type Error"))
   endif
   " echo g:commands
 endfunction
@@ -6912,6 +7024,9 @@ function! DebugBuf(data, clear=0, checkbuf=0)
     " Text
     call appendbufline(t:debugbuf, '$', split(a:data, ''))
     call win_gotoid(save_win)
+    if a:clear==1
+      call deletebufline(t:debugbuf, 1)
+    endif
   else
     if a:clear==1
       call deletebufline(t:debugbuf, 1, '$')
