@@ -101,6 +101,12 @@ function! _map(opts) range
 endfunction
 
 let s:newmaps=[]
+" -nargs=0    No arguments are allowed (the default)
+" -nargs=1    Exactly one argument is required, it includes spaces
+" -nargs=*    Any number of arguments are allowed (0, 1, or many),
+"     separated by white space
+" -nargs=?    0 or 1 arguments are allowed
+" -nargs=+    Arguments must be supplied, but any number are allowed
 let g:newmap_optschema = [
   \ [ 'a', 'A|a', 0],
   \ [ 'aa', 'AA|aa', 0],
@@ -127,6 +133,7 @@ let g:newmap_optschema = [
   \ [ 'command', 'command', 0],
   \ [ 'shift', 'shift', 0],
   \ [ 'alt', 'alt|meta', 0],
+  \ [ 'directly', 'directly', 0]
   \ ]
 
 function! NewMap(args)
@@ -191,6 +198,13 @@ function! NewMap(args)
   "   let opts.o=1
   "   let opts.l=1
   " endif
+  let leaders=[]
+  if opts.leaders
+    let l=split(opts.leadersValues, '-')
+    let leaders=range(l[0], l[1])
+  else
+    let leaders=[0]
+  endif
   " let opts={'command': -1, 'shift': -1, 'alt': -1}
   " let opts.command=1
   " let opts.shift=1
@@ -226,17 +240,36 @@ function! NewMap(args)
     endif
   endfor
   " exec "for n in range("..opts.nr..")"
-  for a in modifiers
-    let obj=copy(opts)
-    " echo obj
-    let obj.key=substitute(obj.key, '{modifiers}', a, 'g')
-    let obj.default=substitute(obj.default, '{modifiers}', a, 'g')
-    call extend(g:newmap_buildfile, _map(obj))
-    let gc=VimCommand()
-    call _command(gc)
+  if opts.directly
+    let newmap_directly=[]
+  endif
+  " call DebugBuf(leaders)
+  for leader_n in leaders
+    let leaders_prefix=repeat(",", leader_n)
+    for a in modifiers
+      let obj=copy(opts)
+      " echo obj
+      let obj.key=leaders_prefix..substitute(obj.key, '{modifiers}', a, 'g')
+      let obj.default=substitute(obj.default, '{modifiers}', a, 'g')
+      if opts.directly
+        call extend(newmap_directly, _map(obj))
+      else
+        call extend(g:newmap_buildfile, _map(obj))
+      endif
+      let gc=VimCommand()
+      call _command(gc)
+    endfor
   endfor
-  " echo g:newmap_buildfile
-  " endfor
+  " if opts.directly
+  "   for m in newmap_directly
+  "     call DebugBuf(m)
+  "     exec m
+  "   endfor
+  " else
+  "   for m in g:newmap_buildfile
+  "     call DebugBuf(m)
+  "   endfor
+  " endif
   endif
 endfunction
 command! -range -nargs=+ NewMap call NewMap(<q-args>)

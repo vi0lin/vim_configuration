@@ -758,12 +758,14 @@ function GetOpts(args_str, structure, delimeter='--')
     for s in a:structure
       if s[2]==0
         let opts[s[0]]=0
-      elseif s[2]=='n'
-        let opts[s[0]]=[]
       elseif s[2]==1
-        let opts[s[0]]=""
-      elseif s[2]>1
-        let opts[s[0]]=[]
+        \ || s[2]=='n'|| s[2]=='*'
+        \ || s[2]=='?'
+        \ || s[2]>1
+        \ || s[2]=='+'
+        " let opts[s[0]]=""
+        let opts[s[0]]=0
+        " let opts[s[0].."Values"]=[]
       endif
     endfor
     return opts
@@ -929,11 +931,14 @@ function GetOpts(args_str, structure, delimeter='--')
   let ignore_flags=0
   " Specifications
   function! Specification() closure
-    let arg_idx = 0
+    let match_idx = -1
     let fill_n=0
     let bag_name=''
     call Debug(opts, 1, 1, "getopts.args: "..string(getopts.args))
     call Debug(opts, 1, 1, "RANGE: "..string(range(0,len(getopts.args)-1)))
+    let cardinality_countdown=0
+    let cardinality_countdown_zero_or_one=0
+    let cardinality_countdown_at_least_one=0
     for arg_idx in range(0,len(getopts.args)-1)
       let stripped_arg=getopts.args[arg_idx]
       let match=[]
@@ -954,29 +959,58 @@ function GetOpts(args_str, structure, delimeter='--')
       " Specs
       if !ignore_flags
         " Is Bag Value
-        if !empty(bag_name)
+        if !empty(bag_name) || cardinality_countdown>0 || cardinality_countdown==-1
+          " call DebugBuf("Is Bag Value")
           call add(specs.argtypes, 2)
           call add(specs.arg_is_default, 0)
           call add(specs.cardinalities, -1)
+          if cardinality_countdown>0
+            let cardinality_countdown-=1
+          elseif cardinality_countdown==-1
+            " found GetOpt
+            if !empty(match)
+              let cardinality_countdown=0
+            endif
+          endif
         " Is GetOpt
         elseif !empty(match)
+          " call DebugBuf("Is GetOpt")
           call add(specs.argtypes, 1)
           call add(specs.arg_is_default, 0)
           call add(specs.cardinalities, match[2])
+          if     match[2]==0
+            let cardinality_countdown=0
+          elseif match[2]==1
+            let cardinality_countdown=1
+          elseif match[2]=='*'||match[2]=='n'
+            let cardinality_countdown=-1
+          elseif match[2]=='?'
+            let cardinality_countdown=1
+            let cardinality_countdown_zero_or_one=1
+          elseif match[2]=='*'
+            let cardinality_countdown=-1
+            let cardinality_countdown_at_least_one=1
+          endif
+          if cardinality_countdown>-1 && cardinality_countdown<1
+            let match_idx+=1
+          endif
         " Not In GetOpt
         elseif empty(match)
+          " call DebugBuf("Not In GetOpt")
           call add(specs.argtypes, 0)
           call add(specs.arg_is_default, 1)
           call add(specs.cardinalities, -1)
         endif
       " Defaults
       else
-        call add(specs.arg_is_default, 1)
+        " call DebugBuf("Defaults")
         call add(specs.argtypes, 3)
+        call add(specs.arg_is_default, 1)
         call add(specs.cardinalities, -1)
       endif
       " Start Default, Just In Case
-      if specs.arg_is_default[arg_idx]==1
+      if specs.arg_is_default[arg_idx]==1 && !ignore_flags
+        " call DebugBuf("Start Default")
         let ignore_flags=1
       endif
       call Debug(opts, 1, 7, "specs: "..string(specs))
@@ -1002,54 +1036,65 @@ function GetOpts(args_str, structure, delimeter='--')
           let opts.default=args_str
         endif
       endif
+      " call DebugBuf(stripped_arg)
+      " call DebugBuf(specs)
       " Processing
-        if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
-          " set-flag
-          let opts[specs.matches[arg_idx][0]]=1
-        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==1
-          " set fill-one
-          " ignore StartsWithDash
-          let bag_name=match[0]
-          call Debug(opts, 1, 10, "bag_name", bag_name)
-          let fill_n=1
-        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
-          " set fill-until-delimeter
-          " ignore StartsWithDash
-          let bag_name=match[0]
-          call Debug(opts, 1, 10, "bag_name", bag_name)
-          let fill_n=-1
-        elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=~'\d'
-          " set fill-\d
-          " ignore StartsWithDash
-          let bag_name=match[0]
-          call Debug(opts, 1, 10, "bag_name", bag_name)
-          let fill_n=specs.cardinalities[arg_idx]
-        elseif specs.argtypes[arg_idx]==2
-          " fill-bag
-          " todo FILL BAG - int string dict list
-          call Debug(opts, 1, 10, "FILL BAG")
-          call Debug(opts, 1, 12, 'bag_name: ', bag_name)
-          " call Debug(opts, 1, 12, 'specs.matches', specs.matches)
-          let bag_len=len(opts[bag_name])
-          if bag_len==0
-            let opts[bag_name]=getopts.args[arg_idx]
-          elseif bag_len>0
-            call add(opts[bag_name], [ getopts.args[arg_idx] ])
-          endif
-          call Debug(opts, 10, 12, "bag_name: ", bag_name, ", fill_n: ", fill_n, ", bag_len: ", bag_len, ', opts[bag_name]: :', opts[bag_name])
-          if fill_n>0
-            let fill_n-=1
-          endif
-          if fill_n==-1
-            if getopts.args[arg_idx][0:1]==a:delimeter
-              let fill_n=0
-            endif
-          endif
-          if fill_n==0
-            let bag_name=''
-            call Debug(opts, 1, 10, "bag_name", bag_name)
+      if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
+        " call DebugBuf("argtype==1 && cardinality==0")
+        " set-flag
+        let opts[specs.matches[match_idx][0]]=1
+      elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==1
+        " call DebugBuf("argtype==1 && cardinality==1")
+        " set fill-one
+        " ignore StartsWithDash
+        let bag_name=match[0].."Values"
+        let opts[bag_name]=[]
+        call Debug(opts, 1, 10, "bag_name", bag_name)
+        let fill_n=1
+      elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
+        " call DebugBuf("argtype==1 && cardinality==n")
+        " set fill-until-delimeter
+        " ignore StartsWithDash
+        let bag_name=match[0].."Values"
+        let opts[bag_name]=[]
+        call Debug(opts, 1, 10, "bag_name", bag_name)
+        let fill_n=-1
+      elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=~'\d'
+        " call DebugBuf("argtype==1 && cardinality=~\d")
+        " set fill-\d
+        " ignore StartsWithDash
+        let bag_name=match[0].."Values"
+        let opts[bag_name]=[]
+        call Debug(opts, 1, 10, "bag_name", bag_name)
+        let fill_n=specs.cardinalities[arg_idx]
+      elseif specs.argtypes[arg_idx]==2
+        " call DebugBuf("argtype==2")
+        " call DebugBuf("bag_name: "..bag_name)
+        " fill-bag
+        " todo FILL BAG - int string dict list
+        call Debug(opts, 1, 10, "FILL BAG")
+        call Debug(opts, 1, 12, 'bag_name: ', bag_name)
+        " call Debug(opts, 1, 12, 'specs.matches', specs.matches)
+        let bag_len=len(opts[bag_name])
+        if bag_len==0
+          let opts[bag_name]=getopts.args[arg_idx]
+        elseif bag_len>0
+          call add(opts[bag_name], [ getopts.args[arg_idx] ])
+        endif
+        call Debug(opts, 10, 12, "bag_name: ", bag_name, ", fill_n: ", fill_n, ", bag_len: ", bag_len, ', opts[bag_name]: :', opts[bag_name])
+        if fill_n>0
+          let fill_n-=1
+        endif
+        if fill_n==-1
+          if getopts.args[arg_idx][0:1]==a:delimeter
+            let fill_n=0
           endif
         endif
+        if fill_n==0
+          let bag_name=''
+          call Debug(opts, 1, 10, "bag_name", bag_name)
+        endif
+      endif
     endfor
     return specs
   endfunction
@@ -2010,8 +2055,8 @@ fun! CloseOther()
     execute b.'bd'
   endfor
 endf
-map <F12> :call CloseOther()<cr>
-map <leader>p :DecidePush<cr>
+" map <F12> :call CloseOther()<cr>
+" map <leader>p :DecidePush<cr>
 
 function! Help()
   " if getbufvar(bufnr(), '&buftype') == 'terminal'

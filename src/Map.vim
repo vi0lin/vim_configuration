@@ -89,10 +89,14 @@ command -range -nargs=* Inc :call Inc(<f-args>)
 " print("TEST!")
 "
 " NewMap -v -n -no -command -shift -alt -nr 5,8 <{modifiers}F5> :call Eexec({nr})<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F5> :call Command()<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F6> :call Command()<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F7> :call Command()<cr>
-NewMap -v -n -no -command -shift -alt <{modifiers}F8> :call Command()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F5> :call Command()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F6> :call Command()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F7> :call Command()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F8> :call Command()<cr>
+
+" Example
+" NewMap -directly -v -n -no -command -shift -alt <{modifiers}F8> :call Command()<cr>
+" NewMap -v -n -no -leaders 0-5 -loop prefix 0-5 -command -shift -alt {prefix}<{modifiers}F5> :call Command()<cr>
 
 """" old command mappings " Todo
 """" old command mappings " When A Visual Selection Is Set
@@ -1241,6 +1245,6 @@ NewMap -no -n -v <C-S-M-F2> :CFDo<cr>
 NewMap -no -v -n <C-]> :OR 1<CR>
 NewMap -no -v -n <C-\> :OR -1<CR>
 
-NewMap -no -v -n ,<F5> :Rel<cr>
+NewMap -no -v -n ,re :Rel<cr>
 
 endif
