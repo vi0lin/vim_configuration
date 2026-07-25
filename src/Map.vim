@@ -1051,7 +1051,7 @@ NewMap -no -n <C-S-'> 20zl
 
 NewMap -no -n ,<C-s> :call ExecFunction()<cr>
 NewMap -no -v -n ,s :call ExecVS()<cr>
-NewMap -directly -no -n -key ,S :Re \| :%source \| :ReEnd<cr>
+NewMap -no -n ,S :Re \| :%source \| :ReEnd<cr>
 NewMap -no -n ,rd :call RedoLeaderS()<cr>
 
 "!! source even with comment # // " literals

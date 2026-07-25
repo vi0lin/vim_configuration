@@ -765,7 +765,8 @@ function GetOpts(args_str, structure, delimeter='--')
         \ || s[2]=='+'
         " let opts[s[0]]=""
         let opts[s[0]]=0
-        " let opts[s[0].."Values"]=[]
+        " let opts[]=[]
+        let opts[s[0].."Values"]=[]
       endif
     endfor
     return opts
@@ -992,8 +993,9 @@ function GetOpts(args_str, structure, delimeter='--')
             let cardinality_countdown_at_least_one=1
           endif
           if cardinality_countdown>-1 && cardinality_countdown<1
-            let match_idx+=1
+            " let match_idx+=1
           endif
+          let match_idx+=1
         " Not In GetOpt
         elseif empty(match)
           " call DebugBuf("Not In GetOpt")
@@ -1038,33 +1040,35 @@ function GetOpts(args_str, structure, delimeter='--')
       endif
       " call DebugBuf(stripped_arg)
       " call DebugBuf(specs)
+      " call DebugBuf(match_idx)
+      " call DebugBuf("")
       " Processing
       if specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==0
         " call DebugBuf("argtype==1 && cardinality==0")
         " set-flag
         let opts[specs.matches[match_idx][0]]=1
       elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]==1
+        let opts[specs.matches[match_idx][0]]=1
         " call DebugBuf("argtype==1 && cardinality==1")
         " set fill-one
         " ignore StartsWithDash
         let bag_name=match[0].."Values"
-        let opts[bag_name]=[]
         call Debug(opts, 1, 10, "bag_name", bag_name)
         let fill_n=1
       elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=='n'
+        let opts[specs.matches[match_idx][0]]=1
         " call DebugBuf("argtype==1 && cardinality==n")
         " set fill-until-delimeter
         " ignore StartsWithDash
         let bag_name=match[0].."Values"
-        let opts[bag_name]=[]
         call Debug(opts, 1, 10, "bag_name", bag_name)
         let fill_n=-1
       elseif specs.argtypes[arg_idx]==1 && specs.cardinalities[arg_idx]=~'\d'
+        let opts[specs.matches[match_idx][0]]=1
         " call DebugBuf("argtype==1 && cardinality=~\d")
         " set fill-\d
         " ignore StartsWithDash
         let bag_name=match[0].."Values"
-        let opts[bag_name]=[]
         call Debug(opts, 1, 10, "bag_name", bag_name)
         let fill_n=specs.cardinalities[arg_idx]
       elseif specs.argtypes[arg_idx]==2

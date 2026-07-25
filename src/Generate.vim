@@ -14,7 +14,6 @@ endfunction
 function! _map(opts) range
   let map=[]
   let opts=a:opts
-  let key=opts.key
   if opts.silent | let silent="<silent>" | else | let silent="" | endif
   if opts.noremap 
    let nore="nore" 
@@ -147,10 +146,11 @@ function! NewMap(args)
   if !opts.a && !opts.aa && !opts.all
     let opts.all=0
   endif
-  call DebugBuf(opts.keyValues)
-  if opts.key==''
-    let opts.key=split(opts.default, ' ')[0]
+  if opts.key==0
+    let opts.keyValues=split(opts.default, ' ')[0]
     let opts.default=join(split(opts.default, ' ')[1:], ' ')
+  else
+    let key=opts.keyValues[0]
   endif
   if opts.all >= 1
     let opts.normal=1
