@@ -7088,6 +7088,16 @@ function! NewOrOverwrite(c)
   if found_index>-1
     " remove(g:commands, found_index)
     call DebugBuf("overwriting")
+    if c['commandSpectrum']=='buffer'
+      let c['commandBuffer']=expand('%:p')
+    elseif c['commandSpectrum']=='repo'
+      let c['commandRepo']=Folder_Repo_Or_Project_Only()
+    elseif c['commandSpectrum']=='folder'
+      let c['commandRepo']=expand('%:p:h')
+    elseif c['commandSpectrum']=='global'
+    elseif c['commandSpectrum']=='tab'
+      "global", "repo", "folder", "tab", "buffer"
+    endif
     let g:commands[found_index]=c
   else
     call DebugBuf("not overwriting - new command")
