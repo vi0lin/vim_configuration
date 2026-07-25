@@ -89,7 +89,7 @@ function! _map(opts) range
   if opts.o
     let prefix=_prefix('o')
     let setmode=_setmode("O")
-    call _build([ 'o'..nore..'map', silent, opts.keyValue[], setmode, opts.default ])
+    call _build([ 'o'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   if opts.l
     let prefix=_prefix('l')
@@ -147,7 +147,8 @@ function! NewMap(args)
     let opts.all=0
   endif
   if opts.key==0
-    let opts.keyValues=split(opts.default, ' ')[0]
+    let opts.keyValues=[]
+    call extend(opts.keyValues, [split(opts.default, ' ')[0]])
     let opts.default=join(split(opts.default, ' ')[1:], ' ')
   endif
   " let key=opts.keyValues[0]
@@ -249,8 +250,9 @@ function! NewMap(args)
     for a in modifiers
       let obj=copy(opts)
       " echo obj
-      "
-      let obj.keyValues[0]=leaders_prefix..substitute(obj.keyValues[0], '{modifiers}', a, 'g')
+      " call DebugBuf(obj.keyValues)
+      let obj.keyValues=[]
+      call extend(obj.keyValues, [leaders_prefix..substitute(opts.keyValues[0], '{modifiers}', a, 'g')])
       let obj.default=substitute(obj.default, '{modifiers}', a, 'g')
       if opts.directly
         call extend(newmap_directly, _map(obj))
