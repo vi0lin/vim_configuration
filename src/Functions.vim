@@ -3426,27 +3426,28 @@ function! LoadCommands()
   "   let cwd=GetParentDir(cwd)
   " endwhile
   " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'), 0)
-  call DebugBuf("Commands", 1, 1)
+  call DebugBuf("Commands", 1, 0)
   for cf in commandorigins
     if filereadable(cf)
-      call DebugBuf("Loading: "..cf, 0, 1)
+      call DebugBuf("Loading: "..cf, 0, 0)
       try
         let d=join(Read(cf), '')
         let data=json_decode(d)
       catch
-        call DebugBuf("Error Parsing File: "..cf, 0, 1)
+        call DebugBuf("Error Parsing File: "..cf, 0, 0)
       finally
         if !empty(data)
           call extend(g:commands, data)
-          call DebugBuf(printf("Added %s commands", len(data)), 0, 1)
+          call DebugBuf(printf("Added %s commands", len(data)), 0, 0)
+          call DebugBuf(map(copy(data), {_, v -> {"buffer": v['bufferFile'], "command": v['command'], "key": v['key']}}), 0, 0)
         endif
-        call DebugBuf(printf("Nothing to add in %s", len(data)), 0, 1)
+        call DebugBuf(printf("Nothing to add in %s", len(data)), 0, 0)
       endtry
     endif
   endfor
   call DebugBuf(join(map(copy(g:commands),
         \ {_, v -> {"buffer": v['bufferFile'], "key": v['key']}}
-    \ ), "\n"),0 , 1)
+    \ ), "\n"),0 , 0)
   return g:commands
   " call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
   "" for page in copy(b:commands['pages'])
@@ -6941,6 +6942,12 @@ function! GetMatchingCommand()
   return c
 endfunction
 
+function! ConfigureKeys()
+  let all=["\<F5>", "\<F6>","\<F7>","\<F8>"]
+  let alll=["<F5>", "<F6>","<F7>","<F8>"]
+  echo alll
+endfunction
+
 function! Command() range
   call InitCommands()
   " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
@@ -6992,6 +6999,9 @@ function! Command() range
       call add(g:commands, c)
     endif
     call SaveCommands()
+  elseif g:keymap=~","
+    call ConfigureKeys()
+    return
   else
     let c=''
     let c=GetMatchingCommand()
@@ -7067,7 +7077,8 @@ function! DebugBuf(data, clear=0, checkbuf=0)
       call deletebufline(t:debugbuf, 1, '$')
     endif
     " Text
-    call appendbufline(t:debugbuf, '$', split(a:data, ''))
+    call appendbufline(t:debugbuf, '$', a:data)
+    " call appendbufline(t:debugbuf, '$', split(a:data, ''))
     call win_gotoid(save_win)
     if a:clear==1
       call deletebufline(t:debugbuf, 1)
@@ -8025,11 +8036,20 @@ function! Width(width)
   exec "vertical resize "..a:width
 endfunction
 command! -nargs=1 Width call Width(<q-args>)
+command! -nargs=1 W call Width(<q-args>)
 
 function! Height(height)
   exec "horizontal resize "..a:height
 endfunction
 command! -nargs=1 Height call Height(<q-args>)
+command! -nargs=1 H call Height(<q-args>)
+
+function! Equal()
+  " :E 3l
+  " :E 2h
+  " :E all
+endfunction
+command! -nargs=1 E call Equal(<q-args>)
 
 function! Bigger()
   let vim_height = &lines

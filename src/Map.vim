@@ -1049,10 +1049,10 @@ NewMap -no -n <C-S-'> 20zl
 " nnoremap <silent> ,lN :lfirst<cr>zz
 " nnoremap <silent> ,lP :llast<cr>zz
 
-NewMap -no -n -key ,<C-s> :call ExecFunction()<cr>
+NewMap -no -n ,<C-s> :call ExecFunction()<cr>
 NewMap -no -v -n ,s :call ExecVS()<cr>
-NewMap -no -n -key ,S :Re \| :%source \| :ReEnd<cr>
-NewMap -no -n -key ,rd :call RedoLeaderS()<cr>
+NewMap -directly -no -n -key ,S :Re \| :%source \| :ReEnd<cr>
+NewMap -no -n ,rd :call RedoLeaderS()<cr>
 
 "!! source even with comment # // " literals
 " NewMap -no <F6> :autocmd! BufAdd,BufCreate,BufDelete,BufWipeout,BufNew,BufEnter,BufLeave,WinEnter,BufWinEnter,BufUnload *<cr>

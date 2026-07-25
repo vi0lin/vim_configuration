@@ -845,11 +845,11 @@ nnoremap <C-;> :call SetMode("\<C-;\>", "Normal") \| zh
 nnoremap <C-'> :call SetMode("\<C-'\>", "Normal") \| zl
 nnoremap <C-S-;> :call SetMode("\<C-S-;\>", "Normal") \| 20zh
 nnoremap <C-S-'> :call SetMode("\<C-S-'\>", "Normal") \| 20zl
-nnoremap :call :call SetMode(":call", "Normal") \| ExecFunction()<cr>
+nnoremap ,<C-s> :call SetMode(",\<C-s\>", "Normal") \| :call ExecFunction()<cr>
 nnoremap ,s :call SetMode(",s", "Normal") \| :call ExecVS()<cr>
 vnoremap ,s :call SetMode(",s", "Visual") \| '<,'>:call ExecVS()<cr>
-nnoremap :Re :call SetMode(":Re", "Normal") \| \| :%source \| :ReEnd<cr>
-nnoremap :call :call SetMode(":call", "Normal") \| RedoLeaderS()<cr>
+nnoremap ,S :call SetMode(",S", "Normal") \| :Re \| :%source \| :ReEnd<cr>
+nnoremap ,rd :call SetMode(",rd", "Normal") \| :call RedoLeaderS()<cr>
 nnoremap <C-7> :call SetMode("\<C-7\>", "Normal") \| :call ToggleComment()<cr>
 nnoremap ,cf :call SetMode(",cf", "Normal") \| :CF 
 vnoremap <F1> :call SetMode("\<F1\>", "Visual") \| '<,'>J

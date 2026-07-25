@@ -3,6 +3,11 @@ if !exists("g:vim_advantages_got_sourced")
 let g:textReplace="Replace: "
 let g:textReplaceWith="Replace With: "
 
+function! FirstCharInWordsToUpper() range
+  '<,'>s/\(\<.\)/\=toupper(submatch(1))/g
+endfunction
+command -range -nargs=0 FirstCharInWordsToUpper <line1>,<line2>:call FirstCharInWordsToUpper()
+
 function WordsPerLine(n) range
   call CommandInfo()
   let text=VS()
