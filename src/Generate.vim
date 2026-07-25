@@ -45,7 +45,7 @@ function! _map(opts) range
     if opts.unchanged
       return ''
     endif
-    let setmode=prefix..':call SetMode("'.escape(key, "<>").'", "'..a:mode..'") \|'
+    let setmode=prefix..':call SetMode("'.escape(opts.keyValues[0], "<>").'", "'..a:mode..'") \|'
     return setmode
   endfunction
   function! _build(values) closure
@@ -54,47 +54,47 @@ function! _map(opts) range
   if opts.normal 
     let prefix=_prefix('normal')
     let setmode=_setmode("Normal")
-    call _build([ 'n'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 'n'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   if opts.visual 
     let prefix=_prefix('visual')
     let setmode=_setmode("Visual")
-    call _build([ 'v'..nore..'map', silent, key, setmode, "'<,'>"..opts.default ])
+    call _build([ 'v'..nore..'map', silent, opts.keyValues[0], setmode, "'<,'>"..opts.default ])
   endif
   if opts.command 
     let prefix=_prefix('command')
     let setmode=_setmode("Command")
-    call _build([ 'c'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 'c'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   if opts.terminal 
     let prefix=_prefix('terminal')
     let setmode=_setmode("Terminal")
-    call _build([ 't'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 't'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   if opts.insert 
     let prefix=_prefix('insert')
     let setmode=_setmode("Insert")
-    call _build([ 'i'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 'i'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   if opts.x
     let prefix=_prefix('x')
     let setmode=_setmode("X")
-    call _build([ 'x'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 'x'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   if opts.s
     let prefix=_prefix('s')
     let setmode=_setmode("S")
-    call _build([ 's'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 's'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   if opts.o
     let prefix=_prefix('o')
     let setmode=_setmode("O")
-    call _build([ 'o'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 'o'..nore..'map', silent, opts.keyValue[], setmode, opts.default ])
   endif
   if opts.l
     let prefix=_prefix('l')
     let setmode=_setmode("L")
-    call _build([ 'l'..nore..'map', silent, key, setmode, opts.default ])
+    call _build([ 'l'..nore..'map', silent, opts.keyValues[0], setmode, opts.default ])
   endif
   return map
 endfunction
@@ -149,9 +149,8 @@ function! NewMap(args)
   if opts.key==0
     let opts.keyValues=split(opts.default, ' ')[0]
     let opts.default=join(split(opts.default, ' ')[1:], ' ')
-  else
-    let key=opts.keyValues[0]
   endif
+  " let key=opts.keyValues[0]
   if opts.all >= 1
     let opts.normal=1
     let opts.visual=1
@@ -250,7 +249,8 @@ function! NewMap(args)
     for a in modifiers
       let obj=copy(opts)
       " echo obj
-      let obj.key=leaders_prefix..substitute(obj.key, '{modifiers}', a, 'g')
+      "
+      let obj.keyValues[0]=leaders_prefix..substitute(obj.keyValues[0], '{modifiers}', a, 'g')
       let obj.default=substitute(obj.default, '{modifiers}', a, 'g')
       if opts.directly
         call extend(newmap_directly, _map(obj))
