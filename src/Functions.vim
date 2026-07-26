@@ -6842,6 +6842,8 @@ let FixBufNr_decision_algorithm = [
   \ "check_clockwise",
   \ "check_only_one_direction",
   \ "check_multiple_directions",
+  \ "check_last_used_term",
+  \ "check_find_some_term",
   \]
 function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
   fun! _not_implemented()
@@ -6993,6 +6995,11 @@ function! Ref(c)
   return c
 endfunction
 
+function! SelectCommand(keymap=g:keymap)
+  echo "Select Command"
+  echo a:keymap
+endfunction
+
 function! ConfigureKeys(keymap=g:keymap)
   " call LoadCommands()
   " let all=["\<F5>", "\<F6>","\<F7>","\<F8>"]
@@ -7018,11 +7025,14 @@ function! ConfigureKeys(keymap=g:keymap)
   endfunction
   function! _printPage() closure
     " call DebugBuf(g:keymap)
-    " call DebugBuf(char)
-    call DebugBuf("key:  "..c['key'], 1)
-    call DebugBuf("command:  "..join(c['command'], ' '))
-    call DebugBuf("savein:   "..c['savein'])
-    call DebugBuf("spectrum: "..c['commandSpectrum'])
+    call DebugBuf(char, 1)
+    call DebugBuf("key:                "..c['key'])
+    call DebugBuf("command:            "..join(c['command'], ' '))
+    call DebugBuf("savein:             "..c['savein'])
+    call DebugBuf("spectrum:           "..c['commandSpectrum'])
+    call DebugBuf("decision_algorithm: "..c['decision_algorithm'])
+    call DebugBuf("decision_mode:      "..c['decision_mode'])
+    " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'vimconfiguration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'commandBuffer': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'commandRepo': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'commandSpectrum': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
     redraw!
   endfunction
   let char=''
@@ -7045,14 +7055,32 @@ function! ConfigureKeys(keymap=g:keymap)
       \ "name": "commandSpectrum",
       \ "value": c['commandSpectrum'],
       \ "values": ["global", "repo", "folder", "tab", "buffer"]
-      \ }]
+      \ },
+      \ {
+      \ "key": keymap,
+      \ "toggleUp": [ 99, 67 ],
+      \ "toggleDown": [ 100, 68 ],
+      \ "name": "decision_algorithm",
+      \ "value": c['decision_algorithm'],
+      \ "values": g:FixBufNr_decision_algorithm
+      \ },
+      \ {
+      \ "key": keymap,
+      \ "toggleUp": [ 102, 70 ],
+      \ "toggleDown": [ 118, 86 ],
+      \ "name": "decision_mode",
+      \ "value": c['decision_mode'],
+      \ "values": g:FixBufNr_decision_mode
+      \ }
+      \ ]
     let char = getchar()
-    call DebugBuf(char)
+    " call DebugBuf(char)
     " redraw
     " echo "\r"
     for s in shortcuts
       let tu=s['toggleUp']
       let td=s['toggleDown']
+      let selectCommand=[8, 6, 24, '€ü€F2']
       if type(tu)==0 && char==tu || type(tu)==3 && index(tu, char)>-1
         let x=_toggle(1)
         let c[s['name']]=x
@@ -7065,6 +7093,8 @@ function! ConfigureKeys(keymap=g:keymap)
         " let g:commands[cidx]=x
         call NewOrOverwrite(c)
         call SaveCommands()
+      elseif type(selectCommand)==0 && char==selectCommand || type(selectCommand)==3 && index(selectCommand, char)>-1
+        echo "select command"
       endif
     endfor
     call _printPage()
@@ -7122,9 +7152,19 @@ function! Command() range
   if g:mode=='visual'
     let c=TermCommand()
     let c['commandSaveinFolder']=DetermineCommandSaveinFolder()
+    " shared commands over multiple repos
+    " let c['commandRepo']=["/path/to/repos", "/another/path/to/repos"]
     let c['commandRepo']=Folder_Repo_Or_Project_Only()
+    " shared commands over multiple folders
+    " let c['commandFolder']=["/path/to/folder", "/another/path/to/folder"]
     let c['commandFolder']=expand('%:p:h')
+    " shared commands over multiple buffers
+    " let c['commandBuffer']=["/path/to/file", "/another/path/to/file"]
     let c['commandBuffer']=b:spectrum=='buffer'?expand('%:p'):''
+    " let c['commandBufferGlob']="*"
+    " let c['commandFolderGlob']="*"
+    " let c['commandBufferGlob']=["*", "**"]
+    " let c['commandFolderGlob']=["*", "**"]
     let c['savein']=b:savein
     let c['released']=b:released
     let c['decision_mode']="check_direct"
@@ -7144,8 +7184,11 @@ function! Command() range
     " call filter(g:commands, 'v:val["key"]!=asdf')
     call NewOrOverwrite(c)
     call SaveCommands()
-  elseif g:keymap=~","
+  elseif g:keymap=~",,"
     call ConfigureKeys()
+    return
+  elseif g:keymap=~","
+    call SelectCommand()
     return
   else
     let c=''
