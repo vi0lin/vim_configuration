@@ -1,6 +1,55 @@
+" ]c / [c
+" git difftool HEAD@{1} -- src/Functions.vim
+" do
+" dp
+" qa
+
+" Better diff algorithm + heuristics
+if has("patch-8.1.0360")
+  set diffopt+=internal,algorithm:histogram,indent-heuristic
+endif
+" Optional but useful
+set diffopt+=filler          " show filler lines for better alignment
+set diffopt+=context:5       " more context around changes
+
+" set diffopt+=algorithm:histogram,indent-heuristic
+" diffupdate
+
+" set diffopt+=algorithm:patience,indent-heuristic
+" diffupdate
+
+" set scrollbind cursorbind
+" syncbind          " force re-sync of the windows
+
+" git config --global diff.algorithm histogram
+
+" set diffopt+=iwhite
+" diffupdate
+
 if !exists("g:vim_advantages_got_sourced")
 
 let g:default_direction='j'
+
+function! Diff(...)
+  let nr = a:000[0]
+  let p=expand('%:p')
+  let ph=expand('%:p:h')
+  vnew
+  exec "r !git show HEAD@{"..nr.."}:./"..substitute(p, ph, '', 'g')[1:]
+  diffthis
+  wincmd p
+  diffthis
+  " exec "!git difftool HEAD@{"..a:nr.."} -- "..expand('%:p')
+  " exec "cd "..Folder_Repo_Or_Project_Only()
+  " pwd
+  " vnew
+  " execute "r !git show HEAD@{"..a:nr.."}:"..expand('%')
+  " 1delete
+  " diffthis
+  " wincmd p
+  " diffthis
+endfunction
+command! -range -nargs=* Diff :call Diff(<f-args>)
 
 function! OpenedRepos(...)
   let value=a:000[0]
@@ -3035,7 +3084,7 @@ function! GitInitRepository()
 endfunction
 
 command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
-command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
+" command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
   " Use GetOpt2
   " GitStatus
@@ -3758,6 +3807,7 @@ function! CommandExample()
   let c['commandFolder']=expand('%:p:h')
   let c['commandSpectrum']='global'
   let c['commandBuffer']=''
+  let c['target']='Local'
   let c['savein']=b:savein
   let c['released']=b:released
   let c['decision_mode']="check_direct"
@@ -7071,6 +7121,14 @@ function! ConfigureKeys(keymap=g:keymap)
       \ "name": "decision_mode",
       \ "value": c['decision_mode'],
       \ "values": g:FixBufNr_decision_mode
+      \ },
+      \ {
+      \ "key": keymap,
+      \ "toggleUp": [ 103, 71 ],
+      \ "toggleDown": [ 98, 66 ],
+      \ "name": "target",
+      \ "value": c['target'],
+      \ "values": g:targets
       \ }
       \ ]
     let char = getchar()
@@ -7081,6 +7139,9 @@ function! ConfigureKeys(keymap=g:keymap)
       let tu=s['toggleUp']
       let td=s['toggleDown']
       let selectCommand=[8, 6, 24, '€ü€F2']
+      let editCommand=[5]
+      " example for <F5>
+      let executeCommand=['€k5']
       if type(tu)==0 && char==tu || type(tu)==3 && index(tu, char)>-1
         let x=_toggle(1)
         let c[s['name']]=x
@@ -7095,6 +7156,8 @@ function! ConfigureKeys(keymap=g:keymap)
         call SaveCommands()
       elseif type(selectCommand)==0 && char==selectCommand || type(selectCommand)==3 && index(selectCommand, char)>-1
         echo "select command"
+      elseif type(editCommand)==0 && char==editCommand || type(editCommand)==3 && index(editCommand, char)>-1
+        echo "open new buffer in popup to edit the command"
       endif
     endfor
     call _printPage()
@@ -7152,19 +7215,21 @@ function! Command() range
   if g:mode=='visual'
     let c=TermCommand()
     let c['commandSaveinFolder']=DetermineCommandSaveinFolder()
-    " shared commands over multiple repos
+    " shared values, when modified prompts for change for all, or detach command
+    " shared command over multiple repos
     " let c['commandRepo']=["/path/to/repos", "/another/path/to/repos"]
     let c['commandRepo']=Folder_Repo_Or_Project_Only()
-    " shared commands over multiple folders
+    " shared command over multiple folders
     " let c['commandFolder']=["/path/to/folder", "/another/path/to/folder"]
     let c['commandFolder']=expand('%:p:h')
-    " shared commands over multiple buffers
+    " shared command over multiple buffers
     " let c['commandBuffer']=["/path/to/file", "/another/path/to/file"]
     let c['commandBuffer']=b:spectrum=='buffer'?expand('%:p'):''
     " let c['commandBufferGlob']="*"
     " let c['commandFolderGlob']="*"
     " let c['commandBufferGlob']=["*", "**"]
     " let c['commandFolderGlob']=["*", "**"]
+    let c['target']='Local'
     let c['savein']=b:savein
     let c['released']=b:released
     let c['decision_mode']="check_direct"

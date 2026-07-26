@@ -825,44 +825,12 @@ nnoremap ,,,<space> :call SetMode(",,,\<space\>", "Normal") \| :IntelligentSelec
 nnoremap ,. :call SetMode(",.", "Normal") \| @q
 nnoremap <C-h> :call SetMode("\<C-h\>", "Normal") \| :call SmartWincmd('h')<cr>
 vnoremap <C-h> :call SetMode("\<C-h\>", "Visual") \| '<,'>:call SmartWincmd('h')<cr>
-cnoremap <C-h> :call SetMode("\<C-h\>", "Command") \| :call SmartWincmd('h')<cr>
-tnoremap <C-h> <C-\><C-n>:call SetMode("\<C-h\>", "Terminal") \| :call SmartWincmd('h')<cr>
-inoremap <C-h> :call SetMode("\<C-h\>", "Insert") \| :call SmartWincmd('h')<cr>
-nnoremap <C-h> :call SetMode("\<C-h\>", "Normal") \| :call SmartWincmd('h')<cr>
-vnoremap <C-h> :call SetMode("\<C-h\>", "Visual") \| '<,'>:call SmartWincmd('h')<cr>
-cnoremap <C-h> :call SetMode("\<C-h\>", "Command") \| :call SmartWincmd('h')<cr>
-tnoremap <C-h> <C-\><C-n>:call SetMode("\<C-h\>", "Terminal") \| :call SmartWincmd('h')<cr>
-inoremap <C-h> :call SetMode("\<C-h\>", "Insert") \| :call SmartWincmd('h')<cr>
 nnoremap <C-j> :call SetMode("\<C-j\>", "Normal") \| :call SmartWincmd('j')<cr>
 vnoremap <C-j> :call SetMode("\<C-j\>", "Visual") \| '<,'>:call SmartWincmd('j')<cr>
-cnoremap <C-j> :call SetMode("\<C-j\>", "Command") \| :call SmartWincmd('j')<cr>
-tnoremap <C-j> <C-\><C-n>:call SetMode("\<C-j\>", "Terminal") \| :call SmartWincmd('j')<cr>
-inoremap <C-j> :call SetMode("\<C-j\>", "Insert") \| :call SmartWincmd('j')<cr>
-nnoremap <C-j> :call SetMode("\<C-j\>", "Normal") \| :call SmartWincmd('j')<cr>
-vnoremap <C-j> :call SetMode("\<C-j\>", "Visual") \| '<,'>:call SmartWincmd('j')<cr>
-cnoremap <C-j> :call SetMode("\<C-j\>", "Command") \| :call SmartWincmd('j')<cr>
-tnoremap <C-j> <C-\><C-n>:call SetMode("\<C-j\>", "Terminal") \| :call SmartWincmd('j')<cr>
-inoremap <C-j> :call SetMode("\<C-j\>", "Insert") \| :call SmartWincmd('j')<cr>
 nnoremap <C-k> :call SetMode("\<C-k\>", "Normal") \| :call SmartWincmd('k')<cr>
 vnoremap <C-k> :call SetMode("\<C-k\>", "Visual") \| '<,'>:call SmartWincmd('k')<cr>
-cnoremap <C-k> :call SetMode("\<C-k\>", "Command") \| :call SmartWincmd('k')<cr>
-tnoremap <C-k> <C-\><C-n>:call SetMode("\<C-k\>", "Terminal") \| :call SmartWincmd('k')<cr>
-inoremap <C-k> :call SetMode("\<C-k\>", "Insert") \| :call SmartWincmd('k')<cr>
-nnoremap <C-k> :call SetMode("\<C-k\>", "Normal") \| :call SmartWincmd('k')<cr>
-vnoremap <C-k> :call SetMode("\<C-k\>", "Visual") \| '<,'>:call SmartWincmd('k')<cr>
-cnoremap <C-k> :call SetMode("\<C-k\>", "Command") \| :call SmartWincmd('k')<cr>
-tnoremap <C-k> <C-\><C-n>:call SetMode("\<C-k\>", "Terminal") \| :call SmartWincmd('k')<cr>
-inoremap <C-k> :call SetMode("\<C-k\>", "Insert") \| :call SmartWincmd('k')<cr>
 nnoremap <C-l> :call SetMode("\<C-l\>", "Normal") \| :call SmartWincmd('l')<cr>
 vnoremap <C-l> :call SetMode("\<C-l\>", "Visual") \| '<,'>:call SmartWincmd('l')<cr>
-cnoremap <C-l> :call SetMode("\<C-l\>", "Command") \| :call SmartWincmd('l')<cr>
-tnoremap <C-l> <C-\><C-n>:call SetMode("\<C-l\>", "Terminal") \| :call SmartWincmd('l')<cr>
-inoremap <C-l> :call SetMode("\<C-l\>", "Insert") \| :call SmartWincmd('l')<cr>
-nnoremap <C-l> :call SetMode("\<C-l\>", "Normal") \| :call SmartWincmd('l')<cr>
-vnoremap <C-l> :call SetMode("\<C-l\>", "Visual") \| '<,'>:call SmartWincmd('l')<cr>
-cnoremap <C-l> :call SetMode("\<C-l\>", "Command") \| :call SmartWincmd('l')<cr>
-tnoremap <C-l> <C-\><C-n>:call SetMode("\<C-l\>", "Terminal") \| :call SmartWincmd('l')<cr>
-inoremap <C-l> :call SetMode("\<C-l\>", "Insert") \| :call SmartWincmd('l')<cr>
 tnoremap <C-l> l
 tnoremap <C-h> h
 tnoremap <C-k> k
@@ -1160,8 +1128,8 @@ nnoremap <Down> :call SetMode("\<Down\>", "Normal") \| :cnext<cr>
 nnoremap <F9> :call SetMode("\<F9\>", "Normal") \| :Pull<cr>
 nnoremap <C-F9> :call SetMode("\<C-F9\>", "Normal") \| :GitFetch<cr>
 nnoremap <F10> :call SetMode("\<F10\>", "Normal") \| :Status<cr>
-nnoremap <C-F10> :call SetMode("\<C-F10\>", "Normal") \| :Diff --all<cr>
-nnoremap <C-S-F10> :call SetMode("\<C-S-F10\>", "Normal") \| :Diff --all --cached<cr>
+nnoremap <C-F10> :call SetMode("\<C-F10\>", "Normal") \| :GitDiff --all<cr>
+nnoremap <C-S-F10> :call SetMode("\<C-S-F10\>", "Normal") \| :GitDiff --all --cached<cr>
 nnoremap <S-F10> :call SetMode("\<S-F10\>", "Normal") \| :Log<cr>
 nnoremap <C-F11> :call SetMode("\<C-F11\>", "Normal") \| :GitAdd<cr>
 nnoremap <C-S-F11> :call SetMode("\<C-S-F11\>", "Normal") \| :GitAddCWD<cr>

@@ -434,10 +434,10 @@ NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
 NewMap -no -n ,. @q
 " map ,s :call NvimStudioSubstitution("selection")<cr>
 " map ,S :call NvimStudioSubstitution("file")<cr>
-NewMap -aa -no <C-h> :call SmartWincmd('h')<cr>
-NewMap -aa -no <C-j> :call SmartWincmd('j')<cr>
-NewMap -aa -no <C-k> :call SmartWincmd('k')<cr>
-NewMap -aa -no <C-l> :call SmartWincmd('l')<cr>
+NewMap -n -v -no <C-h> :call SmartWincmd('h')<cr>
+NewMap -n -v -no <C-j> :call SmartWincmd('j')<cr>
+NewMap -n -v -no <C-k> :call SmartWincmd('k')<cr>
+NewMap -n -v -no <C-l> :call SmartWincmd('l')<cr>
 NewMap -t -un -no <C-l> l
 NewMap -t -un -no <C-h> h
 NewMap -t -un -no <C-k> k
@@ -1163,8 +1163,8 @@ NewMap -no -n <F9> :Pull<cr>
 NewMap -no -n <C-F9> :GitFetch<cr>
 
 NewMap -no -n <F10> :Status<cr>
-NewMap -no -n <C-F10> :Diff --all<cr>
-NewMap -no -n <C-S-F10> :Diff --all --cached<cr>
+NewMap -no -n <C-F10> :GitDiff --all<cr>
+NewMap -no -n <C-S-F10> :GitDiff --all --cached<cr>
 NewMap -no -n <S-F10> :Log<cr>
 
 NewMap -no -n <C-F11> :GitAdd<cr>
