@@ -1,4 +1,3 @@
-"
 " ,,<F5> 8 - to enable autocc
 " while [ 1==1 ]; do echo "ok"; sleep 1; done;
 " select a new command with <F5> to overwrite the old one, keeping the settings and execute it
@@ -22,9 +21,9 @@
 " select a remote, to establish a ssh connection first
 
 " when multiple commands share the same key, you get notified
-" for instance press ,<F5> to toggle trough them and activate one of them
-" for instance press ,,,<F5> to execute once after selecting a command
-" wait 3 seconds or hit enter to execute the command
+" for instance press ,<F5> to toggle through them and activate one of them
+" for instance press ,,,<F5> to execute the command that gets chosen in a drop
+" down menue, once. or wait 3 seconds to execute the selected command
 
 set encoding=utf-8
 set fileencoding=utf-8
@@ -829,7 +828,7 @@ endfunction
 " (Consider Also Storing Non Existent Arguments In A Negative Lookup Matrix? To Avoid Searching A False Parameter Often)
 " Occurs For That Function - This Reduces Calling The Very Often Computed Searching Algorithms
 " 0.05 - 0.5
-" 2. Work Trough Specs More Precisely Instead Of Occasionally Decisiontaking
+" 2. Work Through Specs More Precisely Instead Of Occasionally Decisiontaking
 
 let s:lookup_matrix={}
 " Behaviour (OnDefaultFound_Ignore_Mainargs_FromNowOn)
@@ -1422,7 +1421,7 @@ endfunction
 " put=execute('registers')
 " vim is almost bash / textbased / i want to go away / to c
 " LayoutBash is slow
-" Make LayoutBash Only One File And Have Tabs To Tab Trough
+" Make LayoutBash Only One File And Have Tabs To Tab Through
 " Fix Auto Intending
 " Fix () {} auto closing [] curls "" '' `` ``` """ '''
 " quicker file navigation
@@ -1444,7 +1443,7 @@ endfunction
 "   Ctrl-S jk wird die Markierung weiter nach oben oder unten erweitern
 " Einfach Befehle Verändern / Popup List / Hinzufügen
 " Liste Aller Buffer in FZF öffnen / Auswählen
-" Tabweise Bufferliste Toggle Trough und Popup FZF
+" Tabweise Bufferliste Toggle Through und Popup FZF
 " <leader>s '<,'>s@@@g
 " <leader><leader>s '<,'>s@{PASTE_FROM_REGISTER_"}@{Cursor Here}@g
 " Fix C-c in Mobile, does not leave the visual selection
@@ -5303,7 +5302,7 @@ function! Projects()
   call OpenFilePopup("Projects", g:projects)
 endfunction
 
-function! ToggleTroughOpenedProjects(n=1)
+function! ToggleThroughOpenedProjects(n=1)
   echo "Implement Toggle Project " .. a:n
 endfunction
 
@@ -9694,7 +9693,7 @@ endfunction
 " [!TODO]
 " Add A FZF Functionality, That Behaves The Same, But Extends Searching From A
 " Directory Or A List Of Files
-" Make The FZF Window Visibile Trough Passing Globs Or List Of Files Or A Path
+" Make The FZF Window Visibile Through Passing Globs Or List Of Files Or A Path
 " Make It Possibile To Change Between The Normal And The FZF Popup
 let s:popup_id = -1
 let s:timer_id = -1
