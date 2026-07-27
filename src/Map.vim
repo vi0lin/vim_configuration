@@ -527,6 +527,9 @@ NewMap -no -n ,,B :call Boilerplate_Test()<cr>
 " vmap <C-Space> :call LineUp()<cr>
 NewMap -no -n ,<Space> :call GetCCWD()<cr>
 
+NewMap -no -n ,c :call XCWD()<cr>
+NewMap -no -n ,,c :call PCWD()<cr>
+
 " map <F9>  :BuildProject<cr>
 " map <F10> :RunProject<cr>
 " map <F11> :MakeProject<cr>

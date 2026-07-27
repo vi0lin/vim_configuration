@@ -1515,7 +1515,8 @@ function! StaticWin(...) range
         let j += 1
       endwhile
       function! _init(new)
-        autocmd! WinResized	* StaticWin --win-resized
+        " autocmd! WinResized	* StaticWin --win-resized
+        autocmd! WinResized * StaticWin --win-resized
         let b:focusable=0
         let b:staticWin=a:new
         " setlocal nobuflisted buftype=nofile
@@ -1795,6 +1796,16 @@ command! -bar -nargs=0 NEW :call NEW()
 func! SystemClipboard()
   let @+ = @:
 endfun
+
+function! XCWD()
+  let @x=execute('pwd')
+  let @x=expand('%:p')
+endfunction
+
+function! PCWD()
+  " norm "xp
+  call appendbufline(bufnr(), line('.'), trim(getreg('x')))
+endfunction
 
 func! PutCommand(nr=0)
   " put=":
@@ -3478,6 +3489,17 @@ function! SaveCommands()
   call _save_helper("vimconfiguration", "no", VimConfiguration())
 endfunction
 
+function! RefreshCommands()
+  for c in g:commands
+    let updated=CommandExample()
+    for [k,v] in items(data)
+      let updated[k]=v
+    endfor
+    let c=updated
+  endfor
+  call SaveCommands()
+endfunction
+
 function! LoadCommands()
   " if !exists('b:commands')
   " call CommandDictInit()
@@ -3514,23 +3536,31 @@ function! LoadCommands()
   "   endif
   "   let cwd=GetParentDir(cwd)
   " endwhile
-  " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'), 0)
-  call DebugBuf("Commands", 1, 0)
+  " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'))
+  call DebugBufClear()
+  call DebugBuf("Commands")
   for cf in commandorigins
     if filereadable(cf)
-      call DebugBuf("Loading: "..cf, 0, 0)
+      call DebugBuf("Loading: "..cf)
       try
         let d=join(Read(cf), '')
         let data=json_decode(d)
       catch
-        call DebugBuf("Error Parsing File: "..cf, 0, 0)
+        call DebugBuf("Error Parsing File: "..cf)
       finally
         if !empty(data)
+          " let updated=CommandExample()
+          " for [k,v] in items(data)
+          "   " echo k
+          "   " echo v
+          "   let updated[k]=v
+          " endfor
+          " call extend(g:commands, [updated])
           call extend(g:commands, data)
-          " call DebugBuf(printf("Added %s commands", len(data)), 0, 0)
-          " call DebugBuf(map(copy(data), {_, v -> {"buffer": v['commandBuffer'], "command": v['command'], "key": v['key']}}), 0, 0)
+          " call DebugBuf(printf("Added %s commands", len(data)))
+          " call DebugBuf(map(copy(data), {_, v -> {"buffer": v['commandBuffer'], "command": v['command'], "key": v['key']}}))
         endif
-        " call DebugBuf(printf("Nothing to add in %s", len(data)), 0, 0)
+        " call DebugBuf(printf("Nothing to add in %s", len(data)))
       endtry
     endif
   endfor
@@ -3747,6 +3777,7 @@ function! EmptyCommand()
   " commandInput: vs() data file
   " commandOutputMode: put sendtoterm file clist commandline
   " command: 'ls -al; date'
+  " \ "hash": -1,
   let command={
     \ "hash": NewUUID(),
     \ "name": -1,
@@ -3774,7 +3805,8 @@ endfunction
 
 function! VimCommand(command='')
   call InitCommands()
-  let c=EmptyCommand()
+  " let c=EmptyCommand()
+  let c=CommandExample()
   let c['hash']=NewUUID()
   let c['name']='unnamed'
   let c['commandMode']='vim'
@@ -3792,7 +3824,9 @@ function! VimCommand(command='')
 endfunction
 
 function! TermCommand(command='')
-  let c=EmptyCommand()
+  " let c=EmptyCommand()
+  let c=CommandExample()
+  let c['hash']=NewUUID()
   let c['name']='unnamed'
   let c['commandMode']='term'
   let c['commandInterpreter']='term'
@@ -3808,11 +3842,13 @@ function! CommandExample()
   let c['directionMode']='foremost'
   let c['commandRepo']=Folder_Repo_Or_Project_Only()
   let c['commandFolder']=expand('%:p:h')
-  let c['commandSpectrum']='global'
-  let c['commandBuffer']=''
+  let c['commandSpectrum']='buffer'
+  let c['commandBuffer']=expand('%:p')
   let c['target']='Local'
-  let c['savein']=b:savein
-  let c['released']=b:released
+  let c['autocd']='no'
+  let c['autocd_path']=''
+  let c['savein']='vimconfiguration'
+  let c['released']='no'
   let c['decision_mode']="check_direct"
   let c['decision_algorithm']="check_only_one_direction"
   let c['commandMode']='term'
@@ -3823,7 +3859,8 @@ function! CommandExample()
   let c['commandInput']='-1'
   let c['commandOutputMode']='sendtoterm'
   let c['direction']=g:default_direction
-  let c['command']=['', 'ls -al', '']
+  " let c['command']=['', 'ls -al', '']
+  let c['command']=[]
   return c
 endfunction
 
@@ -6895,6 +6932,9 @@ let FixBufNr_decision_algorithm = [
   \ "check_last_used_term",
   \ "check_find_some_term",
   \]
+let Spectrum = ["global", "repo", "folder", "tab", "buffer"]
+let SaveIn = ["vimconfiguration", "repo", "samedir", "infile"]
+let AutoCD = [ "no", "cd_to_bufferfile", "cd_to_project_root", "cd_to_configured_autocd_path" ]
 function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
   fun! _not_implemented()
     echo "FixBufNr: Not Implemented"
@@ -7003,7 +7043,8 @@ endfunction
   " (1) load them anyways when in vimconfiguration / sometimes, when in projectroot / samedir or infile
 
 function! GetMatchingCommand(keymap=g:keymap)
-  let c = ''
+  let updated = CommandExample()
+  let c=''
   let val = filter(copy(g:commands), { i,v ->
     \ v:val["key"]==a:keymap
     \ && v:val["commandSpectrum"]=="buffer"
@@ -7036,7 +7077,11 @@ function! GetMatchingCommand(keymap=g:keymap)
     \ })
   let c=!empty(c)?c:empty(val)?c:val[0]
   " call DebugBuf(c)
-  return c
+  " return updated
+  for [k,v] in items(c)
+    let updated[k]=v
+  endfor
+  return updated
 endfunction
 
 function! Ref(c)
@@ -7060,36 +7105,39 @@ function! ConfigureKeys(keymap=g:keymap)
   let cidx=index(g:commands, c)
   let c=g:commands[cidx]
   function! _toggle(n=1) closure
-    " call DebugBuf(s['value'], 1)
+    " call DebugBuf(s['value']1)
     " call DebugBuf(join(s['values'], ', '))
     let i = index(s['values'], s['value'])
     " call DebugBuf(len(s['values']))
     let x=i+a:n
     " call DebugBuf(i.."+"..a:n.."="..x)
     let new_index=Mod(x, len(s['values']))
-    " call DebugBuf("new_index="..new_index)
-    let var=s['values'][new_index]
     " call DebugBuf(var)
     " redraw!
-    return var
+    return s['values'][new_index]
   endfunction
   function! _printPage() closure
     " call DebugBuf(g:keymap)
-    call DebugBuf(char, 1)
-    call DebugBuf("key:                "..c['key'])
-    call DebugBuf("command:            "..join(c['command'], ' '))
-    call DebugBuf("savein:             "..c['savein'])
-    call DebugBuf("spectrum:           "..c['commandSpectrum'])
-    call DebugBuf("decision_algorithm: "..c['decision_algorithm'])
-    call DebugBuf("decision_mode:      "..c['decision_mode'])
-    call DebugBuf("target:             "..c['target'])
+    call DebugBufClear()
+    call DebugBufHeight(13)
+    if !empty(c)
+      " call DebugBuf(char)
+      call DebugBuf("key:                "..c['key'])
+      call DebugBuf("command:            "..join(c['command'], ' '))
+      call DebugBuf("savein:             "..c['savein'])
+      call DebugBuf("spectrum:           "..c['commandSpectrum'])
+      call DebugBuf("decision_algorithm: "..c['decision_algorithm'])
+      call DebugBuf("decision_mode:      "..c['decision_mode'])
+      call DebugBuf("target:             "..c['target'])
+      call DebugBuf("autocd:             "..c['autocd'])
+      call DebugBuf("direction:          "..c['direction'])
+    endif
     " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'vimconfiguration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'commandBuffer': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'commandRepo': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'commandSpectrum': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
     redraw!
   endfunction
   let char=''
-  call _printPage()
   while index([13, 113, 81], char)==-1
-    " call DebugBuf("", 1)
+    " call DebugBuf("")
     let shortcuts=[
       \ {
       \ "key": keymap,
@@ -7097,7 +7145,7 @@ function! ConfigureKeys(keymap=g:keymap)
       \ "toggleDown": [ 122, 65 ],
       \ "name": "savein",
       \ "value": c['savein'],
-      \ "values": ["vimconfiguration", "repo", "samedir", "infile"]
+      \ "values": g:SaveIn
       \ },
       \ {
       \ "key": keymap,
@@ -7105,7 +7153,7 @@ function! ConfigureKeys(keymap=g:keymap)
       \ "toggleDown": [ 120, 83 ],
       \ "name": "commandSpectrum",
       \ "value": c['commandSpectrum'],
-      \ "values": ["global", "repo", "folder", "tab", "buffer"]
+      \ "values": g:Spectrum
       \ },
       \ {
       \ "key": keymap,
@@ -7130,6 +7178,14 @@ function! ConfigureKeys(keymap=g:keymap)
       \ "name": "target",
       \ "value": c['target'],
       \ "values": g:targets
+      \ },
+      \ {
+      \ "key": keymap,
+      \ "toggleUp": [ 110, 78 ],
+      \ "toggleDown": [ 109, 77 ],
+      \ "name": "autocd",
+      \ "value": c['autocd'],
+      \ "values": g:AutoCD
       \ }
       \ ]
     let char = getchar()
@@ -7159,6 +7215,14 @@ function! ConfigureKeys(keymap=g:keymap)
         echo "select command"
       elseif type(editCommand)==0 && char==editCommand || type(editCommand)==3 && index(editCommand, char)>-1
         echo "open new buffer in popup to edit the command"
+      elseif index([104, 72], char)>-1
+        let c['direction']='h'
+      elseif index([106, 74], char)>-1
+        let c['direction']='j'
+      elseif index([107, 75], char)>-1
+        let c['direction']='k'
+      elseif index([108, 76], char)>-1
+        let c['direction']='l'
       endif
     endfor
     call _printPage()
@@ -7202,10 +7266,12 @@ endfunction
 
 function! Command() range
   call InitCommands()
+  " call LoadCommands()
   " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
   " return
   let vs=VS()
-  call DebugBuf(g:keymap, 1, 1)
+  call DebugBufClear()
+  call DebugBuf(g:keymap)
   " call CommandPageInit()
   " call CommandPageInit()
   " call DebugBuf(P(b:commands))
@@ -7213,9 +7279,11 @@ function! Command() range
   " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadCommands()), 1500)
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
+  let c=GetMatchingCommand()
   if g:mode=='visual'
-    let c=TermCommand()
-    let c['commandSaveinFolder']=DetermineCommandSaveinFolder()
+    " let c=TermCommand()
+    " let c['hash']=matching['hash']
+    " let c['commandSaveinFolder']=DetermineCommandSaveinFolder()
     " shared values, when modified prompts for change for all, or detach command
     " shared command over multiple repos
     " let c['commandRepo']=["/path/to/repos", "/another/path/to/repos"]
@@ -7231,15 +7299,17 @@ function! Command() range
     " let c['commandBufferGlob']=["*", "**"]
     " let c['commandFolderGlob']=["*", "**"]
     let c['target']='Local'
-    let c['savein']=b:savein
-    let c['released']=b:released
-    let c['decision_mode']="check_direct"
-    let c['decision_algorithm']="check_only_one_direction"
-    let c['commandSpectrum']=b:spectrum
+    " let c['savein']=b:savein
+    " let c['released']=b:released
+    " let c['decision_mode']="check_direct"
+    " let c['decision_algorithm']="check_only_one_direction"
+    " let c['autocd']="no"
+    " let c['autocd_path']="/"
+    " let c['commandSpectrum']=b:spectrum
     let c['command']=vs
-    let c['page']=0
+    " let c['page']=0
     let c['key']=g:keymap
-    let c['direction']=g:default_direction
+    " let c['direction']=g:default_direction
     " let b:commands['pages'][0][g:keymap]=c
     " call filter(copy(g:commands), '!(v:val["commandSpectrum"]==c["commandSpectrum"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
     " call DebugBuf(vs)
@@ -7272,9 +7342,10 @@ function! Command() range
     "
     " let c=g:commands['pages'][0][g:keymap]
   endif
-  if type(c)==0 && c['command'] != -1
+  if type(c)==0 && c['command'] != -1 || c['command']==[]
     " call DebugBuf(c)
-    call DebugBuf("Command Not Send\n"..Pretty(c))
+    " call DebugBuf("Command Not Send\n"..Pretty(c))
+    call DebugBuf("Command Not Send\n")
   elseif type(c)!=3
     " call EchoSafely(Pretty(c), 700)
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
@@ -7302,18 +7373,52 @@ function! Command() range
   " echo g:commands
 endfunction
 
-function! DebugBuf(data, clear=0, checkbuf=0)
-  if a:checkbuf==1 || !exists('t:debugbuf')
+function! WinCmdToWin(winnr)
+  for w in range(1,winnr('$'))
+    if winnr()==a:winnr
+      return 1
+    endif
+    wincmd w
+  endfor
+  return 0
+endfunction
+
+function! WinCmdToBuf(bufnr)
+  let save_win = win_getid()
+  let visibile=BufVisibileInCurrentTab(a:bufnr)
+  if visibile
+    for w in range(1,winnr('$'))
+      if bufnr()==a:bufnr
+        return 1
+      endif
+      wincmd w
+    endfor
+  endif
+  call win_gotoid(save_win)
+  return 0
+endfunction
+
+function! DebugBufHeight(height)
+  let winnr=winnr()
+  if WinCmdToBuf(t:debugbuf)
+    call Height(a:height)
+  endif
+  call WinCmdToWin(winnr)
+  " call win_gotoid(t:debugbuf)
+  " echo bufwinid(t:debugbuf)
+  " call win_gotoid(save_win)
+endfunction
+
+function! EnsureDebugBuf()
+  if !exists('t:debugbuf')
     " Prep
     let save_win = win_getid()
-    if !exists("t:debugbuf")
-      " Not Existent
-      " create
-      vertical new
-      wincmd J
-      exec "resize 5"
-      let t:debugbuf=bufnr()
-    endif
+    " Not Existent
+    " create
+    vertical new
+    wincmd J
+    exec "resize 5"
+    let t:debugbuf=bufnr()
     " Exists
     let isvisibile=BufVisibileInCurrentTab(t:debugbuf)
     if !isvisibile
@@ -7325,27 +7430,36 @@ function! DebugBuf(data, clear=0, checkbuf=0)
     else
       " push far right
       call win_gotoid(t:debugbuf)
-      call EnsureRightmost(t:debugbuf)
-    endif
-    " Clear
-    if a:clear==1
-      call deletebufline(t:debugbuf, 1, '$')
-    endif
-    " Text
-    call appendbufline(t:debugbuf, '$', a:data)
-    " call appendbufline(t:debugbuf, '$', split(a:data, ''))
-    call win_gotoid(save_win)
-    if a:clear==1
-      call deletebufline(t:debugbuf, 1)
+      " call EnsureRightmost(t:debugbuf)
+      call EnsureMost(t:debugbuf, "j")
     endif
   else
-    if a:clear==1
-      call deletebufline(t:debugbuf, 1, '$')
-    endif
+  endif
+endfunction
+
+function! DebugBuf(data)
+  if exists('t:debugbuf')
+    let save_win = win_getid()
+    " Text
+    " call appendbufline(t:debugbuf, '$', a:data)
+    " call appendbufline(t:debugbuf, '$', split(a:data, ''))
+    call win_gotoid(save_win)
+    " if a:clear==1
+    "   call deletebufline(t:debugbuf, 1)
+    " endif
     " let data=split(J(a:data), '\%x0')
     " let data=split(a:data, '\%x0')
-    call appendbufline(t:debugbuf, '$', a:data)
+    " let data=split(substitute(a:data, '\n', "\r", 'g'), '\r')
+    let data=split(a:data, '\n')
+    call appendbufline(t:debugbuf, '$', data)
+    if getbufline(t:debugbuf, 1, 1)[0]==''
+      call deletebufline(t:debugbuf, 1)
+    endif
   endif
+endfunction
+
+function! DebugBufClear()
+  call deletebufline(t:debugbuf, 1, '$')
 endfunction
 
 function! ExecuteInWin(winid, cmd)
@@ -7369,36 +7483,40 @@ function! IsBufferVisibile(bufnr)
   return bufwinid(a:bufnr)
 endfunction
 
-function! IsRightmost(bufnr)
+function! IsMost(bufnr, direction)
+  let winnr=winnr()
+  let win=winnr()
   let winid=bufwinid(a:bufnr)
   if winid==0
     return 0
   endif
   let save = win_getid()
   call win_gotoid(winid)
-  let is_rightmost=(winnr() == winnr('$'))
+  for i in range(1, CountWindowsInDirection(a:direction))
+    let win=DirectionBufWin(i+1..a:direction)
+  endfor
+  let is_most=(winnr == win)
   call win_gotoid(save)
-  return is_rightmost
+  return is_most
 endfunction
 
-function! PushWindowRight(winid)
+function! PushWindow(winid, direction)
   let save = win_getid()
   call win_gotoid(a:winid)
-  wincmd L
+  exec "wincmd "..toUpper(a:direction)
   call win_gotoid(save)
 endfunction
 
-function! EnsureRightmost(bufnr)
+function! EnsureMost(bufnr, direction)
   let winid=bufwinid(a:bufnr)
   if winid==0
     " echo "Buffer not visibile"
     return
   endif
-  if IsRightmost(a:bufnr)
-    " echo "Already Rightmost"
+  if IsMost(a:bufnr, a:direction)
     return
   endif
-  call PushWindowRight(winid)
+  call PushWindow(winid, a:direction)
   " echo "Pushed buffer " . a:bufnr . " to right"
 endfunction
 
@@ -7406,6 +7524,7 @@ function! SigTermToTerm(direction)
   let x=['']
   let buf=winbufnr(winnr(a:direction))
   call TERM(buf, x)
+
 endfunction
 
 function! SendCustomCommandToTerm(direction, command)
@@ -8526,7 +8645,7 @@ endfunction
 function! BufEnter()
   call Statusline()
   call CD(expand('%:p'))
-
+  call EnsureDebugBuf()
   call InitCommands()
   " call DebugPaths()
   " call Statusline()

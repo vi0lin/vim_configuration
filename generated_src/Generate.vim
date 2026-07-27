@@ -869,6 +869,8 @@ nnoremap ,,s :call SetMode(",,s", "Normal") \| :call Statusline_TogglePath()<cr>
 nnoremap ,,d :call SetMode(",,d", "Normal") \| :echo g:debug_layout<cr>
 nnoremap ,,B :call SetMode(",,B", "Normal") \| :call Boilerplate_Test()<cr>
 nnoremap ,<Space> :call SetMode(",\<Space\>", "Normal") \| :call GetCCWD()<cr>
+nnoremap ,c :call SetMode(",c", "Normal") \| :call XCWD()<cr>
+nnoremap ,,c :call SetMode(",,c", "Normal") \| :call PCWD()<cr>
 nnoremap <C-s> :call SetMode("\<C-s\>", "Normal") \| :call SaveFile()<cr>
 vnoremap <C-s> :call SetMode("\<C-s\>", "Visual") \| '<,'>:call SaveFile()<cr>
 inoremap <C-s> :call SetMode("\<C-s\>", "Insert") \| :call SaveFile()<cr>
