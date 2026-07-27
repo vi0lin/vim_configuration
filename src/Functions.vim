@@ -1,3 +1,31 @@
+"
+" ,,<F5> 8 - to enable autocc
+" while [ 1==1 ]; do echo "ok"; sleep 1; done;
+" select a new command with <F5> to overwrite the old one, keeping the settings and execute it
+" while [ 1==1 ]; do echo "new data"; sleep 1; done;
+" select this command and press <C-F5> - now you can cancel on your own
+" 
+"
+" " select this command and fire it with <F5>
+" nano
+"
+" Or this one
+" ls
+
+" Or this one
+" enable auto cd ,,<F5> 8  to automatically return to the project root
+" make the command available in the complete repository, to build build the whole project
+" ./build.sh
+
+" edit the command
+
+" select a remote, to establish a ssh connection first
+
+" when multiple commands share the same key, you get notified
+" for instance press ,<F5> to toggle trough them and activate one of them
+" for instance press ,,,<F5> to execute once after selecting a command
+" wait 3 seconds or hit enter to execute the command
+
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
@@ -2335,6 +2363,16 @@ function! GetBufDirectionIfTerm(direction)
   return -1
 endfunction
 
+function! FindFirstTerm()
+  for win in range(1,winnr('$'))
+    let buf=winbufnr(win)
+    if BufIsTerminal(buf)
+      return buf
+    endif
+  endfor
+  return -1
+endfunction
+
 function! FindSomeTerm()
   for dir in [ 'k', 'h', 'l', 'j' ]
     let buf = GetBufDirectionIfTerm(dir)
@@ -3491,11 +3529,13 @@ endfunction
 
 function! RefreshCommands()
   for c in g:commands
-    let updated=CommandExample()
-    for [k,v] in items(data)
-      let updated[k]=v
+    let updated=CommandTemplate()
+    for [k,v] in items(updated)
+      if !has_key(c, k)
+        let c[k]=v
+      endif
     endfor
-    let c=updated
+    " let c=updated
   endfor
   call SaveCommands()
 endfunction
@@ -3549,7 +3589,7 @@ function! LoadCommands()
         call DebugBuf("Error Parsing File: "..cf)
       finally
         if !empty(data)
-          " let updated=CommandExample()
+          " let updated=CommandTemplate()
           " for [k,v] in items(data)
           "   " echo k
           "   " echo v
@@ -3779,7 +3819,7 @@ function! EmptyCommand()
   " command: 'ls -al; date'
   " \ "hash": -1,
   let command={
-    \ "hash": NewUUID(),
+    \ "hash": -1,
     \ "name": -1,
     \ "key": -1,
     \ "page": -1,
@@ -3806,15 +3846,13 @@ endfunction
 function! VimCommand(command='')
   call InitCommands()
   " let c=EmptyCommand()
-  let c=CommandExample()
+  let c=CommandTemplate()
   let c['hash']=NewUUID()
   let c['name']='unnamed'
   let c['commandMode']='vim'
   let c['commandSpectrum']='buffer'
   let c['savein']=b:savein
   let c['released']=b:released
-  let c['decision_mode']="check_direct"
-  let c['decision_algorithm']="check_only_one_direction"
   let c['commandBuffer']=''
   let c['commandInterpreter']='vim'
   let c['commandOutputMode']='put'
@@ -3825,7 +3863,7 @@ endfunction
 
 function! TermCommand(command='')
   " let c=EmptyCommand()
-  let c=CommandExample()
+  let c=CommandTemplate()
   let c['hash']=NewUUID()
   let c['name']='unnamed'
   let c['commandMode']='term'
@@ -3835,7 +3873,7 @@ function! TermCommand(command='')
   return c
 endfunction
 
-function! CommandExample()
+function! CommandTemplate()
   let c=EmptyCommand()
   let c['name']='unnamed'
   let c['direction']=g:default_direction
@@ -3845,12 +3883,13 @@ function! CommandExample()
   let c['commandSpectrum']='buffer'
   let c['commandBuffer']=expand('%:p')
   let c['target']='Local'
+  let c['autocc']='no'
   let c['autocd']='no'
   let c['autocd_path']=''
   let c['savein']='vimconfiguration'
   let c['released']='no'
   let c['decision_mode']="check_direct"
-  let c['decision_algorithm']="check_only_one_direction"
+  let c['decision_algorithm']="check_find_first_term"
   let c['commandMode']='term'
   let c['commandModeSession']='none'
   let c['commandInterpreter']='term'
@@ -3864,6 +3903,12 @@ function! CommandExample()
   return c
 endfunction
 
+function! CommandTemplateWithUUID()
+  let c=CommandTemplate()
+  let c["hash"]=NewUUID()
+  return c
+endfunction
+
 " function! CommandPageInit()
 "   " if !exists('b:commands')
 "   call CommandPageExample()
@@ -3871,7 +3916,7 @@ endfunction
 " endfunction
 
 " function! CommandPageExample()
-"   let c=CommandExample()
+"   let c=CommandTemplate()
 "   let c['page']=0
 "   let c['command']=['date']
 "   let c['key']='<F5>'
@@ -6925,16 +6970,19 @@ let FixBufNr_decision_mode = [
   \ "check_direct",
   \ "check_faraway",
   \]
+
 let FixBufNr_decision_algorithm = [
   \ "check_clockwise",
   \ "check_only_one_direction",
   \ "check_multiple_directions",
   \ "check_last_used_term",
   \ "check_find_some_term",
+  \ "check_find_first_term",
   \]
 let Spectrum = ["global", "repo", "folder", "tab", "buffer"]
 let SaveIn = ["vimconfiguration", "repo", "samedir", "infile"]
 let AutoCD = [ "no", "cd_to_bufferfile", "cd_to_project_root", "cd_to_configured_autocd_path" ]
+let YesNo = [ "no","yes" ]
 function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
   fun! _not_implemented()
     echo "FixBufNr: Not Implemented"
@@ -6966,7 +7014,13 @@ function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_o
       if x!=-1 | return x | endif
     endfor
   endfun
-  let F_decision_algorithm_fun=a:decision_algorithm=="check_clockwise"?{ -> _check_clockwise()}:a:decision_algorithm=="check_only_one_direction"?{ -> _check_only_one_direction()}:a:decision_algorithm=="check_multiple_directions"?{ -> _check_multiple_directions()}:{ -> _not_implemented()}
+  fun! _check_find_some_term() closure
+    return FindSomeTerm()[1]
+  endfunction
+  fun! _check_find_first_term() closure
+    return FindFirstTerm()
+  endfunction
+  let F_decision_algorithm_fun=a:decision_algorithm=="check_clockwise"?{ -> _check_clockwise()}:a:decision_algorithm=="check_only_one_direction"?{ -> _check_only_one_direction()}:a:decision_algorithm=="check_multiple_directions"?{ -> _check_multiple_directions()}:a:decision_algorithm=="check_find_some_term"?{ -> _check_find_some_term()}:a:decision_algorithm=="check_find_first_term"?{ -> _check_find_first_term()}:{ -> _not_implemented()}
   " return
   let buf=F_decision_algorithm_fun()
   " call DebugBuf("Fixing Buf Nr: "..buf)
@@ -6976,10 +7030,12 @@ function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_o
     call DebugBuf("In This Case, A Command Gets Send To A Term That Has Not Finished Being Created")
     call Open(d, "terminal", "new")
   else
-    if GetBufDirectionIfTermDirect(d)==-1
-      call DebugBuf("Try To ReOpen " .. d)
-    call DebugBuf("In This Case, A Command Gets Send To A Term That Has Not Finished Being Created")
-      call Open(d, "terminal", buf)
+    if !BufVisibileInCurrentTab(buf)
+      if GetBufDirectionIfTermDirect(d)==-1
+        call DebugBuf("Try To ReOpen " .. d)
+        call DebugBuf("In This Case, A Command Gets Send To A Term That Has Not Finished Being Created")
+        call Open(d, "terminal", buf)
+      endif
     endif
   endif
   call win_gotoid(save_win)
@@ -7042,8 +7098,8 @@ endfunction
   " when 2 commands conflict at one key, make them selectable with repeatd keypressing (reverse order)
   " (1) load them anyways when in vimconfiguration / sometimes, when in projectroot / samedir or infile
 
-function! GetMatchingCommand(keymap=g:keymap)
-  let updated = CommandExample()
+function! FindCommand(keymap=g:keymap)
+  let updated = CommandTemplate()
   let c=''
   let val = filter(copy(g:commands), { i,v ->
     \ v:val["key"]==a:keymap
@@ -7095,14 +7151,14 @@ function! SelectCommand(keymap=g:keymap)
   echo a:keymap
 endfunction
 
-function! ConfigureKeys(keymap=g:keymap)
+function! ConfigureKeys(c)
   " call LoadCommands()
   " let all=["\<F5>", "\<F6>","\<F7>","\<F8>"]
   " let alll=["<F5>", "<F6>","<F7>","<F8>"]
-  let keymap=substitute(a:keymap, ',','', 'g')
-  let c=GetMatchingCommand(keymap)
+  let keymap=substitute(g:keymap, ',','', 'g')
+  " let c=FindCommand(keymap)
   " let c=Ref(c)
-  let cidx=index(g:commands, c)
+  let cidx=index(g:commands, a:c)
   let c=g:commands[cidx]
   function! _toggle(n=1) closure
     " call DebugBuf(s['value']1)
@@ -7122,70 +7178,82 @@ function! ConfigureKeys(keymap=g:keymap)
     call DebugBufHeight(13)
     if !empty(c)
       " call DebugBuf(char)
-      call DebugBuf("key:                "..c['key'])
-      call DebugBuf("command:            "..join(c['command'], ' '))
-      call DebugBuf("savein:             "..c['savein'])
-      call DebugBuf("spectrum:           "..c['commandSpectrum'])
-      call DebugBuf("decision_algorithm: "..c['decision_algorithm'])
-      call DebugBuf("decision_mode:      "..c['decision_mode'])
-      call DebugBuf("target:             "..c['target'])
-      call DebugBuf("autocd:             "..c['autocd'])
-      call DebugBuf("direction:          "..c['direction'])
+      call DebugBuf("key:                    "..c['key'])
+      call DebugBuf("1:  command:            "..join(c['command'], ' '))
+      call DebugBuf("2:  savein:             "..c['savein'])
+      call DebugBuf("3:  spectrum:           "..c['commandSpectrum'])
+      call DebugBuf("4:  decision_algorithm: "..c['decision_algorithm'])
+      call DebugBuf("5:  decision_mode:      "..c['decision_mode'])
+      call DebugBuf("6:  target:             "..c['target'])
+      call DebugBuf("7:  autocd:             "..c['autocd'])
+      call DebugBuf("8:  autocc:             "..c['autocc'])
+      call DebugBuf("9:  direction:          "..c['direction'])
     endif
     " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'vimconfiguration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'commandBuffer': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'commandRepo': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'commandSpectrum': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
     redraw!
   endfunction
+  call _printPage()
   let char=''
   while index([13, 113, 81], char)==-1
     " call DebugBuf("")
+    " \ "toggleUp": [ 97, 90 ],
+    " \ "toggleDown": [ 122, 65 ],
     let shortcuts=[
       \ {
       \ "key": keymap,
-      \ "toggleUp": [ 97, 90 ],
-      \ "toggleDown": [ 122, 65 ],
+      \ "toggleUp": [50],
+      \ "toggleDown": [64],
       \ "name": "savein",
       \ "value": c['savein'],
       \ "values": g:SaveIn
       \ },
       \ {
       \ "key": keymap,
-      \ "toggleUp": [ 115, 88 ],
-      \ "toggleDown": [ 120, 83 ],
+      \ "toggleUp": [51],
+      \ "toggleDown": [35],
       \ "name": "commandSpectrum",
       \ "value": c['commandSpectrum'],
       \ "values": g:Spectrum
       \ },
       \ {
       \ "key": keymap,
-      \ "toggleUp": [ 99, 67 ],
-      \ "toggleDown": [ 100, 68 ],
+      \ "toggleUp": [52],
+      \ "toggleDown": [36],
       \ "name": "decision_algorithm",
       \ "value": c['decision_algorithm'],
       \ "values": g:FixBufNr_decision_algorithm
       \ },
       \ {
       \ "key": keymap,
-      \ "toggleUp": [ 102, 70 ],
-      \ "toggleDown": [ 118, 86 ],
+      \ "toggleUp": [53],
+      \ "toggleDown": [37],
       \ "name": "decision_mode",
       \ "value": c['decision_mode'],
       \ "values": g:FixBufNr_decision_mode
       \ },
       \ {
       \ "key": keymap,
-      \ "toggleUp": [ 103, 71 ],
-      \ "toggleDown": [ 98, 66 ],
+      \ "toggleUp": [ 54 ],
+      \ "toggleDown": [ 94 ],
       \ "name": "target",
       \ "value": c['target'],
       \ "values": g:targets
       \ },
       \ {
       \ "key": keymap,
-      \ "toggleUp": [ 110, 78 ],
-      \ "toggleDown": [ 109, 77 ],
+      \ "toggleUp": [ 55 ],
+      \ "toggleDown": [ 38 ],
       \ "name": "autocd",
       \ "value": c['autocd'],
       \ "values": g:AutoCD
+      \ },
+      \ {
+      \ "key": keymap,
+      \ "toggleUp": [ 56 ],
+      \ "toggleDown": [ 41 ],
+      \ "name": "autocc",
+      \ "value": c['autocc'],
+      \ "values": g:YesNo
       \ }
       \ ]
     let char = getchar()
@@ -7195,7 +7263,7 @@ function! ConfigureKeys(keymap=g:keymap)
     for s in shortcuts
       let tu=s['toggleUp']
       let td=s['toggleDown']
-      let selectCommand=[8, 6, 24, '€ü€F2']
+      let selectCommand=[8, 6, 24 ]
       let editCommand=[5]
       " example for <F5>
       let executeCommand=['Â€k5']
@@ -7210,7 +7278,6 @@ function! ConfigureKeys(keymap=g:keymap)
         let c[s['name']]=x
         " let g:commands[cidx]=x
         call NewOrOverwrite(c)
-        call SaveCommands()
       elseif type(selectCommand)==0 && char==selectCommand || type(selectCommand)==3 && index(selectCommand, char)>-1
         echo "select command"
       elseif type(editCommand)==0 && char==editCommand || type(editCommand)==3 && index(editCommand, char)>-1
@@ -7223,10 +7290,13 @@ function! ConfigureKeys(keymap=g:keymap)
         let c['direction']='k'
       elseif index([108, 76], char)>-1
         let c['direction']='l'
+      elseif index([49, 33], char)>-1
+        echo "1: edit command"
       endif
     endfor
     call _printPage()
   endwhile
+  call SaveCommands()
   " call DebugBuf(c)
   " echo join(values(map(shortcuts, {_->"\["..v:key.."\]: "..v:val})), "   ")
 endfunction
@@ -7258,6 +7328,7 @@ function! NewOrOverwrite(c)
     endif
     let g:commands[found_index]=c
   else
+    let c['hash']=NewUUID()
     call DebugBuf("not overwriting - new command")
     " echo c
     call add(g:commands, c)
@@ -7279,7 +7350,11 @@ function! Command() range
   " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadCommands()), 1500)
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
-  let c=GetMatchingCommand()
+  let c=FindCommand()
+  if empty(c)
+    echo "No Matching Command"
+    return
+  endif
   if g:mode=='visual'
     " let c=TermCommand()
     " let c['hash']=matching['hash']
@@ -7321,14 +7396,16 @@ function! Command() range
     call NewOrOverwrite(c)
     call SaveCommands()
   elseif g:keymap=~",,"
-    call ConfigureKeys()
+    call DebugBuf(g:keymap)
+    if !empty(c)
+      call ConfigureKeys(c)
+    endif
     return
   elseif g:keymap=~","
     call SelectCommand()
     return
   else
-    let c=''
-    let c=GetMatchingCommand()
+    " let c=''
     " call DebugBuf(c)
     if !empty(c)
       let b:savein=c['savein']
@@ -7346,6 +7423,7 @@ function! Command() range
     " call DebugBuf(c)
     " call DebugBuf("Command Not Send\n"..Pretty(c))
     call DebugBuf("Command Not Send\n")
+    call DebugBuf(Pretty(c))
   elseif type(c)!=3
     " call EchoSafely(Pretty(c), 700)
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
@@ -7361,10 +7439,24 @@ function! Command() range
     if target_term_buffer!=-1
       " let buf=winbufnr(winnr(c['direction']))
       " call TERM(target_term_buffer, c['command'])
+      if c['autocc']=='yes'
+        call SendCommandToTermByBuf(target_term_buffer, [''])
+      endif
+      if c['autocd']!='no'
+        let topath=''
+        if c['autocd']=='cd_to_bufferfile'
+          let topath=expand('%:p:h')
+        elseif c['autocd']=='cd_to_project_root'
+          let topath=Folder_Repo_Or_Project_Only()
+        elseif c['autocd']=='cd_to_configured_autocd_path'
+          let topath=c['autocd_path']
+        endif
+        call SendCommandToTermByBuf(target_term_buffer, ['cd '..topath])
+      endif
       call SendCommandToTermByBuf(target_term_buffer, c['command'])
       call DebugBuf("Command Send")
     else
-      " call DebugBuf(c)
+      call DebugBuf(c)
       call DebugBuf("Command Not Send")
     endif
   else
@@ -7400,10 +7492,15 @@ endfunction
 
 function! DebugBufHeight(height)
   let winnr=winnr()
-  if WinCmdToBuf(t:debugbuf)
-    call Height(a:height)
+  let w=bufwinnr(t:debugbuf)
+  let buf_height = winheight(w)
+  let buf_width = winwidth(w)
+  if buf_height!=a:height
+    if WinCmdToBuf(t:debugbuf)
+      call Height(a:height)
+    endif
+    call WinCmdToWin(winnr)
   endif
-  call WinCmdToWin(winnr)
   " call win_gotoid(t:debugbuf)
   " echo bufwinid(t:debugbuf)
   " call win_gotoid(save_win)
