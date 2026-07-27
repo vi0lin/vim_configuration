@@ -1,3 +1,4 @@
+
 " ]c / [c
 " git difftool HEAD@{1} -- src/Functions.vim
 " do
@@ -34,7 +35,7 @@ function! Diff(...)
   let nr = a:000[0]
   let p=expand('%:p')
   let ph=expand('%:p:h')
-  vnew
+  vnew "DIFF HEAD@{"..nr.."}:./"..substitute(p, ph, '', 'g')[1:]
   exec "r !git show HEAD@{"..nr.."}:./"..substitute(p, ph, '', 'g')[1:]
   diffthis
   wincmd p
@@ -3084,7 +3085,7 @@ function! GitInitRepository()
 endfunction
 
 command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
-" command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
+command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
   " Use GetOpt2
   " GitStatus
@@ -7082,6 +7083,7 @@ function! ConfigureKeys(keymap=g:keymap)
     call DebugBuf("spectrum:           "..c['commandSpectrum'])
     call DebugBuf("decision_algorithm: "..c['decision_algorithm'])
     call DebugBuf("decision_mode:      "..c['decision_mode'])
+    call DebugBuf("target:             "..c['target'])
     " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'vimconfiguration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'commandBuffer': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'commandRepo': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'commandSpectrum': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
     redraw!
   endfunction
@@ -7141,7 +7143,7 @@ function! ConfigureKeys(keymap=g:keymap)
       let selectCommand=[8, 6, 24, '€ü€F2']
       let editCommand=[5]
       " example for <F5>
-      let executeCommand=['€k5']
+      let executeCommand=['Â€k5']
       if type(tu)==0 && char==tu || type(tu)==3 && index(tu, char)>-1
         let x=_toggle(1)
         let c[s['name']]=x
