@@ -7556,7 +7556,9 @@ function! DebugBuf(data)
 endfunction
 
 function! DebugBufClear()
-  call deletebufline(t:debugbuf, 1, '$')
+  if exists('t:debugbuf')
+    call deletebufline(t:debugbuf, 1, '$')
+    endif
 endfunction
 
 function! ExecuteInWin(winid, cmd)
