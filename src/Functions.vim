@@ -1,4 +1,7 @@
-
+set encoding=utf-8
+set fileencoding=utf-8
+set fileencodings=utf-8
+set termencoding=utf-8
 " ]c / [c
 " git difftool HEAD@{1} -- src/Functions.vim
 " do
@@ -35,7 +38,7 @@ function! Diff(...)
   let nr = a:000[0]
   let p=expand('%:p')
   let ph=expand('%:p:h')
-  vnew "DIFF HEAD@{"..nr.."}:./"..substitute(p, ph, '', 'g')[1:]
+  vnew diff
   exec "r !git show HEAD@{"..nr.."}:./"..substitute(p, ph, '', 'g')[1:]
   diffthis
   wincmd p
@@ -3085,7 +3088,6 @@ function! GitInitRepository()
 endfunction
 
 command! -range -nargs=* GitDiff <line1>,<line2>:call GitDiff(<f-args>)
-command! -range -nargs=* Diff <line1>,<line2>:call GitDiff(<f-args>)
 function! GitDiff(...)
   " Use GetOpt2
   " GitStatus
@@ -4082,9 +4084,6 @@ set tabpagemax=50
 set wildmenu
 set noswapfile
 set verbose=0 " 0-9?
-set encoding=utf-8
-set fileencoding=utf-8
-set termencoding=
 set ttyfast
 filetype on
 filetype indent on
