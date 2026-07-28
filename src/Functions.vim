@@ -7137,6 +7137,7 @@ function! InitCommandSelections(keymap)
 endfunction
 
 function! FindCommand(cs, keymap=g:keymap)
+  call InitCommandSelections(a:keymap)
   if len(a:cs)>0
     let c=a:cs[w:commandselections[a:keymap]]
     if !empty(c)
@@ -7517,7 +7518,9 @@ function! Command() range
   " echo g:keymap type(c)
   let cs=FindCommands()
   " call DebugBuf(cs)
-  let c = FindCommand(cs)
+  "
+  let keymap=substitute(g:keymap, ',','', 'g')
+  let c = FindCommand(cs, keymap)
   " call DebugBuf(c)
   if empty(c)
     let c=CommandTemplate()
@@ -7689,6 +7692,8 @@ function! DebugBuf(data)
     if getbufline(t:debugbuf, 1, 1)[0]==''
       call deletebufline(t:debugbuf, 1)
     endif
+  else
+    call EnsureDebugBuf()
   endif
 endfunction
 
