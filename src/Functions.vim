@@ -1,6 +1,7 @@
 " ,,<F5> 8 - to enable autocc
 " while [ 1==1 ]; do echo "ok"; sleep 1; done;
 " select a new command with <F5> to overwrite the old one, keeping the settings and execute it
+" date
 " while [ 1==1 ]; do echo "new data"; sleep 1; done;
 " select this command and press <C-F5> - now you can cancel on your own
 " 
@@ -1466,7 +1467,7 @@ endfunction
 " 0p 0P    prefixing it with a register should force linewise behaviour (THAT DOES NOT WORK IN MY CASE)
 " :put     inserts below / treats blockwise register
 " :put!    inserts above
-"	if get(Part1, 'name') == get(Part2, 'name')
+"  if get(Part1, 'name') == get(Part2, 'name')
 function! Mod(n,m)
   return ((a:n % a:m) + a:m) % a:m
 endfunction
@@ -1542,7 +1543,7 @@ function! StaticWin(...) range
         let j += 1
       endwhile
       function! _init(new)
-        " autocmd! WinResized	* StaticWin --win-resized
+        " autocmd! WinResized * StaticWin --win-resized
         autocmd! WinResized * StaticWin --win-resized
         let b:focusable=0
         let b:staticWin=a:new
@@ -2478,7 +2479,7 @@ function! BuildString_Find_All_CWDS_slow(cwds)
       let out=out.' '
     endif
     let i+=1
-	endwhile
+  endwhile
   " echo out
   return 'find '.out.' -type f -name ="*.sh"'
 endfunction
@@ -2499,7 +2500,7 @@ function! BuildString_Find_All_CWDS(cwds, pattern, postfix='')
       let out=out.','
     endif
     let i+=1
-	endwhile
+  endwhile
   " exec 'set path='..out
   " set path?
   " find *.sh
@@ -2610,11 +2611,11 @@ function! COTests()
   " lopen copen cclose lclose cwindow height lwindow height cbottom lbottom
   " botright cwindow
   " botleft
-	" au BufReadPost quickfix  setlocal modifiable
-	" 	\ | silent exe 'g/^/s//\=line(".") .. " "/'
-	" 	\ | setlocal nomodifiable
-	" echo getqflist({'winid' : 1}).winid
-	" echo getloclist(2, {'winid' : 1}).winid
+  " au BufReadPost quickfix  setlocal modifiable
+  "   \ | silent exe 'g/^/s//\=line(".") .. " "/'
+  "   \ | setlocal nomodifiable
+  " echo getqflist({'winid' : 1}).winid
+  " echo getloclist(2, {'winid' : 1}).winid
   "  " get the title of the current quickfix list
   "  :echo getqflist({'title' : 0}).title
   "  " get the identifier of the current quickfix list
@@ -2657,7 +2658,7 @@ function! COTests()
   "  " get the file window id of a location list window (winnr: 4)
   "  :echo getloclist(4, {'filewinid' : 0}).filewinid
 <
-	"						*setqflist-examples*
+  "            *setqflist-examples*
 Th"e |setqflist()| and |setloclist()| functions can be used to set the various
 at"tributes of a quickfix and location list respectively. Some examples for
 us"ing these functions are below:
@@ -2676,10 +2677,10 @@ us"ing these functions are below:
   "  :call setqflist([], ' ', {'lines' : systemlist('grep -Hn main *.c')})
   "  " parse text using a custom efm and add to a particular quickfix list
   "  :call setqflist([], 'a', {'id' : qfid,
-	"	\ 'lines' : ["a.c#10#L10", "b.c#20#L20"], 'efm':'%f#%l#%m'})
+  "  \ 'lines' : ["a.c#10#L10", "b.c#20#L20"], 'efm':'%f#%l#%m'})
   "  " add items to the quickfix list specified by an identifier
   "  :let newItems = [{'filename' : 'a.txt', 'lnum' : 10, 'text' : "Apple"},
-	"	    \ {'filename' : 'b.txt', 'lnum' : 20, 'text' : "Orange"}]
+  "      \ {'filename' : 'b.txt', 'lnum' : 20, 'text' : "Orange"}]
   "  :call setqflist([], 'a', {'id' : qfid, 'items' : newItems})
   "  " empty a quickfix list specified by an identifier
   "  :call setqflist([], 'r', {'id' : qfid, 'items' : []})
@@ -2689,7 +2690,7 @@ us"ing these functions are below:
   "  :call setqflist([], 'a', {'nr' : 4, 'title' : 'SomeTitle'})
   "  " create a new quickfix list at the end of the stack
   "  :call setqflist([], ' ', {'nr' : '$',
-	"		\ 'lines' : systemlist('grep -Hn class *.java')})
+  "    \ 'lines' : systemlist('grep -Hn class *.java')})
   "  " create a new location list from a command output
   "  :call setloclist(0, [], ' ', {'lines' : systemlist('grep -Hn main *.c')})
   "  " replace the location list entries for the third window
@@ -2773,19 +2774,19 @@ function! GitStashPush()
   " Todo Add Message Argument
   !git stash push
 endfunction
-command! -range -nargs=0 GitStashPush <line1>,<line2>:call GitStashPush(<q-args>)
+command! -range -nargs=0 GitStashPush <line1>,<line2>:call GitStashPush()
 
 function! GitStashPop()
   " Todo Add Message Argument
   !git stash pop
 endfunction
-command! -range -nargs=0 GitStashPop <line1>,<line2>:call GitStashPop(<q-args>)
+command! -range -nargs=0 GitStashPop <line1>,<line2>:call GitStashPop()
 
 function! GitStashDrop()
   " Todo Add Message Argument
   !git stash drop
 endfunction
-command! -range -nargs=0 GitStashDrop <line1>,<line2>:call GitStashDrop(<q-args>)
+command! -range -nargs=0 GitStashDrop <line1>,<line2>:call GitStashDrop()
 
 function! GitStashCWD()
 endfunction
@@ -3877,7 +3878,7 @@ function! CommandTemplate()
   let c['name']='unnamed'
   let c['direction']=g:default_direction
   let c['directionMode']='foremost'
-  let c['commandRepo']=Folder_Repo_Or_Project_Only()
+  let c['commandRepo']=exists('w:cwd')?Folder_Repo_Or_Project_Only():''
   let c['commandFolder']=expand('%:p:h')
   let c['commandSpectrum']='buffer'
   let c['commandBuffer']=expand('%:p')
@@ -4222,9 +4223,9 @@ set textwidth=0
 
 function! StripComments(input)
   " Alt A Alt D
-	" :echo searchpair('\<if\>', '\<el\%[seif]\>', '\<en\%[dif]\>', 'W',
-	"		\ 'getline(".") =~ "^\\s*\""')
-	" :echo searchpair('{', '', '}', 'bW')
+  " :echo searchpair('\<if\>', '\<el\%[seif]\>', '\<en\%[dif]\>', 'W',
+  "    \ 'getline(".") =~ "^\\s*\""')
+  " :echo searchpair('{', '', '}', 'bW')
   " comments
   return a:input
 endfunction
@@ -5594,8 +5595,8 @@ function! Popup(title, register, list, callback, outfile)
   " call ch_sendraw()
   " let list=['line1', 'line2', 'line3']
   " echo text
-	" call ch_sendraw(chan, text)
-	" call ch_close_in(chan)
+  " call ch_sendraw(chan, text)
+  " call ch_close_in(chan)
   " let stdin = join(list, '\n')
   " let tnr=term_start(cmd, opts)
   " let job=term_getjob(tnr)
@@ -7097,46 +7098,108 @@ endfunction
   " when 2 commands conflict at one key, make them selectable with repeatd keypressing (reverse order)
   " (1) load them anyways when in vimconfiguration / sometimes, when in projectroot / samedir or infile
 
-function! FindCommand(keymap=g:keymap)
-  let updated = CommandTemplate()
-  let c=''
+function _groupBy(input, by)
+  let result={}
+  for i in a:input
+    exec "let k = i."..a:by
+     if !has_key(result, k)
+       let result[k]=[]
+     endif
+     call add(result[k], i)
+  endfor
+  " call DebugBuf(result)
+  return result
+endfunction
+
+" function! _getCommands(cs, keymap)
+"   function! _find(d, keymap=g:keymap)
+"     if has_key(a:d, a:keymap)
+"       return a:d[a:keymap]
+"     else
+"       return []
+"     endif
+"   endfunction
+"   let pp=[]
+"   call extend(pp, [ _find(a:cs['buffer'], a:keymap)])
+"   call extend(pp, [ _find(a:cs['folder'], a:keymap)])
+"   call extend(pp, [ _find(a:cs['repo'], a:keymap)])
+"   call extend(pp, [ _find(a:cs['global'], a:keymap)])
+"   return pp
+" endfunction
+
+function! FindCommand(cs, keymap=g:keymap)
+  if !exists('w:commandselections')
+    let w:commandselections={}
+  endif
+  if !exists('w:commandselections[a:keymap]')
+    call extend(w:commandselections, { a:keymap: 0})
+  endif
+  if len(a:cs)>0
+    let c=a:cs[w:commandselections[a:keymap]]
+    if !empty(c)
+      return c
+    else
+      return {}
+    endif
+  else
+      return {}
+  endif
+  " return _getCommands(a:cs, a:keymap)
+  " for p in pp
+  "   if p
+  " endfor
+  " call DebugBuf(b:c)
+  " call DebugBuf(_eK(b:c, a:keymap))
+endfunction
+
+function! FindCommands(keymap=g:keymap)
+  " let updated = CommandTemplate()
+  " let c={ 'buffer': [],'folder': [],'repo': [], 'global': [] }
+  let c=[]
   let val = filter(copy(g:commands), { i,v ->
     \ v:val["key"]==a:keymap
     \ && v:val["commandSpectrum"]=="buffer"
     \ && v:val["commandBuffer"]==expand('%:p')
     \ })
-  let c=empty(val)?c:empty(val)?c:val[0]
-  " call DebugBuf(c)
-  "
+  if !empty(val)
+    call extend(c, val)
+  endif
   let val = filter(copy(g:commands), { i,v ->
     \ v:val["key"]==a:keymap
     \ && v:val["commandSpectrum"]=="folder"
     \ && v:val["commandFolder"]==expand('%:p:h')
     \ })
-  let c=!empty(c)?c:empty(val)?c:val[0]
-  " call DebugBuf(c)
+  if !empty(val)
+    call extend(c, val)
+  endif
   "
   let val = filter(copy(g:commands), { i,v ->
     \ v:val["key"]==a:keymap
     \ && v:val["commandSpectrum"]=="repo"
     \ && v:val["commandRepo"]==Folder_Repo_Or_Project_Only()
     \ })
-  " call DebugBuf(len(val))
-  " call DebugBuf(empty(c))
-  let c=!empty(c)?c:empty(val)?c:val[0]
-  " call DebugBuf(c)
+  if !empty(val)
+    call extend(c, val)
+  endif
   "
   let val = filter(copy(g:commands), { i,v ->
     \ v:val["key"]==a:keymap
     \ && v:val["commandSpectrum"]=="global"
     \ })
-  let c=!empty(c)?c:empty(val)?c:val[0]
+  if !empty(val)
+    call extend(c, val)
+  endif
   " call DebugBuf(c)
   " return updated
-  for [k,v] in items(c)
-    let updated[k]=v
-  endfor
-  return updated
+  " for [k,v] in items(c)
+  "   let updated[k]=v
+  " endfor
+  " return updated
+  " call EnsureDebugBuf()
+  " let rglobal= reduce(c['global'], {acc,item->extend(acc, {item.key: get(acc, item.key, []) + [item]})}, {})
+  " call DebugBuf(input)
+  " call DebugBuf(c)
+  return c
 endfunction
 
 function! Ref(c)
@@ -7145,19 +7208,28 @@ function! Ref(c)
   return c
 endfunction
 
-function! SelectCommand(keymap=g:keymap)
-  echo "Select Command"
-  echo a:keymap
+function! SelectCommand(cs, keymap=g:keymap)
+  let keymap=substitute(g:keymap, ',','', 'g')
+  return FindCommands(keymap)
+  " return _getCommands(a:cs, keymap)
+  " let length=len(_ek(b:c, keymap))
+  " if length>0
+  "   return _eK(b:c['buffer'], keymap)[0]
+  " else
+  "   return []
+  " endif
 endfunction
 
-function! ConfigureKeys(c)
+function! ConfigureKeys(keymap=g:keymap)
   " call LoadCommands()
   " let all=["\<F5>", "\<F6>","\<F7>","\<F8>"]
   " let alll=["<F5>", "<F6>","<F7>","<F8>"]
   let keymap=substitute(g:keymap, ',','', 'g')
-  " let c=FindCommand(keymap)
+  " echo keymap
+  let cs=FindCommands(keymap)
+  let c = FindCommand(cs, keymap)
   " let c=Ref(c)
-  let cidx=index(g:commands, a:c)
+  let cidx=index(g:commands, c)
   let c=g:commands[cidx]
   function! _toggle(n=1) closure
     " call DebugBuf(s['value']1)
@@ -7256,6 +7328,7 @@ function! ConfigureKeys(c)
       \ }
       \ ]
     let char = getchar()
+    let charstr=nr2char(char)
     " call DebugBuf(char)
     " redraw
     " echo "\r"
@@ -7291,13 +7364,74 @@ function! ConfigureKeys(c)
         let c['direction']='l'
       elseif index([49, 33], char)>-1
         echo "1: edit command"
+      elseif index([','], charstr)>-1
+        let x=getcharstr()
+        if x ==# ','
+          let key=getcharstr()
+          let k=keytrans(key)
+          let a=",,"..k
+          let b=",,\\"..k
+          let c=",,"..key
+          call feedkeys(c, 't')
+        else
+          let k='\'..keytrans(x)
+          let a=","..k
+          let b=",\\"..k
+          let c=","..x
+          call feedkeys(c, 't')
+        endif
+        return
       endif
     endfor
     call _printPage()
   endwhile
   call SaveCommands()
-  " call DebugBuf(c)
+  call DebugBufClear()
+  call DebugBufHeight()
   " echo join(values(map(shortcuts, {_->"\["..v:key.."\]: "..v:val})), "   ")
+endfunction
+
+function! RedefineOrCreateNew(c, vs)
+  let c = a:c
+  " let c=TermCommand()
+  " let c['hash']=matching['hash']
+  " let c['commandSaveinFolder']=DetermineCommandSaveinFolder()
+  " shared values, when modified prompts for change for all, or detach command
+  " shared command over multiple repos
+  " let c['commandRepo']=["/path/to/repos", "/another/path/to/repos"]
+  let c['commandRepo']=Folder_Repo_Or_Project_Only()
+  " shared command over multiple folders
+  " let c['commandFolder']=["/path/to/folder", "/another/path/to/folder"]
+  let c['commandFolder']=expand('%:p:h')
+  " shared command over multiple buffers
+  " let c['commandBuffer']=["/path/to/file", "/another/path/to/file"]
+  let c['commandBuffer']=b:spectrum=='buffer'?expand('%:p'):''
+  " let c['commandBufferGlob']="*"
+  " let c['commandFolderGlob']="*"
+  " let c['commandBufferGlob']=["*", "**"]
+  " let c['commandFolderGlob']=["*", "**"]
+  let c['target']='Local'
+  " let c['savein']=b:savein
+  " let c['released']=b:released
+  " let c['decision_mode']="check_direct"
+  " let c['decision_algorithm']="check_only_one_direction"
+  " let c['autocd']="no"
+  " let c['autocd_path']="/"
+  " let c['commandSpectrum']=b:spectrum
+  let c['command']=a:vs
+  " let c['page']=0
+  let c['key']=g:keymap
+  " let c['direction']=g:default_direction
+  " let b:commands['pages'][0][g:keymap]=c
+  " call filter(copy(g:commands), '!(v:val["commandSpectrum"]==c["commandSpectrum"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
+  " call DebugBuf(a:vs)
+  " let g:commands=[]
+  " let g:commands=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
+  " echo g:commands
+  " let asdf="<F6>"
+  " call filter(g:commands, 'v:val["key"]!=asdf')
+  call NewOrOverwrite(c)
+  call SaveCommands()
 endfunction
 
 function! NewOrOverwrite(c)
@@ -7340,6 +7474,7 @@ function! Command() range
   " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
   " return
   let vs=VS()
+  " let vs=['nano']
   call DebugBufClear()
   call DebugBuf(g:keymap)
   " call CommandPageInit()
@@ -7349,59 +7484,25 @@ function! Command() range
   " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadCommands()), 1500)
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
-  let c=FindCommand()
+  let cs=FindCommands()
+  " call DebugBuf(cs)
+  let c = FindCommand(cs)
+  call DebugBuf(c)
   if empty(c)
-    echo "No Matching Command"
-    return
+    let c=CommandTemplate()
+    " echo "No Matching Command"
+    " return
   endif
   if g:mode=='visual'
-    " let c=TermCommand()
-    " let c['hash']=matching['hash']
-    " let c['commandSaveinFolder']=DetermineCommandSaveinFolder()
-    " shared values, when modified prompts for change for all, or detach command
-    " shared command over multiple repos
-    " let c['commandRepo']=["/path/to/repos", "/another/path/to/repos"]
-    let c['commandRepo']=Folder_Repo_Or_Project_Only()
-    " shared command over multiple folders
-    " let c['commandFolder']=["/path/to/folder", "/another/path/to/folder"]
-    let c['commandFolder']=expand('%:p:h')
-    " shared command over multiple buffers
-    " let c['commandBuffer']=["/path/to/file", "/another/path/to/file"]
-    let c['commandBuffer']=b:spectrum=='buffer'?expand('%:p'):''
-    " let c['commandBufferGlob']="*"
-    " let c['commandFolderGlob']="*"
-    " let c['commandBufferGlob']=["*", "**"]
-    " let c['commandFolderGlob']=["*", "**"]
-    let c['target']='Local'
-    " let c['savein']=b:savein
-    " let c['released']=b:released
-    " let c['decision_mode']="check_direct"
-    " let c['decision_algorithm']="check_only_one_direction"
-    " let c['autocd']="no"
-    " let c['autocd_path']="/"
-    " let c['commandSpectrum']=b:spectrum
-    let c['command']=vs
-    " let c['page']=0
-    let c['key']=g:keymap
-    " let c['direction']=g:default_direction
-    " let b:commands['pages'][0][g:keymap]=c
-    " call filter(copy(g:commands), '!(v:val["commandSpectrum"]==c["commandSpectrum"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
-    " call DebugBuf(vs)
-    " let g:commands=[]
-    " let g:commands=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
-    " echo g:commands
-    " let asdf="<F6>"
-    " call filter(g:commands, 'v:val["key"]!=asdf')
-    call NewOrOverwrite(c)
-    call SaveCommands()
+    call RedefineOrCreateNew(c, vs)
   elseif g:keymap=~",,"
     call DebugBuf(g:keymap)
     if !empty(c)
-      call ConfigureKeys(c)
+      call ConfigureKeys(g:keymap)
     endif
     return
   elseif g:keymap=~","
-    call SelectCommand()
+    call SelectCommand(cs)
     return
   else
     " let c=''
@@ -7418,11 +7519,12 @@ function! Command() range
     "
     " let c=g:commands['pages'][0][g:keymap]
   endif
+  call DebugBuf(c)
   if type(c)==0 && c['command'] != -1 || c['command']==[]
     " call DebugBuf(c)
     " call DebugBuf("Command Not Send\n"..Pretty(c))
     call DebugBuf("Command Not Send\n")
-    call DebugBuf(Pretty(c))
+    call DebugBuf(c)
   elseif type(c)!=3
     " call EchoSafely(Pretty(c), 700)
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
@@ -7459,7 +7561,7 @@ function! Command() range
       call DebugBuf("Command Not Send")
     endif
   else
-    call DebugBuf(Pretty("Type Error"))
+    call DebugBuf("Type Error")
   endif
   " echo g:commands
 endfunction
@@ -7546,7 +7648,12 @@ function! DebugBuf(data)
     " let data=split(J(a:data), '\%x0')
     " let data=split(a:data, '\%x0')
     " let data=split(substitute(a:data, '\n', "\r", 'g'), '\r')
-    let data=split(a:data, '\n')
+    let type=type(a:data)
+    if type==4||type==3
+      let data=split(Pretty(a:data), '\n')
+    else
+      let data=split(a:data, '\n')
+    endif
     call appendbufline(t:debugbuf, '$', data)
     if getbufline(t:debugbuf, 1, 1)[0]==''
       call deletebufline(t:debugbuf, 1)
@@ -8854,7 +8961,7 @@ function! WinLeave()
 endfunction
 
 function! BufLeave()
-	let last_buffer = bufnr("$")
+  let last_buffer = bufnr("$")
   let last_winid = bufwinid(last_buffer)
   let g:lastmain_repo=getwinvar(last_winid, "main_repo")
   " if IsTermWin()
@@ -9719,8 +9826,8 @@ endfunction
 
 " Dateiliste einmalig befüllen (alle geladenen Buffer)
 function! RefreshFileListDir() abort
-	" let tagfiles = glob("`find . -name tags -print`")
-	" let &tags = substitute(tagfiles, "\n", ",", "g")
+  " let tagfiles = glob("`find . -name tags -print`")
+  let &tags = substitute(tagfiles, "\n", ",", "g")
   " glob2regpat
   " globpath
   let g:file_list = []
