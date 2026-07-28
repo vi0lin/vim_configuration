@@ -7126,14 +7126,17 @@ endfunction
 "   call extend(pp, [ _find(a:cs['global'], a:keymap)])
 "   return pp
 " endfunction
-
-function! FindCommand(cs, keymap=g:keymap)
+"
+function! InitCommandSelections(keymap)
   if !exists('w:commandselections')
     let w:commandselections={}
   endif
   if !exists('w:commandselections[a:keymap]')
     call extend(w:commandselections, { a:keymap: 0})
   endif
+endfunction
+
+function! FindCommand(cs, keymap=g:keymap)
   if len(a:cs)>0
     let c=a:cs[w:commandselections[a:keymap]]
     if !empty(c)
@@ -7210,7 +7213,32 @@ endfunction
 
 function! SelectCommand(cs, keymap=g:keymap)
   let keymap=substitute(g:keymap, ',','', 'g')
-  return FindCommands(keymap)
+  call InitCommandSelections(keymap)
+  let result=keymap
+  let result.="\n"
+  let commands=FindCommands(keymap)
+  let length=len(commands)
+  let selected=Mod(w:commandselections[keymap]+1, length)
+  let w:commandselections[keymap]=selected
+  for c in commands
+    let selected=''
+    if index(commands, c)==w:commandselections[keymap]
+      let selected='x'
+    else
+      let selected='_'
+    endif
+    let result.="["..selected.."] === "
+    let result.=c.name
+    let result.=" ==========="
+    let result.="\n"
+    let result.="      "
+    let result.=c.commandSpectrum
+    let result.="\n"
+    let result.="      "
+    let result.=json_encode(c.command)
+    let result.="\n"
+  endfor
+  call DebugBuf(result)
   " return _getCommands(a:cs, keymap)
   " let length=len(_ek(b:c, keymap))
   " if length>0
@@ -7476,7 +7504,7 @@ function! Command() range
   let vs=VS()
   " let vs=['nano']
   call DebugBufClear()
-  call DebugBuf(g:keymap)
+  " call DebugBuf(g:keymap)
   " call CommandPageInit()
   " call CommandPageInit()
   " call DebugBuf(P(b:commands))
@@ -7487,7 +7515,7 @@ function! Command() range
   let cs=FindCommands()
   " call DebugBuf(cs)
   let c = FindCommand(cs)
-  call DebugBuf(c)
+  " call DebugBuf(c)
   if empty(c)
     let c=CommandTemplate()
     " echo "No Matching Command"
