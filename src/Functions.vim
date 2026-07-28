@@ -7232,6 +7232,9 @@ function! SelectCommand(cs, keymap=g:keymap)
     let result.=" ==========="
     let result.="\n"
     let result.="      "
+    let result.=c.commandSpectrum=="buffer"?c.commandBuffer:c.commandSpectrum=="repo"?c.commandRepo:c.commandSpectrum=="global"?VimConfiguration():""
+    let result.="\n"
+    let result.="      "
     let result.=c.commandSpectrum
     let result.="\n"
     let result.="      "
@@ -7547,12 +7550,12 @@ function! Command() range
     "
     " let c=g:commands['pages'][0][g:keymap]
   endif
-  call DebugBuf(c)
+  " call DebugBuf(c)
   if type(c)==0 && c['command'] != -1 || c['command']==[]
     " call DebugBuf(c)
     " call DebugBuf("Command Not Send\n"..Pretty(c))
     call DebugBuf("Command Not Send\n")
-    call DebugBuf(c)
+    " call DebugBuf(c)
   elseif type(c)!=3
     " call EchoSafely(Pretty(c), 700)
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
