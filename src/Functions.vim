@@ -26,6 +26,18 @@
 " for instance press ,,,<F5> to execute the command that gets chosen in a drop
 " down menue, once. or wait 3 seconds to execute the selected command
 
+" global commands for a folder recursively (or *.*)
+" detaching / copy
+" referencing single values [ref: ]
+" associations array [buffer, folder, glob, glob_in_folder, glob_in_repo]
+" when [ buffer_opened, in_same_dir ]
+" modify global commands on basis
+"   when in repo, make term_selection_algorithm different
+"   when in this buffer, change the command name
+"   this creates a new command with referencing the parent
+
+" toggle value dependencies
+
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
@@ -72,7 +84,7 @@ function! Diff(...)
   wincmd p
   diffthis
   " exec "!git difftool HEAD@{"..a:nr.."} -- "..expand('%:p')
-  " exec "cd "..Folder_Repo_Or_Project_Only()
+  " exec "cd "..ProjectPath()
   " pwd
   " vnew
   " execute "r !git show HEAD@{"..a:nr.."}:"..expand('%')
@@ -221,7 +233,7 @@ function! Spare()
       for x in files
         tabnew
         let filename=split(x, "/")[-1]
-        " let path=Folder_Repo_Or_Project_Only()
+        " let path=ProjectPath()
         " path with smallest depth / or split all matches vertically
         let file=filter(globpath(path, "**", 0, 1), 'filereadable(v:val)&&split(v:val, "/")[-1]=="'..filename..'"')
         enew
@@ -1341,7 +1353,7 @@ command! -range -nargs=* R <line1>,<line2>:call R(<f-args>)
 
 function! F(...)
   if join(a:000, ' ')==''
-    let x=Folder_Repo_Or_Project_Only()..'/**'
+    let x=ProjectPath()..'/**'
   else
     let x=join(a:000, ' ')
   endif
@@ -1349,7 +1361,7 @@ function! F(...)
   " let winid=win_getid()
   " silent "cex system('rg --vimgrep "..join(a:000, ' ')..")"
   " redraw!
-  "cexpr map(glob(Folder_Repo_Or_Project_Only()..'/**', 0, 1), '{"filename": v:val}')
+  "cexpr map(glob(ProjectPath()..'/**', 0, 1), '{"filename": v:val}')
   " cexpr map(glob(x, 0, 1), '{"filename": v:val}')
   " call setqflist(
   "       \ systemlist('find . -maxdepth 1 -type f'),
@@ -1917,7 +1929,7 @@ function! Folder_Project()
   return CWD()
 endfunction
 
-function! Folder_Repo_Or_Project_Only()
+function! ProjectPath()
   let cwd=CWD()
   let finish=0
   let paths=[]
@@ -2295,8 +2307,8 @@ function! Pretty(x, ...) abort
       return '{}'
     endif
     let lines = []
-    for [key, val] in items(a:x)
-      call add(lines, pad2 . string(key) . ': ' . Pretty(val, indent + 2))
+    for [key, Val] in items(a:x)
+      call add(lines, pad2 . string(key) . ': ' . Pretty(Val, indent + 2))
     endfor
     return "{\n" . join(lines, ",\n") . "\n" . pad . "}"
   elseif type(a:x) == v:t_list
@@ -3475,7 +3487,7 @@ function! InitCommands()
     let b:spectrum="buffer"
   endif
   if !exists('b:savein')
-    let b:savein="vimconfiguration"
+    let b:savein="vim_configuration"
   endif
 endfunction
 
@@ -3497,34 +3509,40 @@ function! ResetCommands(...)
   endfunction
   call _write_file_helper("yes", expand('%:p:h'))
   call _write_file_helper("no", expand('%:p:h'))
-  call _write_file_helper("yes", Folder_Repo_Or_Project_Only())
-  call _write_file_helper("no", Folder_Repo_Or_Project_Only())
+  call _write_file_helper("yes", ProjectPath())
+  call _write_file_helper("no", ProjectPath())
   call _write_file_helper("yes", VimConfiguration())
   call _write_file_helper("no", VimConfiguration())
 endfunction
 command! -range -nargs=* ResetCommands <line1>,<line2>call ResetCommands(<f-args>)
 
 function! SaveCommands()
-  function! _save_helper(spectrum, released, filepath, )
+  call DebugBuf("SaveCommands")
+  function! _save_helper(save, released)
+    " call DebugBuf("save: ", a:save)
     let filtered=filter(copy(g:commands), { i,v ->
-      \ v:val["savein"]==a:spectrum
-      \ && v:val["released"]==a:released
+      \ v:val.get("save")==a:save
+      \ && v:val.get("save.released")==a:released
       \ })
-    if a:released=="yes"
-      let postfix=""
-    else
-      let postfix=".unreleased"
-    endif
+    " let states=map(copy(filtered), "v:val.state")
+    let states=map(copy(filtered), "v:val.serialize()")
+    let postfix=a:released=='no'?".unreleased":''
     if !empty(filtered) && len(filtered)>0
-      call WriteStructure(filtered, a:filepath.."/.commands"..postfix)
+      call WriteStructure(states, filtered[0].get('save.path').."/.commands"..postfix)
     endif
   endfunction
-  call _save_helper("samedir", "yes", expand('%:p:h'))
-  call _save_helper("samedir", "no", expand('%:p:h'))
-  call _save_helper("repo", "yes", Folder_Repo_Or_Project_Only())
-  call _save_helper("repo", "no", Folder_Repo_Or_Project_Only())
-  call _save_helper("vimconfiguration", "yes", VimConfiguration())
-  call _save_helper("vimconfiguration", "no", VimConfiguration())
+  " call _save_helper("in_vim_configuration", "yes")
+  call _save_helper("in_vim_configuration", "no")
+  " call _save_helper("in_repo_dir", "yes")
+  " call _save_helper("in_repo_dir", "no")
+  " call _save_helper("in_same_dir", "yes")
+  " call _save_helper("in_same_dir", "no")
+  " " call _save_helper("samedir", "yes", expand('%:p:h'))
+  " " call _save_helper("samedir", "no", expand('%:p:h'))
+  " " call _save_helper("repo", "yes", ProjectPath())
+  " " call _save_helper("repo", "no", ProjectPath())
+  " " call _save_helper("in_vim_configuration", "yes", VimConfiguration())
+  " " call _save_helper("in_vim_configuration", "no", VimConfiguration())
 endfunction
 
 function! RefreshCommands()
@@ -3532,7 +3550,7 @@ function! RefreshCommands()
     let updated=CommandTemplate()
     for [k,v] in items(updated)
       if !has_key(c, k)
-        let c[k]=v
+        call c.set(k, v)
       endif
     endfor
     " let c=updated
@@ -3546,47 +3564,50 @@ function! LoadCommands()
   let g:commands=[]
   let b:commands={}
   " endif
-  let commandorigins=[]
-  function! _add(path) closure
-    if index(commandorigins, a:path)==-1
-      call add(commandorigins, a:path)
-    endif
-  endfunction
-  " saved_in_vimconfiguration
-  call _add(VimConfiguration()..'/.unreleased/.commands')
-  call _add(VimConfiguration()..'/.commands')
-  call _add(VimConfiguration()..'/.commands.unreleased')
-  " saved_in_samedir *folder*
-  call _add(expand('%:p:h')..'/.commands')
-  call _add(expand('%:p:h')..'/.commands.unreleased')
-  " saved_in_repo
-  call _add(Folder_Repo_Or_Project_Only()..'/.commands')
-  call _add(Folder_Repo_Or_Project_Only()..'/.commands.unreleased')
-  " saved_in_buffer
-  " unimplemented / extract from file
-  " let file=globpath(cwd, a:filename)
-  " echo file
-  " while 1
-  "   let file=globpath(cwd, a:filename)
-  "   if !empty(file)
-  "     call extend(paths, [file])
+  " let commandorigins=[]
+  " function! _add(path) closure
+  "   if index(commandorigins, a:path)==-1
+  "     call add(commandorigins, a:path)
   "   endif
-  "   if cwd=='/'
-  "     break
-  "   endif
-  "   let cwd=GetParentDir(cwd)
-  " endwhile
-  " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'))
-  call DebugBufClear()
-  call DebugBuf("Commands")
-  for cf in commandorigins
-    if filereadable(cf)
-      call DebugBuf("Loading: "..cf)
+  " endfunction
+  " " saved_in_vim_configuration
+  " " call _add(VimConfiguration()..'/.unreleased/.commands')
+  " call _add(VimConfiguration()..'/.commands')
+  " call _add(VimConfiguration()..'/.commands.unreleased')
+  " " saved_in_samedir *folder*
+  " call _add(expand('%:p:h')..'/.commands')
+  " call _add(expand('%:p:h')..'/.commands.unreleased')
+  " " saved_in_repo
+  " call _add(ProjectPath()..'/.commands')
+  " call _add(ProjectPath()..'/.commands.unreleased')
+  function! _load_helper(path, released)
+    let data=[]
+    let path=NewConfiguration(g:command_schema).set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
+    " call DebugBuf(path)
+    " call DebugBuf(a:path)
+    " call DebugBuf(a:released)
+    if filereadable(path)
+      " call DebugBuf("Loading: "..path)
+      let array=Read(path)[0]
+      for state_serialized in json_decode(array)
+        " echo len(Read(path))
+        " echo state_serialized
+        let c=NewConfiguration(g:command_schema).deserialize(state_serialized)
+        call add(data, c)
+      endfor
+      " for state in states
+      "   echo state
+      " endfor
+      " for state in _data
+      "   " call DebugBuf(state)
+      "   echo state
+      "   let c=NewConfiguration(g:command_schema).deserialize(state)
+      "   " call DebugBuf(c.get('command'))
+      "   " call add(data, )
+      " endfor
       try
-        let d=join(Read(cf), '')
-        let data=json_decode(d)
       catch
-        call DebugBuf("Error Parsing File: "..cf)
+        call DebugBuf("Error Parsing File: "..path)
       finally
         if !empty(data)
           " let updated=CommandTemplate()
@@ -3603,22 +3624,46 @@ function! LoadCommands()
         " call DebugBuf(printf("Nothing to add in %s", len(data)))
       endtry
     endif
-  endfor
+  endfunction
+  call DebugBufClear()
+  call DebugBufHeight(10)
+  call DebugBuf("Commands")
+  " call _save_helper("in_vim_configuration", "yes")
+  call _load_helper("in_vim_configuration", "no")
+  " call _save_helper("in_repo_dir", "yes")
+  " call _save_helper("in_repo_dir", "no")
+  " call _save_helper("in_same_dir", "yes")
+  " call _save_helper("in_same_dir", "no")
+  " saved_in_buffer
+  " unimplemented / extract from file
+  " let file=globpath(cwd, a:filename)
+  " echo file
+  " while 1
+  "   let file=globpath(cwd, a:filename)
+  "   if !empty(file)
+  "     call extend(paths, [file])
+  "   endif
+  "   if cwd=='/'
+  "     break
+  "   endif
+  "   let cwd=GetParentDir(cwd)
+  " endwhile
+  " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'))
   " call DebugBuf(join(map(copy(g:commands), {_, v -> {"buffer": v['commandBuffer'], "key": v['key']}}
     \ ), "\n"),0 , 0)
   return g:commands
-  " call LoadCommands(Folder_Repo_Or_Project_Only()..'/.commands_vim_configuration.unreleased')
+  " call LoadCommands(ProjectPath()..'/.commands_vim_configuration.unreleased')
   "" for page in copy(b:commands['pages'])
   ""   call DebugBuf(copy(page), '"Command: "..P(v:val)')
   "" endfor
   " for c in b:commands['pages']
-  "   echo c['<F5>']['command']
+  "   echo c.get('<F5>')['command']
   " endfor
-  " echo filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
-  " let b:commands['buffer']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
-  " let b:commands['folder']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="folder"&&v:val["commandSaveinFolder"]=="'..expand('%:p:h')..'"')
-  " let b:commands['repo']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="repo"&&v:val["commandSaveinFolder"]=="'..Folder_Repo_Or_Project_Only()..'"')
-  " let b:commands['global']=filter(copy(g:commands), 'v:val["commandSpectrum"]=="global"&&v:val["commandSaveinFolder"]=="'..VimConfiguration()..'/.unreleased/.commands"')
+  " echo filter(copy(g:commands), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
+  " let b:commands['buffer']=filter(copy(g:commands), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
+  " let b:commands['folder']=filter(copy(g:commands), 'v:val["extend"]=="folder"&&v:val["commandSaveinFolder"]=="'..expand('%:p:h')..'"')
+  " let b:commands['repo']=filter(copy(g:commands), 'v:val["extend"]=="repo"&&v:val["commandSaveinFolder"]=="'..ProjectPath()..'"')
+  " let b:commands['global']=filter(copy(g:commands), 'v:val["extend"]=="global"&&v:val["commandSaveinFolder"]=="'..VimConfiguration()..'/.unreleased/.commands"')
   "   " call DebugBuf(b:commands)
   " return [ g:commands,
   "       \ b:commands['buffer'],
@@ -3628,286 +3673,354 @@ function! LoadCommands()
   "       \ ]
 endfunction
 
-
-" function! BuildCommandLines() abort
-"   let folder = Folder_Repo_Or_Project_Only()
-"   let lines = []
-"   for page_idx in range(len(b:commands['pages']))
-"     let page = b:commands['pages'][page_idx]
-"     for key in keys(page)
-"       let data = page[key]
-"       " skip unset / cleared entries
-"       if data is# -1
-"         continue
-"       endif
-"       " skip entries not belonging to this dict
-"       if type(data) != v:t_dict || !has_key(data, 'commandSaveinFolder')
-"         continue
-"       endif
-"       if data['commandSaveinFolder'] != folder
-"         continue
-"       endif
-"       let line = "let b:commands['pages'][" . page_idx . "]['" . key . "']=" . string(data)
-"       call add(lines, line)
-"     endfor
-"   endfor
-"   return lines
-" endfunction
-
-function! BuildCommandLines() abort
-  let folder = Folder_Repo_Or_Project_Only()
-  " let lines = []
-  let data=json_encode(g:commands)
-  for command in g:commands
-    " if data['commandSaveinFolder'] != folder
-    "   continue
-    " endif
-    let line = "BCommandInit"
-    call add(lines, "")
-    call add(lines, line)
-    for key in keys(command)
-      let data = command[key]
-      if data is# -1
-        continue
-      endif
-      " skip unset / cleared entries
-      if data is# -1
-        continue
-      endif
-      " skip entries not belonging to this dict
-      " if type(data) != v:t_dict || !has_key(key, 'commandSaveinFolder')
-      "   continue
-      " endif
-      if type(key)=='command' || type(data)==4 || type(data)==3
-        let line = "let b:loading_command['".key."']=" . string(data)
-      " if type(data)==4 || type(data)==3
-      "   call DebugBuf("type 3 or 4")
-      "   call DebugBuf(type(data))
-      "   call DebugBuf(len(data))
-      "   call DebugBuf(data)
-      "   let line = "let b:loading_command['".key."']=".string(data)
-      else
-        let line = "BCommand " . key . " " . data
-      endif
-      call add(lines, line)
-    endfor
-    " let line = "BCommandFinish " . page_idx . " " . key
-    let line = "BCommandFinish " . command['page'] . " " . command['key']
-    call add(lines, line)
-  endfor
-  " call DebugBuf("saved")
-  " return lines
-endfunction
-
-function! BCommandInit(...)
-  let b:loading_command=EmptyCommand()
-endfunction
-command! -range -nargs=* BCommandInit <line1>,<line2>call BCommandInit(<f-args>)
-
-let g:bcommand_timers=[]
-let g:bcommand_index=0
-let g:bcommand_items=[
- \ 'buffer',
- \ 'folder',
- \ 'repo',
- \ 'global'
- \ ]
-let g:bcommand=g:bcommand_items[g:bcommand_index]
-function! ToggleBCommand()
-  let g:bcommand_index=Mod(g:bcommand_index+1, len(g:bcommand_items))
-  let g:bcommand=g:bcommand_items[g:bcommand_index]
-  for tid in g:bcommand_timers
-    call timer_stop(tid)
-  endfor
-  function! DisplayTimers()
-    let g:bcommand_index=0
-    let g:bcommand=g:bcommand_items[g:bcommand_index]
-    call DebugBuf(string(g:bcommand_timers))
-    call DebugBuf(g:bcommand)
-  endfunction
-  call add(g:bcommand_timers, timer_start(5000, {_->DisplayTimers()}))
-  call DebugBuf(string(g:bcommand_timers))
-  call DebugBuf(g:bcommand)
-endfunction
-command! -range -nargs=* ToggleBCommand <line1>,<line2>call ToggleBCommand()
-
-function! BCommandFinish(...)
-  let page=a:000[0]
-  let key=a:000[1]
-  let str_finish=b:loading_command['commandSaveinFolderType']
-  let str_finish.=' '.key
-  let str_finish.=' '.string(b:loading_command['command'])
-  let str_finish.=' '.b:loading_command['commandSaveinFolder']
-  let str_finish.=' '.expand('%:p')
-  call DebugBuf(str_finish)
-  call add(g:commands, copy(b:loading_command))
-  if b:loading_command['commandSpectrum']=='buffer' && b:loading_command['commandBuffer']==expand('%:p')
-    call DebugBuf("loaded buffer command")
-    let b:commands['pages'][page][key]=copy(b:loading_command)
-    return
-  endif
-  if b:loading_command['commandSpectrum']=='folder' && b:loading_command['commandFolder']==expand('%:p:h')
-    call DebugBuf("loaded folder command")
-    let b:commands['pages'][page][key]=copy(b:loading_command)
-    return
-  endif
-  if b:loading_command['commandSpectrum']=='repo' && b:loading_command['commandRepo']==Folder_Repo_Or_Project_Only()
-    call DebugBuf("loaded repo command")
-    let b:commands['pages'][page][key]=copy(b:loading_command)
-    return
-  endif
-  if b:loading_command['commandSpectrum']=='global'
-    call DebugBuf("loaded global command")
-    let b:commands['pages'][page][key]=copy(b:loading_command)
-    return
-  endif
-  " echo b:loading_command
-endfunction
-command! -range -nargs=* BCommandFinish <line1>,<line2>call BCommandFinish(<f-args>)
-
-function! BCommand(...)
-  let data_key=a:000[0]
-  let data_value=a:000[1]
-  let b:loading_command[data_key]=data_value
-endfunction
-command! -range -nargs=* BCommand <line1>,<line2>call BCommand(<f-args>)
-
-" function! CommandDictInit()
-"   " if !exists('b:commands')
-"   let b:commands={'pages': []}
-"   let b:commands=CommandDictAddPage(CommandDictInitPage())
-"   " if !exists('g:commands')
-"   let g:commands=[]
-"   " endif
-"   return b:commands
-"   " endif
-" endfunction
-
-" function! CommandDictInitPage()
-"   return {
-"         \ '<F5>': -1,
-"         \ '<F6>': -1,
-"         \ '<F7>': -1,
-"         \ '<F8>': -1,
-"         \ '<C-F5>': -1,
-"         \ '<C-F6>': -1,
-"         \ '<C-F7>': -1,
-"         \ '<C-F8>': -1,
-"         \ '<S-F5>': -1,
-"         \ '<S-F6>': -1,
-"         \ '<S-F7>': -1,
-"         \ '<S-F8>': -1,
-"         \ '<C-S-F5>': -1,
-"         \ '<C-S-F6>': -1,
-"         \ '<C-S-F7>': -1,
-"         \ '<C-S-F8>': -1
-"         \ }
-" endfunction
-
 function! EmptyCommand()
-  " direction: hjkl
-  " directionMode: HJKL, neighbor, foremost
-  " directionSkipping: 0 1 2 3
-  " commandSaveinFolder: /path/to/.command.vim_configuration
-  " commandMode: term buffer newbuffer
-  " commandModeSession: -1 / none / bashsession / pythonsession
-  " commandInterpreter: bash / vim / python
-  " commandTargetBuffer: bufnr()
-  " commandTargetWindow: winnr()
-  " commandInput: vs() data file
-  " commandOutputMode: put sendtoterm file clist commandline
-  " command: 'ls -al; date'
-  " \ "hash": -1,
-  let command={
-    \ "hash": -1,
-    \ "name": -1,
-    \ "key": -1,
-    \ "page": -1,
-    \ "direction": -1,
-    \ "bufnr": -1,
-    \ "directionMode": -1,
-    \ "directionSkipping": -1,
-    \ "commandSpectrum": -1,
-    \ "savein": -1,
-    \ "released": -1,
-    \ "commandSaveinFolder": -1,
-    \ "commandMode": -1,
-    \ "commandModeSession": -1,
-    \ "commandInterpreter": -1,
-    \ "commandTargetBuffer": -1,
-    \ "commandTargetWindow": -1,
-    \ "commandInput": -1,
-    \ "commandOutputMode": -1,
-    \ "command": -1
-    \ }
-  return command
+  return NewConfiguration(g:command_schema)
+  " echo NewConfiguration(g:command_schema).set("save", "in_vim_configuration").get("save.path")
 endfunction
 
 function! VimCommand(command='')
   call InitCommands()
   " let c=EmptyCommand()
   let c=CommandTemplate()
-  let c['hash']=NewUUID()
-  let c['name']='unnamed'
-  let c['commandMode']='vim'
-  let c['commandSpectrum']='buffer'
-  let c['savein']=b:savein
-  let c['released']=b:released
-  let c['commandBuffer']=''
-  let c['commandInterpreter']='vim'
-  let c['commandOutputMode']='put'
-  let c['command']=a:command
-  let c['direction']=g:default_direction
+  call c.set('hash', NewUUID())
+  call c.set('name', 'unnamed')
+  call c.set('commandMode', 'vim')
+  call c.set('extend', 'buffer')
+  call c.set('save', b:savein)
+  call c.set('released', b:released)
+  call c.set('commandBuffer', '')
+  call c.set('commandInterpreter', 'vim')
+  call c.set('commandOutputMode', 'put')
+  call c.set('command', a:command)
+  call c.set('direction', g:default_direction)
   return c
 endfunction
 
 function! TermCommand(command='')
   " let c=EmptyCommand()
   let c=CommandTemplate()
-  let c['hash']=NewUUID()
-  let c['name']='unnamed'
-  let c['commandMode']='term'
-  let c['commandInterpreter']='term'
-  let c['command']=a:command
-  let c['direction']=g:default_direction
+  call c.set('hash', NewUUID())
+  call c.set('name', 'unnamed')
+  call c.set('commandMode', 'term')
+  call c.set('commandInterpreter', 'term')
+  call c.set('command', a:command)
+  call c.set('direction', g:default_direction)
   return c
 endfunction
 
 function! CommandTemplate()
-  let c=EmptyCommand()
-  let c['name']='unnamed'
-  let c['direction']=g:default_direction
-  let c['directionMode']='foremost'
-  let c['commandRepo']=exists('w:cwd')?Folder_Repo_Or_Project_Only():''
-  let c['commandFolder']=expand('%:p:h')
-  let c['commandSpectrum']='buffer'
-  let c['commandBuffer']=expand('%:p')
-  let c['target']='Local'
-  let c['autocc']='no'
-  let c['autocd']='no'
-  let c['autocd_path']=''
-  let c['savein']='vimconfiguration'
-  let c['released']='no'
-  let c['decision_mode']="check_direct"
-  let c['decision_algorithm']="check_find_first_term"
-  let c['commandMode']='term'
-  let c['commandModeSession']='none'
-  let c['commandInterpreter']='term'
-  let c['commandTargetBuffer']='-1'
-  let c['commandTargetWindow']='-1'
-  let c['commandInput']='-1'
-  let c['commandOutputMode']='sendtoterm'
-  let c['direction']=g:default_direction
-  " let c['command']=['', 'ls -al', '']
-  let c['command']=[]
+  " let c=EmptyCommand()
+  let c=NewConfiguration(g:command_schema)
+  call c.set('command', ['', 'ls -al', ''])
+  call c.set('command', [])
+  call c.set('name', 'unnamed')
+  call c.set('direction', g:default_direction)
+  call c.set('commandOutputMode', "sendtoterm")
+  call c.set('directionMode', 'foremost')
+  call c.set('commandRepo', exists('w:cwd')?ProjectPath():'')
+  call c.set('commandFolder', expand('%:p:h'))
+  call c.set('extend', 'buffer')
+  call c.set('loadCondition', 'bufferopened')
+  call c.set('commandBuffer', expand('%:p'))
+  call c.set('target', 'Local')
+  call c.set('autocc', 'no')
+  call c.set('autocd', 'no')
+  call c.set('autocd_path', '')
+  call c.set('save', 'in_vim_configuration')
+  call c.set('released', 'no')
+  call c.set('decision_mode', "check_direct")
+  call c.set('decision_algorithm', "check_find_first_term")
+  call c.set('commandMode', 'term')
+  call c.set('commandModeSession', 'none')
+  call c.set('commandInterpreter', 'term')
+  call c.set('commandTargetBuffer', '-1')
+  call c.set('commandTargetWindow', '-1')
+  call c.set('commandInput', '-1')
+  call c.set('commandOutputMode', 'sendtoterm')
   return c
 endfunction
 
 function! CommandTemplateWithUUID()
   let c=CommandTemplate()
-  let c["hash"]=NewUUID()
+  call c.set("hash", NewUUID())
   return c
 endfunction
+
+function! NewConfiguration(schema) abort
+  function! _newconfiguration(schema) abort
+    let obj = {
+      \ 'schema': a:schema,
+      \ 'state':  s:build_defaults(a:schema),
+      \ 'get':         function('s:get'),
+      \ 'set':         function('s:set'),
+      \ 'toggle':      function('s:toggle'),
+      \ 'multiselect': function('s:multiselect'),
+      \ 'visible':     function('s:visible'),
+      \ 'serialize':   function('s:serialize'),
+      \ 'deserialize': function('s:deserialize'),
+      \ 'configure': function('s:configure'),
+    \ }
+    return obj
+  endfunction
+  " call DebugBufClear()
+  " call DebugBuf("test", 3)
+  function! s:configure() abort dict closure
+    " Make Debug Buf Right For Command Exposure of the last command
+    " ,s ,v ,z ,b ,b - work with leader - for changing last command on the fly
+    " [ 'j', 'J' ] add values like this for toggle buttons
+    " or enable s:configure - mode like before with getchar()
+    " call DebugBuf(self.schema)
+    " call DebugBuf(self.state)
+    call DebugBufClear()
+    function! _print(visible, prefix='') closure
+      " call DebugBuf(a:visible)
+      for [k,v] in items(a:visible)
+        let key=!empty(a:prefix)?a:prefix.."."..k:''..k
+        let data=cfg.get(key)
+        " echo "data: "..data
+        call DebugBuf(key, data)
+        " if type(v)==4
+        if has_key(v, 'sub')
+          call _print(v['sub'], key)
+        endif
+        " endif
+      endfor
+    endfunction
+    call _print(cfg.visible())
+  endfunction
+  function! s:build_defaults(schema, ...) abort
+    let prefix = a:0 ? a:1 : ''
+    let state = {}
+    for [key, Item] in items(a:schema)
+      let path = prefix ==# '' ? key : prefix . '.' . key
+      " call DebugBuf(key)
+      if has_key(Item, 'default')
+        let state[path] = Item.default
+      elseif get(Item, 'type', '') ==# 'bool'
+        let state[path] = 0
+      elseif get(Item, 'type', '') ==# 'list'
+        let state[path] = []
+      elseif get(Item, 'type', '') ==# 'string'
+        let state[path] = ''
+      elseif get(Item, 'type', '') ==# 'value_lambda'
+        let state[path] = {}
+      elseif get(Item, 'type', '') ==# 'multiselect'
+        let state[path] = []
+      elseif get(Item, 'type', '') ==# 'toggle' && has_key(Item, 'values') && !empty(Item.values)
+        let state[path] = Item.values[0]
+      endif
+      if has_key(Item, 'sub')
+        call extend(state, s:build_defaults(Item.sub, path))
+      endif
+    endfor
+    return state
+  endfunction
+  function! s:get(path) abort dict
+    let item = s:find_item(self.schema, a:path)
+    if type(item) == v:t_dict && has_key(item, 'lambda_value')
+      return item.lambda_value(self)
+    endif
+    return get(self.state, a:path, v:null)
+  endfunction
+  function! s:set(path, value) abort dict
+    let old = get(self.state, a:path, v:null)
+    let self.state[a:path] = a:value
+    " call lambda if it exists
+    let item = s:find_item(self.schema, a:path)
+    if type(item) == v:t_dict && has_key(item, 'lambda')
+      call item.lambda(a:path, old, a:value)
+    endif
+    return self
+  endfunction
+  function! s:toggle(path) abort dict
+    let item = s:find_item(self.schema, a:path)
+    if type(item) != v:t_dict || get(item, 'type', '') !=# 'toggle'
+      " call DebugBuf('Not a toggle: ' . a:path)
+      return
+    endif
+    let values = get(item, 'values', [])
+    if empty(values) | return | endif
+    let current = self.get(a:path)
+    let idx = index(values, current)
+    let next = values[(idx + 1) % len(values)]
+    call self.set(a:path, next)
+  endfunction
+  function! s:multiselect(path, value) abort dict
+    let current = self.get(a:path)
+    if type(current) != v:t_list
+      let current = []
+    endif
+    let idx = index(current, a:value)
+    if idx >= 0
+      call remove(current, idx)          " remove if already selected
+    else
+      call add(current, a:value)         " add if not selected
+    endif
+    call self.set(a:path, current)
+  endfunction
+  function! s:visible(...) abort dict
+    " Returns only the currently visible part of the schema
+    return s:filter_visible(self.schema, self.state, '')
+  endfunction
+  function! s:serialize() abort dict
+    return json_encode(self.state)
+  endfunction
+  function! s:deserialize(json) abort dict
+    let self.state = json_decode(a:json)
+    return self
+  endfunction
+  function! s:find_item(schema, path) abort
+    let parts = split(a:path, '\.')
+    let current = a:schema
+    for part in parts
+      if type(current) != v:t_dict || !has_key(current, part)
+        return v:null
+      endif
+      let current = current[part]
+      if has_key(current, 'sub') && part != parts[-1]
+        let current = current.sub
+      endif
+    endfor
+    return current
+  endfunction
+  function! s:filter_visible(schema, state, prefix) abort
+    let result = {}
+    for [key, item] in items(a:schema)
+      let path = a:prefix ==# '' ? key : a:prefix . '.' . key
+      " check visibility condition
+      let visible = 1
+      if has_key(item, 'when')
+        let visible = item.when(a:state)
+      endif
+      if !visible | continue | endif
+      let result[key] = copy(item)
+      if has_key(item, 'sub')
+        let result[key].sub = s:filter_visible(item.sub, a:state, path)
+      endif
+    endfor
+    return result
+  endfunction
+  let cfg = _newconfiguration(a:schema)
+  " Toggle / Multiselect
+  " call cfg.toggle('extend')                  " cycles through values
+  " call cfg.multiselect('tags', 'vim')      " add/remove from list
+  " Get / Set
+  " cfg.set('extend.repo.path', VimConfiguration())
+  " call DebugBuf(cfg.get('extend.repo.path'))
+  " cfg.set('extend.buffer.path', expand('%:p'))
+  " call DebugBuf(cfg.get('extend.buffer.path'))
+  " cfg.set('extend.autocd.path', ProjectPath())
+  " call cfg.set('debug', 1)
+  " Visibility
+  " let visible = cfg.visible()              " returns only currently active tree
+  " call DebugBuf(visible)
+  " call DebugBuf(visible)
+  " Serialization
+  " let json = cfg.serialize()
+  " call DebugBuf(json)
+  " call cfg.deserialize(json)
+  " call cfg.set('key', "<F5>")
+  " call cfg.toggle('extend')
+  " call cfg.set('command', ['ls -al', 'date'])
+  " echo cfg.get('command')
+  " call cfg.configure()
+  return cfg
+endfunction
+" {s->s.save=="in_vim_configuration"?VimConfiguration():s.save=="in_repo_dir"?ProjectPath():s.save=="in_same_dir"?expand('%:p:h'):''}
+let command_schema= {
+  \ 'extend': {
+  \   'type': 'toggle',
+  \   'label': 'Erweitern auf',
+  \   'values': ['buffer', 'repo', 'global'],
+  \   'default': 'buffer',
+  \   'lambda': {p,o,n -> DebugBuf('Extend changed to '..n)},
+  \   'sub': {
+  \     'buffer': {
+  \       'type': 'group',
+  \       'label': 'Buffer options',
+  \       'when': {s -> s.extend ==# "buffer"},
+  \       'sub': {
+  \         'path': {
+  \            'type': "string",
+  \            'default': '',
+  \            'when': {s -> s.extend ==# "buffer"},
+  \         },
+  \       }
+  \     },
+  \     'repo': {
+  \       'type': 'group',
+  \       'label': 'Buffer options',
+  \       'when': {s -> s.extend ==# "repo"},
+  \       'sub': {
+  \         'path': {
+  \           'type': "string",
+  \           'default': '',
+  \           'when': {s -> s.extend ==# "repo"},
+  \         },
+  \       },
+  \     }
+  \   }
+  \ },
+  \ 'key': {
+  \   'type': 'string',
+  \ },
+  \ 'autocc': {
+  \   'type': 'bool',
+  \   'default': 0,
+  \ },
+  \ 'autocd': {
+  \   'type': 'bool',
+  \   'default': 0,
+  \     'sub': {
+  \       'path': {'type': "string", 'default': '','when': {s -> s.autocd == 1 } },
+  \     },
+  \ },
+  \ 'commandOutputMode': {
+  \   'type': 'toggle',
+  \   'values': ['sendtoterm'],
+  \   'default': 'sendtoterm',
+  \ },
+  \ 'command': {
+  \   'type': 'list',
+  \   'default': [],
+  \ },
+  \ 'hash': {
+  \   'type': 'number',
+  \   'default': -1,
+  \ },
+  \ 'load': {
+  \   'type': 'toggle',
+  \   'values': ['always', 'buffer_matches', 'same_dir', 'in_repository'],
+  \   'default': 'always',
+  \ },
+  \ 'save': {
+  \   'type': 'toggle',
+  \   'values': ['in_vim_configuration', 'in_repo_dir', 'in_same_dir' ],
+  \   'default': 'in_vim_configuration',
+  \   'sub': {
+  \     'path': {
+  \       'type': 'lambda_value',
+  \       'lambda_value': {s->s.get('save')=="in_vim_configuration"?VimConfiguration():s.get('save')=="in_repo_dir"?ProjectPath():s.get('save')=="in_same_dir"?expand('%:p:h'):''},
+  \     },
+  \     'released': {
+  \       'type': 'toggle',
+  \       'values': ['yes', 'no' ],
+  \       'default': 'no',
+  \     },
+  \   },
+  \ },
+  \ 'debug': {
+  \   'type': 'bool',
+  \   'default': 0,
+  \   'sub': {
+  \     'level': {
+  \       'type': 'toggle',
+  \       'values': [1,2,3],
+  \       'when': {s -> s.debug},
+  \     }
+  \   }
+  \ }
+\}
 
 " function! CommandPageInit()
 "   " if !exists('b:commands')
@@ -3917,18 +4030,18 @@ endfunction
 
 " function! CommandPageExample()
 "   let c=CommandTemplate()
-"   let c['page']=0
-"   let c['command']=['date']
-"   let c['key']='<F5>'
+"   let c.get('page')=0
+"   let c.get('command')=['date']
+"   let c.get('key')='<F5>'
 "   let b:commands['pages'][0]['<F5>']=copy(c)
-"   let c['command']=['ls -al']
-"   let c['key']='<F6>'
+"   let c.get('command')=['ls -al']
+"   let c.get('key')='<F6>'
 "   let b:commands['pages'][0]['<F6>']=copy(c)
-"   let c['command']=['activate']
-"   let c['key']='<F7>'
+"   let c.get('command')=['activate']
+"   let c.get('key')='<F7>'
 "   let b:commands['pages'][0]['<F7>']=copy(c)
-"   let c['command']=['deactivate']
-"   let c['key']='<F8>'
+"   let c.get('command')=['deactivate']
+"   let c.get('key')='<F8>'
 "   let b:commands['pages'][0]['<F8>']=copy(c)
 " endfunction
 
@@ -6945,27 +7058,28 @@ command! -nargs=1 EchoSafely call EchoSafely(<q-args>)
 
 " function FixBufNr(c, mode='right')
 "   let c=a:c
-"   if !bufexists(c['bufnr'])
-"     let c['bufnr']=-1
+"   if !bufexists(c.get('bufnr'))
+"     let c.get('bufnr')=-1
 "   endif
-"   if c['bufnr']==-1
+"   if c.get('bufnr')==-1
 "     " let buf=term
-"     let c['bufnr']=GetBufDirectionIfTerm(c['direction'])
-"     if c['bufnr']==-1
-"       let [c['direction'],c['bufnr']]=FindSomeTerm()
+"     let c.get('bufnr')=GetBufDirectionIfTerm(c.get('direction'))
+"     if c.get('bufnr')==-1
+"       let [c.get('direction'),c.get('bufnr')]=FindSomeTerm()
 "     endif
-"     if c['bufnr']==-1
+"     if c.get('bufnr')==-1
 "       call Open('J', "terminal", "new")
-"       let [c['direction'],c['bufnr']]=FindSomeTerm()
+"       let [c.get('direction'),c.get('bufnr')]=FindSomeTerm()
 "     endif
-"   elseif !bufexists(c['bufnr'])
+"   elseif !bufexists(c.get('bufnr'))
 "     call Open('J', "terminal", "new")
-"     let [c['direction'],c['bufnr']]=FindSomeTerm()
+"     let [c.get('direction'),c.get('bufnr')]=FindSomeTerm()
 "   elseif BufExistsAndAlive(bufnr())
 "     echo "Try To ReOpen"
 "     " call Open('J', "terminal", buf)
 "   endif
 " endfunction
+
 let FixBufNr_decision_mode = [
   \ "check_direct",
   \ "check_faraway",
@@ -6979,10 +7093,14 @@ let FixBufNr_decision_algorithm = [
   \ "check_find_some_term",
   \ "check_find_first_term",
   \]
+" MAKE THIS BETTER
 let Spectrum = ["global", "repo", "folder", "tab", "buffer"]
-let SaveIn = ["vimconfiguration", "repo", "samedir", "infile"]
+let SaveIn = ["vim_configuration", "repo", "samedir", "infile"]
 let AutoCD = [ "no", "cd_to_bufferfile", "cd_to_project_root", "cd_to_configured_autocd_path" ]
 let YesNo = [ "no","yes" ]
+let LoadCondition = [ "buffer_open_in_tab", "buffer_loaded", "..." ]
+" IMPROVE THIS
+" todo
 function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
   fun! _not_implemented()
     echo "FixBufNr: Not Implemented"
@@ -7042,53 +7160,43 @@ function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_o
   return buf
   "
   " let c=a:c
-  " if !bufexists(c['bufnr'])
-  "   let c['bufnr']=-1
+  " if !bufexists(c.get('bufnr'))
+  "   let c.get('bufnr')=-1
   " endif
-  " if c['bufnr']==-1
+  " if c.get('bufnr')==-1
   "   " let buf=term
-  "   let c['bufnr']=GetBufDirectionIfTerm(c['direction'])
-  "   if c['bufnr']==-1
-  "     let [c['direction'],c['bufnr']]=FindSomeTerm()
+  "   let c.get('bufnr')=GetBufDirectionIfTerm(c.get('direction'))
+  "   if c.get('bufnr')==-1
+  "     let [c.get('direction'),c.get('bufnr')]=FindSomeTerm()
   "   endif
-  "   if c['bufnr']==-1
+  "   if c.get('bufnr')==-1
   "     call Open('J', "terminal", "new")
-  "     let [c['direction'],c['bufnr']]=FindSomeTerm()
+  "     let [c.get('direction'),c.get('bufnr')]=FindSomeTerm()
   "   endif
-  " elseif !bufexists(c['bufnr'])
+  " elseif !bufexists(c.get('bufnr'))
   "   call Open('J', "terminal", "new")
-  "   let [c['direction'],c['bufnr']]=FindSomeTerm()
+  "   let [c.get('direction'),c.get('bufnr')]=FindSomeTerm()
   " elseif BufExistsAndAlive(bufnr())
   "   echo "Try To ReOpen"
   "   " call Open('J', "terminal", buf)
   " endif
 endfunction
 
-function! DetermineCommandSaveinFolder()
-  if b:savein=="samedir"
-    return expand('%:p:h')
-  elseif b:savein=="repo"
-    return Folder_Repo_Or_Project_Only()
-  elseif b:savein=="vimconfiguration"
-    return VimConfiguration()
-  endif
-endfunction
-
 " let g:commands=[]
-" let b:savein="vimconfiguration"
+" let b:savein="in_vim_configuration"
 " let b:released="no"
 " let b:spectrum="buffer"
 " date
 " ls
-" commandSpectrum
-" commandExpansion
+" extend
+" commandextend
 " commandSaveinFolder
 "
 " g:commands has all commands
 " save_spot (VimConfiguration/ProjectRoot/SameDir/InFile)
-" command_expansion_to_all_buffers_in_same_tab (yes/no)
+" command_extend_to_all_buffers_in_same_tab (yes/no)
 " released (yes/no) (saved in *.released file)
-" commandSpectrum (global/repo/folder/buffer)
+" extend (global/repo/folder/buffer)
   " Finding The Right Command
     " when a command has global flag *(1)
     " then, when a command has repo flag / load them (when you are inside the repo) *(1)
@@ -7096,7 +7204,7 @@ endfunction
     " and finally when a command has buffer flag / load them, when you are editing the corrosponding buffer *(1)
     " consider g:available_commands per key
   " when 2 commands conflict at one key, make them selectable with repeatd keypressing (reverse order)
-  " (1) load them anyways when in vimconfiguration / sometimes, when in projectroot / samedir or infile
+  " (1) load them anyways when in in_vim_configuration / sometimes, when in projectroot / samedir or infile
 
 function _groupBy(input, by)
   let result={}
@@ -7138,8 +7246,9 @@ endfunction
 
 function! FindCommand(cs, keymap=g:keymap)
   call InitCommandSelections(a:keymap)
-  if len(a:cs)>0
-    let c=a:cs[w:commandselections[a:keymap]]
+  let counter=w:commandselections[a:keymap]
+  if len(a:cs)>0 && counter<len(a:cs)
+    let c=a:cs[counter]
     if !empty(c)
       return c
     else
@@ -7161,34 +7270,34 @@ function! FindCommands(keymap=g:keymap)
   " let c={ 'buffer': [],'folder': [],'repo': [], 'global': [] }
   let c=[]
   let val = filter(copy(g:commands), { i,v ->
-    \ v:val["key"]==a:keymap
-    \ && v:val["commandSpectrum"]=="buffer"
-    \ && v:val["commandBuffer"]==expand('%:p')
+    \ v:val.get("key")==a:keymap
+    \ && v:val.get("extend")=="buffer"
+    \ && v:val.get("commandBuffer")==expand('%:p')
     \ })
   if !empty(val)
     call extend(c, val)
   endif
+  " let val = filter(copy(g:commands), { i,v ->
+  "   \ v:val.get("key")==a:keymap
+  "   \ && v:val.get("extend")=="folder"
+  "   \ && v:val.get("commandFolder")==expand('%:p:h')
+  "   \ })
+  " if !empty(val)
+  "   call extend(c, val)
+  " endif
+  "
   let val = filter(copy(g:commands), { i,v ->
-    \ v:val["key"]==a:keymap
-    \ && v:val["commandSpectrum"]=="folder"
-    \ && v:val["commandFolder"]==expand('%:p:h')
+    \ v:val.get("key")==a:keymap
+    \ && v:val.get("extend")=="repo"
+    \ && v:val.get("commandRepo")==ProjectPath()
     \ })
   if !empty(val)
     call extend(c, val)
   endif
   "
   let val = filter(copy(g:commands), { i,v ->
-    \ v:val["key"]==a:keymap
-    \ && v:val["commandSpectrum"]=="repo"
-    \ && v:val["commandRepo"]==Folder_Repo_Or_Project_Only()
-    \ })
-  if !empty(val)
-    call extend(c, val)
-  endif
-  "
-  let val = filter(copy(g:commands), { i,v ->
-    \ v:val["key"]==a:keymap
-    \ && v:val["commandSpectrum"]=="global"
+    \ v:val.get("key")==a:keymap
+    \ && v:val.get("extend")=="global"
     \ })
   if !empty(val)
     call extend(c, val)
@@ -7229,14 +7338,14 @@ function! SelectCommand(cs, keymap=g:keymap)
       let selected='_'
     endif
     let result.="["..selected.."] === "
-    let result.=c.name
+    let result.=c.name.." "..c.hash
     let result.=" ==========="
     let result.="\n"
     let result.="      "
-    let result.=c.commandSpectrum=="buffer"?c.commandBuffer:c.commandSpectrum=="repo"?c.commandRepo:c.commandSpectrum=="global"?VimConfiguration():""
+    let result.=c.extend=="buffer"?c.commandBuffer:c.extend=="repo"?c.commandRepo:c.extend=="global"?VimConfiguration():""
     let result.="\n"
     let result.="      "
-    let result.=c.commandSpectrum
+    let result.=c.extend
     let result.="\n"
     let result.="      "
     let result.=json_encode(c.command)
@@ -7252,210 +7361,210 @@ function! SelectCommand(cs, keymap=g:keymap)
   " endif
 endfunction
 
-function! ConfigureKeys(keymap=g:keymap)
-  " call LoadCommands()
-  " let all=["\<F5>", "\<F6>","\<F7>","\<F8>"]
-  " let alll=["<F5>", "<F6>","<F7>","<F8>"]
-  let keymap=substitute(g:keymap, ',','', 'g')
-  " echo keymap
-  let cs=FindCommands(keymap)
-  let c = FindCommand(cs, keymap)
-  " let c=Ref(c)
-  let cidx=index(g:commands, c)
-  let c=g:commands[cidx]
-  function! _toggle(n=1) closure
-    " call DebugBuf(s['value']1)
-    " call DebugBuf(join(s['values'], ', '))
-    let i = index(s['values'], s['value'])
-    " call DebugBuf(len(s['values']))
-    let x=i+a:n
-    " call DebugBuf(i.."+"..a:n.."="..x)
-    let new_index=Mod(x, len(s['values']))
-    " call DebugBuf(var)
-    " redraw!
-    return s['values'][new_index]
-  endfunction
-  function! _printPage() closure
-    " call DebugBuf(g:keymap)
-    call DebugBufClear()
-    call DebugBufHeight(13)
-    if !empty(c)
-      " call DebugBuf(char)
-      call DebugBuf("key:                    "..c['key'])
-      call DebugBuf("1:  command:            "..join(c['command'], ' '))
-      call DebugBuf("2:  savein:             "..c['savein'])
-      call DebugBuf("3:  spectrum:           "..c['commandSpectrum'])
-      call DebugBuf("4:  decision_algorithm: "..c['decision_algorithm'])
-      call DebugBuf("5:  decision_mode:      "..c['decision_mode'])
-      call DebugBuf("6:  target:             "..c['target'])
-      call DebugBuf("7:  autocd:             "..c['autocd'])
-      call DebugBuf("8:  autocc:             "..c['autocc'])
-      call DebugBuf("9:  direction:          "..c['direction'])
-    endif
-    " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'vimconfiguration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'commandBuffer': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'commandRepo': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'commandSpectrum': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
-    redraw!
-  endfunction
-  call _printPage()
-  let char=''
-  while index([13, 113, 81], char)==-1
-    " call DebugBuf("")
-    " \ "toggleUp": [ 97, 90 ],
-    " \ "toggleDown": [ 122, 65 ],
-    let shortcuts=[
-      \ {
-      \ "key": keymap,
-      \ "toggleUp": [50],
-      \ "toggleDown": [64],
-      \ "name": "savein",
-      \ "value": c['savein'],
-      \ "values": g:SaveIn
-      \ },
-      \ {
-      \ "key": keymap,
-      \ "toggleUp": [51],
-      \ "toggleDown": [35],
-      \ "name": "commandSpectrum",
-      \ "value": c['commandSpectrum'],
-      \ "values": g:Spectrum
-      \ },
-      \ {
-      \ "key": keymap,
-      \ "toggleUp": [52],
-      \ "toggleDown": [36],
-      \ "name": "decision_algorithm",
-      \ "value": c['decision_algorithm'],
-      \ "values": g:FixBufNr_decision_algorithm
-      \ },
-      \ {
-      \ "key": keymap,
-      \ "toggleUp": [53],
-      \ "toggleDown": [37],
-      \ "name": "decision_mode",
-      \ "value": c['decision_mode'],
-      \ "values": g:FixBufNr_decision_mode
-      \ },
-      \ {
-      \ "key": keymap,
-      \ "toggleUp": [ 54 ],
-      \ "toggleDown": [ 94 ],
-      \ "name": "target",
-      \ "value": c['target'],
-      \ "values": g:targets
-      \ },
-      \ {
-      \ "key": keymap,
-      \ "toggleUp": [ 55 ],
-      \ "toggleDown": [ 38 ],
-      \ "name": "autocd",
-      \ "value": c['autocd'],
-      \ "values": g:AutoCD
-      \ },
-      \ {
-      \ "key": keymap,
-      \ "toggleUp": [ 56 ],
-      \ "toggleDown": [ 41 ],
-      \ "name": "autocc",
-      \ "value": c['autocc'],
-      \ "values": g:YesNo
-      \ }
-      \ ]
-    let char = getchar()
-    let charstr=nr2char(char)
-    " call DebugBuf(char)
-    " redraw
-    " echo "\r"
-    for s in shortcuts
-      let tu=s['toggleUp']
-      let td=s['toggleDown']
-      let selectCommand=[8, 6, 24 ]
-      let editCommand=[5]
-      " example for <F5>
-      let executeCommand=['k5']
-      if type(tu)==0 && char==tu || type(tu)==3 && index(tu, char)>-1
-        let x=_toggle(1)
-        let c[s['name']]=x
-        " let g:commands[cidx]=x
-        call NewOrOverwrite(c)
-        call SaveCommands()
-      elseif type(td)==0 && char==td || type(td)==3 && index(td, char)>-1
-        let x=_toggle(-1)
-        let c[s['name']]=x
-        " let g:commands[cidx]=x
-        call NewOrOverwrite(c)
-      elseif type(selectCommand)==0 && char==selectCommand || type(selectCommand)==3 && index(selectCommand, char)>-1
-        echo "select command"
-      elseif type(editCommand)==0 && char==editCommand || type(editCommand)==3 && index(editCommand, char)>-1
-        echo "open new buffer in popup to edit the command"
-      elseif index([104, 72], char)>-1
-        let c['direction']='h'
-      elseif index([106, 74], char)>-1
-        let c['direction']='j'
-      elseif index([107, 75], char)>-1
-        let c['direction']='k'
-      elseif index([108, 76], char)>-1
-        let c['direction']='l'
-      elseif index([49, 33], char)>-1
-        echo "1: edit command"
-      elseif index([','], charstr)>-1
-        let x=getcharstr()
-        if x ==# ','
-          let key=getcharstr()
-          let k=keytrans(key)
-          let a=",,"..k
-          let b=",,\\"..k
-          let c=",,"..key
-          call feedkeys(c, 't')
-        else
-          let k='\'..keytrans(x)
-          let a=","..k
-          let b=",\\"..k
-          let c=","..x
-          call feedkeys(c, 't')
-        endif
-        return
-      endif
-    endfor
-    call _printPage()
-  endwhile
-  call SaveCommands()
-  call DebugBufClear()
-  call DebugBufHeight()
-  " echo join(values(map(shortcuts, {_->"\["..v:key.."\]: "..v:val})), "   ")
+" function! ConfigureKeys(keymap=g:keymap)
+"   " call LoadCommands()
+"   " let all=["\<F5>", "\<F6>","\<F7>","\<F8>"]
+"   " let alll=["<F5>", "<F6>","<F7>","<F8>"]
+"   let keymap=substitute(g:keymap, ',','', 'g')
+"   " echo keymap
+"   let cs=FindCommands(keymap)
+"   let c = FindCommand(cs, keymap)
+"   " let c=Ref(c)
+"   let cidx=index(g:commands, c)
+"   let c=g:commands[cidx]
+"   function! _toggle(n=1) closure
+"     " call DebugBuf(s['value']1)
+"     " call DebugBuf(join(s['values'], ', '))
+"     let i = index(s['values'], s['value'])
+"     " call DebugBuf(len(s['values']))
+"     let x=i+a:n
+"     " call DebugBuf(i.."+"..a:n.."="..x)
+"     let new_index=Mod(x, len(s['values']))
+"     " call DebugBuf(var)
+"     " redraw!
+"     return s['values'][new_index]
+"   endfunction
+"   function! _printPage() closure
+"     " call DebugBuf(g:keymap)
+"     call DebugBufClear()
+"     call DebugBufHeight(13)
+"     if !empty(c)
+"       " call DebugBuf(char)
+"       call DebugBuf("key:                    "..c['key'])
+"       call DebugBuf("1:  command:            "..join(c['command'], ' '))
+"       call DebugBuf("2:  savein:             "..c['savein'])
+"       call DebugBuf("3:  spectrum:           "..c['extend'])
+"       call DebugBuf("4:  decision_algorithm: "..c['decision_algorithm'])
+"       call DebugBuf("5:  decision_mode:      "..c['decision_mode'])
+"       call DebugBuf("6:  target:             "..c['target'])
+"       call DebugBuf("7:  autocd:             "..c['autocd'])
+"       call DebugBuf("8:  autocc:             "..c['autocc'])
+"       call DebugBuf("9:  direction:          "..c['direction'])
+"     endif
+"     " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'in_vim_configuration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'commandBuffer': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'commandRepo': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'extend': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
+"     redraw!
+"   endfunction
+"   call _printPage()
+"   let char=''
+"   while index([13, 113, 81], char)==-1
+"     " call DebugBuf("")
+"     " \ "toggleUp": [ 97, 90 ],
+"     " \ "toggleDown": [ 122, 65 ],
+"     let shortcuts=[
+"       \ {
+"       \ "key": keymap,
+"       \ "toggleUp": [50],
+"       \ "toggleDown": [64],
+"       \ "name": "savein",
+"       \ "value": c['savein'],
+"       \ "values": g:SaveIn
+"       \ },
+"       \ {
+"       \ "key": keymap,
+"       \ "toggleUp": [51],
+"       \ "toggleDown": [35],
+"       \ "name": "extend",
+"       \ "value": c['extend'],
+"       \ "values": g:Spectrum
+"       \ },
+"       \ {
+"       \ "key": keymap,
+"       \ "toggleUp": [52],
+"       \ "toggleDown": [36],
+"       \ "name": "decision_algorithm",
+"       \ "value": c['decision_algorithm'],
+"       \ "values": g:FixBufNr_decision_algorithm
+"       \ },
+"       \ {
+"       \ "key": keymap,
+"       \ "toggleUp": [53],
+"       \ "toggleDown": [37],
+"       \ "name": "decision_mode",
+"       \ "value": c['decision_mode'],
+"       \ "values": g:FixBufNr_decision_mode
+"       \ },
+"       \ {
+"       \ "key": keymap,
+"       \ "toggleUp": [ 54 ],
+"       \ "toggleDown": [ 94 ],
+"       \ "name": "target",
+"       \ "value": c['target'],
+"       \ "values": g:targets
+"       \ },
+"       \ {
+"       \ "key": keymap,
+"       \ "toggleUp": [ 55 ],
+"       \ "toggleDown": [ 38 ],
+"       \ "name": "autocd",
+"       \ "value": c['autocd'],
+"       \ "values": g:AutoCD
+"       \ },
+"       \ {
+"       \ "key": keymap,
+"       \ "toggleUp": [ 56 ],
+"       \ "toggleDown": [ 41 ],
+"       \ "name": "autocc",
+"       \ "value": c['autocc'],
+"       \ "values": g:YesNo
+"       \ }
+"       \ ]
+"     let char = getchar()
+"     let charstr=nr2char(char)
+"     " call DebugBuf(char)
+"     " redraw
+"     " echo "\r"
+"     for s in shortcuts
+"       let tu=s['toggleUp']
+"       let td=s['toggleDown']
+"       let selectCommand=[8, 6, 24 ]
+"       let editCommand=[5]
+"       " example for <F5>
+"       let executeCommand=['k5']
+"       if type(tu)==0 && char==tu || type(tu)==3 && index(tu, char)>-1
+"         let x=_toggle(1)
+"         call c.set(s['name'], x)
+"         " let g:commands[cidx]=x
+"         call NewOrOverwrite(c)
+"         call SaveCommands()
+"       elseif type(td)==0 && char==td || type(td)==3 && index(td, char)>-1
+"         let x=_toggle(-1)
+"         call c.set(s['name'], x)
+"         " let g:commands[cidx]=x
+"         call NewOrOverwrite(c)
+"       elseif type(selectCommand)==0 && char==selectCommand || type(selectCommand)==3 && index(selectCommand, char)>-1
+"         echo "select command"
+"       elseif type(editCommand)==0 && char==editCommand || type(editCommand)==3 && index(editCommand, char)>-1
+"         echo "open new buffer in popup to edit the command"
+"       elseif index([104, 72], char)>-1
+"         call c.set('direction', 'h')
+"       elseif index([106, 74], char)>-1
+"         call c.set('direction', 'j')
+"       elseif index([107, 75], char)>-1
+"         call c.set('direction', 'k')
+"       elseif index([108, 76], char)>-1
+"         call c.set('direction', 'l')
+"       elseif index([49, 33], char)>-1
+"         echo "1: edit command"
+"       elseif index([','], charstr)>-1
+"         let x=getcharstr()
+"         if x ==# ','
+"           let key=getcharstr()
+"           let k=keytrans(key)
+"           let a=",,"..k
+"           let b=",,\\"..k
+"           let c=",,"..key
+"           call feedkeys(c, 't')
+"         else
+"           let k='\'..keytrans(x)
+"           let a=","..k
+"           let b=",\\"..k
+"           let c=","..x
+"           call feedkeys(c, 't')
+"         endif
+"         return
+"       endif
+"     endfor
+"     call _printPage()
+"   endwhile
+"   call SaveCommands()
+"   call DebugBufClear()
+"   call DebugBufHeight()
+"   " echo join(values(map(shortcuts, {_->"\["..v:key.."\]: "..v:val})), "   ")
+" endfunction
+
+function! ConfigureKeys()
 endfunction
 
 function! RedefineOrCreateNew(c, vs)
   let c = a:c
-  " let c=TermCommand()
-  " let c['hash']=matching['hash']
-  " let c['commandSaveinFolder']=DetermineCommandSaveinFolder()
   " shared values, when modified prompts for change for all, or detach command
   " shared command over multiple repos
-  " let c['commandRepo']=["/path/to/repos", "/another/path/to/repos"]
-  let c['commandRepo']=Folder_Repo_Or_Project_Only()
+  " call c.set('commandRepo', ["/path/to/repos", "/another/path/to/repos"])
+  call c.set('commandRepo', ProjectPath())
   " shared command over multiple folders
-  " let c['commandFolder']=["/path/to/folder", "/another/path/to/folder"]
-  let c['commandFolder']=expand('%:p:h')
+  " call c.set('commandFolder', ["/path/to/folder", "/another/path/to/folder"])
+  call c.set('commandFolder', expand('%:p:h'))
   " shared command over multiple buffers
-  " let c['commandBuffer']=["/path/to/file", "/another/path/to/file"]
-  let c['commandBuffer']=b:spectrum=='buffer'?expand('%:p'):''
-  " let c['commandBufferGlob']="*"
-  " let c['commandFolderGlob']="*"
-  " let c['commandBufferGlob']=["*", "**"]
-  " let c['commandFolderGlob']=["*", "**"]
-  let c['target']='Local'
-  " let c['savein']=b:savein
-  " let c['released']=b:released
-  " let c['decision_mode']="check_direct"
-  " let c['decision_algorithm']="check_only_one_direction"
-  " let c['autocd']="no"
-  " let c['autocd_path']="/"
-  " let c['commandSpectrum']=b:spectrum
-  let c['command']=a:vs
-  " let c['page']=0
-  let c['key']=g:keymap
-  " let c['direction']=g:default_direction
+  " call c.set('commandBuffer', ["/path/to/file", "/another/path/to/file"])
+  call c.set('commandBuffer', b:spectrum=='buffer'?expand('%:p'):'')
+  " call c.set('commandBufferGlob', "*")
+  " call c.set('commandFolderGlob', "*")
+  " call c.set('commandBufferGlob', ["*", "**"])
+  " call c.set('commandFolderGlob', ["*", "**"])
+  call c.set('target', 'Local')
+  " call c.set('savein', b:savein)
+  " call c.set('released', b:released)
+  " call c.set('decision_mode', "check_direct")
+  " call c.set('decision_algorithm', "check_only_one_direction")
+  " call c.set('autocd', "no")
+  " call c.set('autocd_path', "/")
+  " call c.set('extend', b:spectrum)
+  call c.set('command', a:vs)
+  " call c.set('page', 0)
+  call c.set('key', g:keymap)
+  " call c.set('direction', g:default_direction)
   " let b:commands['pages'][0][g:keymap]=c
-  " call filter(copy(g:commands), '!(v:val["commandSpectrum"]==c["commandSpectrum"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
+  " call filter(copy(g:commands), '!(v:val["extend"]==c["extend"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
   " call DebugBuf(a:vs)
   " let g:commands=[]
   " let g:commands=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
@@ -7469,31 +7578,31 @@ endfunction
 function! NewOrOverwrite(c)
   let c = a:c
   " let found_index=indexof(copy(g:commands), { i,v->
-  "   \    v:val["key"]==c["key"]
-  "   \ && v:val["commandSpectrum"]==c["commandSpectrum"]
-  "   \ && v:val["commandBuffer"]==c["commandBuffer"]
-  "   \ && v:val["page"]==c["page"]
+  "   \    v:val["key"]==c.get("key")
+  "   \ && v:val["extend"]==c.get("extend")
+  "   \ && v:val["commandBuffer"]==c.get("commandBuffer")
+  "   \ && v:val["page"]==c.get("page")
   "   \ })
   let found_index=indexof(copy(g:commands), { i,v->
-    \    v:val["hash"]==c["hash"]
+    \    v:val.get("hash")==c.get("hash")
     \ })
   " echo found_index
   if found_index>-1
     " remove(g:commands, found_index)
     call DebugBuf("overwriting")
-    if c['commandSpectrum']=='buffer'
-      let c['commandBuffer']=expand('%:p')
-    elseif c['commandSpectrum']=='repo'
-      let c['commandRepo']=Folder_Repo_Or_Project_Only()
-    elseif c['commandSpectrum']=='folder'
-      let c['commandRepo']=expand('%:p:h')
-    elseif c['commandSpectrum']=='global'
-    elseif c['commandSpectrum']=='tab'
+    if c.get('extend')=='buffer'
+      call c.set('commandBuffer', expand('%:p'))
+    elseif c.get('extend')=='repo'
+      call c.set('commandRepo', ProjectPath())
+    " elseif c.get('extend')=='folder'
+    "   call c.set('commandRepo', expand('%:p:h'))
+    elseif c.get('extend')=='global'
+    " elseif c.get('extend')=='tab'
       "global", "repo", "folder", "tab", "buffer"
     endif
     let g:commands[found_index]=c
   else
-    let c['hash']=NewUUID()
+    call c.set('hash', NewUUID())
     call DebugBuf("not overwriting - new command")
     " echo c
     call add(g:commands, c)
@@ -7517,13 +7626,14 @@ function! Command() range
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
   let cs=FindCommands()
-  " call DebugBuf(cs)
-  "
+  call DebugBuf(cs)
   let keymap=substitute(g:keymap, ',','', 'g')
   let c = FindCommand(cs, keymap)
+  call DebugBuf(c)
   " call DebugBuf(c)
   if empty(c)
     let c=CommandTemplate()
+    call DebugBuf(c)
     " echo "No Matching Command"
     " return
   endif
@@ -7532,19 +7642,19 @@ function! Command() range
   elseif g:keymap=~",,"
     call DebugBuf(g:keymap)
     if !empty(c)
-      call ConfigureKeys(g:keymap)
+      " call ConfigureKeys(g:keymap)
     endif
     return
   elseif g:keymap=~","
-    call SelectCommand(cs)
+    " call SelectCommand(cs)
     return
   else
     " let c=''
     " call DebugBuf(c)
     if !empty(c)
-      let b:savein=c['savein']
-      let b:released=c['released']
-      let b:spectrum=c['commandSpectrum']
+      let b:savein=c.get('save')
+      let b:released=c.get('released')
+      let b:spectrum=c.get('extend')
       " call DebugBuf(c)
     else
       call DebugBuf('No Command Found under '..g:keymap)
@@ -7554,7 +7664,7 @@ function! Command() range
     " let c=g:commands['pages'][0][g:keymap]
   endif
   " call DebugBuf(c)
-  if type(c)==0 && c['command'] != -1 || c['command']==[]
+  if type(c)==0 && c.get('command') != -1 || c.get('command')==[]
     " call DebugBuf(c)
     " call DebugBuf("Command Not Send\n"..Pretty(c))
     call DebugBuf("Command Not Send\n")
@@ -7564,35 +7674,37 @@ function! Command() range
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
     "
     " Find Buffer
-    let target_term_buffer=FixBufNr(c['decision_mode'], c['decision_algorithm'])
+    let target_term_buffer=FixBufNr(c.get('decision_mode'), c.get('decision_algorithm'))
     if target_term_buffer==-1 || !BufVisibileInCurrentTab(target_term_buffer)
       call DebugBuf("BufNr: "..target_term_buffer)
     endif
-    " let b:MapCommand[c['direction']..'t']={'bufnr': buf, 'dir': dir }
-    " let buf=GetBufDirectionIfTerm(c['direction'])
+    " let b:MapCommand[c.get('direction')..'t']={'bufnr': buf, 'dir': dir }
+    " let buf=GetBufDirectionIfTerm(c.get('direction'))
     " let buf=winbufnr(win)
     if target_term_buffer!=-1
-      " let buf=winbufnr(winnr(c['direction']))
-      " call TERM(target_term_buffer, c['command'])
-      if c['autocc']=='yes'
+      " let buf=winbufnr(winnr(c.get('direction')))
+      " call TERM(target_term_buffer, c.get('command'))
+      if c.get('autocc')=='yes'
         call SendCommandToTermByBuf(target_term_buffer, [''])
       endif
-      if c['autocd']!='no'
+      if c.get('autocd')!='no'
         let topath=''
-        if c['autocd']=='cd_to_bufferfile'
+        if c.get('autocd')=='cd_to_bufferfile'
           let topath=expand('%:p:h')
-        elseif c['autocd']=='cd_to_project_root'
-          let topath=Folder_Repo_Or_Project_Only()
-        elseif c['autocd']=='cd_to_configured_autocd_path'
-          let topath=c['autocd_path']
+        elseif c.get('autocd')=='cd_to_project_root'
+          let topath=ProjectPath()
+        elseif c.get('autocd')=='cd_to_configured_autocd_path'
+          let topath=c.get('autocd_path')
         endif
         call SendCommandToTermByBuf(target_term_buffer, ['cd '..topath])
       endif
-      call SendCommandToTermByBuf(target_term_buffer, c['command'])
+      call SendCommandToTermByBuf(target_term_buffer, c.get('command'))
       call DebugBuf("Command Send")
+      " call DebugBufHeight(1)
     else
-      call DebugBuf(c)
+      " call DebugBuf(c)
       call DebugBuf("Command Not Send")
+      " call DebugBufHeight(1)
     endif
   else
     call DebugBuf("Type Error")
@@ -7669,7 +7781,67 @@ function! EnsureDebugBuf()
   endif
 endfunction
 
-function! DebugBuf(data)
+function! DebugBuf(...) abort
+  "   :if exists("*strftime")
+  "   :echo strftime("%c")       Sun Apr 27 11:49:23 1997
+  "   :echo strftime("%Y %b %d %X")     1997 Apr 27 11:53:25
+  "   :echo strftime("%y%m%d %T")     970427 11:53:55
+  "   :echo strftime("%H:%M")     11:55
+  "   :echo strftime("%c", getftime("file.c"))
+  "            Show mod time of file.c.
+  if exists("*strftime")
+    let timestamp=strftime('%Y-%m-%d %H:%M:%S')
+  endif
+  if exists('*getstacktrace')
+    let _stack=getstacktrace()
+    let _frame=get(_stack, 1, {})
+    let caller=printf('%s,%d', get(_frame, 'filepath', '?'), get(_frame, 'lnum', 0))
+  else
+    try
+      throw 'debug'
+    catch
+      let __stack=split(v:throwpoint, '\.\.')
+      let caller=get(__stack, -2, 'unknown')
+    endtry
+    if empty(caller)
+      let caller = 'stack-trace-problem'
+    endif
+  endif
+  let time_prefix=printf('[%s] %s: ', timestamp, caller)
+  " echohl WarningMsg
+  " echom printf('[%s] %s %s: ', timestamp, caller, "test")
+  " echohl None
+  " echo type(a:000)
+  " echo v:throwpoint
+  let data=[]
+  for i in a:000
+    try
+      call add(data, i)
+    catch
+      try
+        call add(data, i)
+      catch
+        call add(data, 'Error')
+      endtry
+    endtry
+  endfor
+  " json_encode(a:000)
+  " echo "Args a:000" json_encode(a:000)
+  " echo a:000
+  " if len(a:000)==0
+  "   let data=''
+  " elseif len(a:000)==1
+  "   let data=a:000[0]
+  " elseif type(a:000)==3 && len(a:000)>1
+  "   let data=[]
+  "   for d in a:000
+  "     if type(d)==3
+  "       call extend(data, [d])
+  "     else
+  "       call extend(data, [json_encode(d)])
+  "     endif
+  "   endfor
+  " endif
   if exists('t:debugbuf')
     let save_win = win_getid()
     " Text
@@ -7682,16 +7854,42 @@ function! DebugBuf(data)
     " let data=split(J(a:data), '\%x0')
     " let data=split(a:data, '\%x0')
     " let data=split(substitute(a:data, '\n', "\r", 'g'), '\r')
-    let type=type(a:data)
-    if type==4||type==3
-      let data=split(Pretty(a:data), '\n')
-    else
-      let data=split(a:data, '\n')
-    endif
-    call appendbufline(t:debugbuf, '$', data)
-    if getbufline(t:debugbuf, 1, 1)[0]==''
-      call deletebufline(t:debugbuf, 1)
-    endif
+    let allout=[]
+    for d in data
+    "   let type=type(d)
+      let vartype=[type(d), typename(d)]
+      let vartype=typename(d)
+    "   if type==4||type==3
+    "     let d=split(Pretty(d), '')
+    "   elseif type!=2
+    "     let d=split(d, '')
+    "   endif
+    "   let out=join([vartype, d], ' ')
+      if type(d)==2
+        call add(allout, vartype..": "..'func{}')
+      else
+        try
+        call add(allout, vartype..": "..json_encode(d))
+        catch
+          " echo "is a func? "..typename(d)
+        endtry
+      endif
+    endfor
+    let result=[time_prefix]
+    call add(result, allout)
+    call appendbufline(t:debugbuf, '$', join(result, ' '))
+    " try
+    "   echo allout
+    "   for o in allout
+    "     " call appendbufline(t:debugbuf, '$', o)
+    "   endfor
+    "   " if getbufline(t:debugbuf, 1, 1)[0]==''
+    "   "   call deletebufline(t:debugbuf, 1)
+    "   " endif
+    " catch
+    "   call appendbufline(t:debugbuf, '$', "Some DebugBuf Error")
+    " finally
+    " endtry
   else
     call EnsureDebugBuf()
   endif
@@ -10146,12 +10344,12 @@ function! TEST()
 endfunction
 
 let gc=TermCommand()
-let gc['command']='echo "TEST"'
+call gc.set('command', 'echo "TEST"')
 call _command(gc)
 
 let gc=TermCommand()
-let gc['name']='Simple Command'
-let gc['command']='echo "TEST"'
+call gc.set('name', 'Simple Command')
+call gc.set('command', 'echo "TEST"')
 call _command(gc)
 
 " Maybe Like This?
@@ -10160,8 +10358,8 @@ call _command(gc)
 " ENDCOMMAND
 
 let gc=VimCommand()
-let gc['name']='Echo'
-let gc['command']='echo "TEST"'
+call gc.set('name', 'Echo')
+call gc.set('command', 'echo "TEST"')
 call _command(gc)
 
 " todo Add Fix To NewMap (generated_src/...) Or Source Outside Of Generate.src

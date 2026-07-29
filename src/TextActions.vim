@@ -1,3 +1,10 @@
+" '<,'>s/" let c\[\(.\{-\}\)]=\(.\{-\}\)$/call c.set\(\1, \2\)/g
+" '<,'>s/v:val\[\(.\{-\}\)]==\(.*\)$/v:val.get\(\1\)==\2/g
+" '<,'>s/"\s\{1,\}$/"/g
+function! CommentsTrim() range
+  '<,'>s/"\s\{1,\}$/"/g
+endfunction
+command -range -nargs=0 CommentsTrim <line1>,<line2>:call CommentsTrim()
 if !exists("g:vim_advantages_got_sourced")
 
 let g:textReplace="Replace: "
