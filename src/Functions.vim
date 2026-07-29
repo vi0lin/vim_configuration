@@ -4,6 +4,7 @@
 " " lookahead
 " \v\%(en\)\@!coding
 " \v%(en)@!coding
+
 if !exists("g:vim_advantages_got_sourced")
 
 function! IsMost(bufnr, direction)
