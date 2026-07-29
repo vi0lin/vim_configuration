@@ -1,3 +1,9 @@
+" " lookbehind
+" \%(en\)\@<!coding
+" \v%(en)@<!coding
+" " lookahead
+" \v\%(en\)\@!coding
+" \v%(en)@!coding
 if !exists("g:vim_advantages_got_sourced")
 
 function! IsMost(bufnr, direction)
@@ -47,19 +53,21 @@ function! BufVisibileInCurrentTab(bufnr) abort
 endfunction
 
 function! DebugBufHeight(height)
-  let winnr=winnr()
-  let w=bufwinnr(t:debugbuf)
-  let buf_height = winheight(w)
-  let buf_width = winwidth(w)
-  if buf_height!=a:height
-    if WinCmdToBuf(t:debugbuf)
-      call Height(a:height)
+  if exists('t:debugbuf')
+    let winnr=winnr()
+    let w=bufwinnr(t:debugbuf)
+    let buf_height = winheight(w)
+    let buf_width = winwidth(w)
+    if buf_height!=a:height
+      if WinCmdToBuf(t:debugbuf)
+        call Height(a:height)
+      endif
+      call WinCmdToWin(winnr)
     endif
-    call WinCmdToWin(winnr)
+    " call win_gotoid(t:debugbuf)
+    " echo bufwinid(t:debugbuf)
+    " call win_gotoid(save_win)
   endif
-  " call win_gotoid(t:debugbuf)
-  " echo bufwinid(t:debugbuf)
-  " call win_gotoid(save_win)
 endfunction
 
 function! EnsureDebugBuf()
@@ -91,117 +99,119 @@ function! EnsureDebugBuf()
 endfunction
 
 function! DebugBuf(...) abort
-  call EnsureDebugBuf()
-  "   :if exists("*strftime")
-  "   :echo strftime("%c")       Sun Apr 27 11:49:23 1997
-  "   :echo strftime("%Y %b %d %X")     1997 Apr 27 11:53:25
-  "   :echo strftime("%y%m%d %T")     970427 11:53:55
-  "   :echo strftime("%H:%M")     11:55
-  "   :echo strftime("%c", getftime("file.c"))
-  "            Show mod time of file.c.
-  if exists("*strftime")
-    let timestamp=strftime('%Y-%m-%d %H:%M:%S')
-  endif
-  if exists('*getstacktrace')
-    let _stack=getstacktrace()
-    let _frame=get(_stack, 1, {})
-    let caller=printf('%s,%d', get(_frame, 'filepath', '?'), get(_frame, 'lnum', 0))
-  else
-    try
-      throw 'debug'
-    catch
-      let __stack=split(v:throwpoint, '\.\.')
-      let caller=get(__stack, -2, 'unknown')
-    endtry
-    if empty(caller)
-      let caller = 'stack-trace-problem'
+  if exists('t:debugbuf')
+    call EnsureDebugBuf()
+    "   :if exists("*strftime")
+    "   :echo strftime("%c")       Sun Apr 27 11:49:23 1997
+    "   :echo strftime("%Y %b %d %X")     1997 Apr 27 11:53:25
+    "   :echo strftime("%y%m%d %T")     970427 11:53:55
+    "   :echo strftime("%H:%M")     11:55
+    "   :echo strftime("%c", getftime("file.c"))
+    "            Show mod time of file.c.
+    if exists("*strftime")
+      let timestamp=strftime('%Y-%m-%d %H:%M:%S')
     endif
-  endif
-  let time_prefix=printf('[%s] %s: ', timestamp, caller)
-  " echohl WarningMsg
-  " echom printf('[%s] %s %s: ', timestamp, caller, "test")
-  " echohl None
-  " echo type(a:000)
-  " echo v:throwpoint
-  let data=[]
-  for i in a:000
-    try
-      call add(data, i)
-    catch
+    if exists('*getstacktrace')
+      let _stack=getstacktrace()
+      let _frame=get(_stack, 1, {})
+      let caller=printf('%s,%d', get(_frame, 'filepath', '?'), get(_frame, 'lnum', 0))
+    else
+      try
+        throw 'debug'
+      catch
+        let __stack=split(v:throwpoint, '\.\.')
+        let caller=get(__stack, -2, 'unknown')
+      endtry
+      if empty(caller)
+        let caller = 'stack-trace-problem'
+      endif
+    endif
+    let time_prefix=printf('[%s] %s: ', timestamp, caller)
+    " echohl WarningMsg
+    " echom printf('[%s] %s %s: ', timestamp, caller, "test")
+    " echohl None
+    " echo type(a:000)
+    " echo v:throwpoint
+    let data=[]
+    for i in a:000
       try
         call add(data, i)
       catch
-        call add(data, 'Error')
-      endtry
-    endtry
-  endfor
-  " json_encode(a:000)
-  " echo "Args a:000" json_encode(a:000)
-  " echo a:000
-  " if len(a:000)==0
-  "   let data=''
-  " elseif len(a:000)==1
-  "   let data=a:000[0]
-  " elseif type(a:000)==3 && len(a:000)>1
-  "   let data=[]
-  "   for d in a:000
-  "     if type(d)==3
-  "       call extend(data, [d])
-  "     else
-  "       call extend(data, [json_encode(d)])
-  "     endif
-  "   endfor
-  " endif
-  if exists('t:debugbuf')
-    let save_win = win_getid()
-    " Text
-    " call appendbufline(t:debugbuf, '$', a:data)
-    " call appendbufline(t:debugbuf, '$', split(a:data, ''))
-    call win_gotoid(save_win)
-    " if a:clear==1
-    "   call deletebufline(t:debugbuf, 1)
-    " endif
-    " let data=split(J(a:data), '\%x0')
-    " let data=split(a:data, '\%x0')
-    " let data=split(substitute(a:data, '\n', "\r", 'g'), '\r')
-    let allout=[]
-    for d in data
-    "   let type=type(d)
-      let vartype=[type(d), typename(d)]
-      let vartype=typename(d)
-    "   if type==4||type==3
-    "     let d=split(Pretty(d), '')
-    "   elseif type!=2
-    "     let d=split(d, '')
-    "   endif
-    "   let out=join([vartype, d], ' ')
-      if type(d)==2
-        call add(allout, vartype..": "..'func{}')
-      else
         try
-        call add(allout, vartype..": "..json_encode(d))
+          call add(data, i)
         catch
-          " echo "is a func? "..typename(d)
+          call add(data, 'Error')
         endtry
-      endif
+      endtry
     endfor
-    let result=[time_prefix]
-    call add(result, allout)
-    call appendbufline(t:debugbuf, '$', join(result, ' '))
-    " try
-    "   echo allout
-    "   for o in allout
-    "     " call appendbufline(t:debugbuf, '$', o)
+    " json_encode(a:000)
+    " echo "Args a:000" json_encode(a:000)
+    " echo a:000
+    " if len(a:000)==0
+    "   let data=''
+    " elseif len(a:000)==1
+    "   let data=a:000[0]
+    " elseif type(a:000)==3 && len(a:000)>1
+    "   let data=[]
+    "   for d in a:000
+    "     if type(d)==3
+    "       call extend(data, [d])
+    "     else
+    "       call extend(data, [json_encode(d)])
+    "     endif
     "   endfor
-    "   " if getbufline(t:debugbuf, 1, 1)[0]==''
-    "   "   call deletebufline(t:debugbuf, 1)
-    "   " endif
-    " catch
-    "   call appendbufline(t:debugbuf, '$', "Some DebugBuf Error")
-    " finally
-    " endtry
-  else
-    call EnsureDebugBuf()
+    " endif
+    if exists('t:debugbuf')
+      let save_win = win_getid()
+      " Text
+      " call appendbufline(t:debugbuf, '$', a:data)
+      " call appendbufline(t:debugbuf, '$', split(a:data, ''))
+      call win_gotoid(save_win)
+      " if a:clear==1
+      "   call deletebufline(t:debugbuf, 1)
+      " endif
+      " let data=split(J(a:data), '\%x0')
+      " let data=split(a:data, '\%x0')
+      " let data=split(substitute(a:data, '\n', "\r", 'g'), '\r')
+      let allout=[]
+      for d in data
+      "   let type=type(d)
+        let vartype=[type(d), typename(d)]
+        let vartype=typename(d)
+      "   if type==4||type==3
+      "     let d=split(Pretty(d), '')
+      "   elseif type!=2
+      "     let d=split(d, '')
+      "   endif
+      "   let out=join([vartype, d], ' ')
+        if type(d)==2
+          call add(allout, vartype..": "..'func{}')
+        else
+          try
+          call add(allout, vartype..": "..json_encode(d))
+          catch
+            " echo "is a func? "..typename(d)
+          endtry
+        endif
+      endfor
+      let result=[time_prefix]
+      call add(result, allout)
+      call appendbufline(t:debugbuf, '$', join(result, ' '))
+      " try
+      "   echo allout
+      "   for o in allout
+      "     " call appendbufline(t:debugbuf, '$', o)
+      "   endfor
+      "   " if getbufline(t:debugbuf, 1, 1)[0]==''
+      "   "   call deletebufline(t:debugbuf, 1)
+      "   " endif
+      " catch
+      "   call appendbufline(t:debugbuf, '$', "Some DebugBuf Error")
+      " finally
+      " endtry
+    else
+      call EnsureDebugBuf()
+    endif
   endif
 endfunction
 
