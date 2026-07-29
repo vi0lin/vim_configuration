@@ -3270,10 +3270,10 @@ endfunction
 command! -range -nargs=0 Rel :call ReloadFile()
 
 function! SystemctlReload()
-  !reload_services() {
+  !Reload_services() {
   \ sudo systemctl daemon-reload;
   \ };
-  \reload_services;
+  \Reload_services;
 endfunction
 command! -range -nargs=0 SystemctlReload :call SystemctlReload()
 
@@ -3281,10 +3281,10 @@ function! Start()
   SystemctlReload
   let $service_file=expand('%:r')
   echo $service_file
-  !start_service() {
+  !Start_service() {
   \ sudo systemctl start $1;
   \ };
-  \start_service $service_file;
+  \Start_service $service_file;
 endfunction
 command! -range -nargs=0 Start :call Start()
 
@@ -3292,10 +3292,10 @@ function! Stop()
   SystemctlReload
   let $service_file=expand('%:r')
   echo $service_file
-  !stop_service() {
+  !Stop_service() {
   \ sudo systemctl stop $1;
   \ };
-  \stop_service $service_file;
+  \Stop_service $service_file;
 endfunction
 command! -range -nargs=0 Stop :call Stop()
 
@@ -3303,14 +3303,12 @@ function! Status()
   SystemctlReload
   let $service_file=expand('%:r')
   echo $service_file
-  !status_service() {
+  !Status_service() {
   \ sudo systemctl status $1;
   \ };
-  \status_service $service_file;
+  \Status_service $service_file;
 endfunction
 command! -range -nargs=0 Status :call Status(<f-args>)
-
-
 
 function! GitInitRepository()
   let output=systemlist("git init")
