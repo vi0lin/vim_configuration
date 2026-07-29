@@ -1,53 +1,222 @@
-" ,,<F5> 8 - to enable autocc
-" while [ 1==1 ]; do echo "ok"; sleep 1; done;
-" select a new command with <F5> to overwrite the old one, keeping the settings and execute it
-" date
-" while [ 1==1 ]; do echo "new data"; sleep 1; done;
-" select this command and press <C-F5> - now you can cancel on your own
-" 
-"
-" " select this command and fire it with <F5>
-" nano
-"
-" Or this one
-" ls
+if !exists("g:vim_advantages_got_sourced")
 
-" Or this one
-" enable auto cd ,,<F5> 8  to automatically return to the project root
-" make the command available in the complete repository, to build build the whole project
-" ./build.sh
+function! IsMost(bufnr, direction)
+  let winnr=winnr()
+  let win=winnr()
+  let winid=bufwinid(a:bufnr)
+  if winid==0
+    return 0
+  endif
+  let save = win_getid()
+  call win_gotoid(winid)
+  for i in range(1, CountWindowsInDirection(a:direction))
+    let win=DirectionBufWin(i+1..a:direction)
+  endfor
+  let is_most=(winnr == win)
+  call win_gotoid(save)
+  return is_most
+endfunction
 
-" edit the command
+function! PushWindow(winid, direction)
+  let save = win_getid()
+  call win_gotoid(a:winid)
+  exec "wincmd "..toUpper(a:direction)
+  call win_gotoid(save)
+endfunction
 
-" select a remote, to establish a ssh connection first
+function! EnsureMost(bufnr, direction)
+  let winid=bufwinid(a:bufnr)
+  if winid==0
+    " echo "Buffer not visibile"
+    return
+  endif
+  if IsMost(a:bufnr, a:direction)
+    return
+  endif
+  call PushWindow(winid, a:direction)
+  " echo "Pushed buffer " . a:bufnr . " to right"
+endfunction
 
-" when multiple commands share the same key, you get notified
-" for instance press ,<F5> to toggle through them and activate one of them
-" for instance press ,,,<F5> to execute the command that gets chosen in a drop
-" down menue, once. or wait 3 seconds to execute the selected command
+function! BufVisibileInCurrentTab(bufnr) abort
+  for l:winnr in range(1, winnr('$'))
+    if winbufnr(l:winnr) == a:bufnr
+      return 1
+    endif
+  endfor
+  return 0
+endfunction
 
-" global commands for a folder recursively (or *.*)
-" detaching / copy
-" referencing single values [ref: ]
-" associations array [buffer, folder, glob, glob_in_folder, glob_in_repo]
-" when [ buffer_opened, in_same_dir ]
-" modify global commands on basis
-"   when in repo, make term_selection_algorithm different
-"   when in this buffer, change the command name
-"   this creates a new command with referencing the parent
+function! DebugBufHeight(height)
+  let winnr=winnr()
+  let w=bufwinnr(t:debugbuf)
+  let buf_height = winheight(w)
+  let buf_width = winwidth(w)
+  if buf_height!=a:height
+    if WinCmdToBuf(t:debugbuf)
+      call Height(a:height)
+    endif
+    call WinCmdToWin(winnr)
+  endif
+  " call win_gotoid(t:debugbuf)
+  " echo bufwinid(t:debugbuf)
+  " call win_gotoid(save_win)
+endfunction
 
-" toggle value dependencies
+function! EnsureDebugBuf()
+  if !exists('t:debugbuf')
+    " Prep
+    let save_win = win_getid()
+    " Not Existent
+    " create
+    vertical new
+    wincmd J
+    exec "resize 5"
+    let t:debugbuf=bufnr()
+    " Exists
+    let isvisibile=BufVisibileInCurrentTab(t:debugbuf)
+    if !isvisibile
+      " show
+      vertical new
+      exec "b" t:debugbuf
+      wincmd J
+      exec "resize 5"
+    else
+      " push far right
+      call win_gotoid(t:debugbuf)
+      " call EnsureRightmost(t:debugbuf)
+      call EnsureMost(t:debugbuf, "j")
+    endif
+  else
+  endif
+endfunction
+
+function! DebugBuf(...) abort
+  call EnsureDebugBuf()
+  "   :if exists("*strftime")
+  "   :echo strftime("%c")       Sun Apr 27 11:49:23 1997
+  "   :echo strftime("%Y %b %d %X")     1997 Apr 27 11:53:25
+  "   :echo strftime("%y%m%d %T")     970427 11:53:55
+  "   :echo strftime("%H:%M")     11:55
+  "   :echo strftime("%c", getftime("file.c"))
+  "            Show mod time of file.c.
+  if exists("*strftime")
+    let timestamp=strftime('%Y-%m-%d %H:%M:%S')
+  endif
+  if exists('*getstacktrace')
+    let _stack=getstacktrace()
+    let _frame=get(_stack, 1, {})
+    let caller=printf('%s,%d', get(_frame, 'filepath', '?'), get(_frame, 'lnum', 0))
+  else
+    try
+      throw 'debug'
+    catch
+      let __stack=split(v:throwpoint, '\.\.')
+      let caller=get(__stack, -2, 'unknown')
+    endtry
+    if empty(caller)
+      let caller = 'stack-trace-problem'
+    endif
+  endif
+  let time_prefix=printf('[%s] %s: ', timestamp, caller)
+  " echohl WarningMsg
+  " echom printf('[%s] %s %s: ', timestamp, caller, "test")
+  " echohl None
+  " echo type(a:000)
+  " echo v:throwpoint
+  let data=[]
+  for i in a:000
+    try
+      call add(data, i)
+    catch
+      try
+        call add(data, i)
+      catch
+        call add(data, 'Error')
+      endtry
+    endtry
+  endfor
+  " json_encode(a:000)
+  " echo "Args a:000" json_encode(a:000)
+  " echo a:000
+  " if len(a:000)==0
+  "   let data=''
+  " elseif len(a:000)==1
+  "   let data=a:000[0]
+  " elseif type(a:000)==3 && len(a:000)>1
+  "   let data=[]
+  "   for d in a:000
+  "     if type(d)==3
+  "       call extend(data, [d])
+  "     else
+  "       call extend(data, [json_encode(d)])
+  "     endif
+  "   endfor
+  " endif
+  if exists('t:debugbuf')
+    let save_win = win_getid()
+    " Text
+    " call appendbufline(t:debugbuf, '$', a:data)
+    " call appendbufline(t:debugbuf, '$', split(a:data, ''))
+    call win_gotoid(save_win)
+    " if a:clear==1
+    "   call deletebufline(t:debugbuf, 1)
+    " endif
+    " let data=split(J(a:data), '\%x0')
+    " let data=split(a:data, '\%x0')
+    " let data=split(substitute(a:data, '\n', "\r", 'g'), '\r')
+    let allout=[]
+    for d in data
+    "   let type=type(d)
+      let vartype=[type(d), typename(d)]
+      let vartype=typename(d)
+    "   if type==4||type==3
+    "     let d=split(Pretty(d), '')
+    "   elseif type!=2
+    "     let d=split(d, '')
+    "   endif
+    "   let out=join([vartype, d], ' ')
+      if type(d)==2
+        call add(allout, vartype..": "..'func{}')
+      else
+        try
+        call add(allout, vartype..": "..json_encode(d))
+        catch
+          " echo "is a func? "..typename(d)
+        endtry
+      endif
+    endfor
+    let result=[time_prefix]
+    call add(result, allout)
+    call appendbufline(t:debugbuf, '$', join(result, ' '))
+    " try
+    "   echo allout
+    "   for o in allout
+    "     " call appendbufline(t:debugbuf, '$', o)
+    "   endfor
+    "   " if getbufline(t:debugbuf, 1, 1)[0]==''
+    "   "   call deletebufline(t:debugbuf, 1)
+    "   " endif
+    " catch
+    "   call appendbufline(t:debugbuf, '$', "Some DebugBuf Error")
+    " finally
+    " endtry
+  else
+    call EnsureDebugBuf()
+  endif
+endfunction
+
+function! DebugBufClear()
+  if exists('t:debugbuf')
+    call deletebufline(t:debugbuf, 1, '$')
+    endif
+endfunction
+
+let g:default_direction='j'
 
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
 set termencoding=utf-8
-" ]c / [c
-" git difftool HEAD@{1} -- src/Functions.vim
-" do
-" dp
-" qa
-
 " Better diff algorithm + heuristics
 if has("patch-8.1.0360")
   set diffopt+=internal,algorithm:histogram,indent-heuristic
@@ -55,24 +224,16 @@ endif
 " Optional but useful
 set diffopt+=filler          " show filler lines for better alignment
 set diffopt+=context:5       " more context around changes
-
 " set diffopt+=algorithm:histogram,indent-heuristic
 " diffupdate
-
 " set diffopt+=algorithm:patience,indent-heuristic
 " diffupdate
-
 " set scrollbind cursorbind
 " syncbind          " force re-sync of the windows
-
 " git config --global diff.algorithm histogram
-
 " set diffopt+=iwhite
 " diffupdate
 
-if !exists("g:vim_advantages_got_sourced")
-
-let g:default_direction='j'
 
 function! Diff(...)
   let nr = a:000[0]
@@ -7737,170 +7898,6 @@ function! WinCmdToBuf(bufnr)
   return 0
 endfunction
 
-function! DebugBufHeight(height)
-  let winnr=winnr()
-  let w=bufwinnr(t:debugbuf)
-  let buf_height = winheight(w)
-  let buf_width = winwidth(w)
-  if buf_height!=a:height
-    if WinCmdToBuf(t:debugbuf)
-      call Height(a:height)
-    endif
-    call WinCmdToWin(winnr)
-  endif
-  " call win_gotoid(t:debugbuf)
-  " echo bufwinid(t:debugbuf)
-  " call win_gotoid(save_win)
-endfunction
-
-function! EnsureDebugBuf()
-  if !exists('t:debugbuf')
-    " Prep
-    let save_win = win_getid()
-    " Not Existent
-    " create
-    vertical new
-    wincmd J
-    exec "resize 5"
-    let t:debugbuf=bufnr()
-    " Exists
-    let isvisibile=BufVisibileInCurrentTab(t:debugbuf)
-    if !isvisibile
-      " show
-      vertical new
-      exec "b" t:debugbuf
-      wincmd J
-      exec "resize 5"
-    else
-      " push far right
-      call win_gotoid(t:debugbuf)
-      " call EnsureRightmost(t:debugbuf)
-      call EnsureMost(t:debugbuf, "j")
-    endif
-  else
-  endif
-endfunction
-
-function! DebugBuf(...) abort
-  "   :if exists("*strftime")
-  "   :echo strftime("%c")       Sun Apr 27 11:49:23 1997
-  "   :echo strftime("%Y %b %d %X")     1997 Apr 27 11:53:25
-  "   :echo strftime("%y%m%d %T")     970427 11:53:55
-  "   :echo strftime("%H:%M")     11:55
-  "   :echo strftime("%c", getftime("file.c"))
-  "            Show mod time of file.c.
-  if exists("*strftime")
-    let timestamp=strftime('%Y-%m-%d %H:%M:%S')
-  endif
-  if exists('*getstacktrace')
-    let _stack=getstacktrace()
-    let _frame=get(_stack, 1, {})
-    let caller=printf('%s,%d', get(_frame, 'filepath', '?'), get(_frame, 'lnum', 0))
-  else
-    try
-      throw 'debug'
-    catch
-      let __stack=split(v:throwpoint, '\.\.')
-      let caller=get(__stack, -2, 'unknown')
-    endtry
-    if empty(caller)
-      let caller = 'stack-trace-problem'
-    endif
-  endif
-  let time_prefix=printf('[%s] %s: ', timestamp, caller)
-  " echohl WarningMsg
-  " echom printf('[%s] %s %s: ', timestamp, caller, "test")
-  " echohl None
-  " echo type(a:000)
-  " echo v:throwpoint
-  let data=[]
-  for i in a:000
-    try
-      call add(data, i)
-    catch
-      try
-        call add(data, i)
-      catch
-        call add(data, 'Error')
-      endtry
-    endtry
-  endfor
-  " json_encode(a:000)
-  " echo "Args a:000" json_encode(a:000)
-  " echo a:000
-  " if len(a:000)==0
-  "   let data=''
-  " elseif len(a:000)==1
-  "   let data=a:000[0]
-  " elseif type(a:000)==3 && len(a:000)>1
-  "   let data=[]
-  "   for d in a:000
-  "     if type(d)==3
-  "       call extend(data, [d])
-  "     else
-  "       call extend(data, [json_encode(d)])
-  "     endif
-  "   endfor
-  " endif
-  if exists('t:debugbuf')
-    let save_win = win_getid()
-    " Text
-    " call appendbufline(t:debugbuf, '$', a:data)
-    " call appendbufline(t:debugbuf, '$', split(a:data, ''))
-    call win_gotoid(save_win)
-    " if a:clear==1
-    "   call deletebufline(t:debugbuf, 1)
-    " endif
-    " let data=split(J(a:data), '\%x0')
-    " let data=split(a:data, '\%x0')
-    " let data=split(substitute(a:data, '\n', "\r", 'g'), '\r')
-    let allout=[]
-    for d in data
-    "   let type=type(d)
-      let vartype=[type(d), typename(d)]
-      let vartype=typename(d)
-    "   if type==4||type==3
-    "     let d=split(Pretty(d), '')
-    "   elseif type!=2
-    "     let d=split(d, '')
-    "   endif
-    "   let out=join([vartype, d], ' ')
-      if type(d)==2
-        call add(allout, vartype..": "..'func{}')
-      else
-        try
-        call add(allout, vartype..": "..json_encode(d))
-        catch
-          " echo "is a func? "..typename(d)
-        endtry
-      endif
-    endfor
-    let result=[time_prefix]
-    call add(result, allout)
-    call appendbufline(t:debugbuf, '$', join(result, ' '))
-    " try
-    "   echo allout
-    "   for o in allout
-    "     " call appendbufline(t:debugbuf, '$', o)
-    "   endfor
-    "   " if getbufline(t:debugbuf, 1, 1)[0]==''
-    "   "   call deletebufline(t:debugbuf, 1)
-    "   " endif
-    " catch
-    "   call appendbufline(t:debugbuf, '$', "Some DebugBuf Error")
-    " finally
-    " endtry
-  else
-    call EnsureDebugBuf()
-  endif
-endfunction
-
-function! DebugBufClear()
-  if exists('t:debugbuf')
-    call deletebufline(t:debugbuf, 1, '$')
-    endif
-endfunction
-
 function! ExecuteInWin(winid, cmd)
   let save_win = win_getid()
   call win_gotoid(a:winid)
@@ -7920,43 +7917,6 @@ endfunction
 
 function! IsBufferVisibile(bufnr)
   return bufwinid(a:bufnr)
-endfunction
-
-function! IsMost(bufnr, direction)
-  let winnr=winnr()
-  let win=winnr()
-  let winid=bufwinid(a:bufnr)
-  if winid==0
-    return 0
-  endif
-  let save = win_getid()
-  call win_gotoid(winid)
-  for i in range(1, CountWindowsInDirection(a:direction))
-    let win=DirectionBufWin(i+1..a:direction)
-  endfor
-  let is_most=(winnr == win)
-  call win_gotoid(save)
-  return is_most
-endfunction
-
-function! PushWindow(winid, direction)
-  let save = win_getid()
-  call win_gotoid(a:winid)
-  exec "wincmd "..toUpper(a:direction)
-  call win_gotoid(save)
-endfunction
-
-function! EnsureMost(bufnr, direction)
-  let winid=bufwinid(a:bufnr)
-  if winid==0
-    " echo "Buffer not visibile"
-    return
-  endif
-  if IsMost(a:bufnr, a:direction)
-    return
-  endif
-  call PushWindow(winid, a:direction)
-  " echo "Pushed buffer " . a:bufnr . " to right"
 endfunction
 
 function! SigTermToTerm(direction)
@@ -8115,15 +8075,6 @@ function! MapCommand(direction) range
     let b:MapCommands['lt']={ 'buf': -1, 'dir': a:direction }
   endif
   call SavedCommandToTerm(a:direction)
-endfunction
-
-function! BufVisibileInCurrentTab(bufnr) abort
-  for l:winnr in range(1, winnr('$'))
-    if winbufnr(l:winnr) == a:bufnr
-      return 1
-    endif
-  endfor
-  return 0
 endfunction
 
 function! BufVisibileInCurrentTab_Winnr(bufnr) abort
@@ -10367,6 +10318,52 @@ augroup NewtrCustomBindings
   autocmd!
   autocmd FileType netrw nnoremap <buffer> <C-l> :wincmd l<cr>
 augroup END
+
+" ,,<F5> 8 - to enable autocc
+" while [ 1==1 ]; do echo "ok"; sleep 1; done;
+" select a new command with <F5> to overwrite the old one, keeping the settings and execute it
+" date
+" while [ 1==1 ]; do echo "new data"; sleep 1; done;
+" select this command and press <C-F5> - now you can cancel on your own
+" 
+"
+" " select this command and fire it with <F5>
+" nano
+"
+" Or this one
+" ls
+
+" Or this one
+" enable auto cd ,,<F5> 8  to automatically return to the project root
+" make the command available in the complete repository, to build build the whole project
+" ./build.sh
+
+" edit the command
+
+" select a remote, to establish a ssh connection first
+
+" when multiple commands share the same key, you get notified
+" for instance press ,<F5> to toggle through them and activate one of them
+" for instance press ,,,<F5> to execute the command that gets chosen in a drop
+" down menue, once. or wait 3 seconds to execute the selected command
+
+" global commands for a folder recursively (or *.*)
+" detaching / copy
+" referencing single values [ref: ]
+" associations array [buffer, folder, glob, glob_in_folder, glob_in_repo]
+" when [ buffer_opened, in_same_dir ]
+" modify global commands on basis
+"   when in repo, make term_selection_algorithm different
+"   when in this buffer, change the command name
+"   this creates a new command with referencing the parent
+
+" toggle value dependencies
+
+" ]c / [c
+" git difftool HEAD@{1} -- src/Functions.vim
+" do
+" dp
+" qa
 
 let g:vim_advantages_got_sourced='true'
 endif
