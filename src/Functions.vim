@@ -3232,6 +3232,18 @@ function! GitContinue(para)
 endfunction
 command! -range -nargs=* Continue <line1>,<line2>:call GitContinue(<f-args>)
 
+function! GitSkip(para)
+  let p=join(a:para, ' ')
+  exec '!clear && git rebase '..p..' --skip'
+endfunction
+command! -range -nargs=* Skip <line1>,<line2>:call GitSkip(<f-args>)
+
+function! GitAbort(para)
+  let p=join(a:para, ' ')
+  exec '!clear && git rebase '..p..' --abort'
+endfunction
+command! -range -nargs=* Abort <line1>,<line2>:call GitAbort(<f-args>)
+
 function! GitMerge(branch)
   let b=join(a:branch, ' ')
   " !git merge --rebase
