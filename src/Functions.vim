@@ -3220,6 +3220,16 @@ function! GetOptExample(...) abort
     endif
 endfunction
 
+function! GitAmend(branch)
+  exec '!clear && git merge --amend'
+endfunction
+command! -range -nargs=* Amend <line1>,<line2>:call GitAmend(<f-args>)
+
+function! GitContinue(branch)
+  exec '!clear && git rebase --continue'
+endfunction
+command! -range -nargs=* Continue <line1>,<line2>:call GitContinue(<f-args>)
+
 function! GitMerge(branch)
   " !git merge --rebase
   " exec '!clear && git merge '..a:branch..' --no-commit --no-ff'
