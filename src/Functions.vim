@@ -2,8 +2,8 @@
 " \%(en\)\@<!coding
 " \v%(en)@<!coding
 " " lookahead
-" \v\%(en\)\@!coding
-" \v%(en)@!coding
+" encod\%(ing\)\@!
+" \vencod%(ing)@!
 
 if !exists("g:vim_advantages_got_sourced")
 
