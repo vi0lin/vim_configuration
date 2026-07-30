@@ -3220,20 +3220,23 @@ function! GetOptExample(...) abort
     endif
 endfunction
 
-function! GitAmend(branch)
-  exec '!clear && git merge --amend'
+function! GitAmend(para)
+  let p=join(a:para, ' ')
+  exec '!clear && git rebase '..p..' --amend'
 endfunction
 command! -range -nargs=* Amend <line1>,<line2>:call GitAmend(<f-args>)
 
-function! GitContinue(branch)
-  exec '!clear && git rebase --continue'
+function! GitContinue(para)
+  let p=join(a:para, ' ')
+  exec '!clear && git rebase '..p..' --continue'
 endfunction
 command! -range -nargs=* Continue <line1>,<line2>:call GitContinue(<f-args>)
 
 function! GitMerge(branch)
+  let b=join(a:branch, ' ')
   " !git merge --rebase
   " exec '!clear && git merge '..a:branch..' --no-commit --no-ff'
-  exec '!clear && git merge '..a:branch..' --rebase'
+  exec '!clear && git merge '..b..' --rebase'
 endfunction
 command! -range -nargs=* Merge <line1>,<line2>:call GitMerge(<f-args>)
 
