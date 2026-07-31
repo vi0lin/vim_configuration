@@ -88,14 +88,19 @@ function! DebugBufHeight(height)
 endfunction
 
 function! EnsureDebugBuf()
+  if exists('t:debugbuf')
+    if !BufVisibileInCurrentTab(t:debugbuf)
+      unlet t:debugbuf
+    endif
+  endif
   if !exists('t:debugbuf')
     " Prep
     let save_win = win_getid()
     " Not Existent
     " create
     vertical new
-    wincmd J
-    exec "resize 5"
+    wincmd L
+    " exec "resize 5"
     let t:debugbuf=bufnr()
     " Exists
     let isvisibile=BufVisibileInCurrentTab(t:debugbuf)
@@ -104,7 +109,7 @@ function! EnsureDebugBuf()
       vertical new
       exec "b" t:debugbuf
       wincmd J
-      exec "resize 5"
+      " exec "resize 5"
     else
       " push far right
       call win_gotoid(t:debugbuf)
@@ -116,8 +121,43 @@ function! EnsureDebugBuf()
 endfunction
 
 function! DebugBuf(...) abort
+  call EnsureDebugBuf()
   if exists('t:debugbuf')
-    call EnsureDebugBuf()
+    let data=[]
+    for i in a:000
+      try
+        call add(data, i)
+      catch
+        try
+          call add(data, i)
+        catch
+          call add(data, 'Error')
+        endtry
+      endtry
+    endfor
+    if exists('t:debugbuf')
+      let save_win = win_getid()
+      call win_gotoid(save_win)
+      let line=""
+      for d in data
+        if type(d)==2
+          let line.='func{}'
+        else
+          try
+            call appendbufline(t:debugbuf, '$', d)
+          catch
+          endtry
+        endif
+      endfor
+    else
+      call EnsureDebugBuf()
+    endif
+  endif
+endfunction
+
+function! DebugBufVerbose(...) abort
+  call EnsureDebugBuf()
+  if exists('t:debugbuf')
     "   :if exists("*strftime")
     "   :echo strftime("%c")       Sun Apr 27 11:49:23 1997
     "   :echo strftime("%Y %b %d %X")     1997 Apr 27 11:53:25
@@ -233,6 +273,7 @@ function! DebugBuf(...) abort
 endfunction
 
 function! DebugBufClear()
+  call EnsureDebugBuf()
   if exists('t:debugbuf')
     call deletebufline(t:debugbuf, 1, '$')
     endif
@@ -3846,7 +3887,7 @@ function! LoadCommands()
     endif
   endfunction
   call DebugBufClear()
-  call DebugBufHeight(10)
+  " call DebugBufHeight(10)
   call DebugBuf("Commands")
   " call _save_helper("in_vim_configuration", "yes")
   call _load_helper("in_vim_configuration", "no")
@@ -4120,11 +4161,14 @@ function! NewCmd() abort
       \ 'serialize':   function('s:serialize'),
       \ 'deserialize': function('s:deserialize'),
       \ 'configure':   function('s:configure'),
+      \ 'select':      function('s:select'),
     \ }
     return obj
   endfunction
   " call DebugBufClear()
   " call DebugBuf("test", 3)
+  function! s:select() abort dict closure
+  endfunction
   function! s:configure() abort dict closure
     " Make Debug Buf Right For Command Exposure of the last command
     " ,s ,v ,z ,b ,b - work with leader - for changing last command on the fly
@@ -4132,22 +4176,51 @@ function! NewCmd() abort
     " or enable s:configure - mode like before with getchar()
     " call DebugBuf(self.schema)
     " call DebugBuf(self.state)
-    call DebugBufClear()
-    function! _print(visible, prefix='') closure
+    function! _set_print(pressed_key, visible, prefix='') closure
+      call DebugBufClear()
       " call DebugBuf(a:visible)
-      for [k,v] in items(a:visible)
-        let key=!empty(a:prefix)?a:prefix.."."..k:''..k
-        let data=cfg.get(key)
-        " echo "data: "..data
-        call DebugBuf(key, data)
-        " if type(v)==4
-        if has_key(v, 'sub')
-          call _print(v['sub'], key)
+      let output=[]
+      for [key,Item] in items(a:visible)
+        let up="_"
+        let down="_"
+        if has_key(Item, 'type') && Item['type']=='toggle' && has_key(Item, 'togglekey')
+
+          let up=Item['togglekey'][0]
+          let down=Item['togglekey'][1]
+          let index=index(Item['values'], self.get(key))
+          let n=0
+          if a:pressed_key==Item['togglekey'][0]
+            let n=-1
+          elseif a:pressed_key==Item['togglekey'][1]
+            let n=1
+          endif
+          if n!=0
+            call self.set(key, Item['values'][Mod(index+n, len(Item['values']))])
+          endif
         endif
+        redraw!
+        " let item = self.get(key)
+        " let key=!empty(a:prefix)?aprefix.."."..key:''..key
+        let data=string(self.get(key))
+        " echo "data: "..data
+        call add(output, '['..up..'|'..down..'] -- '..key..": "..data)
+        " if type(v)==4
+        " if has_key(v, 'sub')
+        "   call _print(v['sub'], key)
+        " endif
         " endif
       endfor
+      " call DebugBuf(self.state)
+      call DebugBuf(output)
+      redraw!
     endfunction
-    call _print(cfg.visible())
+    " call _print(cfg.visible())
+    call _set_print(v:null, self.visible())
+    let charstr=''
+    while index(['q', 'j', 'k'], charstr)==-1
+      let charstr=getcharstr()
+      call _set_print(charstr, self.visible())
+    endwhile
   endfunction
   function! s:toggle(path) abort dict
     let item = s:find_item(self.schema, a:path)
@@ -4239,9 +4312,11 @@ let cmdstorage_schema= {
   \ }
   \}
 
+" \   'lambda': {p,o,n -> DebugBuf('Extend changed to '..n)},
 let cmd_schema= {
   \ 'cmdtype': {
   \   'type': 'toggle',
+  \   'togglekey': ['c', 'C'],
   \   'values': ['vim', 'term'],
   \   'sub': {
   \     'vim': {
@@ -4251,6 +4326,7 @@ let cmd_schema= {
   \       'sub': {
   \         'behaviour': {
   \           'type': 'toggle',
+  \           'togglekey': ['b', 'B'],
   \           'values': ['execute_inplace'],
   \           'default': 'execute_inplace',
   \           'when': {s -> s.cmdtype ==# "vim"},
@@ -4264,17 +4340,20 @@ let cmd_schema= {
   \       'sub': {
   \         'behaviour': {
   \           'type': 'toggle',
+  \           'togglekey': ['b', 'B'],
   \           'values': ['sendtoterm', 'sendtopopup'],
   \           'default': 'sendtoterm',
   \           'when': {s -> s['cmdtype'] ==# "term"},
   \         },
   \         'autocc': {
+  \           'togglekey': ['c', 'C'],
   \           'type': 'bool',
   \           'default': 0,
   \           'when': {s -> s['cmdtype'] ==# "term"},
   \         },
   \         'autocd': {
   \           'type': 'toggle',
+  \           'togglekey': ['d', 'D'],
   \           'values': [ "no", "cd_to_bufferfile", "cd_to_project_root", "cd_to_configured_autocd_path" ],
   \           'default': 'cd_to_project_root',
   \           'when': {s -> s['cmdtype'] ==# "term"},
@@ -4288,10 +4367,10 @@ let cmd_schema= {
   \ },
   \ 'extend': {
   \   'type': 'toggle',
+  \   'togglekey': ['g', 'G'],
   \   'label': 'Erweitern auf',
   \   'values': ['buffer', 'repo', 'global'],
   \   'default': 'buffer',
-  \   'lambda': {p,o,n -> DebugBuf('Extend changed to '..n)},
   \   'sub': {
   \     'buffer': {
   \       'type': 'group',
@@ -4332,11 +4411,13 @@ let cmd_schema= {
   \ },
   \ 'load': {
   \   'type': 'toggle',
+  \   'togglekey': ['l', 'L'],
   \   'values': ['always', 'buffer_matches', 'same_dir', 'in_repository'],
   \   'default': 'always',
   \ },
   \ 'save': {
   \   'type': 'toggle',
+  \   'togglekey': ['s', 'S'],
   \   'values': ['in_vim_configuration', 'in_repo_dir', 'in_same_dir' ],
   \   'default': 'in_vim_configuration',
   \   'sub': {
@@ -4346,6 +4427,7 @@ let cmd_schema= {
   \     },
   \     'released': {
   \       'type': 'toggle',
+  \       'togglekey': ['r', 'R'],
   \       'values': ['yes', 'no' ],
   \       'default': 'no',
   \     },
@@ -4357,6 +4439,7 @@ let cmd_schema= {
   \   'sub': {
   \     'level': {
   \       'type': 'toggle',
+  \       'togglekey': ['d', 'D'],
   \       'values': [1,2,3],
   \       'when': {s -> s.debug},
   \     }
@@ -7984,10 +8067,12 @@ function! Keypress_Handler() range
   elseif g:keymap=~",,"
     call DebugBuf(g:keymap)
     if !empty(c)
+      call c.configure()
       " call ConfigureKeys(g:keymap)
     endif
     return
   elseif g:keymap=~","
+    call c.select()
     " call SelectCommand(cs)
     return
   else
