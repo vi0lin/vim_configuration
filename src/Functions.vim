@@ -14,7 +14,7 @@ if !exists("g:vim_advantages_got_sourced")
 
 " todo: RepoCommand: :CreateReadme :GitPush
 " todo: Commands: Make Every Key Configurable
-" todo: g:commands in :call NewCmd()
+" todo: g:cmdstorage.get('commands') in :call NewCmd()
 " Save - (SaveCommands) Write To File - Serialized
 " Load - (LoadCommands) Load From File - Deserialized
 " ConfigureCommand
@@ -3704,7 +3704,7 @@ endfunction
 
 function! ResetCommands(...)
   echo "does not work"
-  let g:commands=[]
+  let g:cmdstorage.get('commands')=[]
   call SaveCommands()
   return
   " SaveCommands()
@@ -3731,7 +3731,7 @@ function! SaveCommands()
   call DebugBuf("SaveCommands")
   function! _save_helper(save, released)
     " call DebugBuf("save: ", a:save)
-    let filtered=filter(copy(g:commands), { i,v ->
+    let filtered=filter(copy(g:cmdstorage.get('commands')), { i,v ->
       \ v:val.get("save")==a:save
       \ && v:val.get("save.released")==a:released
       \ })
@@ -3757,7 +3757,7 @@ function! SaveCommands()
 endfunction
 
 function! RefreshCommands()
-  for c in g:commands
+  for c in g:cmdstorage.get('commands')
     let updated=CommandTemplate()
     for [k,v] in items(updated)
       if !has_key(c, k)
@@ -3772,7 +3772,7 @@ endfunction
 function! LoadCommands()
   " if !exists('b:commands')
   " call CommandDictInit()
-  let g:commands=[]
+  " let g:cmdstorage.set('commands', [])
   let b:commands={}
   " endif
   " let commandorigins=[]
@@ -3804,7 +3804,16 @@ function! LoadCommands()
         " echo len(Read(path))
         " echo state_serialized
         let c=NewCmd().deserialize(state_serialized)
-        call add(data, c)
+        let overwrite_this=CommandTemplate()
+        " echo overwrite_this.get('cmdtype.term.autocc')
+        for [key,Value] in items(c)
+          " if key == 'cmdtype.term.autocd'
+          "       \ && key == 'cmdtype.term.autocd.path'
+          "       \ && key == 'cmdtype.term.autocc'
+            let overwrite_this[key]=Value
+          " endif
+        endfor
+        call add(data, overwrite_this)
       endfor
       " for state in states
       "   echo state
@@ -3827,8 +3836,8 @@ function! LoadCommands()
           "   " echo v
           "   let updated[k]=v
           " endfor
-          " call extend(g:commands, [updated])
-          call extend(g:commands, data)
+          " call extend(g:cmdstorage.get('commands'), [updated])
+          call extend(g:cmdstorage.get('commands'), data)
           " call DebugBuf(printf("Added %s commands", len(data)))
           " call DebugBuf(map(copy(data), {_, v -> {"buffer": v['commandBuffer'], "command": v['command'], "key": v['key']}}))
         endif
@@ -3860,9 +3869,9 @@ function! LoadCommands()
   "   let cwd=GetParentDir(cwd)
   " endwhile
   " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'))
-  " call DebugBuf(join(map(copy(g:commands), {_, v -> {"buffer": v['commandBuffer'], "key": v['key']}}
+  " call DebugBuf(join(map(copy(g:cmdstorage.get('commands')), {_, v -> {"buffer": v['commandBuffer'], "key": v['key']}}
     \ ), "\n"),0 , 0)
-  return g:commands
+  return g:cmdstorage.get('commands')
   " call LoadCommands(ProjectPath()..'/.commands_vim_configuration.unreleased')
   "" for page in copy(b:commands['pages'])
   ""   call DebugBuf(copy(page), '"Command: "..P(v:val)')
@@ -3870,13 +3879,13 @@ function! LoadCommands()
   " for c in b:commands['pages']
   "   echo c.get('<F5>')['command']
   " endfor
-  " echo filter(copy(g:commands), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
-  " let b:commands['buffer']=filter(copy(g:commands), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
-  " let b:commands['folder']=filter(copy(g:commands), 'v:val["extend"]=="folder"&&v:val["commandSaveinFolder"]=="'..expand('%:p:h')..'"')
-  " let b:commands['repo']=filter(copy(g:commands), 'v:val["extend"]=="repo"&&v:val["commandSaveinFolder"]=="'..ProjectPath()..'"')
-  " let b:commands['global']=filter(copy(g:commands), 'v:val["extend"]=="global"&&v:val["commandSaveinFolder"]=="'..VimConfiguration()..'/.unreleased/.commands"')
+  " echo filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
+  " let b:commands['buffer']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
+  " let b:commands['folder']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="folder"&&v:val["commandSaveinFolder"]=="'..expand('%:p:h')..'"')
+  " let b:commands['repo']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="repo"&&v:val["commandSaveinFolder"]=="'..ProjectPath()..'"')
+  " let b:commands['global']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="global"&&v:val["commandSaveinFolder"]=="'..VimConfiguration()..'/.unreleased/.commands"')
   "   " call DebugBuf(b:commands)
-  " return [ g:commands,
+  " return [ g:cmdstorage.get('commands'),
   "       \ b:commands['buffer'],
   "       \ b:commands['folder'],
   "       \ b:commands['repo'],
@@ -3934,9 +3943,9 @@ function! CommandTemplate()
   call c.set('loadCondition', 'bufferopened')
   call c.set('commandBuffer', expand('%:p'))
   call c.set('target', 'Local')
-  call c.set('commandtype.term.autocc', 0)
-  call c.set('commandtype.term.autocd', 0)
-  call c.set('commandtype.term.autocd_path', '')
+  call c.set('cmdtype.term.autocc', 0)
+  call c.set('cmdtype.term.autocd', 'cd_to_project_root')
+  call c.set('cmdtype.term.autocd_path', '')
   call c.set('save', 'in_vim_configuration')
   call c.set('released', 'no')
   call c.set('decision_mode', "check_direct")
@@ -4004,6 +4013,20 @@ function! s:set(path, value) abort dict
   endif
   return self
 endfunction
+function! s:find_item(schema, path) abort
+  let parts = split(a:path, '\.')
+  let current = a:schema
+  for part in parts
+    if type(current) != v:t_dict || !has_key(current, part)
+      return v:null
+    endif
+    let current = current[part]
+    if has_key(current, 'sub') && part != parts[-1]
+      let current = current.sub
+    endif
+  endfor
+  return current
+endfunction
 
 function! New(schema) abort
   function! _new(schema) abort
@@ -4019,7 +4042,7 @@ function! New(schema) abort
 endfunction
 
 function! NewCmdStorage() abort
-  function! _newlist(schema) abort
+  function! _newcmdstorage(schema) abort
     let obj = {
       \ 'schema': a:schema,
       \ 'state':  s:build_defaults(a:schema),
@@ -4041,7 +4064,7 @@ function! NewCmdStorage() abort
   endfunction
   function! s:save() abort dict
     function! _save_helper(save, released)
-      let filtered=filter(copy(g:commands), { i,v ->
+      let filtered=filter(copy(g:cmdstorage.get('commands')), { i,v ->
         \ v:val.get("save")==a:save
         \ && v:val.get("save.released")==a:released
         \ })
@@ -4081,7 +4104,7 @@ function! NewCmdStorage() abort
     call _load_helper("in_vim_configuration", "no")
     return self.get('commands')
   endfunction
-  return _newlist(g:cmdstorage_schema)
+  return _newcmdstorage(g:cmdstorage_schema)
 endfunction
 
 function! NewCmd() abort
@@ -4163,20 +4186,6 @@ function! NewCmd() abort
     let self.state = json_decode(a:json)
     return self
   endfunction
-  function! s:find_item(schema, path) abort
-    let parts = split(a:path, '\.')
-    let current = a:schema
-    for part in parts
-      if type(current) != v:t_dict || !has_key(current, part)
-        return v:null
-      endif
-      let current = current[part]
-      if has_key(current, 'sub') && part != parts[-1]
-        let current = current.sub
-      endif
-    endfor
-    return current
-  endfunction
   function! s:filter_visible(schema, state, prefix) abort
     let result = {}
     for [key, item] in items(a:schema)
@@ -4231,45 +4240,46 @@ let cmdstorage_schema= {
   \}
 
 let cmd_schema= {
-  \ 'commandtype': {
+  \ 'cmdtype': {
   \   'type': 'toggle',
   \   'values': ['vim', 'term'],
   \   'sub': {
   \     'vim': {
   \       'type': 'group',
   \       'label': 'Vim options',
-  \       'when': {s -> s.commandtype ==# "vim"},
+  \       'when': {s -> s.cmdtype ==# "vim"},
   \       'sub': {
   \         'behaviour': {
   \           'type': 'toggle',
   \           'values': ['execute_inplace'],
   \           'default': 'execute_inplace',
-  \           'when': {s -> s.commandtype ==# "vim"},
+  \           'when': {s -> s.cmdtype ==# "vim"},
   \         },
   \       },
   \     },
   \     'term': {
   \       'type': 'group',
   \       'label': 'Term options',
-  \       'when': {s -> s.commandtype ==# "term"},
+  \       'when': {s -> s['cmdtype'] ==# "term"},
   \       'sub': {
   \         'behaviour': {
   \           'type': 'toggle',
   \           'values': ['sendtoterm', 'sendtopopup'],
   \           'default': 'sendtoterm',
-  \           'when': {s -> s.commandtype ==# "term"},
+  \           'when': {s -> s['cmdtype'] ==# "term"},
   \         },
   \         'autocc': {
   \           'type': 'bool',
   \           'default': 0,
-  \           'when': {s -> s.commandtype ==# "term"},
+  \           'when': {s -> s['cmdtype'] ==# "term"},
   \         },
   \         'autocd': {
-  \           'type': 'bool',
-  \           'default': 0,
-  \           'when': {s -> s.commandtype ==# "term"},
+  \           'type': 'toggle',
+  \           'values': [ "no", "cd_to_bufferfile", "cd_to_project_root", "cd_to_configured_autocd_path" ],
+  \           'default': 'cd_to_project_root',
+  \           'when': {s -> s['cmdtype'] ==# "term"},
   \             'sub': {
-  \               'path': {'type': "string", 'default': '','when': {s -> s.commandtype.term.autocd == 1 } },
+  \               'path': {'type': "string", 'default': '','when': {s -> s['cmdtype.term.autocd'] == "cd_to_configured_autocd_path" } },
   \             },
   \         },
   \       },
@@ -4353,10 +4363,6 @@ let cmd_schema= {
   \   }
   \ }
   \}
-
-" echo NewCmd()
-"  \ .get('commandtype.term.autocd')
-
 
 " function! CommandPageInit()
 "   " if !exists('b:commands')
@@ -7518,7 +7524,7 @@ function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_o
   " endif
 endfunction
 
-" let g:commands=[]
+" let g:cmdstorage.get('commands')=[]
 " let b:savein="in_vim_configuration"
 " let b:released="no"
 " let b:spectrum="buffer"
@@ -7528,7 +7534,7 @@ endfunction
 " commandextend
 " commandSaveinFolder
 "
-" g:commands has all commands
+" g:cmdstorage.get('commands') has all commands
 " save_spot (VimConfiguration/ProjectRoot/SameDir/InFile)
 " command_extend_to_all_buffers_in_same_tab (yes/no)
 " released (yes/no) (saved in *.released file)
@@ -7605,7 +7611,7 @@ function! FindCommands(keymap=g:keymap)
   " let updated = CommandTemplate()
   " let c={ 'buffer': [],'folder': [],'repo': [], 'global': [] }
   let c=[]
-  let val = filter(copy(g:commands), { i,v ->
+  let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
     \ v:val.get("key")==a:keymap
     \ && v:val.get("extend")=="buffer"
     \ && v:val.get("commandBuffer")==expand('%:p')
@@ -7613,7 +7619,7 @@ function! FindCommands(keymap=g:keymap)
   if !empty(val)
     call extend(c, val)
   endif
-  " let val = filter(copy(g:commands), { i,v ->
+  " let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
   "   \ v:val.get("key")==a:keymap
   "   \ && v:val.get("extend")=="folder"
   "   \ && v:val.get("commandFolder")==expand('%:p:h')
@@ -7622,7 +7628,7 @@ function! FindCommands(keymap=g:keymap)
   "   call extend(c, val)
   " endif
   "
-  let val = filter(copy(g:commands), { i,v ->
+  let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
     \ v:val.get("key")==a:keymap
     \ && v:val.get("extend")=="repo"
     \ && v:val.get("commandRepo")==ProjectPath()
@@ -7631,7 +7637,7 @@ function! FindCommands(keymap=g:keymap)
     call extend(c, val)
   endif
   "
-  let val = filter(copy(g:commands), { i,v ->
+  let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
     \ v:val.get("key")==a:keymap
     \ && v:val.get("extend")=="global"
     \ })
@@ -7652,8 +7658,8 @@ function! FindCommands(keymap=g:keymap)
 endfunction
 
 function! Ref(c)
-  let cidx=index(g:commands, a:c)
-  let c=g:commands[cidx]
+  let cidx=index(g:cmdstorage.get('commands'), a:c)
+  let c=g:cmdstorage.get('commands')[cidx]
   return c
 endfunction
 
@@ -7706,8 +7712,8 @@ endfunction
 "   let cs=FindCommands(keymap)
 "   let c = FindCommand(cs, keymap)
 "   " let c=Ref(c)
-"   let cidx=index(g:commands, c)
-"   let c=g:commands[cidx]
+"   let cidx=index(g:cmdstorage.get('commands'), c)
+"   let c=g:cmdstorage.get('commands')[cidx]
 "   function! _toggle(n=1) closure
 "     " call DebugBuf(s['value']1)
 "     " call DebugBuf(join(s['values'], ', '))
@@ -7819,13 +7825,13 @@ endfunction
 "       if type(tu)==0 && char==tu || type(tu)==3 && index(tu, char)>-1
 "         let x=_toggle(1)
 "         call c.set(s['name'], x)
-"         " let g:commands[cidx]=x
+"         " let g:cmdstorage.get('commands')[cidx]=x
 "         call NewOrOverwrite(c)
 "         call SaveCommands()
 "       elseif type(td)==0 && char==td || type(td)==3 && index(td, char)>-1
 "         let x=_toggle(-1)
 "         call c.set(s['name'], x)
-"         " let g:commands[cidx]=x
+"         " let g:cmdstorage.get('commands')[cidx]=x
 "         call NewOrOverwrite(c)
 "       elseif type(selectCommand)==0 && char==selectCommand || type(selectCommand)==3 && index(selectCommand, char)>-1
 "         echo "select command"
@@ -7892,39 +7898,39 @@ function! RedefineOrCreateNew(c, vs)
   " call c.set('released', b:released)
   " call c.set('decision_mode', "check_direct")
   " call c.set('decision_algorithm', "check_only_one_direction")
-  " call c.set('commandtype.term.autocd', "no")
-  " call c.set('commandtype.term.autocd_path', "/")
+  " call c.set('cmdtype.term.autocd', "no")
+  " call c.set('cmdtype.term.autocd_path', "/")
   " call c.set('extend', b:spectrum)
   call c.set('command', a:vs)
   " call c.set('page', 0)
   call c.set('key', g:keymap)
   " call c.set('direction', g:default_direction)
   " let b:commands['pages'][0][g:keymap]=c
-  " call filter(copy(g:commands), '!(v:val["extend"]==c["extend"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
+  " call filter(copy(g:cmdstorage.get('commands')), '!(v:val["extend"]==c["extend"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
   " call DebugBuf(a:vs)
-  " let g:commands=[]
-  " let g:commands=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
-  " echo g:commands
+  " let g:cmdstorage.get('commands')=[]
+  " let g:cmdstorage.get('commands')=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
+  " echo g:cmdstorage.get('commands')
   " let asdf="<F6>"
-  " call filter(g:commands, 'v:val["key"]!=asdf')
+  " call filter(g:cmdstorage.get('commands'), 'v:val["key"]!=asdf')
   call NewOrOverwrite(c)
   call SaveCommands()
 endfunction
 
 function! NewOrOverwrite(c)
   let c = a:c
-  " let found_index=indexof(copy(g:commands), { i,v->
+  " let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
   "   \    v:val["key"]==c.get("key")
   "   \ && v:val["extend"]==c.get("extend")
   "   \ && v:val["commandBuffer"]==c.get("commandBuffer")
   "   \ && v:val["page"]==c.get("page")
   "   \ })
-  let found_index=indexof(copy(g:commands), { i,v->
+  let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
     \    v:val.get("hash")==c.get("hash")
     \ })
   " echo found_index
   if found_index>-1
-    " remove(g:commands, found_index)
+    " remove(g:cmdstorage.get('commands'), found_index)
     call DebugBuf("overwriting")
     if c.get('extend')=='buffer'
       call c.set('commandBuffer', expand('%:p'))
@@ -7936,12 +7942,12 @@ function! NewOrOverwrite(c)
     " elseif c.get('extend')=='tab'
       "global", "repo", "folder", "tab", "buffer"
     endif
-    let g:commands[found_index]=c
+    let g:cmdstorage.get('commands')[found_index]=c
   else
     call c.set('hash', NewUUID())
     call DebugBuf("not overwriting - new command")
     " echo c
-    call add(g:commands, c)
+    call add(g:cmdstorage.get('commands'), c)
   endif
 endfunction
 
@@ -7997,7 +8003,7 @@ function! Keypress_Handler() range
       return
     endif
     "
-    " let c=g:commands['pages'][0][g:keymap]
+    " let c=g:cmdstorage.get('commands')['pages'][0][g:keymap]
   endif
   " call DebugBuf(c)
   if type(c)==0 && c.get('command') != -1 || c.get('command')==[]
@@ -8020,17 +8026,18 @@ function! Keypress_Handler() range
     if target_term_buffer!=-1
       " let buf=winbufnr(winnr(c.get('direction')))
       " call TERM(target_term_buffer, c.get('command'))
-      if c.get('autocc')=='yes'
+      " echo c.get('cmdtype.term.autocc')
+      if c.get('cmdtype.term.autocc')==1
         call SendCommandToTermByBuf(target_term_buffer, [''])
       endif
-      if c.get('commandtype.term.autocd')!='no'
+      if c.get('cmdtype.term.autocd')!='no'
         let topath=''
-        if c.get('commandtype.term.autocd')=='cd_to_bufferfile'
+        if c.get('cmdtype.term.autocd')=='cd_to_bufferfile'
           let topath=expand('%:p:h')
-        elseif c.get('commandtype.term.autocd')=='cd_to_project_root'
+        elseif c.get('cmdtype.term.autocd')=='cd_to_project_root'
           let topath=ProjectPath()
-        elseif c.get('commandtype.term.autocd')=='cd_to_configured_autocd_path'
-          let topath=c.get('commandtype.term.autocd_path')
+        elseif c.get('cmdtype.term.autocd.path')=='cd_to_configured_autocd_path'
+          let topath=c.get('cmdtype.term.autocd_path')
         endif
         call SendCommandToTermByBuf(target_term_buffer, ['cd '..topath])
       endif
@@ -8045,7 +8052,7 @@ function! Keypress_Handler() range
   else
     call DebugBuf("Type Error")
   endif
-  " echo g:commands
+  " echo g:cmdstorage.get('commands')
 endfunction
 
 function! WinCmdToWin(winnr)
@@ -10542,9 +10549,10 @@ augroup END
 
 if !exists('g:cmdstorage')
   let g:cmdstorage=NewCmdStorage()
-  let g:commands=g:cmdstorage.get('commands')
-  echo NewCmd().get('commands')
-    " .set('commands', g:commands)
+  " let g:cmdstorage.get('commands')=g:cmdstorage.get('commands')
+  " echo g:cmdstorage.get('commands')
+  " echo g:cmdstorage.get('commands')[0].get('cmdtype.term.autocc')
+    " .set('commands', g:cmdstorage.get('commands'))
 endif
 
 let g:vim_advantages_got_sourced='true'
