@@ -1,3 +1,8 @@
+" python << EOF
+" print(20*"=");print("Measuring My Kitchen");print(20*"=");
+" print("Center, from left Edge", (1.100-0.018-0.6)/2+0.018); print("Center, in depth", 0.60/2)
+" EOF
+
 " " lookbehind
 " \%(en\)\@<!coding
 " \v%(en)@<!coding
@@ -6,6 +11,17 @@
 " \vencod%(ing)@!
 
 if !exists("g:vim_advantages_got_sourced")
+
+" todo: RepoCommand: :CreateReadme :GitPush
+" todo: Commands: Make Every Key Configurable
+" todo: g:commands in :call NewCmd(g:commands_schema)
+" Save - (SaveCommands) Write To File - Serialized
+" Load - (LoadCommands) Load From File - Deserialized
+" ConfigureCommand
+" SelectCommand
+" NewMap Fusion Command
+" TermComand / VimCommand
+" unchangable
 
 function! IsMost(bufnr, direction)
   let winnr=winnr()
@@ -3777,7 +3793,7 @@ function! LoadCommands()
   " call _add(ProjectPath()..'/.commands.unreleased')
   function! _load_helper(path, released)
     let data=[]
-    let path=NewConfiguration(g:command_schema).set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
+    let path=NewCmd(g:cmd_schema).set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
     " call DebugBuf(path)
     " call DebugBuf(a:path)
     " call DebugBuf(a:released)
@@ -3787,7 +3803,7 @@ function! LoadCommands()
       for state_serialized in json_decode(array)
         " echo len(Read(path))
         " echo state_serialized
-        let c=NewConfiguration(g:command_schema).deserialize(state_serialized)
+        let c=NewCmd(g:cmd_schema).deserialize(state_serialized)
         call add(data, c)
       endfor
       " for state in states
@@ -3796,7 +3812,7 @@ function! LoadCommands()
       " for state in _data
       "   " call DebugBuf(state)
       "   echo state
-      "   let c=NewConfiguration(g:command_schema).deserialize(state)
+      "   let c=NewCmd(g:cmd_schema).deserialize(state)
       "   " call DebugBuf(c.get('command'))
       "   " call add(data, )
       " endfor
@@ -3869,8 +3885,8 @@ function! LoadCommands()
 endfunction
 
 function! EmptyCommand()
-  return NewConfiguration(g:command_schema)
-  " echo NewConfiguration(g:command_schema).set("save", "in_vim_configuration").get("save.path")
+  return NewCmd(g:cmd_schema)
+  " echo NewCmd(g:cmd_schema).set("save", "in_vim_configuration").get("save.path")
 endfunction
 
 function! VimCommand(command='')
@@ -3905,7 +3921,7 @@ endfunction
 
 function! CommandTemplate()
   " let c=EmptyCommand()
-  let c=NewConfiguration(g:command_schema)
+  let c=NewCmd(g:cmd_schema)
   call c.set('command', ['', 'ls -al', ''])
   call c.set('command', [])
   call c.set('name', 'unnamed')
@@ -3918,9 +3934,9 @@ function! CommandTemplate()
   call c.set('loadCondition', 'bufferopened')
   call c.set('commandBuffer', expand('%:p'))
   call c.set('target', 'Local')
-  call c.set('autocc', 'no')
-  call c.set('autocd', 'no')
-  call c.set('autocd_path', '')
+  call c.set('commandtype.term.autocc', 0)
+  call c.set('commandtype.term.autocd', 0)
+  call c.set('commandtype.term.autocd_path', '')
   call c.set('save', 'in_vim_configuration')
   call c.set('released', 'no')
   call c.set('decision_mode', "check_direct")
@@ -3941,8 +3957,122 @@ function! CommandTemplateWithUUID()
   return c
 endfunction
 
-function! NewConfiguration(schema) abort
-  function! _newconfiguration(schema) abort
+function! s:build_defaults(schema, ...) abort
+  let prefix = a:0 ? a:1 : ''
+  let state = {}
+  for [key, Item] in items(a:schema)
+    let path = prefix ==# '' ? key : prefix . '.' . key
+    " call DebugBuf(key)
+    if has_key(Item, 'default')
+      let state[path] = Item.default
+    elseif get(Item, 'type', '') ==# 'bool'
+      let state[path] = 0
+    elseif get(Item, 'type', '') ==# 'list'
+      let state[path] = []
+    elseif get(Item, 'type', '') ==# 'string'
+      let state[path] = ''
+    elseif get(Item, 'type', '') ==# 'lambda_value'
+      let state[path] = {}
+    elseif get(Item, 'type', '') ==# 'multiselect'
+      let state[path] = []
+    elseif get(Item, 'type', '') ==# 'toggle' && has_key(Item, 'values') && !empty(Item.values)
+      let state[path] = Item.values[0]
+    endif
+    if has_key(Item, 'sub')
+      call extend(state, s:build_defaults(Item.sub, path))
+    endif
+  endfor
+  return state
+endfunction
+function! s:get(path) abort dict
+  let item = s:find_item(self.schema, a:path)
+  " if type(item) == v:t_dict && has_key(item, 'type') ^^ item['type'] == 'list'
+  "   return item.value(self)
+  " endif
+  if type(item) == v:t_dict && has_key(item, 'lambda_value')
+    return item.lambda_value(self)
+  endif
+  return get(self.state, a:path, v:null)
+endfunction
+function! s:set(path, value) abort dict
+  let old = get(self.state, a:path, v:null)
+  let self.state[a:path] = a:value
+  " call lambda if it exists
+  let item = s:find_item(self.schema, a:path)
+  if type(item) == v:t_dict && has_key(item, 'lambda')
+    call item.lambda(a:path, old, a:value)
+  endif
+  return self
+endfunction
+
+function! NewCmdStorage(schema) abort
+  function! _newlist(schema) abort
+    let obj = {
+      \ 'schema': a:schema,
+      \ 'state':  s:build_defaults(a:schema),
+      \ 'get':         function('s:get'),
+      \ 'set':         function('s:set'),
+      \ 'find':        function('s:find'),
+      \ 'add':         function('s:add'),
+      \ 'delete':      function('s:delete'),
+      \ 'save':        function('s:save'),
+      \ 'load':        function('s:load'),
+    \ }
+    return obj
+  endfunction
+  function! s:find(item) abort dict
+  endfunction
+  function! s:add(item) abort dict
+  endfunction
+  function! s:delete(item) abort dict
+  endfunction
+  function! s:save() abort dict
+    function! _save_helper(save, released)
+      let filtered=filter(copy(g:commands), { i,v ->
+        \ v:val.get("save")==a:save
+        \ && v:val.get("save.released")==a:released
+        \ })
+      let states=map(copy(filtered), "v:val.serialize()")
+      let postfix=a:released=='no'?".unreleased":''
+      if !empty(filtered) && len(filtered)>0
+        call WriteStructure(states, filtered[0].get('save.path').."/.commands"..postfix)
+      endif
+    endfunction
+    call _save_helper("in_vim_configuration", "no")
+    " call _save_helper("in_repo_dir", "yes")
+    " call _save_helper("in_repo_dir", "no")
+    " call _save_helper("in_same_dir", "yes")
+    " call _save_helper("in_same_dir", "no")
+  endfunction
+  function! s:load(file) abort dict
+    function! _load_helper(path, released)
+      self.set('commands', [])
+      let data=[]
+      let path=NewCmd(g:cmd_schema).set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
+      if filereadable(path)
+        let array=Read(path)[0]
+        for state_serialized in json_decode(array)
+          let c=NewCmd(g:cmd_schema).deserialize(state_serialized)
+          call add(data, c)
+        endfor
+        try
+        catch
+          call DebugBuf("Error Parsing File: "..path)
+        finally
+          if !empty(data)
+            self.extend('commands', data)
+          endif
+        endtry
+      endif
+    endfunction
+    call _load_helper("in_vim_configuration", "no")
+    return self.get('commands')
+  endfunction
+  return _newlist(a:schema)
+endfunction
+
+function! NewCmd(schema) abort
+  function! _newcmd(schema) abort
     let obj = {
       \ 'schema': a:schema,
       \ 'state':  s:build_defaults(a:schema),
@@ -3953,7 +4083,7 @@ function! NewConfiguration(schema) abort
       \ 'visible':     function('s:visible'),
       \ 'serialize':   function('s:serialize'),
       \ 'deserialize': function('s:deserialize'),
-      \ 'configure': function('s:configure'),
+      \ 'configure':   function('s:configure'),
     \ }
     return obj
   endfunction
@@ -3982,50 +4112,6 @@ function! NewConfiguration(schema) abort
       endfor
     endfunction
     call _print(cfg.visible())
-  endfunction
-  function! s:build_defaults(schema, ...) abort
-    let prefix = a:0 ? a:1 : ''
-    let state = {}
-    for [key, Item] in items(a:schema)
-      let path = prefix ==# '' ? key : prefix . '.' . key
-      " call DebugBuf(key)
-      if has_key(Item, 'default')
-        let state[path] = Item.default
-      elseif get(Item, 'type', '') ==# 'bool'
-        let state[path] = 0
-      elseif get(Item, 'type', '') ==# 'list'
-        let state[path] = []
-      elseif get(Item, 'type', '') ==# 'string'
-        let state[path] = ''
-      elseif get(Item, 'type', '') ==# 'value_lambda'
-        let state[path] = {}
-      elseif get(Item, 'type', '') ==# 'multiselect'
-        let state[path] = []
-      elseif get(Item, 'type', '') ==# 'toggle' && has_key(Item, 'values') && !empty(Item.values)
-        let state[path] = Item.values[0]
-      endif
-      if has_key(Item, 'sub')
-        call extend(state, s:build_defaults(Item.sub, path))
-      endif
-    endfor
-    return state
-  endfunction
-  function! s:get(path) abort dict
-    let item = s:find_item(self.schema, a:path)
-    if type(item) == v:t_dict && has_key(item, 'lambda_value')
-      return item.lambda_value(self)
-    endif
-    return get(self.state, a:path, v:null)
-  endfunction
-  function! s:set(path, value) abort dict
-    let old = get(self.state, a:path, v:null)
-    let self.state[a:path] = a:value
-    " call lambda if it exists
-    let item = s:find_item(self.schema, a:path)
-    if type(item) == v:t_dict && has_key(item, 'lambda')
-      call item.lambda(a:path, old, a:value)
-    endif
-    return self
   endfunction
   function! s:toggle(path) abort dict
     let item = s:find_item(self.schema, a:path)
@@ -4095,7 +4181,7 @@ function! NewConfiguration(schema) abort
     endfor
     return result
   endfunction
-  let cfg = _newconfiguration(a:schema)
+  let cfg = _newcmd(a:schema)
   " Toggle / Multiselect
   " call cfg.toggle('extend')                  " cycles through values
   " call cfg.multiselect('tags', 'vim')      " add/remove from list
@@ -4122,7 +4208,61 @@ function! NewConfiguration(schema) abort
   return cfg
 endfunction
 " {s->s.save=="in_vim_configuration"?VimConfiguration():s.save=="in_repo_dir"?ProjectPath():s.save=="in_same_dir"?expand('%:p:h'):''}
-let command_schema= {
+"
+
+let cmdstorage_schema= {
+  \ 'commands': {
+  \   'type': 'list',
+  \   'value': [],
+  \ }
+  \}
+
+let cmd_schema= {
+  \ 'commandtype': {
+  \   'type': 'toggle',
+  \   'values': ['vim', 'term'],
+  \   'sub': {
+  \     'vim': {
+  \       'type': 'group',
+  \       'label': 'Vim options',
+  \       'when': {s -> s.commandtype ==# "vim"},
+  \       'sub': {
+  \         'behaviour': {
+  \           'type': 'toggle',
+  \           'values': ['execute_inplace'],
+  \           'default': 'execute_inplace',
+  \           'when': {s -> s.commandtype ==# "vim"},
+  \         },
+  \       },
+  \     },
+  \     'term': {
+  \       'type': 'group',
+  \       'label': 'Term options',
+  \       'when': {s -> s.commandtype ==# "term"},
+  \       'sub': {
+  \         'behaviour': {
+  \           'type': 'toggle',
+  \           'values': ['sendtoterm', 'sendtopopup'],
+  \           'default': 'sendtoterm',
+  \           'when': {s -> s.commandtype ==# "term"},
+  \         },
+  \         'autocc': {
+  \           'type': 'bool',
+  \           'default': 0,
+  \           'when': {s -> s.commandtype ==# "term"},
+  \         },
+  \         'autocd': {
+  \           'type': 'bool',
+  \           'default': 0,
+  \           'when': {s -> s.commandtype ==# "term"},
+  \             'sub': {
+  \               'path': {'type': "string", 'default': '','when': {s -> s.commandtype.term.autocd == 1 } },
+  \             },
+  \         },
+  \       },
+  \     },
+  \   },
+  \ },
   \ 'extend': {
   \   'type': 'toggle',
   \   'label': 'Erweitern auf',
@@ -4158,22 +4298,6 @@ let command_schema= {
   \ },
   \ 'key': {
   \   'type': 'string',
-  \ },
-  \ 'autocc': {
-  \   'type': 'bool',
-  \   'default': 0,
-  \ },
-  \ 'autocd': {
-  \   'type': 'bool',
-  \   'default': 0,
-  \     'sub': {
-  \       'path': {'type': "string", 'default': '','when': {s -> s.autocd == 1 } },
-  \     },
-  \ },
-  \ 'commandOutputMode': {
-  \   'type': 'toggle',
-  \   'values': ['sendtoterm'],
-  \   'default': 'sendtoterm',
   \ },
   \ 'command': {
   \   'type': 'list',
@@ -4215,7 +4339,11 @@ let command_schema= {
   \     }
   \   }
   \ }
-\}
+  \}
+
+" echo NewCmd(g:cmd_schema)
+"  \ .get('commandtype.term.autocd')
+
 
 " function! CommandPageInit()
 "   " if !exists('b:commands')
@@ -7751,8 +7879,8 @@ function! RedefineOrCreateNew(c, vs)
   " call c.set('released', b:released)
   " call c.set('decision_mode', "check_direct")
   " call c.set('decision_algorithm', "check_only_one_direction")
-  " call c.set('autocd', "no")
-  " call c.set('autocd_path', "/")
+  " call c.set('commandtype.term.autocd', "no")
+  " call c.set('commandtype.term.autocd_path', "/")
   " call c.set('extend', b:spectrum)
   call c.set('command', a:vs)
   " call c.set('page', 0)
@@ -7804,7 +7932,7 @@ function! NewOrOverwrite(c)
   endif
 endfunction
 
-function! Command() range
+function! Keypress_Handler() range
   call InitCommands()
   " call LoadCommands()
   " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
@@ -7882,14 +8010,14 @@ function! Command() range
       if c.get('autocc')=='yes'
         call SendCommandToTermByBuf(target_term_buffer, [''])
       endif
-      if c.get('autocd')!='no'
+      if c.get('commandtype.term.autocd')!='no'
         let topath=''
-        if c.get('autocd')=='cd_to_bufferfile'
+        if c.get('commandtype.term.autocd')=='cd_to_bufferfile'
           let topath=expand('%:p:h')
-        elseif c.get('autocd')=='cd_to_project_root'
+        elseif c.get('commandtype.term.autocd')=='cd_to_project_root'
           let topath=ProjectPath()
-        elseif c.get('autocd')=='cd_to_configured_autocd_path'
-          let topath=c.get('autocd_path')
+        elseif c.get('commandtype.term.autocd')=='cd_to_configured_autocd_path'
+          let topath=c.get('commandtype.term.autocd_path')
         endif
         call SendCommandToTermByBuf(target_term_buffer, ['cd '..topath])
       endif
@@ -10398,6 +10526,12 @@ augroup END
 " do
 " dp
 " qa
+
+if !exists('g:cmdstorage')
+  let g:cmdstorage=NewCmdStorage(g:cmdstorage_schema)
+  let g:commands=g:cmdstorage.get('commands')
+    " .set('commands', g:commands)
+endif
 
 let g:vim_advantages_got_sourced='true'
 endif

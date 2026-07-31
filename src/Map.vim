@@ -89,14 +89,14 @@ command -range -nargs=* Inc :call Inc(<f-args>)
 " print("TEST!")
 "
 " NewMap -v -n -no -command -shift -alt -nr 5,8 <{modifiers}F5> :call Eexec({nr})<cr>
-NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F5> :call Command()<cr>
-NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F6> :call Command()<cr>
-NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F7> :call Command()<cr>
-NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F8> :call Command()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F5> :call Keypress_Handler()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F6> :call Keypress_Handler()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F7> :call Keypress_Handler()<cr>
+NewMap -v -n -no -leaders 0-5 -command -shift -alt <{modifiers}F8> :call Keypress_Handler()<cr>
 
 " Example
-" NewMap -directly -v -n -no -command -shift -alt <{modifiers}F8> :call Command()<cr>
-" NewMap -v -n -no -leaders 0-5 -loop prefix 0-5 -command -shift -alt {prefix}<{modifiers}F5> :call Command()<cr>
+" NewMap -directly -v -n -no -command -shift -alt <{modifiers}F8> :call Keypress_Handler()<cr>
+" NewMap -v -n -no -leaders 0-5 -loop prefix 0-5 -command -shift -alt {prefix}<{modifiers}F5> :call Keypress_Handler()<cr>
 
 """" old command mappings " Todo
 """" old command mappings " When A Visual Selection Is Set
