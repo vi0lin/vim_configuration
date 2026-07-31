@@ -14,7 +14,7 @@ if !exists("g:vim_advantages_got_sourced")
 
 " todo: RepoCommand: :CreateReadme :GitPush
 " todo: Commands: Make Every Key Configurable
-" todo: g:commands in :call NewCmd(g:commands_schema)
+" todo: g:commands in :call NewCmd()
 " Save - (SaveCommands) Write To File - Serialized
 " Load - (LoadCommands) Load From File - Deserialized
 " ConfigureCommand
@@ -3793,7 +3793,7 @@ function! LoadCommands()
   " call _add(ProjectPath()..'/.commands.unreleased')
   function! _load_helper(path, released)
     let data=[]
-    let path=NewCmd(g:cmd_schema).set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
+    let path=NewCmd().set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
     " call DebugBuf(path)
     " call DebugBuf(a:path)
     " call DebugBuf(a:released)
@@ -3803,7 +3803,7 @@ function! LoadCommands()
       for state_serialized in json_decode(array)
         " echo len(Read(path))
         " echo state_serialized
-        let c=NewCmd(g:cmd_schema).deserialize(state_serialized)
+        let c=NewCmd().deserialize(state_serialized)
         call add(data, c)
       endfor
       " for state in states
@@ -3812,7 +3812,7 @@ function! LoadCommands()
       " for state in _data
       "   " call DebugBuf(state)
       "   echo state
-      "   let c=NewCmd(g:cmd_schema).deserialize(state)
+      "   let c=NewCmd().deserialize(state)
       "   " call DebugBuf(c.get('command'))
       "   " call add(data, )
       " endfor
@@ -3885,8 +3885,8 @@ function! LoadCommands()
 endfunction
 
 function! EmptyCommand()
-  return NewCmd(g:cmd_schema)
-  " echo NewCmd(g:cmd_schema).set("save", "in_vim_configuration").get("save.path")
+  return NewCmd()
+  " echo NewCmd().set("save", "in_vim_configuration").get("save.path")
 endfunction
 
 function! VimCommand(command='')
@@ -3921,7 +3921,7 @@ endfunction
 
 function! CommandTemplate()
   " let c=EmptyCommand()
-  let c=NewCmd(g:cmd_schema)
+  let c=NewCmd()
   call c.set('command', ['', 'ls -al', ''])
   call c.set('command', [])
   call c.set('name', 'unnamed')
@@ -4005,7 +4005,20 @@ function! s:set(path, value) abort dict
   return self
 endfunction
 
-function! NewCmdStorage(schema) abort
+function! New(schema) abort
+  function! _new(schema) abort
+    let obj = {
+      \ 'schema': a:schema,
+      \ 'state':  s:build_defaults(a:schema),
+      \ 'get':         function('s:get'),
+      \ 'set':         function('s:set'),
+    \ }
+    return obj
+  endfunction
+  return _new(a:schema)
+endfunction
+
+function! NewCmdStorage() abort
   function! _newlist(schema) abort
     let obj = {
       \ 'schema': a:schema,
@@ -4048,11 +4061,11 @@ function! NewCmdStorage(schema) abort
     function! _load_helper(path, released)
       self.set('commands', [])
       let data=[]
-      let path=NewCmd(g:cmd_schema).set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
+      let path=NewCmd().set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
       if filereadable(path)
         let array=Read(path)[0]
         for state_serialized in json_decode(array)
-          let c=NewCmd(g:cmd_schema).deserialize(state_serialized)
+          let c=NewCmd().deserialize(state_serialized)
           call add(data, c)
         endfor
         try
@@ -4068,10 +4081,10 @@ function! NewCmdStorage(schema) abort
     call _load_helper("in_vim_configuration", "no")
     return self.get('commands')
   endfunction
-  return _newlist(a:schema)
+  return _newlist(g:cmdstorage_schema)
 endfunction
 
-function! NewCmd(schema) abort
+function! NewCmd() abort
   function! _newcmd(schema) abort
     let obj = {
       \ 'schema': a:schema,
@@ -4181,7 +4194,7 @@ function! NewCmd(schema) abort
     endfor
     return result
   endfunction
-  let cfg = _newcmd(a:schema)
+  let cfg = _newcmd(g:cmd_schema)
   " Toggle / Multiselect
   " call cfg.toggle('extend')                  " cycles through values
   " call cfg.multiselect('tags', 'vim')      " add/remove from list
@@ -4341,7 +4354,7 @@ let cmd_schema= {
   \ }
   \}
 
-" echo NewCmd(g:cmd_schema)
+" echo NewCmd()
 "  \ .get('commandtype.term.autocd')
 
 
@@ -10528,8 +10541,9 @@ augroup END
 " qa
 
 if !exists('g:cmdstorage')
-  let g:cmdstorage=NewCmdStorage(g:cmdstorage_schema)
+  let g:cmdstorage=NewCmdStorage()
   let g:commands=g:cmdstorage.get('commands')
+  echo NewCmd().get('commands')
     " .set('commands', g:commands)
 endif
 
