@@ -121,7 +121,6 @@ function! EnsureDebugBuf()
 endfunction
 
 function! DebugBuf(...) abort
-  call EnsureDebugBuf()
   if exists('t:debugbuf')
     let data=[]
     for i in a:000
@@ -135,23 +134,25 @@ function! DebugBuf(...) abort
         endtry
       endtry
     endfor
-    if exists('t:debugbuf')
-      let save_win = win_getid()
-      call win_gotoid(save_win)
-      let line=""
-      for d in data
-        if type(d)==2
-          let line.='func{}'
-        else
-          try
-            call appendbufline(t:debugbuf, '$', d)
-          catch
-          endtry
-        endif
-      endfor
-    else
+    let save_win = win_getid()
+    call win_gotoid(save_win)
+    let line=""
+    for d in data
+      if type(d)==2
+        let line.='func{}'
+      else
+        try
+          call appendbufline(t:debugbuf, '$', d)
+          redraw!
+        catch
+        endtry
+      endif
+    endfor
+    if !exists('t:debugbuf')
       call EnsureDebugBuf()
     endif
+  else
+    call EnsureDebugBuf()
   endif
 endfunction
 
@@ -4176,34 +4177,91 @@ function! NewCmd() abort
     " or enable s:configure - mode like before with getchar()
     " call DebugBuf(self.schema)
     " call DebugBuf(self.state)
-    function! _set_print(pressed_key, visible, prefix='') closure
-      call DebugBufClear()
-      " call DebugBuf(a:visible)
-      let output=[]
-      for [key,Item] in items(a:visible)
-        let up="_"
-        let down="_"
-        if has_key(Item, 'type') && Item['type']=='toggle' && has_key(Item, 'togglekey')
-
-          let up=Item['togglekey'][0]
-          let down=Item['togglekey'][1]
-          let index=index(Item['values'], self.get(key))
-          let n=0
-          if a:pressed_key==Item['togglekey'][0]
-            let n=-1
-          elseif a:pressed_key==Item['togglekey'][1]
-            let n=1
-          endif
-          if n!=0
-            call self.set(key, Item['values'][Mod(index+n, len(Item['values']))])
+    function! _update_keys(self, key, Item)
+      let self=a:self
+      let key=a:key
+      let Item=a:Item
+      let up="_"
+      let down="_"
+      if has_key(Item, 'type') && ( Item['type']=='toggle' || Item['type']=='bool') && has_key(Item, 'togglekey')
+        let up=Item['togglekey'][0]
+        let down=Item['togglekey'][1]
+      endif
+      return [up, down]
+    endfunction
+    function! _toggle(self, output, pressed_key, visible)
+      let self=a:self
+      function! _t(self, output, pressed_key, key_prefixed, key, Item)
+        let key_prefixed=a:key_prefixed
+        let key=a:key
+        let Item=a:Item
+        let output=a:output
+        let output=""..a:key_prefixed
+        if has_key(Item, 'type')
+          " call DebugBuf(Item)
+          if Item['type']=='bool'
+            if has_key(Item, 'togglekey')
+              let output.='toggle'
+            endif
           endif
         endif
-        redraw!
+        if (has_key(Item, 'type') && ( Item['type']=='toggle' || Item['type']=='bool') && has_key(Item, 'togglekey'))
+          let up=Item['togglekey'][0]
+          let down=Item['togglekey'][1]
+          if Item['type']=="toggle"
+            let index=index(Item['values'], a:self.get(key_prefixed))
+            let n=0
+            if a:pressed_key==Item['togglekey'][0]
+              let n=-1
+            elseif a:pressed_key==Item['togglekey'][1]
+              let n=1
+            endif
+            if n!=0
+              call a:self.set(key_prefixed, Item['values'][Mod(index+n, len(Item['values']))])
+            endif
+          elseif Item['type']=='bool'
+            echo "toggle bool"
+            " call DebugBuf(a:self.get(key_prefixed))
+            " call DebugBuf(!a:self.get(key_prefixed))
+            call a:self.set(key_prefixed, !a:self.get(key_prefixed))
+          endif
+        endif
+        if has_key(Item, 'sub')
+          for [key2, Item2] in items(Item['sub'])
+            call _t(a:self, a:output, a:pressed_key, key_prefixed.."."..key2, key2, Item2)
+          endfor
+        endif
+      endfunction
+      for [key,Item] in items(a:visible)
+        call _t(a:self, a:output, a:pressed_key, key ,key, Item)
+      endfor
+    endfunction
+    function! _set_print(self, output, pressed_key, visible, prefix='')
+      let self=a:self
+      " call DebugBuf(Pretty(a:visible))
+      function! _print_item(self, output, key, Item)
+        let self=a:self
+        let key=a:key
+        let Item=a:Item
+        let [up, down]=_update_keys(self, key, Item)
         " let item = self.get(key)
         " let key=!empty(a:prefix)?aprefix.."."..key:''..key
         let data=string(self.get(key))
         " echo "data: "..data
-        call add(output, '['..up..'|'..down..'] -- '..key..": "..data)
+        call add(a:output, '['..up..'|'..down..'] -- '..key..": "..data)
+        if has_key(Item, 'sub')
+          for [key2, Item2] in items(Item['sub'])
+            " call add(output, key..'.'..key2)
+            " call DebugBuf(key..'.'..key2)
+             call _print_item(self, a:output, key..'.'..key2, Item2)
+          endfor
+        endif
+      endfunction
+      for [key,Item] in items(a:visible)
+        let up="_"
+        let down="_"
+        call _print_item(self, a:output, key, Item)
+        redraw!
         " if type(v)==4
         " if has_key(v, 'sub')
         "   call _print(v['sub'], key)
@@ -4211,15 +4269,18 @@ function! NewCmd() abort
         " endif
       endfor
       " call DebugBuf(self.state)
-      call DebugBuf(output)
-      redraw!
     endfunction
     " call _print(cfg.visible())
-    call _set_print(v:null, self.visible())
+    let output=[]
+    call _set_print(self, output, v:null, self.visible())
     let charstr=''
     while index(['q', 'j', 'k'], charstr)==-1
+      call DebugBuf(output)
       let charstr=getcharstr()
-      call _set_print(charstr, self.visible())
+      let output=[]
+      call DebugBufClear()
+      call _toggle(self, output, charstr, self.visible())
+      call _set_print(self, output, charstr, self.visible())
     endwhile
   endfunction
   function! s:toggle(path) abort dict
@@ -4269,6 +4330,7 @@ function! NewCmd() abort
         let visible = item.when(a:state)
       endif
       if !visible | continue | endif
+      if has_key(item, 'lambda_value') | continue | endif
       let result[key] = copy(item)
       if has_key(item, 'sub')
         let result[key].sub = s:filter_visible(item.sub, a:state, path)
@@ -4316,7 +4378,7 @@ let cmdstorage_schema= {
 let cmd_schema= {
   \ 'cmdtype': {
   \   'type': 'toggle',
-  \   'togglekey': ['c', 'C'],
+  \   'togglekey': ['t', 'T'],
   \   'values': ['vim', 'term'],
   \   'sub': {
   \     'vim': {
@@ -4346,10 +4408,13 @@ let cmd_schema= {
   \           'when': {s -> s['cmdtype'] ==# "term"},
   \         },
   \         'autocc': {
-  \           'togglekey': ['c', 'C'],
   \           'type': 'bool',
+  \           'togglekey': ['c', 'C'],
   \           'default': 0,
   \           'when': {s -> s['cmdtype'] ==# "term"},
+  \           'sub': {
+  \             'test': {'type':'bool', 'default': 0}
+  \           }
   \         },
   \         'autocd': {
   \           'type': 'toggle',
@@ -4433,19 +4498,21 @@ let cmd_schema= {
   \     },
   \   },
   \ },
-  \ 'debug': {
-  \   'type': 'bool',
-  \   'default': 0,
-  \   'sub': {
-  \     'level': {
-  \       'type': 'toggle',
-  \       'togglekey': ['d', 'D'],
-  \       'values': [1,2,3],
-  \       'when': {s -> s.debug},
-  \     }
-  \   }
-  \ }
   \}
+
+  " \ 'debug': {
+  " \   'type': 'bool',
+  " \   'default': 0,
+  " \   'sub': {
+  " \     'level': {
+  " \       'type': 'toggle',
+  " \       'togglekey': ['d', 'D'],
+  " \       'values': [1,2,3],
+  " \       'when': {s -> s.debug},
+  " \     }
+  " \   }
+  " \ }
+  " \}
 
 " function! CommandPageInit()
 "   " if !exists('b:commands')
@@ -8041,7 +8108,7 @@ function! Keypress_Handler() range
   " return
   let vs=VS()
   " let vs=['nano']
-  call DebugBufClear()
+  "call DebugBufClear()
   " call DebugBuf(g:keymap)
   " call CommandPageInit()
   " call CommandPageInit()
