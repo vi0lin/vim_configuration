@@ -1177,6 +1177,18 @@ nnoremap <C-F3> :call SetMode("\<C-F3\>", "Normal") \| :call WinSwap_Prep() \| :
 vnoremap <C-F3> :call SetMode("\<C-F3\>", "Visual") \| '<,'>:call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
 nnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Normal") \| :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 vnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Visual") \| '<,'>:call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
+nnoremap dv :call SetMode("dv", "Normal") \| :DiffOff<cr>
+nnoremap dt :call SetMode("dt", "Normal") \| :diffthis<cr>
+nnoremap dj :call SetMode("dj", "Normal") \| :norm ]c<cr>
+nnoremap dk :call SetMode("dk", "Normal") \| :norm [c<cr>
+nnoremap do :call SetMode("do", "Normal") \| :norm! do]c<cr>
+nnoremap dp :call SetMode("dp", "Normal") \| :norm! dp]c<cr>
+nnoremap ,do :call SetMode(",do", "Normal") \| :norm! do<cr>
+nnoremap ,dp :call SetMode(",dp", "Normal") \| :norm! dp<cr>
+nnoremap dh :call SetMode("dh", "Normal") \| :call DiffWithNeighbor('h')<cr>
+nnoremap dl :call SetMode("dl", "Normal") \| :call DiffWithNeighbor('l')<cr>
+nnoremap ,oh :call SetMode(",oh", "Normal") \| :call OpenFileHereAndInNeighbor('h')<cr>
+nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighbor('l')<cr>
 nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
 vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>
 nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call ToggleBCommand()<cr>

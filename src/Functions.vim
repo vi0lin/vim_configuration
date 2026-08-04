@@ -303,6 +303,18 @@ set diffopt+=context:5       " more context around changes
 " set diffopt+=iwhite
 " diffupdate
 
+function! FDiff(...)
+  let file1=a:000[0]
+  let file2=a:000[1]
+  let p=expand('%:p')
+  let ph=expand('%:p:h')
+  exec "e "..ph..'/'..file1
+  vnew | exec "e "..ph..'/'..file2
+  diffthis
+  wincmd p
+  diffthis
+endfunction
+command! -range -nargs=* -complete=dir FDiff :call FDiff(<f-args>)
 
 function! Diff(...)
   let nr = a:000[0]
@@ -5866,6 +5878,30 @@ function! IsPopup(winid)
   return !empty(x)
 endfunction
 
+function! OpenFileHereAndInNeighbor(dir)
+  let save_win = win_getid()
+  let filename=input("Filename: ", '', 'file')
+  exec "e "..filename
+  " norm gg
+  call cursor(1,1)
+  exec "wincmd "..a:dir
+  exec "e "..filename
+  " norm gg
+  call cursor(1,1)
+  " call cursor(1,col('.'))
+  call win_gotoid(save_win)
+  call DiffWithNeighbor(a:dir)
+endfunction
+
+function! DiffWithNeighbor(dir)
+  let save_win = win_getid()
+  :DiffOff
+  diffthis
+  exec "wincmd "..a:dir
+  diffthis
+  call win_gotoid(save_win)
+endfunction
+
 function! MakeDirCurrentCWD(bufnr)
   if !exists('g:temporaryfix')
   " echo expand("%:p:h")
@@ -6032,17 +6068,17 @@ else
   let g:SearchGitProjectsPath="/"
 endif
 
-" if has('mac') || has('unix') || has('linux') || has('android')
-"   let g:outfile="/tmp/outfile_fzf"
-"   let g:stdin_tmp_file="/tmp/tmp_stdin_file"
-"   let g:tempfile="/tmp/tempfile_fzf"
-"   let g:tempprofile="/tmp/profile.log"
-" else
+if has('mac') || has('unix') || has('linux') || has('android')
+  let g:outfile="/tmp/outfile_fzf"
+  let g:stdin_tmp_file="/tmp/tmp_stdin_file"
+  let g:tempfile="/tmp/tempfile_fzf"
+  let g:tempprofile="/tmp/profile.log"
+else
   let g:outfile=g:vim_configuration_path.."/outfile_fzf.unreleased"
   let g:stdin_tmp_file=g:vim_configuration_path.."/tmp_stdin_file.unreleased"
   let g:tempfile=g:vim_configuration_path.."/tempfile_fzf.unreleased"
   let g:tempprofile=g:vim_configuration_path.."/profile.log"
-" endif
+endif
 
 function Commands()
   function! Execute_callback(job, status, file)
@@ -7337,10 +7373,75 @@ function! BufPrep()
   let g:bufprep=bufnr()
 endfunction
 
-function! DiffOff()
-  :windo diffoff
-  :bufdo diffoff
+" function! FindAllDiffBuffers()
+"   let l:current_buf = bufnr('%')
+"   let l:diff_buffers = []
+"   " Temporarily check buffers through a safe viewport layout
+"   for l:b in range(1, bufnr('$'))
+"     if bufexists(l:b)
+"       " execute 'silent! hide buffer' l:b
+"       " execute 'silent! e buffer' l:b
+"       if &diff
+"         call add(l:diff_buffers, 'Buf ' . l:b . ': ' . bufname(l:b))
+"       endif
+"       " execute 'silent! hide buffer' l:b
+"     endif
+"   endfor
+"   " Restore your original view perfectly
+"   execute 'silent! hide buffer' l:current_buf
+"   return l:diff_buffers
+"   " Output results
+"   " if empty(l:diff_buffers)
+"   "     echo "No buffers (visible or hidden) are in diff mode."
+"   " else
+"   "     echo "Buffers with active diff mode:"
+"   "     for l:line in l:diff_buffers
+"   "         echo l:line
+"   "     endfor
+"   " endif
+" endfunction
+
+function! DiffOff(...)
+  let g:temporaryfix=0
+  " let save_win = win_getid()
+  " cexpr [] | for b in range(1, bufnr('$')) | if getbufvar(b, '&diff') | caddexpr bufname(b) . ':1: Active Diff' | endif | endfor | copen
+  " for b in range(1, bufnr('$')) | if getbufvar(b, '&diff') | echo "Buffer " . b . ": " . bufname(b) | endif | endfor
+  " echo filter(map(range(1, tabpagenr('$')), {_, t -> filter(map(range(1, tabpagewinnr(t, '$')), {_, w -> gettabwinvar(t, w, '&diff') ? 'Tab ' . t . ', Win ' . w . ': ' . bufname(tabpagebuflist(t)[w-1]) : ''}), {_, val -> !empty(val)})}), {_, val -> !empty(val)})
+  " let [t, w, c] = [tabpagenr(), winnr(), getpos('.')] | tabdo windo diffoff! | execute t . 'tabnext' | execute w . 'wincmd w' | call setpos('.', c)
+  let [t, w, v] = [tabpagenr(), winnr(), winsaveview()] | tabdo windo diffoff! | execute t . 'tabnext' | execute w . 'wincmd w' | call winrestview(v)
+  " :windo diffoff
+  " let diff_buffers=[]
+  " bufdo | if bufexists(bufnr('%')) | if &diff | call add(diff_buffers, winbufnr(w)) diffoff | endif | endif
+  " echo diff_buffers
+  " if (line('$')>1 || getline(1)!='') |
+  " let diff_buffers=[]
+  " for b in range(1,bufnr('$')) | if getbufvar(b, '&diff')==0 | call add(diff_buffers, b) | endif | endfor
+  " echo diff_buffers
+  " working
+  " bufdo diffoff!
+  " let visibile_diff_windows=filter(map(range(1, winnr('$')), {_, w -> getwinvar(w, '&diff') ? 'Window ' . w . ': ' . bufname(winbufnr(w)) : ''}), {_, val -> !empty(val)})
+  " echo visibile_diff_windows
+  " let all_diff_windows=filter(map(range(1, bufnr('$')), {_, b -> getbufvar(b, '&diff') ? 'Buf ' . b . ': ' . bufname(b) : ''}), {_, val -> !empty(val)})
+  " let diff_buffers=[]
+  " echo all_diff_windows
+  " for w in range(1, winnr('$'))
+  "   " echo w
+  "   if getwinvar(w, '&diff')
+  "     " echo "Buf: " . winbufnr(w) . ":" . bufname(winbufnr(w))
+  "     call add(diff_buffers, winbufnr(w))
+  "   endif
+  " endfor
+  " for buffer in diff_buffers
+  "   " if bufexists(buffer)
+  "     " echo buffer.."bufdo diffoff"
+  "     exec buffer.."bufdo diffoff"
+  "   " endif
+  " endfor
+  " echo FindAllDiffBuffers()
+  " call win_gotoid(save_win)
+  unlet g:temporaryfix
 endfunction
+command! -nargs=* DiffOff call DiffOff(<f-args>)
 
 function! BufBack()
   exec "e" g:bufprep

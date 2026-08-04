@@ -30,6 +30,32 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   " autocmd FileType vim setlocal indentexpr=
   autocmd FileType vim setlocal nosmartindent noautoindent indentexpr=
 
+  " set mouse=a
+  " augroup TerminalMouseInsert
+  " autocmd!
+  "   " autocmd BufEnter,WinEnter term://* startinsert
+  "   " autocmd BufEnter,WinEnter if &buftype=='terminal' | startinsert | endif
+  "   " autocmd BufEnter,WinEnter term://* call timer_start(10, {->exeucte('startinsert')})
+  "   " autocmd CursorMoved * startinsert
+  " augroup END
+
+  "" trying to fix
+  """ set mouse=a
+  """ " 2. Prevent clicks from kicking you out of Terminal-Job mode
+  """ augroup TermMouseFix
+  """   autocmd!
+  """   " Trigger on window/buffer focus
+  """   autocmd BufEnter,WinEnter * if &buftype == 'terminal' | startinsert | endif
+  """   " Trap the actual mouse click event specifically inside terminal buffers
+  """   autocmd BufEnter * if &buftype == 'terminal' |
+  """     \ nnoremap <buffer> <LeftMouse> <LeftMouse>i|
+  """     \ inoremap <buffer> <LeftMouse> <LeftMouse>i|
+  """     \ endif
+  """   autocmd BufEnter,WinEnter * if &buftype=='terminal' | call timer_start(10, {-> execute('startinsert')}) | endif
+  """ augroup END
+  """ nnoremap <silent><expr> <LeftMouse> (&buftype==#'terminal' ? "<LeftMouse>:startinsert<CR>" : "<LeftMouse>")
+
+
   " autocmd VimLeave * if :WriteSession
   " autocmd! FileType fzf tnoremap <Esc> <C-c>
   " autocmd! FileType fzf autocmd BufLeave <buffer> bdelete!

@@ -1234,6 +1234,19 @@ NewMap -no -n -v <S-F3> :call WinSwap_Prep() \| :windo diffthis \| :call WinSwap
 NewMap -no -n -v <C-F3> :call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
 NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 
+NewMap -no -n dv :DiffOff<cr>
+NewMap -no -n dt :diffthis<cr>
+NewMap -no -n dj :norm ]c<cr>
+NewMap -no -n dk :norm [c<cr>
+NewMap -no -n do :norm! do]c<cr>
+NewMap -no -n dp :norm! dp]c<cr>
+NewMap -no -n ,do :norm! do<cr>
+NewMap -no -n ,dp :norm! dp<cr>
+NewMap -no -n dh :call DiffWithNeighbor('h')<cr>
+NewMap -no -n dl :call DiffWithNeighbor('l')<cr>
+NewMap -no -n ,oh :call OpenFileHereAndInNeighbor('h')<cr>
+NewMap -no -n ,ol :call OpenFileHereAndInNeighbor('l')<cr>
+
 NewMap -no -n -v <C-S-.> :@:<cr>
 
 NewMap -no <F4> :call ToggleBCommand()<cr>
