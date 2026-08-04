@@ -14,7 +14,7 @@ if !exists("g:vim_advantages_got_sourced")
 
 " todo: RepoCommand: :CreateReadme :GitPush
 " todo: Commands: Make Every Key Configurable
-" todo: g:cmdstorage.get('commands') in :call NewCmd()
+" todo: g:cmdstorage.get('commands') in :call Command()
 " Save - (SaveCommands) Write To File - Serialized
 " Load - (LoadCommands) Load From File - Deserialized
 " ConfigureCommand
@@ -3811,133 +3811,133 @@ function! RefreshCommands()
   call SaveCommands()
 endfunction
 
-function! LoadCommands()
-  " if !exists('b:commands')
-  " call CommandDictInit()
-  " let g:cmdstorage.set('commands', [])
-  let b:commands={}
-  " endif
-  " let commandorigins=[]
-  " function! _add(path) closure
-  "   if index(commandorigins, a:path)==-1
-  "     call add(commandorigins, a:path)
-  "   endif
-  " endfunction
-  " " saved_in_vim_configuration
-  " " call _add(VimConfiguration()..'/.unreleased/.commands')
-  " call _add(VimConfiguration()..'/.commands')
-  " call _add(VimConfiguration()..'/.commands.unreleased')
-  " " saved_in_samedir *folder*
-  " call _add(expand('%:p:h')..'/.commands')
-  " call _add(expand('%:p:h')..'/.commands.unreleased')
-  " " saved_in_repo
-  " call _add(ProjectPath()..'/.commands')
-  " call _add(ProjectPath()..'/.commands.unreleased')
-  function! _load_helper(path, released)
-    let data=[]
-    let path=NewCmd().set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
-    " call DebugBuf(path)
-    " call DebugBuf(a:path)
-    " call DebugBuf(a:released)
-    if filereadable(path)
-      " call DebugBuf("Loading: "..path)
-      let array=Read(path)[0]
-      for state_serialized in json_decode(array)
-        " echo len(Read(path))
-        " echo state_serialized
-        let c=NewCmd().deserialize(state_serialized)
-        let overwrite_this=CommandTemplate()
-        " echo overwrite_this.get('cmdtype.term.autocc')
-        for [key,Value] in items(c)
-          " if key == 'cmdtype.term.autocd'
-          "       \ && key == 'cmdtype.term.autocd.path'
-          "       \ && key == 'cmdtype.term.autocc'
-            let overwrite_this[key]=Value
-          " endif
-        endfor
-        call add(data, overwrite_this)
-      endfor
-      " for state in states
-      "   echo state
-      " endfor
-      " for state in _data
-      "   " call DebugBuf(state)
-      "   echo state
-      "   let c=NewCmd().deserialize(state)
-      "   " call DebugBuf(c.get('command'))
-      "   " call add(data, )
-      " endfor
-      try
-      catch
-        call DebugBuf("Error Parsing File: "..path)
-      finally
-        if !empty(data)
-          " let updated=CommandTemplate()
-          " for [k,v] in items(data)
-          "   " echo k
-          "   " echo v
-          "   let updated[k]=v
-          " endfor
-          " call extend(g:cmdstorage.get('commands'), [updated])
-          call extend(g:cmdstorage.get('commands'), data)
-          " call DebugBuf(printf("Added %s commands", len(data)))
-          " call DebugBuf(map(copy(data), {_, v -> {"buffer": v['commandBuffer'], "command": v['command'], "key": v['key']}}))
-        endif
-        " call DebugBuf(printf("Nothing to add in %s", len(data)))
-      endtry
-    endif
-  endfunction
-  call DebugBufClear()
-  " call DebugBufHeight(10)
-  call DebugBuf("Commands")
-  " call _save_helper("in_vim_configuration", "yes")
-  call _load_helper("in_vim_configuration", "no")
-  " call _save_helper("in_repo_dir", "yes")
-  " call _save_helper("in_repo_dir", "no")
-  " call _save_helper("in_same_dir", "yes")
-  " call _save_helper("in_same_dir", "no")
-  " saved_in_buffer
-  " unimplemented / extract from file
-  " let file=globpath(cwd, a:filename)
-  " echo file
-  " while 1
-  "   let file=globpath(cwd, a:filename)
-  "   if !empty(file)
-  "     call extend(paths, [file])
-  "   endif
-  "   if cwd=='/'
-  "     break
-  "   endif
-  "   let cwd=GetParentDir(cwd)
-  " endwhile
-  " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'))
-  " call DebugBuf(join(map(copy(g:cmdstorage.get('commands')), {_, v -> {"buffer": v['commandBuffer'], "key": v['key']}}
-    \ ), "\n"),0 , 0)
-  return g:cmdstorage.get('commands')
-  " call LoadCommands(ProjectPath()..'/.commands_vim_configuration.unreleased')
-  "" for page in copy(b:commands['pages'])
-  ""   call DebugBuf(copy(page), '"Command: "..P(v:val)')
-  "" endfor
-  " for c in b:commands['pages']
-  "   echo c.get('<F5>')['command']
-  " endfor
-  " echo filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
-  " let b:commands['buffer']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
-  " let b:commands['folder']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="folder"&&v:val["commandSaveinFolder"]=="'..expand('%:p:h')..'"')
-  " let b:commands['repo']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="repo"&&v:val["commandSaveinFolder"]=="'..ProjectPath()..'"')
-  " let b:commands['global']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="global"&&v:val["commandSaveinFolder"]=="'..VimConfiguration()..'/.unreleased/.commands"')
-  "   " call DebugBuf(b:commands)
-  " return [ g:cmdstorage.get('commands'),
-  "       \ b:commands['buffer'],
-  "       \ b:commands['folder'],
-  "       \ b:commands['repo'],
-  "       \ b:commands['global']
-  "       \ ]
-endfunction
+" function! LoadCommands()
+"   " if !exists('b:commands')
+"   " call CommandDictInit()
+"   " let g:cmdstorage.set('commands', [])
+"   let b:commands={}
+"   " endif
+"   " let commandorigins=[]
+"   " function! _add(path) closure
+"   "   if index(commandorigins, a:path)==-1
+"   "     call add(commandorigins, a:path)
+"   "   endif
+"   " endfunction
+"   " " saved_in_vim_configuration
+"   " " call _add(VimConfiguration()..'/.unreleased/.commands')
+"   " call _add(VimConfiguration()..'/.commands')
+"   " call _add(VimConfiguration()..'/.commands.unreleased')
+"   " " saved_in_samedir *folder*
+"   " call _add(expand('%:p:h')..'/.commands')
+"   " call _add(expand('%:p:h')..'/.commands.unreleased')
+"   " " saved_in_repo
+"   " call _add(ProjectPath()..'/.commands')
+"   " call _add(ProjectPath()..'/.commands.unreleased')
+"   function! _load_helper(path, released)
+"     let data=[]
+"     let path=Command().set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
+"     " call DebugBuf(path)
+"     " call DebugBuf(a:path)
+"     " call DebugBuf(a:released)
+"     if filereadable(path)
+"       " call DebugBuf("Loading: "..path)
+"       let array=Read(path)[0]
+"       for state_serialized in json_decode(array)
+"         " echo len(Read(path))
+"         " echo state_serialized
+"         let c=Command().deserialize(state_serialized)
+"         let overwrite_this=CommandTemplate()
+"         " echo overwrite_this.get('cmdtype.term.autocc')
+"         for [key,Value] in items(c)
+"           " if key == 'cmdtype.term.autocd'
+"           "       \ && key == 'cmdtype.term.autocd.path'
+"           "       \ && key == 'cmdtype.term.autocc'
+"             let overwrite_this[key]=Value
+"           " endif
+"         endfor
+"         call add(data, overwrite_this)
+"       endfor
+"       " for state in states
+"       "   echo state
+"       " endfor
+"       " for state in _data
+"       "   " call DebugBuf(state)
+"       "   echo state
+"       "   let c=Command().deserialize(state)
+"       "   " call DebugBuf(c.get('command'))
+"       "   " call add(data, )
+"       " endfor
+"       try
+"       catch
+"         call DebugBuf("Error Parsing File: "..path)
+"       finally
+"         if !empty(data)
+"           " let updated=CommandTemplate()
+"           " for [k,v] in items(data)
+"           "   " echo k
+"           "   " echo v
+"           "   let updated[k]=v
+"           " endfor
+"           " call extend(g:cmdstorage.get('commands'), [updated])
+"           call extend(g:cmdstorage.get('commands'), data)
+"           " call DebugBuf(printf("Added %s commands", len(data)))
+"           " call DebugBuf(map(copy(data), {_, v -> {"buffer": v['commandBuffer'], "command": v['command'], "key": v['key']}}))
+"         endif
+"         " call DebugBuf(printf("Nothing to add in %s", len(data)))
+"       endtry
+"     endif
+"   endfunction
+"   call DebugBufClear()
+"   " call DebugBufHeight(10)
+"   call DebugBuf("Commands")
+"   " call _save_helper("in_vim_configuration", "yes")
+"   call _load_helper("in_vim_configuration", "no")
+"   " call _save_helper("in_repo_dir", "yes")
+"   " call _save_helper("in_repo_dir", "no")
+"   " call _save_helper("in_same_dir", "yes")
+"   " call _save_helper("in_same_dir", "no")
+"   " saved_in_buffer
+"   " unimplemented / extract from file
+"   " let file=globpath(cwd, a:filename)
+"   " echo file
+"   " while 1
+"   "   let file=globpath(cwd, a:filename)
+"   "   if !empty(file)
+"   "     call extend(paths, [file])
+"   "   endif
+"   "   if cwd=='/'
+"   "     break
+"   "   endif
+"   "   let cwd=GetParentDir(cwd)
+"   " endwhile
+"   " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'))
+"   " call DebugBuf(join(map(copy(g:cmdstorage.get('commands')), {_, v -> {"buffer": v['commandBuffer'], "key": v['key']}}
+"     \ ), "\n"),0 , 0)
+"   return g:cmdstorage.get('commands')
+"   " call LoadCommands(ProjectPath()..'/.commands_vim_configuration.unreleased')
+"   "" for page in copy(b:commands['pages'])
+"   ""   call DebugBuf(copy(page), '"Command: "..P(v:val)')
+"   "" endfor
+"   " for c in b:commands['pages']
+"   "   echo c.get('<F5>')['command']
+"   " endfor
+"   " echo filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
+"   " let b:commands['buffer']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="buffer"&&v:val["commandSaveinFolder"]=="'..expand('%:p')..'"')
+"   " let b:commands['folder']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="folder"&&v:val["commandSaveinFolder"]=="'..expand('%:p:h')..'"')
+"   " let b:commands['repo']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="repo"&&v:val["commandSaveinFolder"]=="'..ProjectPath()..'"')
+"   " let b:commands['global']=filter(copy(g:cmdstorage.get('commands')), 'v:val["extend"]=="global"&&v:val["commandSaveinFolder"]=="'..VimConfiguration()..'/.unreleased/.commands"')
+"   "   " call DebugBuf(b:commands)
+"   " return [ g:cmdstorage.get('commands'),
+"   "       \ b:commands['buffer'],
+"   "       \ b:commands['folder'],
+"   "       \ b:commands['repo'],
+"   "       \ b:commands['global']
+"   "       \ ]
+" endfunction
 
 function! EmptyCommand()
-  return NewCmd()
-  " echo NewCmd().set("save", "in_vim_configuration").get("save.path")
+  return Command()
+  " echo Command().set("save", "in_vim_configuration").get("save.path")
 endfunction
 
 function! VimCommand(command='')
@@ -3972,7 +3972,7 @@ endfunction
 
 function! CommandTemplate()
   " let c=EmptyCommand()
-  let c=NewCmd()
+  let c=Command()
   call c.set('command', ['', 'ls -al', ''])
   call c.set('command', [])
   call c.set('name', 'unnamed')
@@ -4014,23 +4014,25 @@ function! s:build_defaults(schema, ...) abort
   for [key, Item] in items(a:schema)
     let path = prefix ==# '' ? key : prefix . '.' . key
     " call DebugBuf(key)
-    if has_key(Item, 'default')
-      let state[path] = Item.default
-    elseif get(Item, 'type', '') ==# 'bool'
-      let state[path] = 0
-    elseif get(Item, 'type', '') ==# 'list'
-      let state[path] = []
-    elseif get(Item, 'type', '') ==# 'string'
-      let state[path] = ''
-    elseif get(Item, 'type', '') ==# 'lambda_value'
-      let state[path] = {}
-    elseif get(Item, 'type', '') ==# 'multiselect'
-      let state[path] = []
-    elseif get(Item, 'type', '') ==# 'toggle' && has_key(Item, 'values') && !empty(Item.values)
-      let state[path] = Item.values[0]
-    endif
-    if has_key(Item, 'sub')
-      call extend(state, s:build_defaults(Item.sub, path))
+    if type(Item)==4
+      if has_key(Item, 'default')
+        let state[path] = Item.default
+      elseif get(Item, 'type', '') ==# 'bool'
+        let state[path] = 0
+      elseif get(Item, 'type', '') ==# 'list'
+        let state[path] = []
+      elseif get(Item, 'type', '') ==# 'string'
+        let state[path] = ''
+      elseif get(Item, 'type', '') ==# 'lambda_value'
+        let state[path] = {}
+      elseif get(Item, 'type', '') ==# 'multiselect'
+        let state[path] = []
+      elseif get(Item, 'type', '') ==# 'toggle' && has_key(Item, 'values') && !empty(Item.values)
+        let state[path] = Item.values[0]
+      endif
+      if has_key(Item, 'sub')
+        call extend(state, s:build_defaults(Item.sub, path))
+      endif
     endif
   endfor
   return state
@@ -4083,24 +4085,43 @@ function! New(schema) abort
   return _new(a:schema)
 endfunction
 
-function! NewCmdStorage() abort
-  function! _newcmdstorage(schema) abort
+let cmdstorage_schema= {
+  \ 'commands': {
+  \   'type': 'list<dict<any>>',
+  \   'value': [],
+  \ }
+  \}
+function! CmdStorage() abort
+  function! _cmdstorage(schema) abort
     let obj = {
       \ 'schema': a:schema,
       \ 'state':  s:build_defaults(a:schema),
-      \ 'get':         function('s:get'),
-      \ 'set':         function('s:set'),
-      \ 'find':        function('s:find'),
-      \ 'add':         function('s:add'),
-      \ 'delete':      function('s:delete'),
-      \ 'save':        function('s:save'),
-      \ 'load':        function('s:load'),
+      \ 'get':                      function('s:get'),
+      \ 'set':                      function('s:set'),
+      \ 'find':                     function('s:find'),
+      \ 'add':                      function('s:add'),
+      \ 'delete':                   function('s:delete'),
+      \ 'save':                     function('s:save'),
+      \ 'load':                     function('s:load'),
+      \ 'refresh_current_commands': function('s:refresh_current_commands'),
     \ }
     return obj
   endfunction
-  function! s:find(item) abort dict
+  function! s:find(item, key) abort dict
+    " copy(g:cmdstorage.get('commands')
+    let c=self.get('commands')
+    let val = filter(copy(c)), { i,v ->
+      \ v:val.get("key")==a:key (
+      \ && ( v:val.get("extend")=="buffer"
+      \    && v:val.get("extend.buffer.path")==expand('%:p') )
+      \ || ( v:val.get("extend")=="repo"
+      \    && v:val.get("extend.repo.path")==ProjectPath() )
+      \ || ( v:val.get("extend")=="global" )
+      \ )
+    \ })
   endfunction
-  function! s:add(item) abort dict
+  function! s:add(name, value) abort dict
+    call extend(self.get(a:name), [a:value])
   endfunction
   function! s:delete(item) abort dict
   endfunction
@@ -4122,15 +4143,18 @@ function! NewCmdStorage() abort
     " call _save_helper("in_same_dir", "yes")
     " call _save_helper("in_same_dir", "no")
   endfunction
-  function! s:load(file) abort dict
-    function! _load_helper(path, released)
-      self.set('commands', [])
+  function! s:refresh_current_commands() abort dict
+    return
+  endfunction
+  function! s:load() abort dict
+    function! _load_helper(path, released) closure
+      call self.set('commands', [])
       let data=[]
-      let path=NewCmd().set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
+      let path=Command().set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
       if filereadable(path)
         let array=Read(path)[0]
         for state_serialized in json_decode(array)
-          let c=NewCmd().deserialize(state_serialized)
+          let c=Command().deserialize(state_serialized)
           call add(data, c)
         endfor
         try
@@ -4138,7 +4162,7 @@ function! NewCmdStorage() abort
           call DebugBuf("Error Parsing File: "..path)
         finally
           if !empty(data)
-            self.extend('commands', data)
+            call self.add('commands', data)
           endif
         endtry
       endif
@@ -4146,235 +4170,9 @@ function! NewCmdStorage() abort
     call _load_helper("in_vim_configuration", "no")
     return self.get('commands')
   endfunction
-  return _newcmdstorage(g:cmdstorage_schema)
+  return _cmdstorage(g:cmdstorage_schema)
 endfunction
 
-function! NewCmd() abort
-  function! _newcmd(schema) abort
-    let obj = {
-      \ 'schema': a:schema,
-      \ 'state':  s:build_defaults(a:schema),
-      \ 'get':         function('s:get'),
-      \ 'set':         function('s:set'),
-      \ 'toggle':      function('s:toggle'),
-      \ 'multiselect': function('s:multiselect'),
-      \ 'visible':     function('s:visible'),
-      \ 'serialize':   function('s:serialize'),
-      \ 'deserialize': function('s:deserialize'),
-      \ 'configure':   function('s:configure'),
-      \ 'select':      function('s:select'),
-    \ }
-    return obj
-  endfunction
-  " call DebugBufClear()
-  " call DebugBuf("test", 3)
-  function! s:select() abort dict closure
-  endfunction
-  function! s:configure() abort dict closure
-    " Make Debug Buf Right For Command Exposure of the last command
-    " ,s ,v ,z ,b ,b - work with leader - for changing last command on the fly
-    " [ 'j', 'J' ] add values like this for toggle buttons
-    " or enable s:configure - mode like before with getchar()
-    " call DebugBuf(self.schema)
-    " call DebugBuf(self.state)
-    function! _update_keys(self, key, Item)
-      let self=a:self
-      let key=a:key
-      let Item=a:Item
-      let up="_"
-      let down="_"
-      if has_key(Item, 'type') && ( Item['type']=='toggle' || Item['type']=='bool') && has_key(Item, 'togglekey')
-        let up=Item['togglekey'][0]
-        let down=Item['togglekey'][1]
-      endif
-      return [up, down]
-    endfunction
-    function! _toggle(self, output, pressed_key, visible)
-      let self=a:self
-      function! _t(self, output, pressed_key, key_prefixed, key, Item)
-        let key_prefixed=a:key_prefixed
-        let key=a:key
-        let Item=a:Item
-        let output=a:output
-        let output=""..a:key_prefixed
-        if has_key(Item, 'type')
-          " call DebugBuf(Item)
-          if Item['type']=='bool'
-            if has_key(Item, 'togglekey')
-              let output.='toggle'
-            endif
-          endif
-        endif
-        if (has_key(Item, 'type') && ( Item['type']=='toggle' || Item['type']=='bool') && has_key(Item, 'togglekey'))
-          let up=Item['togglekey'][0]
-          let down=Item['togglekey'][1]
-          if Item['type']=="toggle"
-            let index=index(Item['values'], a:self.get(key_prefixed))
-            let n=0
-            if a:pressed_key==Item['togglekey'][0]
-              let n=-1
-            elseif a:pressed_key==Item['togglekey'][1]
-              let n=1
-            endif
-            if n!=0
-              call a:self.set(key_prefixed, Item['values'][Mod(index+n, len(Item['values']))])
-            endif
-          elseif Item['type']=='bool'
-            echo "toggle bool"
-            " call DebugBuf(a:self.get(key_prefixed))
-            " call DebugBuf(!a:self.get(key_prefixed))
-            call a:self.set(key_prefixed, !a:self.get(key_prefixed))
-          endif
-        endif
-        if has_key(Item, 'sub')
-          for [key2, Item2] in items(Item['sub'])
-            call _t(a:self, a:output, a:pressed_key, key_prefixed.."."..key2, key2, Item2)
-          endfor
-        endif
-      endfunction
-      for [key,Item] in items(a:visible)
-        call _t(a:self, a:output, a:pressed_key, key ,key, Item)
-      endfor
-    endfunction
-    function! _set_print(self, output, pressed_key, visible, prefix='')
-      let self=a:self
-      " call DebugBuf(Pretty(a:visible))
-      function! _print_item(self, output, key, Item)
-        let self=a:self
-        let key=a:key
-        let Item=a:Item
-        let [up, down]=_update_keys(self, key, Item)
-        " let item = self.get(key)
-        " let key=!empty(a:prefix)?aprefix.."."..key:''..key
-        let data=string(self.get(key))
-        " echo "data: "..data
-        call add(a:output, '['..up..'|'..down..'] -- '..key..": "..data)
-        if has_key(Item, 'sub')
-          for [key2, Item2] in items(Item['sub'])
-            " call add(output, key..'.'..key2)
-            " call DebugBuf(key..'.'..key2)
-             call _print_item(self, a:output, key..'.'..key2, Item2)
-          endfor
-        endif
-      endfunction
-      for [key,Item] in items(a:visible)
-        let up="_"
-        let down="_"
-        call _print_item(self, a:output, key, Item)
-        redraw!
-        " if type(v)==4
-        " if has_key(v, 'sub')
-        "   call _print(v['sub'], key)
-        " endif
-        " endif
-      endfor
-      " call DebugBuf(self.state)
-    endfunction
-    " call _print(cfg.visible())
-    let output=[]
-    call _set_print(self, output, v:null, self.visible())
-    let charstr=''
-    while index(['q', 'j', 'k'], charstr)==-1
-      call DebugBuf(output)
-      let charstr=getcharstr()
-      let output=[]
-      call DebugBufClear()
-      call _toggle(self, output, charstr, self.visible())
-      call _set_print(self, output, charstr, self.visible())
-    endwhile
-  endfunction
-  function! s:toggle(path) abort dict
-    let item = s:find_item(self.schema, a:path)
-    if type(item) != v:t_dict || get(item, 'type', '') !=# 'toggle'
-      " call DebugBuf('Not a toggle: ' . a:path)
-      return
-    endif
-    let values = get(item, 'values', [])
-    if empty(values) | return | endif
-    let current = self.get(a:path)
-    let idx = index(values, current)
-    let next = values[(idx + 1) % len(values)]
-    call self.set(a:path, next)
-  endfunction
-  function! s:multiselect(path, value) abort dict
-    let current = self.get(a:path)
-    if type(current) != v:t_list
-      let current = []
-    endif
-    let idx = index(current, a:value)
-    if idx >= 0
-      call remove(current, idx)          " remove if already selected
-    else
-      call add(current, a:value)         " add if not selected
-    endif
-    call self.set(a:path, current)
-  endfunction
-  function! s:visible(...) abort dict
-    " Returns only the currently visible part of the schema
-    return s:filter_visible(self.schema, self.state, '')
-  endfunction
-  function! s:serialize() abort dict
-    return json_encode(self.state)
-  endfunction
-  function! s:deserialize(json) abort dict
-    let self.state = json_decode(a:json)
-    return self
-  endfunction
-  function! s:filter_visible(schema, state, prefix) abort
-    let result = {}
-    for [key, item] in items(a:schema)
-      let path = a:prefix ==# '' ? key : a:prefix . '.' . key
-      " check visibility condition
-      let visible = 1
-      if has_key(item, 'when')
-        let visible = item.when(a:state)
-      endif
-      if !visible | continue | endif
-      if has_key(item, 'lambda_value') | continue | endif
-      let result[key] = copy(item)
-      if has_key(item, 'sub')
-        let result[key].sub = s:filter_visible(item.sub, a:state, path)
-      endif
-    endfor
-    return result
-  endfunction
-  let cfg = _newcmd(g:cmd_schema)
-  " Toggle / Multiselect
-  " call cfg.toggle('extend')                  " cycles through values
-  " call cfg.multiselect('tags', 'vim')      " add/remove from list
-  " Get / Set
-  " cfg.set('extend.repo.path', VimConfiguration())
-  " call DebugBuf(cfg.get('extend.repo.path'))
-  " cfg.set('extend.buffer.path', expand('%:p'))
-  " call DebugBuf(cfg.get('extend.buffer.path'))
-  " cfg.set('extend.autocd.path', ProjectPath())
-  " call cfg.set('debug', 1)
-  " Visibility
-  " let visible = cfg.visible()              " returns only currently active tree
-  " call DebugBuf(visible)
-  " call DebugBuf(visible)
-  " Serialization
-  " let json = cfg.serialize()
-  " call DebugBuf(json)
-  " call cfg.deserialize(json)
-  " call cfg.set('key', "<F5>")
-  " call cfg.toggle('extend')
-  " call cfg.set('command', ['ls -al', 'date'])
-  " echo cfg.get('command')
-  " call cfg.configure()
-  return cfg
-endfunction
-" {s->s.save=="in_vim_configuration"?VimConfiguration():s.save=="in_repo_dir"?ProjectPath():s.save=="in_same_dir"?expand('%:p:h'):''}
-"
-
-let cmdstorage_schema= {
-  \ 'commands': {
-  \   'type': 'list',
-  \   'value': [],
-  \ }
-  \}
-
-" \   'lambda': {p,o,n -> DebugBuf('Extend changed to '..n)},
 let cmd_schema= {
   \ 'cmdtype': {
   \   'type': 'toggle',
@@ -4499,7 +4297,6 @@ let cmd_schema= {
   \   },
   \ },
   \}
-
   " \ 'debug': {
   " \   'type': 'bool',
   " \   'default': 0,
@@ -4513,6 +4310,230 @@ let cmd_schema= {
   " \   }
   " \ }
   " \}
+
+function! Command() abort
+  function! _command(schema) abort
+    let obj = {
+      \ 'schema': a:schema,
+      \ 'state':  s:build_defaults(a:schema),
+      \ 'get':         function('s:get'),
+      \ 'set':         function('s:set'),
+      \ 'toggle':      function('s:toggle'),
+      \ 'multiselect': function('s:multiselect'),
+      \ 'visible':     function('s:visible'),
+      \ 'serialize':   function('s:serialize'),
+      \ 'deserialize': function('s:deserialize'),
+      \ 'configure':   function('s:configure'),
+      \ 'select':      function('s:select'),
+    \ }
+    return obj
+  endfunction
+  " call DebugBufClear()
+  " call DebugBuf("test", 3)
+  function! s:select() abort dict closure
+  endfunction
+  function! s:configure() abort dict closure
+    " Make Debug Buf Right For Command Exposure of the last command
+    " ,s ,v ,z ,b ,b - work with leader - for changing last command on the fly
+    " [ 'j', 'J' ] add values like this for toggle buttons
+    " or enable s:configure - mode like before with getchar()
+    " call DebugBuf(self.schema)
+    " call DebugBuf(self.state)
+    function! _update_keys(key, Item) closure
+      let l:key=a:key
+      let l:Item=a:Item
+      let l:up="_"
+      let l:down="_"
+      if has_key(l:Item, 'type') && ( l:Item['type']=='toggle' || l:Item['type']=='bool') && has_key(l:Item, 'togglekey')
+        let l:up=l:Item['togglekey'][0]
+        let l:down=l:Item['togglekey'][1]
+      endif
+      return [l:up, l:down]
+    endfunction
+    function! _toggle(pressed_key, visible) closure
+      function! _t(pressed_key, key_prefixed, key, Item) closure
+        let l:key=a:key
+        let l:Item=a:Item
+        let key_prefixed=a:key_prefixed
+        " call add(output, a:key_prefixed)
+        if has_key(l:Item, 'type')
+          " call DebugBuf(l:Item)
+          if l:Item['type']=='bool'
+            if has_key(l:Item, 'togglekey')
+            endif
+          endif
+        endif
+        if (has_key(l:Item, 'type') && ( l:Item['type']=='toggle' || l:Item['type']=='bool') && has_key(l:Item, 'togglekey'))
+          let up=l:Item['togglekey'][0]
+          let down=l:Item['togglekey'][1]
+          if l:Item['type']=="toggle"
+            let index=index(l:Item['values'], self.get(key_prefixed))
+            let n=0
+            if a:pressed_key==l:Item['togglekey'][0]
+              let n=-1
+            elseif a:pressed_key==l:Item['togglekey'][1]
+              let n=1
+            endif
+            if n!=0
+              call self.set(key_prefixed, l:Item['values'][Mod(index+n, len(l:Item['values']))])
+            endif
+          elseif l:Item['type']=='bool' && index(l:Item['togglekey'], a:pressed_key)>-1
+            " call DebugBuf(self.get(key_prefixed))
+            " call DebugBuf(!self.get(key_prefixed))
+            call self.set(key_prefixed, !self.get(key_prefixed))
+          endif
+        endif
+        if has_key(l:Item, 'sub')
+          for [l:k, l:I] in items(l:Item['sub'])
+            call _t(a:pressed_key, key_prefixed.."."..l:k, l:k, l:I)
+          endfor
+        endif
+      endfunction
+      for [l:key,l:Item] in items(a:visible)
+        call _t(a:pressed_key, l:key, l:key, l:Item)
+      endfor
+    endfunction
+    function! _set_print(pressed_key, visible, prefix='') closure
+      " call DebugBuf(Pretty(a:visible))
+      function! _print_item(key, Item) closure
+        let l:key=a:key
+        let l:Item=a:Item
+        let [l:up, l:down]=_update_keys(l:key, l:Item)
+        " let item = self.get(key)
+        " let key=!empty(a:prefix)?aprefix.."."..key:''..key
+        let data=string(self.get(key))
+        " echo "data: "..data
+        call add(output, '['..l:up..'|'..l:down..'] -- '..l:key..": "..data)
+        if has_key(l:Item, 'sub')
+          for [l:key2, l:Item2] in items(l:Item['sub'])
+            " call add(output, key..'.'..key2)
+            " call DebugBuf(key..'.'..key2)
+             call _print_item(l:key..'.'..l:key2, l:Item2)
+          endfor
+        endif
+      endfunction
+      for [l:key, l:Item] in items(a:visible)
+        let up="_"
+        let down="_"
+        call _print_item(l:key, l:Item)
+        redraw!
+        " if type(v)==4
+        " if has_key(v, 'sub')
+        "   call _print(v['sub'], key)
+        " endif
+        " endif
+      endfor
+      " call DebugBuf(self.state)
+    endfunction
+    " call _print(cfg.visible())
+    let output=[]
+    call DebugBufClear()
+    call _set_print(v:null, self.visible())
+    let charstr=''
+    while index(['q', 'j', 'k'], charstr)==-1
+      call DebugBufClear()
+      call DebugBuf(output)
+      let charstr=getcharstr()
+      let output=[]
+      call _toggle(charstr, self.visible())
+      call _set_print(charstr, self.visible())
+    endwhile
+    call SaveCommands()
+  endfunction
+  function! s:toggle(path) abort dict
+    let item = s:find_item(self.schema, a:path)
+    if type(item) != v:t_dict || get(item, 'type', '') !=# 'toggle'
+      " call DebugBuf('Not a toggle: ' . a:path)
+      return
+    endif
+    let values = get(item, 'values', [])
+    if empty(values) | return | endif
+    let current = self.get(a:path)
+    let idx = index(values, current)
+    let next = values[(idx + 1) % len(values)]
+    call self.set(a:path, next)
+  endfunction
+  function! s:multiselect(path, value) abort dict
+    let current = self.get(a:path)
+    if type(current) != v:t_list
+      let current = []
+    endif
+    let idx = index(current, a:value)
+    if idx >= 0
+      call remove(current, idx)          " remove if already selected
+    else
+      call add(current, a:value)         " add if not selected
+    endif
+    call self.set(a:path, current)
+  endfunction
+  function! s:visible(...) abort dict
+    " Returns only the currently visible part of the schema
+    return s:filter_visible(self.schema, self.state, '')
+  endfunction
+  function! s:serialize() abort dict
+    return json_encode(self.state)
+  endfunction
+  function! s:deserialize(json) abort dict
+    let self.state = json_decode(a:json)
+    return self
+  endfunction
+  function! s:filter_visible(schema, state, prefix) abort
+    let result = {}
+    for [key, item] in items(a:schema)
+      let path = a:prefix ==# '' ? key : a:prefix . '.' . key
+      " check visibility condition
+      let visible = 1
+      if has_key(item, 'when')
+        let visible = item.when(a:state)
+      endif
+      if !visible | continue | endif
+      if has_key(item, 'lambda_value') | continue | endif
+      let result[key] = copy(item)
+      if has_key(item, 'sub')
+        let result[key].sub = s:filter_visible(item.sub, a:state, path)
+      endif
+    endfor
+    return result
+  endfunction
+  let cfg = _command(g:cmd_schema)
+  " Toggle / Multiselect
+  " call cfg.toggle('extend')                  " cycles through values
+  " call cfg.multiselect('tags', 'vim')      " add/remove from list
+  " Get / Set
+  " cfg.set('extend.repo.path', VimConfiguration())
+  " call DebugBuf(cfg.get('extend.repo.path'))
+  " cfg.set('extend.buffer.path', expand('%:p'))
+  " call DebugBuf(cfg.get('extend.buffer.path'))
+  " cfg.set('extend.autocd.path', ProjectPath())
+  " call cfg.set('debug', 1)
+  " Visibility
+  " let visible = cfg.visible()              " returns only currently active tree
+  " call DebugBuf(visible)
+  " call DebugBuf(visible)
+  " Serialization
+  " let json = cfg.serialize()
+  " call DebugBuf(json)
+  " call cfg.deserialize(json)
+  " call cfg.set('key', "<F5>")
+  " call cfg.toggle('extend')
+  " call cfg.set('command', ['ls -al', 'date'])
+  " echo cfg.get('command')
+  " call cfg.configure()
+  return cfg
+endfunction
+" {s->s.save=="in_vim_configuration"?VimConfiguration():s.save=="in_repo_dir"?ProjectPath():s.save=="in_same_dir"?expand('%:p:h'):''}
+"
+
+if !exists('g:cmdstorage')
+  let g:cmdstorage=CmdStorage()
+  call g:cmdstorage.load()
+  " let g:cmdstorage.get('commands')=g:cmdstorage.get('commands')
+  " echo g:cmdstorage.get('commands')
+  " echo g:cmdstorage.get('commands')[0].get('cmdtype.term.autocc')
+    " .set('commands', g:cmdstorage.get('commands'))
+endif
+
+" \   'lambda': {p,o,n -> DebugBuf('Extend changed to '..n)},
 
 " function! CommandPageInit()
 "   " if !exists('b:commands')
@@ -6011,17 +6032,17 @@ else
   let g:SearchGitProjectsPath="/"
 endif
 
-if has('mac') || has('unix') || has('linux') || has('android')
-  let g:outfile="/tmp/outfile_fzf"
-  let g:stdin_tmp_file="/tmp/tmp_stdin_file"
-  let g:tempfile="/tmp/tempfile_fzf"
-  let g:tempprofile="/tmp/profile.log"
-else
+" if has('mac') || has('unix') || has('linux') || has('android')
+"   let g:outfile="/tmp/outfile_fzf"
+"   let g:stdin_tmp_file="/tmp/tmp_stdin_file"
+"   let g:tempfile="/tmp/tempfile_fzf"
+"   let g:tempprofile="/tmp/profile.log"
+" else
   let g:outfile=g:vim_configuration_path.."/outfile_fzf.unreleased"
   let g:stdin_tmp_file=g:vim_configuration_path.."/tmp_stdin_file.unreleased"
-  let g:tempfile=g:vim_configuration_path.."/tempfile_fzf"
+  let g:tempfile=g:vim_configuration_path.."/tempfile_fzf.unreleased"
   let g:tempprofile=g:vim_configuration_path.."/profile.log"
-endif
+" endif
 
 function Commands()
   function! Execute_callback(job, status, file)
@@ -8097,7 +8118,8 @@ function! NewOrOverwrite(c)
     call c.set('hash', NewUUID())
     call DebugBuf("not overwriting - new command")
     " echo c
-    call add(g:cmdstorage.get('commands'), c)
+    " call add(g:cmdstorage.get('commands'), c)
+    call g:cmdstorage.add(c)
   endif
 endfunction
 
@@ -9348,7 +9370,8 @@ endfunction
 
 function BufCreateCommandInit()
    "call CommandDictInit()
-  call LoadCommands()
+  " call LoadCommands()
+  call g:cmdstorage.refresh_current_commands()
   call MakeDirCurrentCWD(bufnr())
 endfunction
 
@@ -9363,7 +9386,8 @@ function! BufWinEnter()
   " call CD(expand('%:p:h'))
   " call InitLineState()
   " echo "BufReadPost"
-  call LoadCommands()
+  " call LoadCommands()
+  call g:cmdstorage.refresh_current_commands()
 endfunction
 
 function! BufEnter()
@@ -10698,14 +10722,6 @@ augroup END
 " do
 " dp
 " qa
-
-if !exists('g:cmdstorage')
-  let g:cmdstorage=NewCmdStorage()
-  " let g:cmdstorage.get('commands')=g:cmdstorage.get('commands')
-  " echo g:cmdstorage.get('commands')
-  " echo g:cmdstorage.get('commands')[0].get('cmdtype.term.autocc')
-    " .set('commands', g:cmdstorage.get('commands'))
-endif
 
 let g:vim_advantages_got_sourced='true'
 endif
