@@ -39,7 +39,7 @@ NewMap -t -n -no <C-z> :if winnr('$')<=1 \| suspend \| else \| hide \| endif<cr>
 NewMap -n -no <C-/> :e .<cr>
 NewMap -n -no ,/ :e .<cr>
 NewMap -no -n ,,,,f :call SetUnset("projectPocket", w:cwd)<cr>
-NewMap -no -n ,f :call FavoritesPopup()<cr>
+NewMap -no -n ,f :call Favorites()<cr>
 NewMap -no -n ,,f :call SetUnset("favorites", expand('%:p')) \| :call Refresh('favorites_folders', 'GetFavoritesFolders()')<cr>
 " NewMap -no -n <C-8> :call Favorite()<cr>
 NewMap -no -n ,,,f :call OpenUnreleased("favorites")<cr>
@@ -1074,7 +1074,8 @@ NewMap -no -n ,rd :call RedoLeaderS()<cr>
 
 " NewMap -no ,c :call ToggleComment()<cr>
 NewMap -no <C-7> :call ToggleComment()<cr>
-NewMap -no -n ,cf :CF  
+" NewMap -no -n ,cf :CF  
+NewMap -no -n ,cf :call JumpToNextCFile_CreateFile_Open()<cr>
 
 NewMap -no -v <F1> J
 NewMap -no -n <F2> :call GetKeys()<cr>
@@ -1249,7 +1250,9 @@ NewMap -no -n dt :diffthis<cr>
 NewMap -no -n dj :norm ]c<cr>
 NewMap -no -n dk :norm [c<cr>
 NewMap -no -n do :norm! do]c<cr>
+NewMap -no -n dO :call DoAll()<cr>
 NewMap -no -n dp :norm! dp]c<cr>
+" NewMap -no -n dP :norm! dp]c<cr>
 NewMap -no -n ,do :norm! do<cr>
 NewMap -no -n ,dp :norm! dp<cr>
 NewMap -no -n dh :call DiffWithNeighbor('h')<cr>

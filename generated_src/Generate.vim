@@ -7,7 +7,7 @@ tnoremap <C-z> <C-\><C-n>:call SetMode("\<C-z\>", "Terminal") \| :if winnr('$')<
 nnoremap <C-/> :call SetMode("\<C-/\>", "Normal") \| :e .<cr>
 nnoremap ,/ :call SetMode(",/", "Normal") \| :e .<cr>
 nnoremap ,,,,f :call SetMode(",,,,f", "Normal") \| :call SetUnset("projectPocket", w:cwd)<cr>
-nnoremap ,f :call SetMode(",f", "Normal") \| :call FavoritesPopup()<cr>
+nnoremap ,f :call SetMode(",f", "Normal") \| :call Favorites()<cr>
 nnoremap ,,f :call SetMode(",,f", "Normal") \| :call SetUnset("favorites", expand('%:p')) \| :call Refresh('favorites_folders', 'GetFavoritesFolders()')<cr>
 nnoremap ,,,f :call SetMode(",,,f", "Normal") \| :call OpenUnreleased("favorites")<cr>
 nnoremap ,s :call SetMode(",s", "Normal") \| :so %<cr>
@@ -1114,7 +1114,7 @@ vnoremap ,s :call SetMode(",s", "Visual") \| '<,'>:call ExecVS()<cr>
 nnoremap ,S :call SetMode(",S", "Normal") \| :Re \| :%source \| :ReEnd<cr>
 nnoremap ,rd :call SetMode(",rd", "Normal") \| :call RedoLeaderS()<cr>
 nnoremap <C-7> :call SetMode("\<C-7\>", "Normal") \| :call ToggleComment()<cr>
-nnoremap ,cf :call SetMode(",cf", "Normal") \| :CF 
+nnoremap ,cf :call SetMode(",cf", "Normal") \| :call JumpToNextCFile_CreateFile_Open()<cr>
 vnoremap <F1> :call SetMode("\<F1\>", "Visual") \| '<,'>J
 nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :call GetKeys()<cr>
 nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :call FindKeyPerform()<cr>
@@ -1187,6 +1187,7 @@ nnoremap dt :call SetMode("dt", "Normal") \| :diffthis<cr>
 nnoremap dj :call SetMode("dj", "Normal") \| :norm ]c<cr>
 nnoremap dk :call SetMode("dk", "Normal") \| :norm [c<cr>
 nnoremap do :call SetMode("do", "Normal") \| :norm! do]c<cr>
+nnoremap dO :call SetMode("dO", "Normal") \| :call DoAll()<cr>
 nnoremap dp :call SetMode("dp", "Normal") \| :norm! dp]c<cr>
 nnoremap ,do :call SetMode(",do", "Normal") \| :norm! do<cr>
 nnoremap ,dp :call SetMode(",dp", "Normal") \| :norm! dp<cr>

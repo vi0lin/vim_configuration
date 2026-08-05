@@ -316,6 +316,19 @@ function! FDiff(...)
 endfunction
 command! -range -nargs=* -complete=dir FDiff :call FDiff(<f-args>)
 
+function! DoAll()
+  norm gg
+  let cursor=[]
+  let cursornew=getpos('.')
+  while cursor!=cursornew
+    let cursor=copy(cursornew)
+    " norm! exclamaition mark makes it non executing mappings
+    norm! ]c
+    norm! do
+    let cursornew=getpos('.')
+  endwhile
+endfunction
+
 function! Diff(...)
   let nr = a:000[0]
   let p=expand('%:p')
@@ -570,6 +583,26 @@ if !exists('g:generated_src')
   let g:generated_src=g:vim_configuration_path..'/generated_src'
 endif
 
+function! JumpToNextCFile_CreateFile_Open()
+  let file_or_path=expand('<cfile>')
+  if file_or_path==""
+    norm w
+    let file_or_path=expand('<cfile>')
+  endif
+  let relative_dir_to_cwd=fnamemodify(file_or_path, ':h')
+  let absolute_dir_to_cwd=fnamemodify(file_or_path, ':p:h')
+  let absolute_dir_relative_to_cwd=fnamemodify(absolute_dir_to_cwd, ':.')
+  let relative_file_to_cwd=file_or_path
+  let relative_file_to_cwd=fnamemodify(file_or_path, ':.')
+  let absolute_file_to_cwd=fnamemodify(file_or_path, ':p')
+  let given_dir=ProjectPath()
+  let absolute_file_to_given_file_or_path=given_dir..'/'..file_or_path
+  let relative_file_to_given_file_or_path = substitute(absolute_file_to_given_file_or_path, '^' . escape(given_dir, '.\^$*~[]') . '/\?', '', '')
+  " echo file_or_path .. " " .. relative_file_to_given_file_or_path .. " " ..  absolute_file_to_given_dir
+  call CreateFileAndPathIfNotExists(absolute_file_to_given_file_or_path)
+  exec "e "..absolute_file_to_given_file_or_path
+endfunction
+
 function! CreateFileAndPathIfNotExists(file)
   let dir = fnamemodify(a:file, ':h')
   if !isdirectory(dir)
@@ -661,7 +694,7 @@ endfunction
 
 function! GetGitprojects(file=g:unreleased..'/.gitprojects')
   if !filereadable(a:file)
-    call SearchGitProjects()
+    call UpdateGitProjects()
   endif
   " Add Updating Logic When New Projects Were Visited Or Removed
   let g:gitprojects=Read(a:file)
@@ -719,6 +752,7 @@ map <F3> exec ""
 
 function! GetProjects()
   call Refresh('multiprojectholder', 'GetMultiprojectHolder()')
+  call Refresh('multiprojectholder_projects', 'GetMultiprojectHolder_Projects()')
   call Refresh('projectholder', 'GetProjectHolder()')
   call Refresh('gitprojects', 'GetGitprojects()')
   call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
@@ -726,6 +760,12 @@ function! GetProjects()
   call Refresh('pathsoffavorites', 'GetPathsOfFavorites()')
   return Merge(g:gitprojects, g:favoritefolders_files, g:multiprojectholder_projects, g:projectholder_projects, g:pathsoffavorites)
 endfunction
+
+function! UpdateProjects()
+  " call UpdateGitProjects()
+  call Refresh('projects', 'GetProjects()')
+endfunction
+command! -range -nargs=0 UpdateProjects :call UpdateProjects()
 
 function! GetFoldersFolders(name)
   call UnreleasedVariable(a:name)
@@ -743,13 +783,13 @@ function! GetProjectFolders()
   return x
 endfunction
 
-function! SearchGitProjects(file=g:unreleased..'/.gitprojects')
-  let gitprojects=systemlist("find "..g:SearchGitProjectsPath.." -name .git -type d 2>/dev/null | sed 's|/.git||'")
+function! UpdateGitProjects(file=g:unreleased..'/.gitprojects')
+  let gitprojects=systemlist("find "..g:UpdateGitProjectsPath.." -name .git -type d 2>/dev/null | sed 's|/.git||'")
   " echo gitprojects
   return Write(gitprojects, a:file)
   echo "Done"
 endfunction
-command! -range -nargs=0 SearchGitProjects :call SearchGitProjects()
+command! -range -nargs=0 UpdateGitProjects :call UpdateGitProjects()
 
 function! Read(file)
   if CreateFileAndPathIfNotExists(a:file)
@@ -825,7 +865,7 @@ endfunction
 
 function! GetMultiprojectHolder()
   call UnreleasedVariable('multiprojectholder')
-  call GetMultiprojectHolder_Projects()
+  " call GetMultiprojectHolder_Projects()
   return g:multiprojectholder
 endfunction
 
@@ -1638,11 +1678,6 @@ function! ToggleHiddenAll()
 endfunction
 
 " jump to same intendation level up/down
-
-function! FindGitReposSystem()
-  !find / -name .git -type d 2>/dev/null
-  " Populate A FZF Function, Choosing A Repo
-endfunction
 
 function! __words()
   let c = 0
@@ -2533,11 +2568,6 @@ endfunction
 
 function! LoadDict(file)
   return json_decode(join(readfile(a:file), "\n"))
-endfunction
-
-function! FindProjects()
-  let list=systemlist("find . -name .git -type d")
-  echo list
 endfunction
 
 function! Pretty(x, ...) abort
@@ -3667,6 +3697,14 @@ function! DB()
 endfunction
 
 function! FindGitProjects()
+  function! FindProjects()
+    let list=systemlist("find . -name .git -type d")
+    echo list
+  endfunction
+  function! FindGitReposSystem()
+    !find / -name .git -type d 2>/dev/null
+    " Populate A FZF Function, Choosing A Repo
+  endfunction
 endfunction
 
 function! GithubCreateProject(...)
@@ -5887,8 +5925,7 @@ function! AdaptNeighborCWD(dir)
   exec "wincmd "..a:dir
   let new_cwd=CWD()
   if &buftype=='terminal'
-    let new_cwd=SendCommandToTermByBuf(bufnr(), ['pwd'], 2)
-    " echo new_cwd
+    let new_cwd=SendCommandToTermByBuf(bufnr(), ['pwd'], 3)
     " let new_cwd=getline(line('$')-1)
   endif
   wincmd p
@@ -5986,10 +6023,25 @@ function! Merge(...)
   return f
 endfunction
 
+function! MergeUniq(...)
+  let f = []
+  let ff={}
+  for x in a:000[0]
+    let ff[x]=x
+  endfor
+  for k in keys(ff)
+    call add(f, ff[k])
+  endfor
+  return f
+  " call map(copy(f), {k,v -> extend(out, [{v: v})})
+  " return reduce(f, {acc, val, idx -> extend(acc, {val: idx})}, {})
+endfunction
+
 function! Projects()
   call Refresh('projects', 'GetProjects()')
   call OpenFilePopup("Projects", g:projects)
 endfunction
+command! -range -nargs=0 Projects :call Projects()
 
 function! ToggleThroughOpenedProjects(n=1)
   echo "Implement Toggle Project " .. a:n
@@ -6013,7 +6065,7 @@ endfunction
 "   call OpenFilePopup(title, list)
 " endfunction
 
-function! FavoritesPopup()
+function! Favorites()
   call Refresh('favorites', 'ReadUnreleased("favorites")')
   call Refresh('favoritefolders', 'GetFavoriteFolders()')
   call Refresh('favoritefolders_recursively', 'GetFavoriteFolders_Recursively()')
@@ -6026,6 +6078,7 @@ function! FavoritesPopup()
   call extend(f, g:favoritefolders_files_recursively)
   call OpenFilePopup("Favorites", f)
 endfunction
+command! -range -nargs=0 Favorites :call Favorites()
 
 function! OpenFilePopup(title, list)
   function! OpenFile_callback(file)
@@ -6089,9 +6142,9 @@ let g:is_wsl = has('unix') && filereadable('/proc/version') &&
 
 if g:is_wsl
   let _runtime=systemlist("wslpath \"$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r' )\"")
-  let g:SearchGitProjectsPath=expand('~').." ".._runtime[0]
+  let g:UpdateGitProjectsPath=expand('~').." ".._runtime[0]
 else
-  let g:SearchGitProjectsPath="/"
+  let g:UpdateGitProjectsPath="/"
 endif
 
 if has('mac') || has('unix') || has('linux') || has('android')
@@ -6853,14 +6906,14 @@ endfunction
 function! FavoritePath()
 endfunction
 
-function! Favorite()
-  let list=systemlist("ls -al")
-  call Buildstring_Popup(
-        \ "Favorites",
-        \ list,
-        \ "file",
-        \)
-endfunction
+" function! Favorite()
+"   let list=systemlist("ls -al")
+"   call Buildstring_Popup(
+"         \ "Favorites",
+"         \ list,
+"         \ "file",
+"         \)
+" endfunction
 
 if !exists("g:shortenpath")
   let shortenpath=-1
@@ -7098,7 +7151,9 @@ function! s:_term_vim(p, commands, lineslen=0)
   for c in a:commands
     call term_sendkeys(a:p, c)
     call term_sendkeys(a:p, '')
-    call term_wait(a:p)
+    if a:lineslen>0
+      call term_wait(a:p, 40)
+    endif
   endfor
   if a:lineslen>0
     " return term_scrape(a:p, a:lineslen)
