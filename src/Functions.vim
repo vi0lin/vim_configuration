@@ -9366,7 +9366,7 @@ endfunction
 
 function! ResizeBorder(dir)
   let invert=0
-  call DebugBufClear()
+  " call DebugBufClear()
   call SetBorder(a:dir)
   let b=w:resizeborder
   let d=a:dir
@@ -9385,13 +9385,13 @@ function! ResizeBorder(dir)
   endif
   let save_win = win_getid()
   let n=DirectionWin(b)
-  call DebugBuf("b:  "..b)
-  call DebugBuf("d:  "..d)
-  call DebugBuf("n:  "..n)
-  call DebugBuf("ch: "..ch)
-  call DebugBuf("cj: "..cj)
-  call DebugBuf("ck: "..ck)
-  call DebugBuf("cl: "..cl)
+  " call DebugBuf("b:  "..b)
+  " call DebugBuf("d:  "..d)
+  " call DebugBuf("n:  "..n)
+  " call DebugBuf("ch: "..ch)
+  " call DebugBuf("cj: "..cj)
+  " call DebugBuf("ck: "..ck)
+  " call DebugBuf("cl: "..cl)
   if b=='h' && d=='h'
     call WinCmdToWin(n)
     call WidthDelta(-v)
