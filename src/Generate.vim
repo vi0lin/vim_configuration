@@ -33,6 +33,7 @@ function! _map(opts) range
       elseif a:mode=='insert'
         " let prefix="<C-o>"
         let prefix=""
+        let prefix="<C-\\><C-n>"
       elseif a:mode=='x'
       elseif a:mode=='s'
       elseif a:mode=='o'

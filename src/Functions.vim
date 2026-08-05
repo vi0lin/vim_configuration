@@ -5878,6 +5878,32 @@ function! IsPopup(winid)
   return !empty(x)
 endfunction
 
+function! AdaptNeighborCWD(dir)
+  " add functionality, that if this is a term, fire command to cdir to the bla bla
+  " let save_win = win_getid()
+  if exists('b:netrw_curdir')
+    let netrw_curdir=b:netrw_curdir
+  endif
+  exec "wincmd "..a:dir
+  let new_cwd=CWD()
+  if &buftype=='terminal'
+    let new_cwd=SendCommandToTermByBuf(bufnr(), ['pwd'], 2)
+    " echo new_cwd
+    " let new_cwd=getline(line('$')-1)
+  endif
+  wincmd p
+  if &buftype=='terminal'
+    call SendCommandToTermByBuf(bufnr(), ['cd '..new_cwd])
+    norm i
+  else
+    call CD(new_cwd)
+  endif
+  if exists('netrw_curdir') && !empty(netrw_curdir) && isdirectory(new_cwd)
+    exec "e "..new_cwd
+  endif
+  " call win_gotoid(save_win)
+endfunction
+
 function! OpenFileHereAndInNeighbor(dir)
   let save_win = win_getid()
   let filename=input("Filename: ", '', 'file')
@@ -7068,18 +7094,26 @@ function! s:_term_nvim(p, commands)
   call chansend(chan, c)
 endfunction
 
-function! s:_term_vim(p, commands)
+function! s:_term_vim(p, commands, lineslen=0)
   for c in a:commands
     call term_sendkeys(a:p, c)
     call term_sendkeys(a:p, '')
+    call term_wait(a:p)
   endfor
+  if a:lineslen>0
+    " return term_scrape(a:p, a:lineslen)
+    return term_getline(a:p, a:lineslen)
+  endif
 endfunction
 
-function! TERM(p, commands)
+function! TERM(p, commands, lineslen=0)
   if has('nvim')
-    call s:_term_nvim(a:p, a:commands)
+    return s:_term_nvim(a:p, a:commands)
   else
-    call s:_term_vim(a:p, a:commands)
+    let ret=s:_term_vim(a:p, a:commands, a:lineslen)
+    if a:lineslen>0
+      return ret
+    endif
   endif
 endfunction
 
@@ -8621,8 +8655,11 @@ function! SendCommandToThisTerm(cmd) range
   call TERM(buf, a:cmd)
 endfunction
 
-function! SendCommandToTermByBuf(buf, cmd) range
-  call TERM(a:buf, a:cmd)
+function! SendCommandToTermByBuf(buf, cmd, lineslen=0) range
+  let res=TERM(a:buf, a:cmd, a:lineslen)
+  if a:lineslen>0
+    return res
+  endif
 endfunction
 
 function! SendCommandToTermByDirection(direction, cmd) range

@@ -352,7 +352,7 @@ NewMap -no -a <A-q> :call TabClose()<cr>
 NewMap -no -la ,,r :redraw!<cr>
 " Amap ,ser  :call ServiceMenu()<cr>
 NewMap -no -a <S-F2> :let x=input("Find In Files: ") \| :echo system("grep ".expand('%')." -nrw -e \"".x."\"")<cr>
-NewMap -no -a ,c call CountRegex()<cr>
+" NewMap -no -a ,c call CountRegex()<cr>
 " Amap ,c :call COP('P')<cr>
 " Amap ,x :call CUT('P')<cr>
 " NewMap -no -a ,z :call CreateMarker('P')<cr>
@@ -527,8 +527,18 @@ NewMap -no -n ,,B :call Boilerplate_Test()<cr>
 " vmap <C-Space> :call LineUp()<cr>
 NewMap -no -n ,<Space> :call GetCCWD()<cr>
 
-NewMap -no -n ,c :call XCWD()<cr>
-NewMap -no -n ,,c :call PCWD()<cr>
+NewMap -no -n ,ch :call AdaptNeighborCWD('h')<cr>
+NewMap -no -n ,cj :call AdaptNeighborCWD('j')<cr>
+NewMap -no -n ,ck :call AdaptNeighborCWD('k')<cr>
+NewMap -no -n ,cl :call AdaptNeighborCWD('l')<cr>
+
+NewMap -no -t ,ch :call AdaptNeighborCWD('h')<cr>
+NewMap -no -t ,cj :call AdaptNeighborCWD('j')<cr>
+NewMap -no -t ,ck :call AdaptNeighborCWD('k')<cr>
+NewMap -no -t ,cl :call AdaptNeighborCWD('l')<cr>
+
+NewMap -no -n ,,c :call XCWD()<cr>
+NewMap -no -n ,,p :call PCWD()<cr>
 
 " map <F9>  :BuildProject<cr>
 " map <F10> :RunProject<cr>
