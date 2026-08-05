@@ -2627,6 +2627,10 @@ function! DirectionBufWin(direction)
   return winbufnr(winnr(a:direction))
 endfunction
 
+function! DirectionWin(direction)
+  return winnr(a:direction)
+endfunction
+
 function! GetBufDirectionIfTermDirect(direction)
   let win=DirectionBufWin(a:direction)
   if BufIsTerminal(win)
@@ -9351,11 +9355,108 @@ function! Resize(keymap)
   call DebugKeys()
 endfunction
 
+function! SetBorder(dir, rewrite=0)
+  if !exists('w:resizeborder') || a:rewrite
+    let w:resizeborder=a:dir
+  endif
+  if !exists('w;resizeborder_value')
+    let w:resizeborder_value=5
+  endif
+endfunction
+
+function! ResizeBorder(dir)
+  let invert=0
+  call DebugBufClear()
+  call SetBorder(a:dir)
+  let b=w:resizeborder
+  let d=a:dir
+  let v=w:resizeborder_value
+  let ch=CountWindowsInDirection('h')
+  let cj=CountWindowsInDirection('j')
+  let ck=CountWindowsInDirection('k')
+  let cl=CountWindowsInDirection('l')
+  if ch==0 && b=='l'
+    let invert=1
+    " call SetBorder('l',1)
+  endif
+  if cl==0 && b=='h'
+    let invert=1
+    " call SetBorder('h',1)
+  endif
+  let save_win = win_getid()
+  let n=DirectionWin(b)
+  call DebugBuf("b:  "..b)
+  call DebugBuf("d:  "..d)
+  call DebugBuf("n:  "..n)
+  call DebugBuf("ch: "..ch)
+  call DebugBuf("cj: "..cj)
+  call DebugBuf("ck: "..ck)
+  call DebugBuf("cl: "..cl)
+  if b=='h' && d=='h'
+    call WinCmdToWin(n)
+    call WidthDelta(-v)
+  elseif b=='h' && d=='l'
+    call WinCmdToWin(n)
+    call WidthDelta(v)
+  elseif b=='l' && d=='l'
+    if invert==0
+      call WinCmdToWin(n)
+      call WidthDelta(-v)
+    else
+      call WidthDelta(v)
+    endif
+  elseif b=='l' && d=='h'
+    if invert==0
+      call WinCmdToWin(n)
+      call WidthDelta(v)
+    else
+      call WidthDelta(-v)
+    endif
+  elseif b=='k' && d=='k'
+    call WinCmdToWin(n)
+    call HeightDelta(-v)
+  elseif b=='k' && d=='j'
+    call WinCmdToWin(n)
+    call HeightDelta(v)
+  elseif b=='j' && d=='j'
+    call WinCmdToWin(n)
+    call HeightDelta(-v)
+  elseif b=='j' && d=='k'
+    call WinCmdToWin(n)
+    call HeightDelta(v)
+  elseif d=='h'
+    call WidthDelta(-v)
+  elseif d=='j'
+    call HeightDelta(-v)
+  elseif d=='k'
+    call HeightDelta(v)
+  elseif d=='l'
+    call WidthDelta(v)
+  endif
+  call win_gotoid(save_win)
+  " echo "border: "..b
+  " echo "dir:    "..d
+endfunction
+
+function! WidthDelta(delta)
+  let buf_width = winwidth(winnr())
+  exec "vertical resize "..(buf_width+a:delta)
+endfunction
+command! -nargs=1 WidthDelta call WidthDelta(<q-args>)
+command! -nargs=1 WD call WidthDelta(<q-args>)
+
 function! Width(width)
   exec "vertical resize "..a:width
 endfunction
 command! -nargs=1 Width call Width(<q-args>)
 command! -nargs=1 W call Width(<q-args>)
+
+function! HeightDelta(delta)
+  let buf_height = winheight(winnr())
+  exec "horizontal resize "..(buf_height+a:delta)
+endfunction
+command! -nargs=1 HeightDelta call HeightDelta(<q-args>)
+command! -nargs=1 HD call HeightDelta(<q-args>)
 
 function! Height(height)
   exec "horizontal resize "..a:height

@@ -1262,6 +1262,110 @@ NewMap -no -n ,ol :call OpenFileHereAndInNeighbor('l')<cr>
 
 NewMap -no -n -v <C-S-.> :@:<cr>
 
+
+" Map numpad numbers 0-9 in Normal Mode
+" nnoremap <k0> :echo "You pressed Numpad 0"<CR>
+" nnoremap <k1> :echo "You pressed Numpad 1"<CR>
+" nnoremap <k2> :echo "You pressed Numpad 2"<CR>
+" nnoremap <k3> :echo "You pressed Numpad 3"<CR>
+" nnoremap <k4> :echo "You pressed Numpad 4"<CR>
+" nnoremap <k5> :echo "You pressed Numpad 5"<CR>
+" nnoremap <k6> :echo "You pressed Numpad 6"<CR>
+" nnoremap <k7> :echo "You pressed Numpad 7"<CR>
+" nnoremap <k8> :echo "You pressed Numpad 8"<CR>
+" nnoremap <k9> :echo "You pressed Numpad 9"<CR>
+" Map numpad operators
+" nnoremap <kPlus>     :echo "Numpad Plus"<CR>
+" nnoremap <kMinus>    :echo "Numpad Minus"<CR>
+" nnoremap <kMultiply> :echo "Numpad Multiply"<CR>
+" nnoremap <kDivide>   :echo "Numpad Divide"<CR>
+" nnoremap <kPoint>    :echo "Numpad Decimal Point"<CR>
+" nnoremap <kEnter>    :echo "Numpad Enter"<CR>
+" Use code with caution.Step 2: Ensure Insert Mode Still Types Numbers (Optional)If you want the numpad to trigger custom commands in Normal Mode but act as normal numbers when you are typing text, add standard insert mode mappings:viminoremap <k0> 0
+" inoremap <k1> 1
+" inoremap <k2> 2
+" inoremap <k3> 3
+" inoremap <k4> 4
+" inoremap <k5> 5
+" inoremap <k6> 6
+" inoremap <k7> 7
+" inoremap <k8> 8
+" inoremap <k9> 9
+" inoremap <kPoint> .
+" inoremap <kEnter> <CR>
+" Use code with caution.Troubleshooting Escape SequencesIf your version of Vim does not natively recognize <k0>, it means Kitty is sending raw ANSI escape sequences (like \eOq or \eOR). You can catch these sequences directly in Vim by adding these lines instead:vim" Fallback mapping for application keypad codes
+" set <k0>=Op
+" set <k1>=Oq
+" set <k2>=Or
+" set <k3>=Os
+" set <k4>=Ot
+" set <k5>=Ou
+" set <k6>=Ov
+" set <k7>=Ow
+" set <k8>=Ox
+" set <k9>=Oy
+" NewMap -no -n <k0> :echo Numpad0()<cr>
+" set <k4>=0t
+" Map application keypad sequences back to numbers in Insert mode
+" noremap Op 0
+" noremap Oq 1
+" noremap Or 2
+" noremap Os 3
+" noremap Ot 4
+" noremap Ou 5
+" noremap Ov 6
+" noremap Ow 7
+" noremap Ox 8
+" noremap Oy 9
+" noremap On .
+" noremap Oo /
+" noremap Oj *
+" noremap Om -
+" noremap Ol +
+" noremap OM <CR>
+"
+" nnoremap <expr> <script> nr2char(52) ":echo 'Numpad 4 pressed <cr>'"
+NewMap -no -n  :call ResizeBorder('h')<cr>
+NewMap -no -n  :call ResizeBorder('j')<cr>
+NewMap -no -n  :call ResizeBorder('k')<cr>
+NewMap -no -n  :call ResizeBorder('l')<cr>
+NewMap -no -n <S-> :call SetBorder('h', 1)<cr>
+NewMap -no -n <S-> :call SetBorder('j', 1)<cr>
+NewMap -no -n <S-> :call SetBorder('k', 1)<cr>
+NewMap -no -n <S-> :call SetBorder('l', 1)<cr>
+NewMap -no -n <C-> :call SmartWincmd('h')<cr>
+NewMap -no -n <C-> :call SmartWincmd('j')<cr>
+NewMap -no -n <C-> :call SmartWincmd('k')<cr>
+NewMap -no -n <C-> :call SmartWincmd('l')<cr>
+" sometimes fires COpen
+" sometimes undos very much stuff
+" add also quickfix possibilities
+" check behaviour when you are the outer most window
+" NewMap -no -n �� :call SetBorder('h')<cr>
+" NewMap -no -n �� :call SetBorder('j')<cr>
+" NewMap -no -n �� :call SetBorder('k')<cr>
+" NewMap -no -n �� :call SetBorder('l')<cr>
+" nnoremap <Esc>[96;5u :echo "Numpad 0"<CR>
+" nnoremap <Esc>[97;5u :echo "Numpad 1"<CR>
+" nnoremap <Esc>[98;5u :echo "Numpad 2"<CR>
+" nnoremap <Esc>[99;5u :echo "Numpad 3"<CR>
+" nnoremap <Esc>[100;5u :echo "Numpad 4"<CR>
+" nnoremap <Esc>[101;5u :echo "Numpad 5"<CR>
+" nnoremap <Esc>[102;5u :echo "Numpad 6"<CR>
+" nnoremap <Esc>[103;5u :echo "Numpad 7"<CR>
+" nnoremap <Esc>[104;5u :echo "Numpad 8"<CR>
+" nnoremap <Esc>[105;5u :echo "Numpad 9"<CR>
+
+" map :echo "h"<cr>
+" for i in range(1,4) | put=char2nr(getchar()) | endfor
+" with <Numpad1...9>
+" put=getchar()
+" with <S-Numpad1...9>
+" put=nr2char(getchar())
+
+" D" unmap <Esc>Oq
+" :echo 1<cr>
+
 NewMap -no <F4> :call ToggleBCommand()<cr>
 
 NewMap -no -n <F2> :F  

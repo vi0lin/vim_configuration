@@ -1197,6 +1197,18 @@ nnoremap ,oh :call SetMode(",oh", "Normal") \| :call OpenFileHereAndInNeighbor('
 nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighbor('l')<cr>
 nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
 vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('h')<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('j')<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('k')<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('l')<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('h', 1)<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('j', 1)<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('k', 1)<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('l', 1)<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('h')<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('j')<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('k')<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('l')<cr>
 nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call ToggleBCommand()<cr>
 nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :F 
 vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:F<cr>
