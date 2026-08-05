@@ -758,11 +758,11 @@ function! GetProjects()
   call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
   call Refresh('favoritefolders_files_recursively', 'GetFavoriteFolders_Files_Recursively()')
   call Refresh('pathsoffavorites', 'GetPathsOfFavorites()')
-  return Merge(g:gitprojects, g:favoritefolders_files, g:multiprojectholder_projects, g:projectholder_projects, g:pathsoffavorites)
+  return MergeUniq(g:gitprojects, g:favoritefolders_files, g:multiprojectholder_projects, g:projectholder_projects, g:pathsoffavorites)
 endfunction
 
 function! UpdateProjects()
-  " call UpdateGitProjects()
+  call UpdateGitProjects()
   call Refresh('projects', 'GetProjects()')
 endfunction
 command! -range -nargs=0 UpdateProjects :call UpdateProjects()
@@ -6015,6 +6015,7 @@ function! AgFile(title, register, path)
   echo "AG"
 endfunction
 
+" Caution, [[], [], []]
 function! Merge(...)
   let f = []
   for x in a:000
@@ -6023,12 +6024,17 @@ function! Merge(...)
   return f
 endfunction
 
+" Caution, [[], [], []]
 function! MergeUniq(...)
-  let f = []
+  let l= []
+  for m in a:000
+    call extend(l, m)
+  endfor
   let ff={}
-  for x in a:000[0]
+  for x in l
     let ff[x]=x
   endfor
+  let f = []
   for k in keys(ff)
     call add(f, ff[k])
   endfor
