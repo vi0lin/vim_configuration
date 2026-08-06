@@ -11,8 +11,11 @@ let g:ST_Mode=[]
 
 " Todo: Toggle Statusline
 call add(g:ST_Mode, [ 1, {->Mode()}, {->Mode()}])
+call add(g:ST_Mode, [ 1, {->' '}, {->' '}])
+call add(g:ST_Mode, [ 1, {->''}, {->Is_select_execution_window()}])
+call add(g:ST_Mode, [ 1, {->''..winnr()}, {->' '..winnr()}])
 " call add(g:ST_Mode, [ 1, {->Mode()}, {->toupper(' '..mode())..' '}])
-call add(g:ST_Mode, [ 2, {->'  '..bufnr()..' '}, ''])
+call add(g:ST_Mode, [ 1, {->'  '..bufnr()..' '}, ''])
 call add(g:ST_Mode, [ 2, {->PathCharwise_All(CWD(),1,1)}, ''])
 call add(g:ST_Mode, [ 2, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,0)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,1)}])
 call add(g:ST_Mode, [ 2, "%#User0# %= %<", "%#User0# %= %<"])

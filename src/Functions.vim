@@ -9,7 +9,6 @@
 " " lookahead
 " encod\%(ing\)\@!
 " \vencod%(ing)@!
-
 if !exists("g:vim_advantages_got_sourced")
 
 " todo: RepoCommand: :CreateReadme :GitPush
@@ -745,10 +744,6 @@ function FN(...)
   " NewMap -n -no <f1> :FunctionName 3<cr>:FunctionName 1<cr>
 endfunction
 " call FN()
-
-map <F2> :echo FN()<cr>
-map <F4> :exec "echo g:"..expand('<cword>')<cr>
-map <F3> exec ""
 
 function! GetProjects()
   call Refresh('multiprojectholder', 'GetMultiprojectHolder()')
@@ -3801,9 +3796,9 @@ endfunction
 function! ResetCommands(...)
   echo "does not work"
   let g:cmdstorage.get('commands')=[]
-  call SaveCommands()
+  call g:cmdstorage.save()
   return
-  " SaveCommands()
+  " call g:cmdstorage.save()
   function! _write_file_helper(released, filepath)
     if a:released=="yes"
       let postfix=""
@@ -3823,34 +3818,34 @@ function! ResetCommands(...)
 endfunction
 command! -range -nargs=* ResetCommands <line1>,<line2>call ResetCommands(<f-args>)
 
-function! SaveCommands()
-  call DebugBuf("SaveCommands")
-  function! _save_helper(save, released)
-    " call DebugBuf("save: ", a:save)
-    let filtered=filter(copy(g:cmdstorage.get('commands')), { i,v ->
-      \ v:val.get("save")==a:save
-      \ && v:val.get("save.released")==a:released
-      \ })
-    " let states=map(copy(filtered), "v:val.state")
-    let states=map(copy(filtered), "v:val.serialize()")
-    let postfix=a:released=='no'?".unreleased":''
-    if !empty(filtered) && len(filtered)>0
-      call WriteStructure(states, filtered[0].get('save.path').."/.commands"..postfix)
-    endif
-  endfunction
-  " call _save_helper("in_vim_configuration", "yes")
-  call _save_helper("in_vim_configuration", "no")
-  " call _save_helper("in_repo_dir", "yes")
-  " call _save_helper("in_repo_dir", "no")
-  " call _save_helper("in_same_dir", "yes")
-  " call _save_helper("in_same_dir", "no")
-  " " call _save_helper("samedir", "yes", expand('%:p:h'))
-  " " call _save_helper("samedir", "no", expand('%:p:h'))
-  " " call _save_helper("repo", "yes", ProjectPath())
-  " " call _save_helper("repo", "no", ProjectPath())
-  " " call _save_helper("in_vim_configuration", "yes", VimConfiguration())
-  " " call _save_helper("in_vim_configuration", "no", VimConfiguration())
-endfunction
+" function! SaveCommands()
+"   call DebugBuf("SaveCommands")
+"   function! _save_helper(save, released)
+"     " call DebugBuf("save: ", a:save)
+"     let filtered=filter(copy(g:cmdstorage.get('commands')), { i,v ->
+"       \ v:val.get("save")==a:save
+"       \ && v:val.get("save.released")==a:released
+"       \ })
+"     " let states=map(copy(filtered), "v:val.state")
+"     let states=map(copy(filtered), "v:val.serialize()")
+"     let postfix=a:released=='no'?".unreleased":''
+"     if !empty(filtered) && len(filtered)>0
+"       call WriteStructure(states, filtered[0].get('save.path').."/.commands"..postfix)
+"     endif
+"   endfunction
+"   " call _save_helper("in_vim_configuration", "yes")
+"   call _save_helper("in_vim_configuration", "no")
+"   " call _save_helper("in_repo_dir", "yes")
+"   " call _save_helper("in_repo_dir", "no")
+"   " call _save_helper("in_same_dir", "yes")
+"   " call _save_helper("in_same_dir", "no")
+"   " " call _save_helper("samedir", "yes", expand('%:p:h'))
+"   " " call _save_helper("samedir", "no", expand('%:p:h'))
+"   " " call _save_helper("repo", "yes", ProjectPath())
+"   " " call _save_helper("repo", "no", ProjectPath())
+"   " " call _save_helper("in_vim_configuration", "yes", VimConfiguration())
+"   " " call _save_helper("in_vim_configuration", "no", VimConfiguration())
+" endfunction
 
 function! RefreshCommands()
   for c in g:cmdstorage.get('commands')
@@ -3862,7 +3857,7 @@ function! RefreshCommands()
     endfor
     " let c=updated
   endfor
-  call SaveCommands()
+  call g:cmdstorage.save()
 endfunction
 
 " function! LoadCommands()
@@ -3935,7 +3930,7 @@ endfunction
 "           " call extend(g:cmdstorage.get('commands'), [updated])
 "           call extend(g:cmdstorage.get('commands'), data)
 "           " call DebugBuf(printf("Added %s commands", len(data)))
-"           " call DebugBuf(map(copy(data), {_, v -> {"buffer": v['commandBuffer'], "command": v['command'], "key": v['key']}}))
+"           " call DebugBuf(map(copy(data), {_, v -> {"buffer": v['extend.buffer.path'], "command": v['command'], "key": v['key']}}))
 "         endif
 "         " call DebugBuf(printf("Nothing to add in %s", len(data)))
 "       endtry
@@ -3965,7 +3960,7 @@ endfunction
 "   "   let cwd=GetParentDir(cwd)
 "   " endwhile
 "   " call DebugBuf(map(copy(reverse(paths)), '"Source: "..v:val'))
-"   " call DebugBuf(join(map(copy(g:cmdstorage.get('commands')), {_, v -> {"buffer": v['commandBuffer'], "key": v['key']}}
+"   " call DebugBuf(join(map(copy(g:cmdstorage.get('commands')), {_, v -> {"buffer": v['extend.buffer.path'], "key": v['key']}}
 "     \ ), "\n"),0 , 0)
 "   return g:cmdstorage.get('commands')
 "   " call LoadCommands(ProjectPath()..'/.commands_vim_configuration.unreleased')
@@ -4004,7 +3999,7 @@ function! VimCommand(command='')
   call c.set('extend', 'buffer')
   call c.set('save', b:savein)
   call c.set('released', b:released)
-  call c.set('commandBuffer', '')
+  call c.set('extend.buffer.path', '')
   call c.set('commandInterpreter', 'vim')
   call c.set('commandOutputMode', 'put')
   call c.set('command', a:command)
@@ -4033,11 +4028,11 @@ function! CommandTemplate()
   call c.set('direction', g:default_direction)
   call c.set('commandOutputMode', "sendtoterm")
   call c.set('directionMode', 'foremost')
-  call c.set('commandRepo', exists('w:cwd')?ProjectPath():'')
+  call c.set('extend.repo.path', exists('w:cwd')?ProjectPath():'')
   call c.set('commandFolder', expand('%:p:h'))
   call c.set('extend', 'buffer')
   call c.set('loadCondition', 'bufferopened')
-  call c.set('commandBuffer', expand('%:p'))
+  call c.set('extend.buffer.path', expand('%:p'))
   call c.set('target', 'Local')
   call c.set('cmdtype.term.autocc', 0)
   call c.set('cmdtype.term.autocd', 'cd_to_project_root')
@@ -4141,7 +4136,7 @@ endfunction
 
 let cmdstorage_schema= {
   \ 'commands': {
-  \   'type': 'list<dict<any>>',
+  \   'type': 'list',
   \   'value': [],
   \ }
   \}
@@ -4153,14 +4148,66 @@ function! CmdStorage() abort
       \ 'get':                      function('s:get'),
       \ 'set':                      function('s:set'),
       \ 'find':                     function('s:find'),
-      \ 'add':                      function('s:add'),
+      \ 'find_by_key':              function('s:find_by_key'),
+      \ 'additem':                  function('s:additem'),
+      \ 'additems':                 function('s:additems'),
       \ 'delete':                   function('s:delete'),
       \ 'save':                     function('s:save'),
       \ 'load':                     function('s:load'),
-      \ 'refresh_current_commands': function('s:refresh_current_commands'),
     \ }
     return obj
   endfunction
+
+  function! s:find_by_key(keymap=g:keymap) abort dict
+    " let updated = CommandTemplate()
+    " let c={ 'buffer': [],'folder': [],'repo': [], 'global': [] }
+    let c=[]
+    let val = filter(copy(self.get('commands')), { i,v ->
+      \ v:val.get("key")==a:keymap
+      \ && v:val.get("extend")=="buffer"
+      \ && v:val.get("extend.buffer.path")==expand('%:p')
+      \ })
+    if !empty(val)
+      call extend(c, val)
+    endif
+    " let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
+    "   \ v:val.get("key")==a:keymap
+    "   \ && v:val.get("extend")=="folder"
+    "   \ && v:val.get("commandFolder")==expand('%:p:h')
+    "   \ })
+    " if !empty(val)
+    "   call extend(c, val)
+    " endif
+    "
+    let val = filter(copy(self.get('commands')), { i,v ->
+      \ v:val.get("key")==a:keymap
+      \ && v:val.get("extend")=="repo"
+      \ && v:val.get("extend.repo.path")==ProjectPath()
+      \ })
+    if !empty(val)
+      call extend(c, val)
+    endif
+    "
+    let val = filter(copy(self.get('commands')), { i,v ->
+      \ v:val.get("key")==a:keymap
+      \ && v:val.get("extend")=="global"
+      \ })
+    if !empty(val)
+      call extend(c, val)
+    endif
+    " call DebugBuf(c)
+    " return updated
+    " for [k,v] in items(c)
+    "   let updated[k]=v
+    " endfor
+    " return updated
+    " call EnsureDebugBuf()
+    " let rglobal= reduce(c['global'], {acc,item->extend(acc, {item.key: get(acc, item.key, []) + [item]})}, {})
+    " call DebugBuf(input)
+    " call DebugBuf(c)
+    return c
+  endfunction
+
   function! s:find(item, key) abort dict
     " copy(g:cmdstorage.get('commands')
     let c=self.get('commands')
@@ -4174,21 +4221,32 @@ function! CmdStorage() abort
       \ )
     \ })
   endfunction
-  function! s:add(name, value) abort dict
-    call extend(self.get(a:name), [a:value])
+
+  function! s:additem(name, value) abort dict
+    call add(self.get(a:name), a:value)
   endfunction
+
+  function! s:additems(name, value) abort dict
+    call extend(self.get(a:name), a:value)
+  endfunction
+
   function! s:delete(item) abort dict
   endfunction
+
   function! s:save() abort dict
-    function! _save_helper(save, released)
-      let filtered=filter(copy(g:cmdstorage.get('commands')), { i,v ->
+    function! _save_helper(save, released) closure
+      let filtered=filter(copy(self.get('commands')), { i,v ->
         \ v:val.get("save")==a:save
         \ && v:val.get("save.released")==a:released
         \ })
+      " echo filtered
       let states=map(copy(filtered), "v:val.serialize()")
       let postfix=a:released=='no'?".unreleased":''
       if !empty(filtered) && len(filtered)>0
+        call DebugBuf(filtered[0].get('save.path').."/.commands"..postfix)
+        " echo states
         call WriteStructure(states, filtered[0].get('save.path').."/.commands"..postfix)
+        call DebugBuf("commands saved")
       endif
     endfunction
     call _save_helper("in_vim_configuration", "no")
@@ -4197,17 +4255,18 @@ function! CmdStorage() abort
     " call _save_helper("in_same_dir", "yes")
     " call _save_helper("in_same_dir", "no")
   endfunction
-  function! s:refresh_current_commands() abort dict
-    return
-  endfunction
+
   function! s:load() abort dict
     function! _load_helper(path, released) closure
-      call self.set('commands', [])
+      " call self.set('commands', [])
+      " let g:cmdstorage=CmdStorage()
       let data=[]
       let path=Command().set('save', a:path).get("save.path")..'/.commands'..(a:released=='no'?'.unreleased':'')
       if filereadable(path)
-        let array=Read(path)[0]
-        for state_serialized in json_decode(array)
+        let _read=Read(path)
+        let array=len(_read)>0?_read[0]:[]
+        let iter=len(_read)>0?json_decode(array):[]
+        for state_serialized in iter
           let c=Command().deserialize(state_serialized)
           call add(data, c)
         endfor
@@ -4216,7 +4275,7 @@ function! CmdStorage() abort
           call DebugBuf("Error Parsing File: "..path)
         finally
           if !empty(data)
-            call self.add('commands', data)
+            call self.additems('commands', data)
           endif
         endtry
       endif
@@ -4258,6 +4317,21 @@ let cmd_schema= {
   \           'values': ['sendtoterm', 'sendtopopup'],
   \           'default': 'sendtoterm',
   \           'when': {s -> s['cmdtype'] ==# "term"},
+  \           'sub': {
+  \             'behaviour': {
+  \               'type': 'group',
+  \               'label': 'Term options',
+  \               'when': {s -> s['cmdtype.term.behaviour'] ==# "sendtoterm"},
+  \               'sub': {
+  \                 'term_winid': {
+  \                   'type': 'toggle',
+  \                   'togglekey': ['b', 'B'],
+  \                   'values': {->g:select_execution_window['terminals']},
+  \                   'default': '-1',
+  \                 },
+  \               }
+  \             }
+  \           }
   \         },
   \         'autocc': {
   \           'type': 'bool',
@@ -4386,7 +4460,9 @@ function! Command() abort
   " call DebugBuf("test", 3)
   function! s:select() abort dict closure
   endfunction
-  function! s:configure() abort dict closure
+  " add closure?
+
+  function! s:configure() abort dict
     " Make Debug Buf Right For Command Exposure of the last command
     " ,s ,v ,z ,b ,b - work with leader - for changing last command on the fly
     " [ 'j', 'J' ] add values like this for toggle buttons
@@ -4429,11 +4505,13 @@ function! Command() abort
               let n=1
             endif
             if n!=0
+              " call input("self.set("..key_prefixed..", l:Item['values'][Mod(index+n, len(l:Item['values']))])")
               call self.set(key_prefixed, l:Item['values'][Mod(index+n, len(l:Item['values']))])
             endif
           elseif l:Item['type']=='bool' && index(l:Item['togglekey'], a:pressed_key)>-1
             " call DebugBuf(self.get(key_prefixed))
             " call DebugBuf(!self.get(key_prefixed))
+            " call input("self.set("..key_prefixed..", !self.get(key_prefixed))")
             call self.set(key_prefixed, !self.get(key_prefixed))
           endif
         endif
@@ -4484,16 +4562,22 @@ function! Command() abort
     call DebugBufClear()
     call _set_print(v:null, self.visible())
     let charstr=''
-    while index(['q', 'j', 'k'], charstr)==-1
+    while index(['q', 'j', 'k', ''], charstr)==-1
       call DebugBufClear()
       call DebugBuf(output)
+      " call DebugBuf(g:cmdstorage.get('commands'))
+      " call DebugBuf(self.get('extend'))
+      " call DebugBuf(g:cmdstorage.get('commands'))
+      call DebugBuf("!!!"..self.get('extend'))
       let charstr=getcharstr()
       let output=[]
       call _toggle(charstr, self.visible())
+      " call g:cmdstorage.save()
       call _set_print(charstr, self.visible())
     endwhile
-    call SaveCommands()
+    " call g:cmdstorage.save()
   endfunction
+
   function! s:toggle(path) abort dict
     let item = s:find_item(self.schema, a:path)
     if type(item) != v:t_dict || get(item, 'type', '') !=# 'toggle'
@@ -4577,15 +4661,29 @@ function! Command() abort
 endfunction
 " {s->s.save=="in_vim_configuration"?VimConfiguration():s.save=="in_repo_dir"?ProjectPath():s.save=="in_same_dir"?expand('%:p:h'):''}
 "
+function InitCmdStorage()
+  if !exists('g:cmdstorage')
+    let g:cmdstorage=CmdStorage()
+    " let g:cmdstorage.get('commands')=g:cmdstorage.get('commands')
+    " echo g:cmdstorage.get('commands')
+    " echo g:cmdstorage.get('commands')[0].get('cmdtype.term.autocc')
+      " .set('commands', g:cmdstorage.get('commands'))
+  endif
+endfunction
 
-if !exists('g:cmdstorage')
-  let g:cmdstorage=CmdStorage()
+function! NoCommands()
+  if exists('g:cmdstorage')
+    unlet g:cmdstorage
+  endif
+endfunction
+command! -range -nargs=0 NoCommands :call NoCommands()
+function! ReloadCommands()
+  call NoCommands()
+  call InitCmdStorage()
   call g:cmdstorage.load()
-  " let g:cmdstorage.get('commands')=g:cmdstorage.get('commands')
-  " echo g:cmdstorage.get('commands')
-  " echo g:cmdstorage.get('commands')[0].get('cmdtype.term.autocc')
-    " .set('commands', g:cmdstorage.get('commands'))
-endif
+endfunction
+command! -range -nargs=0 ReloadCommands :call ReloadCommands()
+call ReloadCommands()
 
 " \   'lambda': {p,o,n -> DebugBuf('Extend changed to '..n)},
 
@@ -6057,6 +6155,10 @@ function! ToggleThroughOpenedProjects(n=1)
   echo "Implement Toggle Project " .. a:n
 endfunction
 
+function! ToggleThroughCurrentProjectOpenedBuffers(n=1)
+  echo "Implement Toggle Opened Buffers " .. a:n
+endfunction
+
 " fzf buildstring find in projects
 " why file exists 3 times in the list?
 function! FilesInProjects()
@@ -7296,11 +7398,23 @@ function! Open(direction, type="buffer", mode="copy", file="")
   elseif a:mode=="copy"
   elseif a:mode=="new" && a:type != "terminal"
     " enew
-  elseif type(a:mode)==0
-    if bufexists(a:mode)
-      exec "b".a:mode
+  elseif a:mode=="open"
+    if type(a:file)==0
+      if bufexists(a:file)
+        exec "b".a:file
+      else
+        echo "No Buffer With Number "..a:file.." found"
+      endif
       " if BufVisibileInCurrentTab(bufnr())
       " endif
+    else
+      if !filereadable(a:file) && !isdirectory(file)
+        let yY=input("File Or Directory Not Found. Create? [yY]")
+        if yY==#"y"
+          call CreateFileAndPathIfNotExists(a:file)
+        endif
+      endif
+      exec "e "..a:file
     endif
   endif
   if terminal && h
@@ -7978,56 +8092,6 @@ function! FindCommand(cs, keymap=g:keymap)
   " call DebugBuf(_eK(b:c, a:keymap))
 endfunction
 
-function! FindCommands(keymap=g:keymap)
-  " let updated = CommandTemplate()
-  " let c={ 'buffer': [],'folder': [],'repo': [], 'global': [] }
-  let c=[]
-  let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
-    \ v:val.get("key")==a:keymap
-    \ && v:val.get("extend")=="buffer"
-    \ && v:val.get("commandBuffer")==expand('%:p')
-    \ })
-  if !empty(val)
-    call extend(c, val)
-  endif
-  " let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
-  "   \ v:val.get("key")==a:keymap
-  "   \ && v:val.get("extend")=="folder"
-  "   \ && v:val.get("commandFolder")==expand('%:p:h')
-  "   \ })
-  " if !empty(val)
-  "   call extend(c, val)
-  " endif
-  "
-  let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
-    \ v:val.get("key")==a:keymap
-    \ && v:val.get("extend")=="repo"
-    \ && v:val.get("commandRepo")==ProjectPath()
-    \ })
-  if !empty(val)
-    call extend(c, val)
-  endif
-  "
-  let val = filter(copy(g:cmdstorage.get('commands')), { i,v ->
-    \ v:val.get("key")==a:keymap
-    \ && v:val.get("extend")=="global"
-    \ })
-  if !empty(val)
-    call extend(c, val)
-  endif
-  " call DebugBuf(c)
-  " return updated
-  " for [k,v] in items(c)
-  "   let updated[k]=v
-  " endfor
-  " return updated
-  " call EnsureDebugBuf()
-  " let rglobal= reduce(c['global'], {acc,item->extend(acc, {item.key: get(acc, item.key, []) + [item]})}, {})
-  " call DebugBuf(input)
-  " call DebugBuf(c)
-  return c
-endfunction
-
 function! Ref(c)
   let cidx=index(g:cmdstorage.get('commands'), a:c)
   let c=g:cmdstorage.get('commands')[cidx]
@@ -8055,7 +8119,7 @@ function! SelectCommand(cs, keymap=g:keymap)
     let result.=" ==========="
     let result.="\n"
     let result.="      "
-    let result.=c.extend=="buffer"?c.commandBuffer:c.extend=="repo"?c.commandRepo:c.extend=="global"?VimConfiguration():""
+    let result.=c.extend=="buffer"?c.extend.buffer.path:c.extend=="repo"?c.extend.repo.path:c.extend=="global"?VimConfiguration():""
     let result.="\n"
     let result.="      "
     let result.=c.extend
@@ -8114,7 +8178,7 @@ endfunction
 "       call DebugBuf("8:  autocc:             "..c['autocc'])
 "       call DebugBuf("9:  direction:          "..c['direction'])
 "     endif
-"     " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'in_vim_configuration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'commandBuffer': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'commandRepo': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'extend': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
+"     " {'commandOutputMode': -1, 'key': '<F5>', 'commandMode': 'term', 'commandTargetWindow': -1, 'command': ['date'], 'bufnr': -1, 'commandInterpreter': 'term', 'name': 'unnamed', 'savein': 'in_vim_configuration', 'decision_mode': 'check_direct', 'commandFolder': '/home/user/.vim/plugged/vim_configuration/src', 'decision_algorithm': 'check_only_one_direction', 'extend.buffer.path': '/home/user/.vim/plugged/vim_configuration/src/Map.vim', 'commandModeSession': -1, 'commandOrigin': '/home/user/.vim/plugged/vim_configuration', 'extend.repo.path': '/home/user/.vim/plugged/vim_configuration', 'hash': 1330024172, 'extend': 'global', 'directionMode': -1, 'commandTargetBuffer': -1, 'page': 0, 'commandInput': -1, 'directionSkipping': -1, 'released': 'no', 'direction': 'j'}
 "     redraw!
 "   endfunction
 "   call _printPage()
@@ -8198,7 +8262,7 @@ endfunction
 "         call c.set(s['name'], x)
 "         " let g:cmdstorage.get('commands')[cidx]=x
 "         call NewOrOverwrite(c)
-"         call SaveCommands()
+"         call g:cmdstorage.save()
 "       elseif type(td)==0 && char==td || type(td)==3 && index(td, char)>-1
 "         let x=_toggle(-1)
 "         call c.set(s['name'], x)
@@ -8239,7 +8303,7 @@ endfunction
 "     endfor
 "     call _printPage()
 "   endwhile
-"   call SaveCommands()
+"   call g:cmdstorage.save()
 "   call DebugBufClear()
 "   call DebugBufHeight()
 "   " echo join(values(map(shortcuts, {_->"\["..v:key.."\]: "..v:val})), "   ")
@@ -8252,19 +8316,22 @@ function! RedefineOrCreateNew(c, vs)
   let c = a:c
   " shared values, when modified prompts for change for all, or detach command
   " shared command over multiple repos
-  " call c.set('commandRepo', ["/path/to/repos", "/another/path/to/repos"])
-  call c.set('commandRepo', ProjectPath())
+  " call c.set('extend.repo.path', ["/path/to/repos", "/another/path/to/repos"])
+  call c.set('extend.repo.path', ProjectPath())
+  call c.set('extend.buffer.path', expand('%:p'))
+
+  call SelectExecutionUpdateTermWindow(c)
   " shared command over multiple folders
   " call c.set('commandFolder', ["/path/to/folder", "/another/path/to/folder"])
-  call c.set('commandFolder', expand('%:p:h'))
+  " call c.set('commandFolder', expand('%:p:h'))
   " shared command over multiple buffers
-  " call c.set('commandBuffer', ["/path/to/file", "/another/path/to/file"])
-  call c.set('commandBuffer', b:spectrum=='buffer'?expand('%:p'):'')
-  " call c.set('commandBufferGlob', "*")
+  " call c.set('extend.buffer.path', ["/path/to/file", "/another/path/to/file"])
+  " call c.set('extend.buffer.path', expand('%:p'))
+  " call c.set('extend.buffer.pathGlob', "*")
   " call c.set('commandFolderGlob', "*")
-  " call c.set('commandBufferGlob', ["*", "**"])
+  " call c.set('extend.buffer.pathGlob', ["*", "**"])
   " call c.set('commandFolderGlob', ["*", "**"])
-  call c.set('target', 'Local')
+  " call c.set('target', 'Local')
   " call c.set('savein', b:savein)
   " call c.set('released', b:released)
   " call c.set('decision_mode', "check_direct")
@@ -8285,7 +8352,6 @@ function! RedefineOrCreateNew(c, vs)
   " let asdf="<F6>"
   " call filter(g:cmdstorage.get('commands'), 'v:val["key"]!=asdf')
   call NewOrOverwrite(c)
-  call SaveCommands()
 endfunction
 
 function! NewOrOverwrite(c)
@@ -8293,7 +8359,7 @@ function! NewOrOverwrite(c)
   " let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
   "   \    v:val["key"]==c.get("key")
   "   \ && v:val["extend"]==c.get("extend")
-  "   \ && v:val["commandBuffer"]==c.get("commandBuffer")
+  "   \ && v:val["extend.buffer.path"]==c.get("extend.buffer.path")
   "   \ && v:val["page"]==c.get("page")
   "   \ })
   let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
@@ -8304,23 +8370,25 @@ function! NewOrOverwrite(c)
     " remove(g:cmdstorage.get('commands'), found_index)
     call DebugBuf("overwriting")
     if c.get('extend')=='buffer'
-      call c.set('commandBuffer', expand('%:p'))
+      call c.set('extend.buffer.path', expand('%:p'))
     elseif c.get('extend')=='repo'
-      call c.set('commandRepo', ProjectPath())
+      call c.set('extend.repo.path', ProjectPath())
     " elseif c.get('extend')=='folder'
-    "   call c.set('commandRepo', expand('%:p:h'))
+    "   call c.set('extend.repo.path', expand('%:p:h'))
     elseif c.get('extend')=='global'
     " elseif c.get('extend')=='tab'
       "global", "repo", "folder", "tab", "buffer"
     endif
-    let g:cmdstorage.get('commands')[found_index]=c
+    call DebugBuf("found_index ", found_index)
+    " let g:cmdstorage.find(found_index)=c
   else
     call c.set('hash', NewUUID())
     call DebugBuf("not overwriting - new command")
     " echo c
     " call add(g:cmdstorage.get('commands'), c)
-    call g:cmdstorage.add(c)
+    call g:cmdstorage.additem('commands', c)
   endif
+  call g:cmdstorage.save()
 endfunction
 
 function! Keypress_Handler() range
@@ -8330,7 +8398,7 @@ function! Keypress_Handler() range
   " return
   let vs=VS()
   " let vs=['nano']
-  "call DebugBufClear()
+  call DebugBufClear()
   " call DebugBuf(g:keymap)
   " call CommandPageInit()
   " call CommandPageInit()
@@ -8339,15 +8407,16 @@ function! Keypress_Handler() range
   " call EchoSafely(printf("%s %s %s", g:mode, g:keymap, LoadCommands()), 1500)
   " call EchoSafely(Pretty(c), 1500)
   " echo g:keymap type(c)
-  let cs=FindCommands()
-  call DebugBuf(cs)
+  " let cs=FindCommands()
+  let cs=g:cmdstorage.find_by_key(g:keymap)
+  " call DebugBuf(Pretty(cs))
   let keymap=substitute(g:keymap, ',','', 'g')
   let c = FindCommand(cs, keymap)
-  call DebugBuf(c)
+  " call DebugBuf(Pretty(c))
   " call DebugBuf(c)
   if empty(c)
     let c=CommandTemplate()
-    call DebugBuf(c)
+    " call DebugBuf(Pretty(c))
     " echo "No Matching Command"
     " return
   endif
@@ -9364,6 +9433,64 @@ function! SetBorder(dir, rewrite=0)
   endif
 endfunction
 
+function! Is_select_execution_window()
+  let s = g:select_execution_window['selected_idx']
+  let t = g:select_execution_window['terminals']
+  if s>=1 && winnr() == t[s][0]
+    return ' x '
+  else
+    return '   '
+  endif
+endfunction
+
+function! SelectExecutionUpdateTermWindow(c)
+  call SelectExecutionInit()
+  let s=g:select_execution_window['selected_idx']
+  if s>=0
+    let t=g:select_execution_window['terminals']
+    call a:c.set('term_window', t[s][0])
+    let g:select_execution_window['selected_idx']=-1
+  endif
+endfunction
+
+function! SelectExecutionInit()
+  if !exists('g:select_execution_window')
+    let g:select_execution_window={'selected_idx': -1, 'terminals': []}
+  endif
+endfunction
+
+function! SelectExecutionWindow(n)
+  call SelectExecutionInit()
+  let list=[]
+  for nr in range(1,winnr('$'))
+    let b=winbufnr(nr)
+    if getwinvar(nr, '&buftype')=='terminal'
+      call add(list, [nr, getwinvar(nr, 'cwd'), b])
+    endif
+  endfor
+  let t=g:select_execution_window['terminals']
+  let s=g:select_execution_window['selected_idx']
+  let t=list
+  let s=Mod(s+a:n, len(t)+1)
+  if s>=len(t)
+    let s = -1
+  endif
+  let g:select_execution_window['terminals']=t
+  let g:select_execution_window['selected_idx']=s
+  " let save_win = win_getid()
+  " call WinCmdToWin(t[s][0])
+  " let i = 0
+  " while i<10
+  "   norm \<C-W>\<C-N>
+  "   " norm i
+  "   sleep 100m
+  "   let i+=1
+  " endwhile
+  " echo g:select_execution_window
+  " call win_gotoid(save_win)
+  call Statusline()
+endfunction
+
 function! ResizeBorder(dir)
   let invert=0
   " call DebugBufClear()
@@ -9385,6 +9512,14 @@ function! ResizeBorder(dir)
   endif
   let save_win = win_getid()
   let n=DirectionWin(b)
+  let left_left=b=='h'&&d=='h'
+  let left_right=b=='h'&&d=='l'
+  let right_left=b=='h'&&d=='h'
+  let right_right=b=='h'&&d=='l'
+  let top_up=b=='k'&&d=='k'
+  let top_down=b=='k'&&d=='j'
+  let bottom_up=b=='j'&&d=='k'
+  let bottom_down=b=='j'&&d=='j'
   " call DebugBuf("b:  "..b)
   " call DebugBuf("d:  "..d)
   " call DebugBuf("n:  "..n)
@@ -9392,47 +9527,48 @@ function! ResizeBorder(dir)
   " call DebugBuf("cj: "..cj)
   " call DebugBuf("ck: "..ck)
   " call DebugBuf("cl: "..cl)
-  if b=='h' && d=='h'
+  if left_left
     call WinCmdToWin(n)
     call WidthDelta(-v)
-  elseif b=='h' && d=='l'
+  elseif left_right
     call WinCmdToWin(n)
     call WidthDelta(v)
-  elseif b=='l' && d=='l'
+  elseif right_right
     if invert==0
       call WinCmdToWin(n)
       call WidthDelta(-v)
     else
       call WidthDelta(v)
     endif
-  elseif b=='l' && d=='h'
+  elseif right_left
     if invert==0
       call WinCmdToWin(n)
       call WidthDelta(v)
     else
       call WidthDelta(-v)
     endif
-  elseif b=='k' && d=='k'
+  elseif top_up
     call WinCmdToWin(n)
     call HeightDelta(-v)
-  elseif b=='k' && d=='j'
+  elseif top_down
     call WinCmdToWin(n)
     call HeightDelta(v)
-  elseif b=='j' && d=='j'
+  elseif down_down
     call WinCmdToWin(n)
     call HeightDelta(-v)
-  elseif b=='j' && d=='k'
+  elseif down_up
     call WinCmdToWin(n)
     call HeightDelta(v)
-  elseif d=='h'
-    call WidthDelta(-v)
-  elseif d=='j'
-    call HeightDelta(-v)
-  elseif d=='k'
-    call HeightDelta(v)
-  elseif d=='l'
-    call WidthDelta(v)
   endif
+  " elseif d=='h'
+  "   call WidthDelta(-v)
+  " elseif d=='j'
+  "   call HeightDelta(-v)
+  " elseif d=='k'
+  "   call HeightDelta(v)
+  " elseif d=='l'
+  "   call WidthDelta(v)
+  " endif
   call win_gotoid(save_win)
   " echo "border: "..b
   " echo "dir:    "..d
@@ -9671,7 +9807,6 @@ endfunction
 function BufCreateCommandInit()
    "call CommandDictInit()
   " call LoadCommands()
-  call g:cmdstorage.refresh_current_commands()
   call MakeDirCurrentCWD(bufnr())
 endfunction
 
@@ -9687,7 +9822,6 @@ function! BufWinEnter()
   " call InitLineState()
   " echo "BufReadPost"
   " call LoadCommands()
-  call g:cmdstorage.refresh_current_commands()
 endfunction
 
 function! BufEnter()
@@ -10599,6 +10733,11 @@ nnoremap <leader>F :put=string(KeyToArray(getchar()))<cr>
 " ---- grep settings -------------------------------------------------
 " set grepprg=grep\ -nH\ --\ -r\ -w\ $*
 " set grepprg=grep -nrw -- $*
+
+function! OpenFileUnderCursorDirection(dir)
+  let file=expand("<cfile>")
+  call Open(a:dir, "buffer", "open", file)
+endfunction
 
 function! OpenFileUnderCursor()
   hide e <cfile>

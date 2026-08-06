@@ -866,14 +866,18 @@ nnoremap ,,s :call SetMode(",,s", "Normal") \| :call Statusline_TogglePath()<cr>
 nnoremap ,,d :call SetMode(",,d", "Normal") \| :echo g:debug_layout<cr>
 nnoremap ,,B :call SetMode(",,B", "Normal") \| :call Boilerplate_Test()<cr>
 nnoremap ,<Space> :call SetMode(",\<Space\>", "Normal") \| :call GetCCWD()<cr>
-nnoremap ,ch :call SetMode(",ch", "Normal") \| :call AdaptNeighborCWD('h')<cr>
-nnoremap ,cj :call SetMode(",cj", "Normal") \| :call AdaptNeighborCWD('j')<cr>
-nnoremap ,ck :call SetMode(",ck", "Normal") \| :call AdaptNeighborCWD('k')<cr>
-nnoremap ,cl :call SetMode(",cl", "Normal") \| :call AdaptNeighborCWD('l')<cr>
-tnoremap ,ch <C-\><C-n>:call SetMode(",ch", "Terminal") \| :call AdaptNeighborCWD('h')<cr>
-tnoremap ,cj <C-\><C-n>:call SetMode(",cj", "Terminal") \| :call AdaptNeighborCWD('j')<cr>
-tnoremap ,ck <C-\><C-n>:call SetMode(",ck", "Terminal") \| :call AdaptNeighborCWD('k')<cr>
-tnoremap ,cl <C-\><C-n>:call SetMode(",cl", "Terminal") \| :call AdaptNeighborCWD('l')<cr>
+nnoremap ,ah :call SetMode(",ah", "Normal") \| :call AdaptNeighborCWD('h')<cr>
+nnoremap ,aj :call SetMode(",aj", "Normal") \| :call AdaptNeighborCWD('j')<cr>
+nnoremap ,ak :call SetMode(",ak", "Normal") \| :call AdaptNeighborCWD('k')<cr>
+nnoremap ,al :call SetMode(",al", "Normal") \| :call AdaptNeighborCWD('l')<cr>
+tnoremap ,ah <C-\><C-n>:call SetMode(",ah", "Terminal") \| :call AdaptNeighborCWD('h')<cr>
+tnoremap ,aj <C-\><C-n>:call SetMode(",aj", "Terminal") \| :call AdaptNeighborCWD('j')<cr>
+tnoremap ,ak <C-\><C-n>:call SetMode(",ak", "Terminal") \| :call AdaptNeighborCWD('k')<cr>
+tnoremap ,al <C-\><C-n>:call SetMode(",al", "Terminal") \| :call AdaptNeighborCWD('l')<cr>
+nnoremap ,ch :call SetMode(",ch", "Normal") \| :call OpenFileUnderCursorDirection('h')<cr>
+nnoremap ,cj :call SetMode(",cj", "Normal") \| :call OpenFileUnderCursorDirection('j')<cr>
+nnoremap ,ck :call SetMode(",ck", "Normal") \| :call OpenFileUnderCursorDirection('k')<cr>
+nnoremap ,cl :call SetMode(",cl", "Normal") \| :call OpenFileUnderCursorDirection('l')<cr>
 nnoremap ,,c :call SetMode(",,c", "Normal") \| :call XCWD()<cr>
 nnoremap ,,p :call SetMode(",,p", "Normal") \| :call PCWD()<cr>
 nnoremap <C-s> :call SetMode("\<C-s\>", "Normal") \| :call SaveFile()<cr>
@@ -939,6 +943,8 @@ nnoremap ,,p :call SetMode(",,p", "Normal") \| :call FilesInProjects()<cr>
 nnoremap <C-S-p> :call SetMode("\<C-S-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-p> :call SetMode("\<A-p\>", "Normal") \| :call ToggleThroughOpenedProjects()<cr>
 nnoremap <A-S-p> :call SetMode("\<A-S-p\>", "Normal") \| :call ToggleThroughOpenedProjects(-1)<cr>
+nnoremap <A-[> :call SetMode("\<A-[\>", "Normal") \| :call ToggleThroughCurrentProjectOpenedBuffers()<cr>
+nnoremap <A-{> :call SetMode("\<A-{\>", "Normal") \| :call ToggleThroughCurrentProjectOpenedBuffers(-1)<cr>
 nnoremap <A-C-p> :call SetMode("\<A-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-S-C-p> :call SetMode("\<A-S-C-p\>", "Normal") \| :call Projects()<cr>
 nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call SearchGitProjects()<cr>
@@ -1209,7 +1215,8 @@ nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('h')<
 nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('j')<cr>
 nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('k')<cr>
 nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('l')<cr>
-nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call ToggleBCommand()<cr>
+nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call SelectExecutionWindow(1)<cr>
+nnoremap <S-F4> :call SetMode("\<S-F4\>", "Normal") \| :call SelectExecutionWindow(-1)<cr>
 nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :F 
 vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:F<cr>
 nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :IF 

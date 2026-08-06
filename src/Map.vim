@@ -527,15 +527,20 @@ NewMap -no -n ,,B :call Boilerplate_Test()<cr>
 " vmap <C-Space> :call LineUp()<cr>
 NewMap -no -n ,<Space> :call GetCCWD()<cr>
 
-NewMap -no -n ,ch :call AdaptNeighborCWD('h')<cr>
-NewMap -no -n ,cj :call AdaptNeighborCWD('j')<cr>
-NewMap -no -n ,ck :call AdaptNeighborCWD('k')<cr>
-NewMap -no -n ,cl :call AdaptNeighborCWD('l')<cr>
+NewMap -no -n ,ah :call AdaptNeighborCWD('h')<cr>
+NewMap -no -n ,aj :call AdaptNeighborCWD('j')<cr>
+NewMap -no -n ,ak :call AdaptNeighborCWD('k')<cr>
+NewMap -no -n ,al :call AdaptNeighborCWD('l')<cr>
 
-NewMap -no -t ,ch :call AdaptNeighborCWD('h')<cr>
-NewMap -no -t ,cj :call AdaptNeighborCWD('j')<cr>
-NewMap -no -t ,ck :call AdaptNeighborCWD('k')<cr>
-NewMap -no -t ,cl :call AdaptNeighborCWD('l')<cr>
+NewMap -no -t ,ah :call AdaptNeighborCWD('h')<cr>
+NewMap -no -t ,aj :call AdaptNeighborCWD('j')<cr>
+NewMap -no -t ,ak :call AdaptNeighborCWD('k')<cr>
+NewMap -no -t ,al :call AdaptNeighborCWD('l')<cr>
+
+NewMap -no -n ,ch :call OpenFileUnderCursorDirection('h')<cr>
+NewMap -no -n ,cj :call OpenFileUnderCursorDirection('j')<cr>
+NewMap -no -n ,ck :call OpenFileUnderCursorDirection('k')<cr>
+NewMap -no -n ,cl :call OpenFileUnderCursorDirection('l')<cr>
 
 NewMap -no -n ,,c :call XCWD()<cr>
 NewMap -no -n ,,p :call PCWD()<cr>
@@ -660,8 +665,10 @@ NewMap -no -n ,p :call Projects()<cr>
 NewMap -no -n ,,p :call FilesInProjects()<cr>
 " NewMap -no -n ,,p :call FilesInProjects()<cr>
 NewMap -no <C-S-p> :call Projects()<cr>
-NewMap -no <A-p> :call ToggleThroughOpenedProjects()<cr>
-NewMap -no <A-S-p> :call ToggleThroughOpenedProjects(-1)<cr>
+NewMap -no -n <A-p> :call ToggleThroughOpenedProjects()<cr>
+NewMap -no -n <A-S-p> :call ToggleThroughOpenedProjects(-1)<cr>
+NewMap -no -n <A-[> :call ToggleThroughCurrentProjectOpenedBuffers()<cr>
+NewMap -no -n <A-{> :call ToggleThroughCurrentProjectOpenedBuffers(-1)<cr>
 NewMap -no <A-C-p> :call Projects()<cr>
 NewMap -no <A-S-C-p> :call Projects()<cr>
 NewMap -no -n ,<C-p> :call SearchGitProjects()<cr>
@@ -1341,10 +1348,10 @@ NewMap -no -n <C-ÓÅä> :call SmartWincmd('l')<cr>
 " sometimes undos very much stuff
 " add also quickfix possibilities
 " check behaviour when you are the outer most window
-" NewMap -no -n Ä¸ÓÅâ :call SetBorder('h')<cr>
-" NewMap -no -n Ä¸ÓÅå :call SetBorder('j')<cr>
-" NewMap -no -n Ä¸ÓÅã :call SetBorder('k')<cr>
-" NewMap -no -n Ä¸ÓÅä :call SetBorder('l')<cr>
+" NewMap -no -n ??ÓÅâ :call SetBorder('h')<cr>
+" NewMap -no -n ??ÓÅå :call SetBorder('j')<cr>
+" NewMap -no -n ??ÓÅã :call SetBorder('k')<cr>
+" NewMap -no -n ??ÓÅä :call SetBorder('l')<cr>
 " nnoremap <Esc>[96;5u :echo "Numpad 0"<CR>
 " nnoremap <Esc>[97;5u :echo "Numpad 1"<CR>
 " nnoremap <Esc>[98;5u :echo "Numpad 2"<CR>
@@ -1366,7 +1373,13 @@ NewMap -no -n <C-ÓÅä> :call SmartWincmd('l')<cr>
 " D" unmap <Esc>Oq
 " :echo 1<cr>
 
-NewMap -no <F4> :call ToggleBCommand()<cr>
+" NewMap -no <F4> :call ToggleBCommand()<cr>
+NewMap -no -n <F4> :call SelectExecutionWindow(1)<cr>
+NewMap -no -n <S-F4> :call SelectExecutionWindow(-1)<cr>
+" map <F2> :echo FN()<cr>
+" map <F4> :exec "echo g:"..expand('<cword>')<cr>
+" map <F3> exec ""
+
 
 NewMap -no -n <F2> :F  
 NewMap -no -v <F2> :F<cr>
