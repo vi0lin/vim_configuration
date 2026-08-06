@@ -10,28 +10,40 @@ let g:breakpoint=60
 let g:ST_Mode=[]
 
 " Todo: Toggle Statusline
-call add(g:ST_Mode, [ 1, {->Mode()}, {->Mode()}])
-call add(g:ST_Mode, [ 1, {->' '}, {->' '}])
-call add(g:ST_Mode, [ 1, {->''}, {->Is_select_execution_window()}])
-call add(g:ST_Mode, [ 1, {->''..winnr()}, {->' '..winnr()}])
-" call add(g:ST_Mode, [ 1, {->Mode()}, {->toupper(' '..mode())..' '}])
-call add(g:ST_Mode, [ 1, {->'  '..bufnr()..' '}, ''])
-call add(g:ST_Mode, [ 2, {->PathCharwise_All(CWD(),1,1)}, ''])
-call add(g:ST_Mode, [ 2, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,0)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,1)}])
-call add(g:ST_Mode, [ 2, "%#User0# %= %<", "%#User0# %= %<"])
-call add(g:ST_Mode, [ 2, {->IsFavorite()}, ''])
-call add(g:ST_Mode, [ 2, {->GitName_Statusline()}, {->GitName_Statusline_short()}])
-call add(g:ST_Mode, [ 2, {->GitRemote_Statusline()}, {->GitRemote_Statusline_short()}])
-call add(g:ST_Mode, [ 2, {->GitBranch_Statusline()}, {->GitBranch_Statusline_short()}])
-call add(g:ST_Mode, [ 2, {->GitDiff_Statusline()}, {->GitDiff_Statusline()}])
-call add(g:ST_Mode, [ 2, {->GitTerm_Statusline_ExecKeys()}, ''])
-call add(g:ST_Mode, [ 2, {-> '  '..getcurpos()[1]..'/'..line('$')}, ''])
-call add(g:ST_Mode, [ 2, {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''}, ''])
+call add(g:ST_Mode, [ 1, {->Mode()}, {->Mode()}, ''])
+call add(g:ST_Mode, [ 1, {->' '}, {->' '}, {->IsTerm()}])
+call add(g:ST_Mode, [ 1, {->Is_select_execution_window()}, {->Is_select_execution_window()}, {->IsTerm()}])
+call add(g:ST_Mode, [ 1, {->''..winnr()}, {->' '..winnr()}, ''])
+" call add(g:ST_Mode, [ 1, {->Mode()}, {->toupper(' '..mode())..' '}, ''])
+call add(g:ST_Mode, [ 1, {->'  '..bufnr()..' '}, '', ''])
+call add(g:ST_Mode, [ 2, {->PathCharwise_All(CWD(),1,1)}, '', ''])
+call add(g:ST_Mode, [ 2, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,0)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,1)}, ''])
+call add(g:ST_Mode, [ 2, "%#User0# %= %<", "%#User0# %= %<", ''])
+call add(g:ST_Mode, [ 2, {->IsFavorite()}, '', ''])
+call add(g:ST_Mode, [ 2, {->GitName_Statusline()}, {->GitName_Statusline_short()}, ''])
+call add(g:ST_Mode, [ 2, {->GitRemote_Statusline()}, {->GitRemote_Statusline_short()}, ''])
+call add(g:ST_Mode, [ 2, {->GitBranch_Statusline()}, {->GitBranch_Statusline_short()}, ''])
+call add(g:ST_Mode, [ 2, {->GitDiff_Statusline()}, {->GitDiff_Statusline()}, ''])
+call add(g:ST_Mode, [ 2, {->GitTerm_Statusline_ExecKeys()}, '', ''])
+call add(g:ST_Mode, [ 2, {-> '  '..getcurpos()[1]..'/'..line('$')}, '', ''])
+call add(g:ST_Mode, [ 2, {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''}, '', ''])
 
 " Ctrl+v u 2026
 " …
 " Ctrl+v u 2713
 " ✓
+
+function! IsTerm()
+  " if getwinvar(winnr(), '&buftype')=='terminal'
+  " if &buftype=='terminal'
+  " if getwinvar(winnr(), '&buftype')=='terminal'
+"  if b:st"ate.type=='terminal'
+  if 'terminal'=='terminal'
+    return 1
+  else
+    return 0
+  endif
+endfunction
 
 function! Mode()
   if mode() =='n'
@@ -79,26 +91,26 @@ function! Statusline()
       endfunction
       let l:sl='%{MyFunc()}'
       for i in range(len(g:ST_Mode)-1)
-        " if buf_width>=g:ST_Mode[i][0]
-        "   let func=1
-        " else
-        "   let func=2
-        " endif
-        let usercolor=g:ST_Mode[i][0]
-        let usercolor_b=g:ST_Mode[i][0]+3
-        let usercolor_t=g:ST_Mode[i][0]+6
-        if type(g:ST_Mode[i][1])==2
-          " let l:sl.='%#User'..usercolor..'#%{(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w])}'
-          let l:sl.='%#User'..usercolor..'#%{(!exists("b:state")?(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w]):"")}'
-          let l:sl.='%#User'..usercolor_b..'#%{(exists("b:state")&&b:state.type=="buffer"?(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w]):"")}'
-          let l:sl.='%#User'..usercolor_t..'#%{(exists("b:state")&&b:state.type=="terminal"?(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w]):"")}'
-          " let l:sl.='%#User2#%{winwidth(winnr())>=50?g:ST_Mode['..i..'][1]():g:ST_Mode['..i..'][2]()}\ '
-        " elseif type(g:ST_Mode[i][w:w])==1
-        else
-          let l:sl.='%#User'..usercolor..'#'..g:ST_Mode[i][w:w]
-          " let l:sl.='%#User'..usercolor..'#%{exists("b:state")&&b:state.type=="buffer"?'..g:ST_Mode[i][w:w]..":''}"
-          " let l:sl.='%#User'..usercolor_t..'#%{exists("b:state")&&b:state.type=="terminal"?'..g:ST_Mode[i][w:w]..":''}"
-        endif
+          " if buf_width>=g:ST_Mode[i][0]
+          "   let func=1
+          " else
+          "   let func=2
+          " endif
+          let usercolor=g:ST_Mode[i][0]
+          let usercolor_b=g:ST_Mode[i][0]+3
+          let usercolor_t=g:ST_Mode[i][0]+6
+          if type(g:ST_Mode[i][1])==2
+            " let l:sl.='%#User'..usercolor..'#%{(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w])}'
+            let l:sl.='%#User'..usercolor..'#%{(type(g:ST_Mode['..i..'][3])==2&&g:ST_Mode['..i..'][3]()||g:ST_Mode['..i..'][3]==""?(!exists("b:state")?(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w]):""):"")}'
+            let l:sl.='%#User'..usercolor_b..'#%{(type(g:ST_Mode['..i..'][3])==2&&g:ST_Mode['..i..'][3]()||g:ST_Mode['..i..'][3]==""?(exists("b:state")&&b:state.type=="buffer"?(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w]):""):"")}'
+            let l:sl.='%#User'..usercolor_t..'#%{(type(g:ST_Mode['..i..'][3])==2&&g:ST_Mode['..i..'][3]()||g:ST_Mode['..i..'][3]==""?(exists("b:state")&&b:state.type=="terminal"?(type(g:ST_Mode['..i..'][w:w])==2?g:ST_Mode['..i..'][w:w]():g:ST_Mode['..i..'][w:w]):""):"")}'
+            " let l:sl.='%#User2#%{winwidth(winnr())>=50?g:ST_Mode['..i..'][1]():g:ST_Mode['..i..'][2]()}\ '
+          " elseif type(g:ST_Mode[i][w:w])==1
+          else
+            let l:sl.='%#User'..usercolor..'#'..g:ST_Mode[i][w:w]
+            " let l:sl.='%#User'..usercolor..'#%{exists("b:state")&&b:state.type=="buffer"?'..g:ST_Mode[i][w:w]..":''}"
+            " let l:sl.='%#User'..usercolor_t..'#%{exists("b:state")&&b:state.type=="terminal"?'..g:ST_Mode[i][w:w]..":''}"
+          endif
       endfor
       let &statusline=l:sl
       return
