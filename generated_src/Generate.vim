@@ -1195,12 +1195,13 @@ nnoremap dk :call SetMode("dk", "Normal") \| :norm [c<cr>
 nnoremap do :call SetMode("do", "Normal") \| :norm! do]c<cr>
 nnoremap dO :call SetMode("dO", "Normal") \| :call DoAll()<cr>
 nnoremap dp :call SetMode("dp", "Normal") \| :norm! dp]c<cr>
+nnoremap dP :call SetMode("dP", "Normal") \| :call DpAll()<cr>
 nnoremap ,do :call SetMode(",do", "Normal") \| :norm! do<cr>
 nnoremap ,dp :call SetMode(",dp", "Normal") \| :norm! dp<cr>
 nnoremap dh :call SetMode("dh", "Normal") \| :call DiffWithNeighbor('h')<cr>
 nnoremap dl :call SetMode("dl", "Normal") \| :call DiffWithNeighbor('l')<cr>
-nnoremap ,oh :call SetMode(",oh", "Normal") \| :call OpenFileHereAndInNeighbor('h')<cr>
-nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighbor('l')<cr>
+nnoremap ,oh :call SetMode(",oh", "Normal") \| :call OpenFileHereAndInNeighborV2('h')<cr>
+nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighborV2('l')<cr>
 nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
 vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>
 nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('h')<cr>
@@ -1231,3 +1232,5 @@ nnoremap <C-\> :call SetMode("\<C-\\>", "Normal") \| :OR -1<CR>
 vnoremap <C-\> :call SetMode("\<C-\\>", "Visual") \| '<,'>:OR -1<CR>
 nnoremap ,re :call SetMode(",re", "Normal") \| :Rel<cr>
 vnoremap ,re :call SetMode(",re", "Visual") \| '<,'>:Rel<cr>
+nnoremap ,,r :call SetMode(",,r", "Normal") \| :e! %<CR>
+nnoremap ,,R :call SetMode(",,R", "Normal") \| :silent windo \| if filereadable(expand("%")) \| :silent e! % \| fi \| :norm G \| :redraw!<CR>

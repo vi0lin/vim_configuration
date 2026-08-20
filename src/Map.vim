@@ -1259,13 +1259,14 @@ NewMap -no -n dk :norm [c<cr>
 NewMap -no -n do :norm! do]c<cr>
 NewMap -no -n dO :call DoAll()<cr>
 NewMap -no -n dp :norm! dp]c<cr>
+NewMap -no -n dP :call DpAll()<cr>
 " NewMap -no -n dP :norm! dp]c<cr>
 NewMap -no -n ,do :norm! do<cr>
 NewMap -no -n ,dp :norm! dp<cr>
 NewMap -no -n dh :call DiffWithNeighbor('h')<cr>
 NewMap -no -n dl :call DiffWithNeighbor('l')<cr>
-NewMap -no -n ,oh :call OpenFileHereAndInNeighbor('h')<cr>
-NewMap -no -n ,ol :call OpenFileHereAndInNeighbor('l')<cr>
+NewMap -no -n ,oh :call OpenFileHereAndInNeighborV2('h')<cr>
+NewMap -no -n ,ol :call OpenFileHereAndInNeighborV2('l')<cr>
 
 NewMap -no -n -v <C-S-.> :@:<cr>
 
@@ -1392,5 +1393,8 @@ NewMap -no -v -n <C-]> :OR 1<CR>
 NewMap -no -v -n <C-\> :OR -1<CR>
 
 NewMap -no -v -n ,re :Rel<cr>
+
+NewMap -no -n ,,r :e! %<CR>
+NewMap -no -n ,,R :silent windo \| if filereadable(expand("%")) \| :silent e! % \| fi \| :norm G \| :redraw!<CR>
 
 endif

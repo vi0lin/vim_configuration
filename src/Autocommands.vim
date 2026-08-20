@@ -26,7 +26,7 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   autocmd! WinResized	* :call Statusline()
   autocmd! BufReadPost * :call BufReadPost()
   " autocmd! BufNew,DirChanged,BufAdd,BufReadPost * :call  BufCreateCommandInit()
-  autocmd! BufEnter,BufWinEnter,BufReadPost * :call BufCreateCommandInit()
+  autocmd! BufEnter,BufWinEnter,BufReadPost * :call Entering()
   " autocmd FileType vim setlocal indentexpr=
   autocmd FileType vim setlocal nosmartindent noautoindent indentexpr=
 

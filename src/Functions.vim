@@ -16,6 +16,7 @@
 " " lookahead
 " encod\%(ing\)\@!
 " \vencod%(ing)@!
+
 if !exists("g:vim_advantages_got_sourced")
 
 " todo: RepoCommand: :CreateReadme :GitPush
@@ -321,6 +322,19 @@ function! FDiff(...)
   diffthis
 endfunction
 command! -range -nargs=* -complete=dir FDiff :call FDiff(<f-args>)
+
+function! DpAll()
+  norm gg
+  let cursor=[]
+  let cursornew=getpos('.')
+  while cursor!=cursornew
+    let cursor=copy(cursornew)
+    " norm! exclamaition mark makes it non executing mappings
+    norm! ]c
+    norm! dp
+    let cursornew=getpos('.')
+  endwhile
+endfunction
 
 function! DoAll()
   norm gg
@@ -4844,6 +4858,91 @@ function! OpenFileHereAndInNeighbor(dir)
   call DiffWithNeighbor(a:dir)
 endfunction
 
+" Todo Multiple Elements Like :echo Mglobpath('.', './**3/**5/*.md')
+function! Mglobpath(cwd, pattern)
+  let numbers=split(a:pattern, '\D\+')
+  let s = a:pattern
+  let pack=[]
+  for l in numbers
+    let subst=""
+    if l == 0
+      let subst=""
+    else
+    let placeholder=substitute(s, '**'..l.."/", '{'..l..'}', 'g')
+    for a in range(0, l)
+      if a == 0
+        let subst=""
+      else
+        let subst.="*/"
+      endif
+      call add(pack, substitute(placeholder, '{'..l..'}', subst, 'g') )
+    endfor
+    endif
+    " let s=substitute(s, '**'..l.."/", subst, 'g')
+  endfor
+  return glob('{'.join(pack,',')..'}',0,1)
+  " return [a:pattern , s ]
+  " return matchlist(a:pattern, '(\d+)')
+  " echo matchlist("*/**3/5/**4/", '\v**(\d+)')
+endfunction
+
+function! Mglob(pattern)
+  let numbers=split(a:pattern, '\D\+')
+  let s = a:pattern
+  let pack=[]
+  for l in numbers
+    let subst=""
+    if l == 0
+      let subst=""
+    else
+    let placeholder=substitute(s, '**'..l.."/", '{'..l..'}', 'g')
+    for a in range(0, l)
+      if a == 0
+        let subst=""
+      else
+        let subst.="*/"
+      endif
+      call add(pack, substitute(placeholder, '{'..l..'}', subst, 'g') )
+    endfor
+    endif
+    " let s=substitute(s, '**'..l.."/", subst, 'g')
+  endfor
+  return glob('{'.join(pack,',')..'}',0,1)
+  " return [a:pattern , s ]
+  " return matchlist(a:pattern, '(\d+)')
+  " echo matchlist("*/**3/5/**4/", '\v**(\d+)')
+endfunction
+
+function! OpenFileHereAndInNeighborV2(dir)
+  set autoread
+  let dir=ProjectPath()
+  let ow=winnr(a:dir)
+  let odir=getwinvar(ow, 'cwd')
+  let save_win = win_getid()
+  let filename=input("Filename: ", '', 'file')
+  " let file=glob([ dir..'/'..filename, dir..'/*/'..filename], 0, 1)
+  " not working let file=glob(dir..'/'..filename, { maxdepth: 2 })
+  " not working let file_o=glob(odir..'/'..filename, { maxdepth: 2 })
+  let file=Mglob(dir..'/**2/'..filename)
+  let file_o=Mglob(odir..'/**2/'..filename)
+  " let file_o=glob([ odir..'/'..filename, odir..'/*/'..filename], 0, 1)
+  if len(file)>0
+    exec "e! "..file[0]
+  endif
+  " norm gg
+  call cursor(1,1)
+  exec "wincmd "..a:dir
+  if len(file_o)>0
+    exec "e! "..file_o[0]
+  endif
+  " norm gg
+  call cursor(1,1)
+  " call cursor(1,col('.'))
+  call win_gotoid(save_win)
+  call DiffWithNeighbor(a:dir)
+  set noautoread
+endfunction
+
 function! DiffWithNeighbor(dir)
   let save_win = win_getid()
   :DiffOff
@@ -5453,100 +5552,6 @@ endfunction
 "   " catch
 "   " endtry
 " endfunction
-
-function! GitName()
-  let b=split(w:git, "/")
-  return b[-1]
-endfunction
-
-function! GitDiff_Text()
-  let b=w:gitDiff
-  return b
-endfunction
-
-function! GitBranch()
-  let b=split(w:gitBranch, "/")
-  return b[-1]
-endfunction
-
-function! GitRemote()
-  let b=split(w:gitRemote, "/")
-  return b[-1]
-endfunction
-
-function! GitName_Statusline()
-  if exists('w:git')
-    if w:git==-1
-      return ''
-    endif
-    return ' '..GitName()
-  else
-    return ''
-  endif
-endfunction
-
-function! GitName_Statusline_short()
-  if exists('w:git')
-    if w:git==-1
-      return ''
-    endif
-    return ' '..GitName()[0:5]..'…'
-  else
-    return ''
-  endif
-endfunction
-
-function! GitDiff_Statusline()
-  if exists('w:gitDiff')
-    return GitDiff_Text()
-  else
-    return ''
-  endif
-endfunction
-
-function! GitBranch_Statusline()
-  if exists('w:gitBranch')
-    if w:gitBranch==-1
-      return ''
-    endif
-    return '  '..GitBranch()
-  else
-    return ''
-  endif
-endfunction
-
-function! GitBranch_Statusline_short()
-  if exists('w:gitBranch')
-    if w:gitBranch==-1
-      return ''
-    endif
-    return '  '..GitBranch()[0:2]..'…'
-  else
-    return ''
-  endif
-endfunction
-
-function! GitRemote_Statusline()
-  if exists('w:gitRemote')
-    if w:gitRemote==-1
-      return ''
-    endif
-    return '  '..GitRemote()
-  else
-    return ''
-  endif
-endfunction
-
-function! GitRemote_Statusline_short()
-  if exists('w:gitRemote')
-    if w:gitRemote==-1
-      return ''
-    endif
-    return '  '..GitRemote()[0:2]..'…'
-  else
-    return ''
-  endif
-endfunction
 
 function! SetProject(dir)
   " echo "TODO Async Backgrounded Job"
@@ -6517,7 +6522,7 @@ let YesNo = [ "no","yes" ]
 let LoadCondition = [ "buffer_open_in_tab", "buffer_loaded", "..." ]
 " IMPROVE THIS
 " todo
-function FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
+function! FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
   fun! _not_implemented()
     echo "FixBufNr: Not Implemented"
   endfun
@@ -6925,9 +6930,10 @@ function! Keypress_Handler() range
   call DebugBuf("command_len: " .. len(g:cmdstorage.get('commands')))
   for y in g:cmdstorage.get('commands')
     let co=y.get('command')
+    let eo=y.get('extend')
     " let co=co==[]?"[]":co
     let bo=bufnr(y.get('extend.buffer.path'))
-    call DebugBuf(": " .. y.get('hash') .. " " .. y.get('key').. " " .. y.get('extend').. " " .. ((y.get('extend.buffer.path')==expand('%:p')?">here<":"> "..bo..FillSpaces(bo, 2).."<").." "..string(co)))
+    call DebugBuf(": " .. y.get('hash') .. " " .. y.get('key').. " "..eo..FillSpaces(eo, 7).." " .. ((y.get('extend.buffer.path')==expand('%:p')?">>><<<":"> "..bo..FillSpaces(bo, 2).."<").." "..string(co)))
   endfor
   call DebugBuf("cs_len: " .. len(cs))
   " let c = FindCommand(cs, keymap)
@@ -6955,16 +6961,16 @@ function! Keypress_Handler() range
     " echo "No Matching Command"
     " return
   endif
+  function! SelectExecutionUpdateTermWindow() closure
+    call SelectExecutionInit()
+    let s=g:select_execution_window['selected_idx']
+    if s>=0
+      let t=g:select_execution_window['terminals']
+      call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', t[s][0])
+      let g:select_execution_window['selected_idx']=-1
+    endif
+  endfunction
   if g:mode=='visual'
-    function! SelectExecutionUpdateTermWindow() closure
-      call SelectExecutionInit()
-      let s=g:select_execution_window['selected_idx']
-      if s>=0
-        let t=g:select_execution_window['terminals']
-        call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', t[s][0])
-        let g:select_execution_window['selected_idx']=-1
-      endif
-    endfunction
     function! RedefineOrCreateNew(keymap) closure
       " shared values, when modified prompts for change for all, or detach command
       " shared command over multiple repos
@@ -7076,16 +7082,35 @@ function! Keypress_Handler() range
     " call EchoSafely(Pretty(c), 700)
     " call EchoSafely("Command Send\n"..Pretty(c), 5000)
     "
-    " Find Buffer
+    " Overwrite With F4 Selection
     let target_term_buffer_saved=c.get('cmdtype.term.behaviour.sendtoterm.term_winid')
-    let target_term_buffer=FixBufNr(c.get('decision_mode'), c.get('decision_algorithm'))
+    let overwrite_with=-1
+    let is_overwriting_with_selected_term=0
+    if g:select_execution_window>-1
+      let is_overwriting_with_selected_term=1
+      " let overwrite_with=g:select_execution_window
+      call SelectExecutionUpdateTermWindow()
+      " call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', overwrite_with)
+      let target_term_buffer_saved=c.get('cmdtype.term.behaviour.sendtoterm.term_winid')
+      call DebugBuf("Overwriting Target Term with" .. target_term_buffer_saved)
+      let g:select_execution_window=-1
+    endif
+    if !is_overwriting_with_selected_term && !BufVisibileInCurrentTab(target_term_buffer_saved)
+      let target_term_buffer=FixBufNr(c.get('decision_mode'), c.get('decision_algorithm'))
+      call DebugBuf("Target Term Fix "..target_term_buffer_saved.." -> "..target_term_buffer)
+    else
+      call DebugBuf("Target Term Valid"..target_term_buffer)
+      let target_term_buffer=target_term_buffer_saved
+    endif
     if target_term_buffer==-1 || !BufVisibileInCurrentTab(target_term_buffer)
       call DebugBuf("BufNr: "..target_term_buffer)
+      call DebugBuf("Target Term Invisible Or -1")
     endif
     " let b:MapCommand[c.get('direction')..'t']={'bufnr': buf, 'dir': dir }
     " let buf=GetBufDirectionIfTerm(c.get('direction'))
     " let buf=winbufnr(win)
     if target_term_buffer!=-1
+      call DebugBuf("Target Term Found " .. target_term_buffer .. " - Command Execution")
       " let buf=winbufnr(winnr(c.get('direction')))
       " call TERM(target_term_buffer, c.get('command'))
       " echo c.get('cmdtype.term.autocc')
@@ -7104,7 +7129,7 @@ function! Keypress_Handler() range
         call SendCommandToTermByBuf(target_term_buffer, ['cd '..topath])
       endif
       call SendCommandToTermByBuf(target_term_buffer, c.get('command'))
-      call DebugBuf("Command Send")
+      call DebugBuf("Command Send: "..c.get('cmdtype.term.behaviour.sendtoterm.term_winid'))
       " call DebugBufHeight(1)
     else
       " call DebugBuf(c)
@@ -8415,10 +8440,12 @@ endfunction
 function! BufReadPost()
 endfunction
 
-function BufCreateCommandInit()
-   "call CommandDictInit()
+function Entering()
+  "call CommandDictInit()
   " call LoadCommands()
   call MakeDirCurrentCWD(bufnr())
+  " ProjectPath()
+  " exec "cd"ProjectPath()
 endfunction
 
 function! BufReadPre()
@@ -8436,6 +8463,8 @@ function! BufWinEnter()
 endfunction
 
 function! BufEnter()
+  " signature todo
+  return
   call Statusline()
   call CD(expand('%:p'))
   call EnsureDebugBuf()

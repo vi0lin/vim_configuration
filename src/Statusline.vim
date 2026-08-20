@@ -10,23 +10,30 @@ let g:breakpoint=60
 let g:ST_Mode=[]
 
 " Todo: Toggle Statusline
+call add(g:ST_Mode, [ 1, {->''..winnr()..' '}, {->''..winnr()..' '}, ''])
 call add(g:ST_Mode, [ 1, {->Mode()}, {->Mode()}, ''])
+" call add(g:ST_Mode, [ 1, {->Mode()}, {->toupper(' '..mode())..' '}, ''])
 call add(g:ST_Mode, [ 1, {->' '}, {->' '}, {->IsTerm()}])
 call add(g:ST_Mode, [ 1, {->Is_select_execution_window()}, {->Is_select_execution_window()}, {->IsTerm()}])
-call add(g:ST_Mode, [ 1, {->''..winnr()}, {->' '..winnr()}, ''])
-" call add(g:ST_Mode, [ 1, {->Mode()}, {->toupper(' '..mode())..' '}, ''])
-call add(g:ST_Mode, [ 1, {->'  '..bufnr()..' '}, '', ''])
-call add(g:ST_Mode, [ 2, {->PathCharwise_All(CWD(),1,1)}, '', ''])
-call add(g:ST_Mode, [ 2, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,0)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,1)}, ''])
-call add(g:ST_Mode, [ 2, "%#User0# %= %<", "%#User0# %= %<", ''])
-call add(g:ST_Mode, [ 2, {->IsFavorite()}, '', ''])
-call add(g:ST_Mode, [ 2, {->GitName_Statusline()}, {->GitName_Statusline_short()}, ''])
-call add(g:ST_Mode, [ 2, {->GitRemote_Statusline()}, {->GitRemote_Statusline_short()}, ''])
+call add(g:ST_Mode, [ 1, {->' '..bufnr()..' '}, {->' '..bufnr()..' '}, ''])
+call add(g:ST_Mode, [ 2, {->fnamemodify(ProjectPath(), ":t").." "}, {->fnamemodify(ProjectPath(), ":t").." "}, ''])
+" call add(g:ST_Mode, [ 2, {->GitName_Statusline()}, {->GitName_Statusline_short()}, ''])
 call add(g:ST_Mode, [ 2, {->GitBranch_Statusline()}, {->GitBranch_Statusline_short()}, ''])
+call add(g:ST_Mode, [ 2, {->expand("%:p:t")}, {->expand("%:p:t")}, ''])
+call add(g:ST_Mode, [ 2, {->GitRemote_Statusline()}, {->GitRemote_Statusline(3)}, ''])
+call add(g:ST_Mode, [ 2, {->GitPushTo_Statusline()}, {->GitPushTo_Statusline(3)}, ''])
+call add(g:ST_Mode, [ 2, "%#User0# %= %<", "%#User0# %= %<", ''])
+call add(g:ST_Mode, [ 2, {->PathShortForm(CWD(), 2)}, {->PathShortForm(CWD(), 2)}, ''])
+call add(g:ST_Mode, [ 2, {->IsFavorite()}, '', ''])
 call add(g:ST_Mode, [ 2, {->GitDiff_Statusline()}, {->GitDiff_Statusline()}, ''])
 call add(g:ST_Mode, [ 2, {->GitTerm_Statusline_ExecKeys()}, '', ''])
 call add(g:ST_Mode, [ 2, {-> '  '..getcurpos()[1]..'/'..line('$')}, '', ''])
 call add(g:ST_Mode, [ 2, {->exists('b:state.exec_keys')&&b:state.type=='vash'?b:state.exec_keys:''}, '', ''])
+
+
+
+" call add(g:ST_Mode, [ 2, {->PathCharwise_All(CWD(),1,1)}, '', ''])
+" call add(g:ST_Mode, [ 2, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,0)}, {->PathCharwise_All(RELATIVE(),g:shortenpath_file,1)}, ''])
 
 " Ctrl+v u 2026
 " …

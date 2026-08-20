@@ -31,7 +31,9 @@ function! CD(path)
   let w:cwd=getcwd()
   " Optimize (One Thread, gather All Information In Vim)
   call UpdateGit()
-  if w:git!=-1
+  if exists('w:git')
+    if w:git!=-1
+    endif
   endif
   " echo "Not A Directory"
   let $folderrepo=Folder_Repo(0, 0)
@@ -40,33 +42,6 @@ endfunction
 function! GetParentDir(path)
     let l:parent = fnamemodify(a:path, ':h')
     return l:parent
-endfunction
-
-function! MakeDirCurrentCWD(bufnr)
-  if !exists('g:temporaryfix')
-  " echo expand("%:p:h")
-  " if win_gettype() != 'popup'
-  " echo a:bufnr
-  " echo ThisIsFZF(a:bufnr)
-  " if getbufvar(a:bufnr, '&filetype')!=#'fzf'
-    " echo a:bufnr
-  " && !IsPopup(win_getid())
-    let [n, y, x, n, n]=getcurpos()
-    " let w:cwd=expand("%:p:h")
-    " let w:pointer=expand('%')
-    let p1=expand("%:p:h")
-    let p2=expand('%:p')
-    if isdirectory(p1)
-      call CD(p1)
-    else
-      echo "Dir does not exist" p1
-    endif
-    if filereadable(p2)
-      call SetPointer(p2)
-    endif
-    " call SetProject(expand("%:p:h"))
-    call cursor(y, x)
-  endif
 endfunction
 
 function! MakeDirCurrent(path)
@@ -284,11 +259,117 @@ function! GitToggleRemote()
 endfunction
 
 function! UpdateGit_OnSave()
-  let w:gitDiff=FindDiff(w:cwd)
+  if exists("w:cwd")
+    let w:gitDiff=FindDiff(w:cwd)
+  endif
   call Statusline()
 endfunction
 
+function! GitName()
+  let b=split(w:git, "/")
+  return b[-1]
+endfunction
+
+function! GitDiff_Text()
+  let b=w:gitDiff
+  return b
+endfunction
+
+function! GitBranch()
+  let b=split(w:gitBranch, "/")
+  return b[-1]
+endfunction
+
+function! GitRemote()
+  let b=split(w:gitRemote, "/")
+  return b[-1]
+endfunction
+
+function! GitName_Statusline()
+  if exists('w:git')
+    if w:git==-1
+      return ''
+    endif
+    return ' '..GitName()
+  else
+    return ''
+  endif
+endfunction
+
+function! GitName_Statusline_short()
+  if exists('w:git')
+    if w:git==-1
+      return ''
+    endif
+    return ' '..GitName()[0:5]..'…'
+  else
+    return ''
+  endif
+endfunction
+
+function! GitDiff_Statusline()
+  if exists('w:gitDiff')
+    return GitDiff_Text()
+  else
+    return ''
+  endif
+endfunction
+
+function! GitBranch_Statusline()
+  if exists('w:gitBranch')
+    if w:gitBranch==-1
+      return ''
+    endif
+    return ""..GitBranch()..'▶'
+  else
+    return ''
+  endif
+endfunction
+
+function! GitBranch_Statusline_short()
+  if exists('w:gitBranch')
+    if w:gitBranch==-1
+      return ''
+    endif
+    return ('  '..GitBranch()[0:2]..'…')
+  else
+    return ''
+  endif
+endfunction
+
+function! GitRemote_Statusline(num=-1)
+  let num=a:num
+  let post=""
+  if num>-1
+  let post="…"
+  endif
+  if exists('w:gitRemote')
+    if w:gitRemote==-1
+      return ''
+    endif
+    return ('  {remote:'..GitRemote()..'}')[:num]..post..' '
+  else
+    return ''
+  endif
+endfunction
+
+function! GitPushTo_Statusline(num=-1)
+  return (' ▲'.."{push_to:remote_branches}"..' ')
+endfunction
+
+function! GitRemote_Statusline_short()
+  if exists('w:gitRemote')
+    if w:gitRemote==-1
+      return ''
+    endif
+    return '  '..GitRemote()[0:2]..'…'
+  else
+    return ''
+  endif
+endfunction
+
 function! UpdateGit()
+  " signature todo
   let cwd=CWD()
   let w:git=FindGit(cwd)
   let w:gitBranch=FindBranch(cwd)
@@ -300,7 +381,104 @@ function! UpdateGit()
   call UpdateGit_OnSave()
 endfunction
 
+function! MakeDirCurrentCWD(bufnr)
+  " signature todo
+  if !exists('g:temporaryfix')
+  " echo expand("%:p:h")
+  " if win_gettype() != 'popup'
+  " echo a:bufnr
+  " echo ThisIsFZF(a:bufnr)
+  " if getbufvar(a:bufnr, '&filetype')!=#'fzf'
+    " echo a:bufnr
+  " && !IsPopup(win_getid())
+    let [n, y, x, n, n]=getcurpos()
+    " let w:cwd=expand("%:p:h")
+    " let w:pointer=expand('%')
+    let p1=expand("%:p:h")
+    let p2=expand('%:p')
+    if isdirectory(p1)
+      call CD(p1)
+    else
+      echo "Dir does not exist" p1
+    endif
+    if filereadable(p2)
+      call SetPointer(p2)
+    endif
+    " call SetProject(expand("%:p:h"))
+    call cursor(y, x)
+  endif
+endfunction
+
+function! CWD()
+  " if !IsPopup(win_getid())
+  " if !ThisIsFZF(bufnr())
+  if !exists("w:cwd")
+    " let w:cwd=expand('%:p:h')
+    " call SetPointer('%:p')
+    call MakeDirCurrentCWD(bufnr())
+    " redir=>w:cwd | pwd | redir END
+    " let w:cwd=substitute(w:cwd, '\n', "", 'g')
+  endif
+  " endif
+  if exists('w:cwd')
+    return w:cwd
+  else
+    return ''
+  endif
+endfunction
+
 function! ProjectPath()
+  let cwd=CWD()
+  " let cwd=expand("%:p:h")
+  let finish=0
+  let paths=[]
+  while 1
+    let isgit=globpath(cwd, '.git')
+    let isproject=index(g:projects, cwd)
+    if !empty(isgit) || isproject>-1
+      return cwd
+    endif
+    if cwd=='/'
+      break
+    endif
+    let cwd=GetParentDir(cwd)
+  endwhile
+  return -1
+  " let file = -1
+  " let c=a:count+a:nr
+  " let i = 0
+  " let file = w:git
+  " while i < c
+  "   if i==0
+  "     let x = FindGit(file)
+  "   else
+  "     let x = FindGit(GetParentDir(file))
+  "   endif
+  "   if x=='0' || x==-1 || x==0
+  "     let file=GetParentDir(file)
+  "   else
+  "     let file=x
+  "   endif
+  "   let i += 1
+  " endwhile
+  " " if c==0
+  " "   let file=w:git
+  " " elseif c==1
+  " "   let file=FindGit(GetParentDir(w:git))
+  " " elseif c==2
+  " "   let file=FindGit(GetParentDir(FindGit(GetParentDir(w:git))))
+  " " endif
+  " if file == -1
+  "   " getcwd is not userfriendly
+  "   " consider throwing a message
+  "   " let file=getcwd()
+  "   " echo "No higher Repo"
+  "   return
+  " endif
+  " return file
+endfunction
+
+function! ProjectOrGitPath()
   let cwd=CWD()
   let finish=0
   let paths=[]
@@ -423,13 +601,27 @@ function! Folder_Repo_Or_Project_notright(count, nr)
   return Folder(cwd, a:nr)
 endfunction
 
+function! PathShortForm(path, num)
+  let folders=split(a:path, '/')
+  let out=""
+  let num=a:num
+  for f in folders
+    let out.="/"..f[ 0 : num].."…"
+  endfor
+  return out
+endfunction
+
 " TODO Also Consider g:projects to check agains if its a "repo" not only .git
 " containing folders
 function! Folder_Repo(count, nr)
   let file = -1
   let c=a:count+a:nr
   let i = 0
-  let file = w:git
+  if exists('w:git')
+    let file = w:git
+  else
+    " echo "fix CD"
+  endif
   while i < c
     if i==0
       let x = FindGit(file)
@@ -473,22 +665,3 @@ endfunction
 "   set laststatus=0
 " endfunction
 " au BufEnter,BufWinEnter,WinEnter,CmdwinEnter * call s:disable_statusline('Information')
-
-function! CWD()
-  " if !IsPopup(win_getid())
-  " if !ThisIsFZF(bufnr())
-  if !exists("w:cwd")
-    " let w:cwd=expand('%:p:h')
-    " call SetPointer('%:p')
-    call MakeDirCurrentCWD(bufnr())
-    " redir=>w:cwd | pwd | redir END
-    " let w:cwd=substitute(w:cwd, '\n', "", 'g')
-  endif
-  " endif
-  if exists('w:cwd')
-    return w:cwd
-  else
-    return ''
-  endif
-endfunction
-
