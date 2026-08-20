@@ -347,14 +347,16 @@ function! GitRemote_Statusline(num=-1)
     if w:gitRemote==-1
       return ''
     endif
-    return ('  {remote:'..GitRemote()..'}')[:num]..post..' '
+    " r-->remote
+    return ('  {r:'..GitRemote()..'}')[:num]..post..' '
   else
     return ''
   endif
 endfunction
 
 function! GitPushTo_Statusline(num=-1)
-  return (' ▲'.."{push_to:remote_branches}"..' ')
+  " p-->push_to
+  return (' ▲'.."{p:remote_branches}"..' ')
 endfunction
 
 function! GitRemote_Statusline_short()
@@ -599,6 +601,16 @@ function! Folder_Repo_Or_Project_notright(count, nr)
   " Folder_Up(cwd)
   " return '/'
   return Folder(cwd, a:nr)
+endfunction
+
+function! PathShortForm_when_small(path, num)
+    let buf_height = winheight(winnr())
+    let buf_width = winwidth(winnr())
+    if buf_width<=136
+      return PathShortForm(a:path, a:num)
+    else
+      return a:path
+    endif
 endfunction
 
 function! PathShortForm(path, num)
