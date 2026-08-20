@@ -1,3 +1,5 @@
+" v /@!
+"
 " ,lcr last command repo
 " ,lcg
 " ,lcb
@@ -127,34 +129,54 @@ function! EnsureDebugBuf()
   endif
 endfunction
 
-function! DebugBuf(...) abort
-  if exists('t:debugbuf')
-    let data=[]
-    for i in a:000
+let t:debugbuf_buffer=[]
+function! DebugBuf(...)
+  let data=[]
+  for i in a:000
+    try
+      call add(data, i)
+    catch
       try
         call add(data, i)
       catch
-        try
-          call add(data, i)
-        catch
-          call add(data, 'Error')
-        endtry
+        call add(data, 'Error')
       endtry
-    endfor
+    endtry
+  endfor
+  call extend(t:debugbuf_buffer, data)
+endfunction
+
+function! DebugBufFlush()
+  call DebugBufClear()
+  if exists('t:debugbuf')
+    " let data=[]
+    " for i in a:000
+    "   try
+    "     call add(data, i)
+    "   catch
+    "     try
+    "       call add(data, i)
+    "     catch
+    "       call add(data, 'Error')
+    "     endtry
+    "   endtry
+    " endfor
     let save_win = win_getid()
     call win_gotoid(save_win)
-    let line=""
-    for d in data
-      if type(d)==2
-        let line.='func{}'
-      else
-        try
-          call appendbufline(t:debugbuf, '$', d)
-          redraw!
-        catch
-        endtry
-      endif
-    endfor
+    call appendbufline(t:debugbuf, '$', t:debugbuf_buffer)
+    " let line=""
+    " for d in t:debugbuf_buffer
+    "   if type(d)==2
+    "     let line.='func{}'
+    "   else
+    "     try
+    "       call appendbufline(t:debugbuf, '$', d)
+    "       redraw!
+    "     catch
+    "     endtry
+    "   endif
+    " endfor
+    let t:debugbuf_buffer=[]
     if !exists('t:debugbuf')
       call EnsureDebugBuf()
     endif
@@ -2478,6 +2500,10 @@ function! GetBufDirectionIfTermDirect(direction)
   endif
 endfunction
 
+function! GetWinDirectionIfTermDirect(direction)
+  return bufwinnr(GetBufDirectionIfTermDirect(a:direction))
+endfunction
+
 function! GetBufDirectionIfTerm(direction)
   for i in range(0, CountWindowsInDirection(a:direction))
     let win=DirectionBufWin(i+1..a:direction)
@@ -2487,6 +2513,11 @@ function! GetBufDirectionIfTerm(direction)
   endfor
   return -1
 endfunction
+
+function! GetWinDirectionIfTerm(direction)
+  return bufwinnr(GetBufDirectionIfTerm(a:direction))
+endfunction
+
 
 function! FindFirstTerm()
   for win in range(1,winnr('$'))
@@ -5959,6 +5990,8 @@ function! Open(direction, type="buffer", mode="copy", file="")
   " echo pre arg file
   " return
   " exec post
+  "
+  let buf=bufnr()
   let win = winnr()
   " exec previous_win "wincmd w"
   " if buffer
@@ -6038,6 +6071,7 @@ function! Open(direction, type="buffer", mode="copy", file="")
   " exec previous_win "wincmd w"
   call WinSwap_Back()
   endif
+  return {"win": win, "buf": buf}
 endfunction
 
 function! TabHMove()
@@ -6567,19 +6601,21 @@ function! FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_
   if !bufexists(buf)
     " if d==-1 | let d="l" | endif
     call DebugBuf("In This Case, A Command Gets Send To A Term That Has Not Finished Being Created")
-    call Open(d, "terminal", "new")
+    let buf=Open(d, "terminal", "new").buf
+    call DebugBuf("New Terminal:" .. buf)
   else
     if !BufVisibileInCurrentTab(buf)
       if GetBufDirectionIfTermDirect(d)==-1
         call DebugBuf("Try To ReOpen " .. d)
         call DebugBuf("In This Case, A Command Gets Send To A Term That Has Not Finished Being Created")
-        call Open(d, "terminal", buf)
+        let buf=Open(d, "terminal", buf).buf
+        call DebugBuf("Reopen Terminal:" .. buf)
       endif
     endif
   endif
   call win_gotoid(save_win)
+  call DebugBuf("Buf Open Return: "..buf)
   return buf
-  "
   " let c=a:c
   " if !bufexists(c.get('bufnr'))
   "   let c.get('bufnr')=-1
@@ -6601,6 +6637,10 @@ function! FixBufNr(decision_mode="check_direct", decision_algorithm="check_only_
   "   echo "Try To ReOpen"
   "   " call Open('J', "terminal", buf)
   " endif
+endfunction
+
+function! FixWinNr(decision_mode="check_direct", decision_algorithm="check_only_one_direction")
+  return winbufnr(FixBufNr(a:decision_mode, a:decision_algorithm))
 endfunction
 
 " let g:cmdstorage.get('commands')=[]
@@ -6907,14 +6947,16 @@ function! ConfigureKeys()
 endfunction
 
 function! Keypress_Handler() range
+  let g:temporaryfix=0
   let save_win = win_getid()
   call InitCommands()
+  let execution_window=GetExecutionWindow()
   " call LoadCommands()
   " call TermPopup("TERM", 21, {_ -> TestFunction(21) }, g:outfile)
   " return
   let vs=VS()
   " let vs=['nano']
-  call DebugBufClear()
+  " call DebugBufClear()
   " call DebugBuf(g:keymap)
   " call CommandPageInit()
   " call CommandPageInit()
@@ -6928,25 +6970,32 @@ function! Keypress_Handler() range
   " let cs=g:cmdstorage.find_by_key(keymap)
   let cs=g:cmdstorage.find(keymap)
   call DebugBuf("command_len: " .. len(g:cmdstorage.get('commands')))
-  for y in g:cmdstorage.get('commands')
-    let co=y.get('command')
-    let eo=y.get('extend')
-    " let co=co==[]?"[]":co
-    let bo=bufnr(y.get('extend.buffer.path'))
-    call DebugBuf(": " .. y.get('hash') .. " " .. y.get('key').. " "..eo..FillSpaces(eo, 7).." " .. ((y.get('extend.buffer.path')==expand('%:p')?">>><<<":"> "..bo..FillSpaces(bo, 2).."<").." "..string(co)))
-  endfor
+  """" COMMAND DEBUGGING for y in g:cmdstorage.get('commands')
+  """" COMMAND DEBUGGING   let co=y.get('command')
+  """" COMMAND DEBUGGING   let eo=y.get('extend')
+  """" COMMAND DEBUGGING   " let co=co==[]?"[]":co
+  """" COMMAND DEBUGGING   let bo=bufnr(y.get('extend.buffer.path'))
+  """" THIS COMMAND DEBUGGING   call DebugBuf(": " .. y.get('hash') .. " " .. y.get('key').. " "..eo..FillSpaces(eo, 7).." " .. ((y.get('extend.buffer.path')==expand('%:p')?">>><<<":"> "..bo..FillSpaces(bo, 2).."<").." "..string(co)))
+  """" THIS COMMAND DEBUGGING endfor
   call DebugBuf("cs_len: " .. len(cs))
   " let c = FindCommand(cs, keymap)
+  let b:selected_conflicting_command=0
   if len(cs)>1
     call DebugBuf("multiple commands found - conflicting")
+    call DebugBuf("Planning: "..c.get('cmdtype.term.behaviour.sendtoterm.term_winid'))
+    call DebugBuf("Always selecting first, at the moment")
     let i = 0
     for a in cs
-      call DebugBuf(i .. " " .. string(a.get('command')))
+      let prefix="   "
+      if i==b:selected_conflicting_command
+        let prefix=" > "
+      endif
+      call DebugBuf(prefix.." "..i .. " " .. string(a.get('command')))
       let i+=1
     endfor
   endif
   if len(cs)>0
-    let c = cs[0]
+    let c = cs[b:selected_conflicting_command]
   else
     let c={}
   endif
@@ -6961,84 +7010,84 @@ function! Keypress_Handler() range
     " echo "No Matching Command"
     " return
   endif
-  function! SelectExecutionUpdateTermWindow() closure
-    call SelectExecutionInit()
-    let s=g:select_execution_window['selected_idx']
-    if s>=0
-      let t=g:select_execution_window['terminals']
-      call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', t[s][0])
-      let g:select_execution_window['selected_idx']=-1
-    endif
-  endfunction
-  if g:mode=='visual'
+  let target_term_buffer=-1
+  if g:mode=='visual' || execution_window>-1
     function! RedefineOrCreateNew(keymap) closure
-      " shared values, when modified prompts for change for all, or detach command
-      " shared command over multiple repos
-      " call c.set('extend.repo.path', ["/path/to/repos", "/another/path/to/repos"])
-      call c.set('extend.repo.path', ProjectPath())
-      call c.set('extend.buffer.path', expand('%:p'))
-      call SelectExecutionUpdateTermWindow()
-      " shared command over multiple folders
-      " call c.set('commandFolder', ["/path/to/folder", "/another/path/to/folder"])
-      " call c.set('commandFolder', expand('%:p:h'))
-      " shared command over multiple buffers
-      " call c.set('extend.buffer.path', ["/path/to/file", "/another/path/to/file"])
-      " call c.set('extend.buffer.path', expand('%:p'))
-      " call c.set('extend.buffer.pathGlob', "*")
-      " call c.set('commandFolderGlob', "*")
-      " call c.set('extend.buffer.pathGlob', ["*", "**"])
-      " call c.set('commandFolderGlob', ["*", "**"])
-      " call c.set('target', 'Local')
-      " call c.set('savein', b:savein)
-      " call c.set('released', b:released)
-      " call c.set('decision_mode', "check_direct")
-      " call c.set('decision_algorithm', "check_only_one_direction")
-      " call c.set('cmdtype.term.autocd', "no")
-      " call c.set('cmdtype.term.autocd_path', "/")
-      " call c.set('extend', b:spectrum)
-      call c.set('command', vs)
-      " call c.set('page', 0)
-      call c.set('key', a:keymap)
-      " call c.set('direction', g:default_direction)
-      " let b:commands['pages'][0][g:keymap]=c
-      " call filter(copy(g:cmdstorage.get('commands')), '!(v:val["extend"]==c["extend"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
-      " call DebugBuf(vs)
-      " let g:cmdstorage.get('commands')=[]
-      " let g:cmdstorage.get('commands')=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
-      " echo g:cmdstorage.get('commands')
-      " let asdf="<F6>"
-      " call filter(g:cmdstorage.get('commands'), 'v:val["key"]!=asdf')
-      " let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
-      "   \    v:val["key"]==c.get("key")
-      "   \ && v:val["extend"]==c.get("extend")
-      "   \ && v:val["extend.buffer.path"]==c.get("extend.buffer.path")
-      "   \ && v:val["page"]==c.get("page")
-      "   \ })
-      let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
-        \    v:val.get("hash")==c.get("hash")
-        \ })
-      " echo found_index
-      if found_index>-1
-        " remove(g:cmdstorage.get('commands'), found_index)
-        call DebugBuf("overwriting")
-        if c.get('extend')=='buffer'
-          call c.set('extend.buffer.path', expand('%:p'))
-        elseif c.get('extend')=='repo'
-          call c.set('extend.repo.path', ProjectPath())
-        " elseif c.get('extend')=='folder'
-        "   call c.set('extend.repo.path', expand('%:p:h'))
-        elseif c.get('extend')=='global'
-        " elseif c.get('extend')=='tab'
-          "global", "repo", "folder", "tab", "buffer"
+      if execution_window>-1
+        call DebugBuf('cmdtype.term.behaviour.sendtoterm.term_winid'..winbufnr(execution_window))
+        call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', winbufnr(execution_window))
+        let target_term_buffer = winbufnr(execution_window)
+        let execution_window=-1
+      endif
+      if g:mode=='visual'
+        " shared values, when modified prompts for change for all, or detach command
+        " shared command over multiple repos
+        " call c.set('extend.repo.path', ["/path/to/repos", "/another/path/to/repos"])
+        call c.set('extend.repo.path', ProjectPath())
+        call c.set('extend.buffer.path', expand('%:p'))
+        " shared command over multiple folders
+        " call c.set('commandFolder', ["/path/to/folder", "/another/path/to/folder"])
+        " call c.set('commandFolder', expand('%:p:h'))
+        " shared command over multiple buffers
+        " call c.set('extend.buffer.path', ["/path/to/file", "/another/path/to/file"])
+        " call c.set('extend.buffer.path', expand('%:p'))
+        " call c.set('extend.buffer.pathGlob', "*")
+        " call c.set('commandFolderGlob', "*")
+        " call c.set('extend.buffer.pathGlob', ["*", "**"])
+        " call c.set('commandFolderGlob', ["*", "**"])
+        " call c.set('target', 'Local')
+        " call c.set('savein', b:savein)
+        " call c.set('released', b:released)
+        " call c.set('decision_mode', "check_direct")
+        " call c.set('decision_algorithm', "check_only_one_direction")
+        " call c.set('cmdtype.term.autocd', "no")
+        " call c.set('cmdtype.term.autocd_path', "/")
+        " call c.set('extend', b:spectrum)
+        call DebugBuf("overwriting: "..join(c.get('command'), ', ').." with "..join(vs, ', '))
+        call c.set('command', vs)
+        " call c.set('page', 0)
+        call c.set('key', a:keymap)
+        " call c.set('direction', g:default_direction)
+        " let b:commands['pages'][0][g:keymap]=c
+        " call filter(copy(g:cmdstorage.get('commands')), '!(v:val["extend"]==c["extend"]&&v:val["commandSaveinFolder"]==c["commandSaveinFolder"]&&v:val["key"]==c["key"]&&v:val["page"]==c["page"])')
+        " call DebugBuf(vs)
+        " let g:cmdstorage.get('commands')=[]
+        " let g:cmdstorage.get('commands')=[{'test': "asdf", 'test2': "asdf3"}, {'test': "asd", 'test2': "asdf"}]
+        " echo g:cmdstorage.get('commands')
+        " let asdf="<F6>"
+        " call filter(g:cmdstorage.get('commands'), 'v:val["key"]!=asdf')
+        " let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
+        "   \    v:val["key"]==c.get("key")
+        "   \ && v:val["extend"]==c.get("extend")
+        "   \ && v:val["extend.buffer.path"]==c.get("extend.buffer.path")
+        "   \ && v:val["page"]==c.get("page")
+        "   \ })
+        call DebugBuf("old_hash: "..c.get('hash'))
+        let found_index=indexof(copy(g:cmdstorage.get('commands')), { i,v->
+          \    v:val.get("hash")==c.get("hash")
+          \ })
+        " echo found_index
+        if found_index>-1
+          " remove(g:cmdstorage.get('commands'), found_index)
+          if c.get('extend')=='buffer'
+            call c.set('extend.buffer.path', expand('%:p'))
+          elseif c.get('extend')=='repo'
+            call c.set('extend.repo.path', ProjectPath())
+          " elseif c.get('extend')=='folder'
+          "   call c.set('extend.repo.path', expand('%:p:h'))
+          elseif c.get('extend')=='global'
+          " elseif c.get('extend')=='tab'
+            "global", "repo", "folder", "tab", "buffer"
+          endif
+          call DebugBuf("found_index ", found_index)
+          " let g:cmdstorage.find(found_index)=c
+        else
+          call c.set('hash', NewUUID())
+          call DebugBuf("not overwriting - new command")
+          " echo c
+          " call add(g:cmdstorage.get('commands'), c)
+          call g:cmdstorage.additem('commands', c)
         endif
-        call DebugBuf("found_index ", found_index)
-        " let g:cmdstorage.find(found_index)=c
-      else
-        call c.set('hash', NewUUID())
-        call DebugBuf("not overwriting - new command")
-        " echo c
-        " call add(g:cmdstorage.get('commands'), c)
-        call g:cmdstorage.additem('commands', c)
       endif
       call g:cmdstorage.save()
     endfunction
@@ -7076,7 +7125,7 @@ function! Keypress_Handler() range
   if type(c)==0 && c.get('command') != -1 || c.get('command')==[]
     " call DebugBuf(c)
     " call DebugBuf("Command Not Send\n"..Pretty(c))
-    call DebugBuf("Command Not Send")
+    call DebugBuf("Command Not Send (1)")
     " call DebugBuf(c)
   elseif type(c)!=3
     " call EchoSafely(Pretty(c), 700)
@@ -7084,32 +7133,44 @@ function! Keypress_Handler() range
     "
     " Overwrite With F4 Selection
     let target_term_buffer_saved=c.get('cmdtype.term.behaviour.sendtoterm.term_winid')
-    let overwrite_with=-1
-    let is_overwriting_with_selected_term=0
-    if g:select_execution_window>-1
-      let is_overwriting_with_selected_term=1
-      " let overwrite_with=g:select_execution_window
-      call SelectExecutionUpdateTermWindow()
-      " call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', overwrite_with)
-      let target_term_buffer_saved=c.get('cmdtype.term.behaviour.sendtoterm.term_winid')
-      call DebugBuf("Overwriting Target Term with" .. target_term_buffer_saved)
-      let g:select_execution_window=-1
+    " let overwrite_with=-1
+    " let is_overwriting_with_selected_term=0
+    " if g:select_execution_window.selected_idx>-1
+    "   let is_overwriting_with_selected_term=1
+    "   " let overwrite_with=g:select_execution_window
+    "   " call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', overwrite_with)
+    "   let target_term_buffer_saved=c.get('cmdtype.term.behaviour.sendtoterm.term_winid')
+    "   call DebugBuf("Overwriting Target Term with" .. target_term_buffer_saved)
+    "   let g:select_execution_window=-1
+    " endif
+    call DebugBuf("execution_window "..execution_window)
+    if execution_window==-1
+      let target_term_buffer=c.get('cmdtype.term.behaviour.sendtoterm.term_winid')
+    elseif execution_window>-1
+      let target_term_buffer=execution_window
+    " elseif !is_overwriting_with_selected_term && !BufVisibileInCurrentTab(target_term_buffer_saved)
     endif
-    if !is_overwriting_with_selected_term && !BufVisibileInCurrentTab(target_term_buffer_saved)
-      let target_term_buffer=FixBufNr(c.get('decision_mode'), c.get('decision_algorithm'))
+    if execution_window==-1 && !BufVisibileInCurrentTab(target_term_buffer_saved)
       call DebugBuf("Target Term Fix "..target_term_buffer_saved.." -> "..target_term_buffer)
-    else
-      call DebugBuf("Target Term Valid"..target_term_buffer)
-      let target_term_buffer=target_term_buffer_saved
+      let target_term_buffer=FixBufNr(c.get('decision_mode'), c.get('decision_algorithm'))
+      " call DebugBuf("Command Send: "..c.get('cmdtype.term.behaviour.sendtoterm.term_winid'))
+      " call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', target_term_buffer)
+      call DebugBuf('cmdtype.term.behaviour.sendtoterm.term_winid'..target_term_buffer)
+      call c.set('cmdtype.term.behaviour.sendtoterm.term_winid', target_term_buffer)
+    "elseif !overwrite_with
+    "  call DebugBuf("Target Term Valid"..target_term_buffer)
+    "  let target_term_buffer=target_term_buffer_saved
     endif
+    call DebugBuf("target_term_buffer: "..target_term_buffer)
     if target_term_buffer==-1 || !BufVisibileInCurrentTab(target_term_buffer)
-      call DebugBuf("BufNr: "..target_term_buffer)
       call DebugBuf("Target Term Invisible Or -1")
     endif
     " let b:MapCommand[c.get('direction')..'t']={'bufnr': buf, 'dir': dir }
     " let buf=GetBufDirectionIfTerm(c.get('direction'))
     " let buf=winbufnr(win)
-    if target_term_buffer!=-1
+    "
+    " call DebugBuf("Target Term Buffer" .. target_term_buffer)
+    if target_term_buffer>-1
       call DebugBuf("Target Term Found " .. target_term_buffer .. " - Command Execution")
       " let buf=winbufnr(winnr(c.get('direction')))
       " call TERM(target_term_buffer, c.get('command'))
@@ -7128,12 +7189,12 @@ function! Keypress_Handler() range
         endif
         call SendCommandToTermByBuf(target_term_buffer, ['cd '..topath])
       endif
+      call DebugBuf("Command Send: "..target_term_buffer)
       call SendCommandToTermByBuf(target_term_buffer, c.get('command'))
-      call DebugBuf("Command Send: "..c.get('cmdtype.term.behaviour.sendtoterm.term_winid'))
       " call DebugBufHeight(1)
     else
       " call DebugBuf(c)
-      call DebugBuf("Command Not Send")
+      call DebugBuf("Command Not Send (2)")
       " call DebugBufHeight(1)
     endif
   else
@@ -7141,6 +7202,8 @@ function! Keypress_Handler() range
   endif
   " echo g:cmdstorage.get('commands')
   call win_gotoid(save_win)
+  unlet g:temporaryfix
+  call DebugBufFlush()
 endfunction
 
 function! WinCmdToWin(winnr)
@@ -8093,6 +8156,28 @@ function! SelectExecutionInit()
   if !exists('g:select_execution_window')
     let g:select_execution_window={'selected_idx': -1, 'terminals': []}
   endif
+endfunction
+
+function! GetExecutionWindow()
+  call SelectExecutionInit()
+  let t=g:select_execution_window['terminals']
+  let s=g:select_execution_window['selected_idx']
+  let out=-1
+  if s!=-1
+    let out=t[s][0]
+  endif
+  return out
+endfunction
+
+function! GetExecutionBuffer()
+  call SelectExecutionInit()
+  let t=g:select_execution_window['terminals']
+  let s=g:select_execution_window['selected_idx']
+  let out=-1
+  if s!=-1
+    let out=t[s][2]
+  endif
+  return out
 endfunction
 
 function! SelectExecutionWindow(n)

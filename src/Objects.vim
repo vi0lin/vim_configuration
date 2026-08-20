@@ -929,7 +929,7 @@ function! ReloadCommands()
   call g:cmdstorage.load()
 endfunction
 command! -range -nargs=0 ReloadCommands :call ReloadCommands()
-" call ReloadCommands()
+call ReloadCommands()
 
 " \   'lambda': {p,o,n -> DebugBuf('Extend changed to '..n)},
 
