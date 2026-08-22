@@ -9896,7 +9896,7 @@ endif
 let filepairs=[]
 function DirDiff()
   let g:dir_diff_list=[]
-  let g:filepairs=systemlist("diff -rq "..left.." "..right.." | grep 'differ$' | sed 's/^Files //; s/ differ$//; s/ and / /'")
+  let g:filepairs=systemlist("diff -rq "..g:left.." "..g:right.." | grep 'differ$' | sed 's/^Files //; s/ differ$//; s/ and / /'")
 "  while read -r a b; do
 "    vimdiff "$a" "$b"
 "  done
@@ -9926,7 +9926,7 @@ function DirDiffNext()
     let diff_files=split(g:filepairs[0], ' ')
     let left=diff_files[0]
     let right=diff_files[1]
-    call DirDiffOpen(left, right)
+    call DirDiffOpen(g:left, g:right)
     call remove(g:filepairs, 0)
   else
     echo "done"
