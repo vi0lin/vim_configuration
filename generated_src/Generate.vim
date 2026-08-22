@@ -906,7 +906,6 @@ vnoremap ,ir :call SetMode(",ir", "Visual") \| '<,'>:call RUST('', 'exec_input_v
 nnoremap <space>p :call SetMode("\<space\>p", "Normal") \| :CopyFileNameToClipboard<cr>
 nnoremap <space>P :call SetMode("\<space\>P", "Normal") \| :CopyWholePathToClipboard<cr>
 nnoremap <space>r :call SetMode("\<space\>r", "Normal") \| :InsertReceiver<cr>
-nnoremap ,dd :call SetMode(",dd", "Normal") \| :call Rewindworkdir()<cr>
 nnoremap <C-Space> :call SetMode("\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 0))<cr>
 nnoremap ,<C-Space> :call SetMode(",\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 1))<cr>
 nnoremap ,,<C-Space> :call SetMode(",,\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 2))<cr>
@@ -1202,6 +1201,9 @@ nnoremap dh :call SetMode("dh", "Normal") \| :call DiffWithNeighbor('h')<cr>
 nnoremap dl :call SetMode("dl", "Normal") \| :call DiffWithNeighbor('l')<cr>
 nnoremap ,oh :call SetMode(",oh", "Normal") \| :call OpenFileHereAndInNeighborV2('h')<cr>
 nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighborV2('l')<cr>
+nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighborV2('l')<cr>
+nnoremap ,dd :call SetMode(",dd", "Normal") \| :call DirDiff()<cr>
+nnoremap ,dn :call SetMode(",dn", "Normal") \| :call DirDiffNext()<cr>
 nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
 vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>
 nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('h')<cr>

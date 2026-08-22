@@ -612,7 +612,7 @@ NewMap -no -n -v ,ir :call RUST('', 'exec_input_vs')<cr>
 NewMap -n -no <space>p :CopyFileNameToClipboard<cr>
 NewMap -n -no <space>P :CopyWholePathToClipboard<cr>
 NewMap -n -no <space>r :InsertReceiver<cr>
-NewMap -n -no ,dd :call Rewindworkdir()<cr>
+" NewMap -n -no ,dd :call Rewindworkdir()<cr>
 
 "" nnoremap <C-p>              :OpenFileFZFProject<cr>
 "" nnoremap <A-p>              :OpenFileFZFRepo<cr>
@@ -1267,6 +1267,12 @@ NewMap -no -n dh :call DiffWithNeighbor('h')<cr>
 NewMap -no -n dl :call DiffWithNeighbor('l')<cr>
 NewMap -no -n ,oh :call OpenFileHereAndInNeighborV2('h')<cr>
 NewMap -no -n ,ol :call OpenFileHereAndInNeighborV2('l')<cr>
+
+
+NewMap -no -n ,ol :call OpenFileHereAndInNeighborV2('l')<cr>
+
+NewMap -n -no ,dd :call DirDiff()<cr>
+NewMap -no -n ,dn :call DirDiffNext()<cr>
 
 NewMap -no -n -v <C-S-.> :@:<cr>
 

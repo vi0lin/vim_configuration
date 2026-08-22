@@ -9887,6 +9887,56 @@ augroup END
 " dp
 " qa
 
+if !exists("g:left")
+  let left="/your/dirdiff/left/path"
+endif
+if !exists("g:right")
+  let right="/your/dirdiff/right/path"
+endif
+let filepairs=[]
+function DirDiff()
+  let g:dir_diff_list=[]
+  let g:filepairs=systemlist("diff -rq "..left.." "..right.." | grep 'differ$' | sed 's/^Files //; s/ differ$//; s/ and / /'")
+"  while read -r a b; do
+"    vimdiff "$a" "$b"
+"  done
+  call DirDiffNext()
+endfunction
+function DirDiffOpen(left, right)
+  DiffOff
+  let left=a:left
+  let right=a:right
+  set autoread
+  let save_win = win_getid()
+  if len(left)>0
+    exec "e! "..left
+  endif
+  call cursor(1,1)
+  exec "wincmd l"
+  if len(right)>0
+    exec "e! "..right
+  endif
+  call cursor(1,1)
+  call win_gotoid(save_win)
+  call DiffWithNeighbor('l')
+  set noautoread
+endfunction
+function DirDiffNext()
+  if len(g:filepairs)>0
+    let diff_files=split(g:filepairs[0], ' ')
+    let left=diff_files[0]
+    let right=diff_files[1]
+    call DirDiffOpen(left, right)
+    call remove(g:filepairs, 0)
+  else
+    echo "done"
+  endif
+  " for f in g:filepairs
+  "   let left=f[0]
+  "   let right=f[1]
+  " endfor
+endfunction
+
 let g:vim_advantages_got_sourced='true'
 
 endif
