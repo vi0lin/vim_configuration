@@ -1,3 +1,4 @@
+"
 " v /@!
 "
 " ,lcr last command repo
@@ -4110,6 +4111,8 @@ endfunction
 " Project Manager
 
 function! JumpFile(path)
+  echo a:path
+  return
   let path=a:path
   let node = input('Open File:  ['..path..']  ', path, 'file')
   call _openfile_andCD(node)
@@ -5034,6 +5037,21 @@ function! ToggleThroughCurrentProjectOpenedBuffers(n=1)
   echo "Implement Toggle Opened Buffers " .. a:n
 endfunction
 
+function! UniqueProjects()
+  let buffers=[]
+  for l:b in range(1, bufnr('$'))
+    if bufexists(l:b)
+      call add(buffers, l:b)
+    endif
+  endfor
+  let uniqueprojects=uniq(sort(map(copy(buffers), "getbufvar(v:val[0], '')")))
+  return uniqueprojects
+endfunction
+
+function! TProject(a)
+  echo UniqueProjects()
+endfunction
+
 " fzf buildstring find in projects
 " why file exists 3 times in the list?
 function! FilesInProjects()
@@ -5135,10 +5153,14 @@ else
 endif
 
 if has('mac') || has('unix') || has('linux') || has('android')
-  let g:outfile="/tmp/outfile_fzf"
-  let g:stdin_tmp_file="/tmp/tmp_stdin_file"
-  let g:tempfile="/tmp/tempfile_fzf"
-  let g:tempprofile="/tmp/profile.log"
+  " let g:outfile="/tmp/outfile_fzf"
+  " let g:stdin_tmp_file="/tmp/tmp_stdin_file"
+  " let g:tempfile="/tmp/tempfile_fzf"
+  " let g:tempprofile="/tmp/profile.log"
+  let g:outfile=g:vim_configuration_path.."/outfile_fzf.unreleased"
+  let g:stdin_tmp_file=g:vim_configuration_path.."/tmp_stdin_file.unreleased"
+  let g:tempfile=g:vim_configuration_path.."/tempfile_fzf.unreleased"
+  let g:tempprofile=g:vim_configuration_path.."/profile.log"
 else
   let g:outfile=g:vim_configuration_path.."/outfile_fzf.unreleased"
   let g:stdin_tmp_file=g:vim_configuration_path.."/tmp_stdin_file.unreleased"
@@ -6280,6 +6302,7 @@ function! DiffOff(...)
   " endfor
   " echo FindAllDiffBuffers()
   " call win_gotoid(save_win)
+  :diffoff
   unlet g:temporaryfix
 endfunction
 command! -nargs=* DiffOff call DiffOff(<f-args>)
@@ -8526,9 +8549,9 @@ function! BufReadPost()
 endfunction
 
 function Entering()
+  " call MakeDirCurrentCWD(bufnr())
   "call CommandDictInit()
   " call LoadCommands()
-  call MakeDirCurrentCWD(bufnr())
   " ProjectPath()
   " exec "cd"ProjectPath()
 endfunction
@@ -8770,6 +8793,7 @@ function! InitPlug()
     Plug 'vi0lin/vim_configuration'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
+    " Plug 'chriszarate/yazi.vim'
   call plug#end()
 endfunction
 " Execute In File
@@ -9888,54 +9912,85 @@ augroup END
 " qa
 
 if !exists("g:left")
-  let left="/your/dirdiff/left/path"
+  let g:left = "/your/dirdiff/left/path"
 endif
 if !exists("g:right")
-  let right="/your/dirdiff/right/path"
+  let g:right = "/your/dirdiff/right/path"
 endif
-let filepairs=[]
-function DirDiff()
-  let g:dir_diff_list=[]
-  let g:filepairs=systemlist("diff -rq "..g:left.." "..g:right.." | grep 'differ$' | sed 's/^Files //; s/ differ$//; s/ and / /'")
-"  while read -r a b; do
-"    vimdiff "$a" "$b"
-"  done
+let g:filepairs = []
+function! DirDiff()
+  let g:filepairs = []
+  " 1. Files that differ
+  let differing = systemlist(
+        \ "diff -rq " . shellescape(g:left) . " " . shellescape(g:right) .
+        \ " | grep 'differ$' | sed 's/^Files //; s/ differ$//; s/ and / /'")
+  for line in differing
+    let lfe=fnamemodify(split(line, ' ')[0], ":e")
+    let rfe=fnamemodify(split(line, ' ')[1], ":e")
+    " echo lfe " " rfe
+    if lfe!="zip"&&rfe!="zip"
+      echo line
+      call add(g:filepairs, split(line, ' '))
+    endif
+  endfor
+  " 2. Files that exist only on the RIGHT → create empty counterpart on LEFT
+  let only_right = systemlist(
+        \ "diff -rq " . shellescape(g:left) . " " . shellescape(g:right) .
+        \ " | grep '^Only in " . escape(g:right, '/\') . "'")
+  for line in only_right
+    " Example line: Only in /path/to/right/subdir: filename.ext
+    let m = matchlist(line, '^Only in \(.*\): \(.*\)$')
+    if empty(m) | continue | endif
+    let right_dir  = m[1]
+    let filename   = m[2]
+    let right_file = right_dir . '/' . filename
+    " Calculate relative path under g:right
+    let rel = substitute(right_dir, '^' . escape(g:right, '/\') . '/\?', '', '')
+    let left_file = g:left . (empty(rel) ? '' : '/' . rel) . '/' . filename
+    " Create directory structure + empty file on left
+    call mkdir(fnamemodify(left_file, ':h'), 'p')
+    call writefile([], left_file)          " create empty file
+    call add(g:filepairs, [left_file, right_file])
+    echo "Created missing file on left: " . left_file
+  endfor
+  " Start with the first pair
   call DirDiffNext()
 endfunction
-function DirDiffOpen(left, right)
+" === Open a pair (your original logic, slightly cleaned) ===
+function! DirDiffOpen(left, right)
   DiffOff
-  let left=a:left
-  let right=a:right
   set autoread
   let save_win = win_getid()
-  if len(left)>0
-    exec "e! "..left
+  " Left window
+  if !empty(a:left)
+    execute 'e!' fnameescape(a:left)
   endif
-  call cursor(1,1)
-  exec "wincmd l"
-  if len(right)>0
-    exec "e! "..right
+  call cursor(1, 1)
+  " Right window
+  execute 'wincmd l'
+  if !empty(a:right)
+    execute 'e!' fnameescape(a:right)
   endif
-  call cursor(1,1)
+  call cursor(1, 1)
   call win_gotoid(save_win)
   call DiffWithNeighbor('l')
   set noautoread
 endfunction
-function DirDiffNext()
-  if len(g:filepairs)>0
-    let diff_files=split(g:filepairs[0], ' ')
-    let left=diff_files[0]
-    let right=diff_files[1]
-    call DirDiffOpen(g:left, g:right)
-    call remove(g:filepairs, 0)
-  else
-    echo "done"
+" === Go to next pair ===
+function! DirDiffNext()
+  if empty(g:filepairs)
+    echo "DirDiff: done"
+    return
   endif
-  " for f in g:filepairs
-  "   let left=f[0]
-  "   let right=f[1]
-  " endfor
+  let pair = remove(g:filepairs, 0)
+  let left  = pair[0]
+  let right = pair[1]
+  call DirDiffOpen(left, right)
+  " echo "Remaining: " . len(g:filepairs)
 endfunction
+" Optional: previous (if you keep a history)
+" let g:filepairs_history = []
+" … you can add DirDiffPrev later if needed
 
 let g:vim_advantages_got_sourced='true'
 

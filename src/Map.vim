@@ -809,6 +809,9 @@ NewMap -n -no <C-.> :call CD(WFileNext())<cr>
 NewMap -n -no ,<Tab> :JumpProjectIn<cr>
 NewMap -n -no <localleader><Tab> :JumpProjectIn<cr>
 
+NewMap -n -no <Tab> :call TProject(1)<cr>
+NewMap -n -no <S-Tab> :call TProject(-1)<cr>
+
 " C - u
 NewMap -v -no <F14> :call VS()<cr>
 NewMap -n -no <F13> :call VS()<cr>
@@ -1402,5 +1405,8 @@ NewMap -no -v -n ,re :Rel<cr>
 
 NewMap -no -n ,,r :e! %<CR>
 NewMap -no -n ,,R :silent windo \| if filereadable(expand("%")) \| :silent e! % \| fi \| :norm G \| :redraw!<CR>
+
+" NewMap -no -n - :Yazi<cr>
+" NewMap -no -n _ :YaziWorkingDirectory<cr>
 
 endif

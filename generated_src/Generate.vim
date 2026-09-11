@@ -1047,6 +1047,8 @@ nnoremap <C-,> :call SetMode("\<C-,\>", "Normal") \| :call CD(WFilePrev())<cr>
 nnoremap <C-.> :call SetMode("\<C-.\>", "Normal") \| :call CD(WFileNext())<cr>
 nnoremap ,<Tab> :call SetMode(",\<Tab\>", "Normal") \| :JumpProjectIn<cr>
 nnoremap <localleader><Tab> :call SetMode("\<localleader\>\<Tab\>", "Normal") \| :JumpProjectIn<cr>
+nnoremap <Tab> :call SetMode("\<Tab\>", "Normal") \| :call TProject(1)<cr>
+nnoremap <S-Tab> :call SetMode("\<S-Tab\>", "Normal") \| :call TProject(-1)<cr>
 vnoremap <F14> :call SetMode("\<F14\>", "Visual") \| '<,'>:call VS()<cr>
 nnoremap <F13> :call SetMode("\<F13\>", "Normal") \| :call VS()<cr>
 inoremap <F13> <C-\><C-n>:call SetMode("\<F13\>", "Insert") \| :call VS()<cr>

@@ -68,6 +68,7 @@ function! FindGit(path)
       " call SetProject(dir)
       return dir
     elseif filereadable(git)
+      " bring back in
       call SetProject(dir)
       return dir
     endif
@@ -320,7 +321,12 @@ function! GitBranch_Statusline()
     if w:gitBranch==-1
       return ''
     endif
-    return ""..GitBranch()..'▶'
+    " ▶
+    " ⇒
+    " →
+    " ♣
+    " №
+    return ""..GitBranch()..'♣'
   else
     return ''
   endif
@@ -429,21 +435,31 @@ function! CWD()
   endif
 endfunction
 
-function! ProjectPath()
-  let cwd=CWD()
+function! ProjectPath(bufnr=-1)
   " let cwd=expand("%:p:h")
+  if a:bufnr==-1
+    " let cwd=CWD()
+    let nr=bufnr('%')
+  else
+    let nr=a:bufnr
+    " let cwd=getwinvar(bufwinnr(a:bufnr), "cwd")
+  endif
+  let wincwd=fnamemodify(expand(bufname(nr)), "%:p:h")
+  if empty(wincwd)
+    return "/"
+  endif
   let finish=0
   let paths=[]
   while 1
-    let isgit=globpath(cwd, '.git')
-    let isproject=index(g:projects, cwd)
+    let isgit=globpath(wincwd, '.git')
+    let isproject=index(g:projects, wincwd)
     if !empty(isgit) || isproject>-1
-      return cwd
+      return wincwd 
     endif
-    if cwd=='/'
+    if wincwd=='/'
       break
     endif
-    let cwd=GetParentDir(cwd)
+    let wincwd=GetParentDir(wincwd)
   endwhile
   return -1
   " let file = -1
@@ -603,22 +619,22 @@ function! Folder_Repo_Or_Project_notright(count, nr)
   return Folder(cwd, a:nr)
 endfunction
 
-function! PathShortForm_when_small(path, num)
+function! PathShortForm_when_small(path, num, sign="…")
     let buf_height = winheight(winnr())
     let buf_width = winwidth(winnr())
     if buf_width<=136
-      return PathShortForm(a:path, a:num)
+      return PathShortForm(a:path, a:num, a:sign)
     else
       return a:path
     endif
 endfunction
 
-function! PathShortForm(path, num)
+function! PathShortForm(path, num, sign="…")
   let folders=split(a:path, '/')
   let out=""
   let num=a:num
   for f in folders
-    let out.="/"..f[ 0 : num].."…"
+    let out.="/"..f[ 0 : num]..a:sign
   endfor
   return out
 endfunction
