@@ -68,6 +68,11 @@ if !exists("g:autocommands_set") || g:autocommands_set==0
   "
   " autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * if !exists('g:fzfabort') | call MakeDirCurrentCWD('<abuf>') | else |  unlet g:fzfabort | endif
   autocmd BufAdd,BufNew,BufReadPost,BufFilePost * if !exists('g:fzfabort') | call MakeDirCurrentCWD('<abuf>') | else |  unlet g:fzfabort | endif
+
+  augroup VimConfigurationCwd
+    autocmd!
+    autocmd BufEnter * if !exists('g:temporaryfix') | call timer_start(0, function('SyncCwdToBuffer', [win_getid(), str2nr(expand('<abuf>'))])) | endif
+  augroup END
   " autocmd BufAdd,BufNew,BufReadPost,BufFilePost * call MakeDirCurrentCWD(expand('<abuf>'))
 
   " autocmd BufAdd,BufNew,BufReadPost,BufFilePost,BufEnter * call MakeDirCurrentCWD(expand('<abuf>'))
