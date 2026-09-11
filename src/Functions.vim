@@ -4111,8 +4111,8 @@ endfunction
 " Project Manager
 
 function! JumpFile(path)
-  echo a:path
-  return
+  " echo a:path
+  " return
   let path=a:path
   let node = input('Open File:  ['..path..']  ', path, 'file')
   call _openfile_andCD(node)
@@ -9911,86 +9911,80 @@ augroup END
 " dp
 " qa
 
-if !exists("g:left")
-  let g:left = "/your/dirdiff/left/path"
-endif
-if !exists("g:right")
-  let g:right = "/your/dirdiff/right/path"
-endif
-let g:filepairs = []
-function! DirDiff()
-  let g:filepairs = []
-  " 1. Files that differ
-  let differing = systemlist(
-        \ "diff -rq " . shellescape(g:left) . " " . shellescape(g:right) .
-        \ " | grep 'differ$' | sed 's/^Files //; s/ differ$//; s/ and / /'")
-  for line in differing
-    let lfe=fnamemodify(split(line, ' ')[0], ":e")
-    let rfe=fnamemodify(split(line, ' ')[1], ":e")
-    " echo lfe " " rfe
-    if lfe!="zip"&&rfe!="zip"
-      echo line
-      call add(g:filepairs, split(line, ' '))
-    endif
-  endfor
-  " 2. Files that exist only on the RIGHT → create empty counterpart on LEFT
-  let only_right = systemlist(
-        \ "diff -rq " . shellescape(g:left) . " " . shellescape(g:right) .
-        \ " | grep '^Only in " . escape(g:right, '/\') . "'")
-  for line in only_right
-    " Example line: Only in /path/to/right/subdir: filename.ext
-    let m = matchlist(line, '^Only in \(.*\): \(.*\)$')
-    if empty(m) | continue | endif
-    let right_dir  = m[1]
-    let filename   = m[2]
-    let right_file = right_dir . '/' . filename
-    " Calculate relative path under g:right
-    let rel = substitute(right_dir, '^' . escape(g:right, '/\') . '/\?', '', '')
-    let left_file = g:left . (empty(rel) ? '' : '/' . rel) . '/' . filename
-    " Create directory structure + empty file on left
-    call mkdir(fnamemodify(left_file, ':h'), 'p')
-    call writefile([], left_file)          " create empty file
-    call add(g:filepairs, [left_file, right_file])
-    echo "Created missing file on left: " . left_file
-  endfor
-  " Start with the first pair
-  call DirDiffNext()
-endfunction
-" === Open a pair (your original logic, slightly cleaned) ===
-function! DirDiffOpen(left, right)
-  DiffOff
-  set autoread
-  let save_win = win_getid()
-  " Left window
-  if !empty(a:left)
-    execute 'e!' fnameescape(a:left)
-  endif
-  call cursor(1, 1)
-  " Right window
-  execute 'wincmd l'
-  if !empty(a:right)
-    execute 'e!' fnameescape(a:right)
-  endif
-  call cursor(1, 1)
-  call win_gotoid(save_win)
-  call DiffWithNeighbor('l')
-  set noautoread
-endfunction
-" === Go to next pair ===
-function! DirDiffNext()
-  if empty(g:filepairs)
-    echo "DirDiff: done"
-    return
-  endif
-  let pair = remove(g:filepairs, 0)
-  let left  = pair[0]
-  let right = pair[1]
-  call DirDiffOpen(left, right)
-  " echo "Remaining: " . len(g:filepairs)
-endfunction
-" Optional: previous (if you keep a history)
-" let g:filepairs_history = []
-" … you can add DirDiffPrev later if needed
+""" function! DirDiff()
+"""   let g:filepairs = []
+"""   " 1. Files that differ
+"""   let differing = systemlist(
+"""         \ "diff -rq " . shellescape(g:left) . " " . shellescape(g:right) .
+"""         \ " | grep 'differ$' | sed 's/^Files //; s/ differ$//; s/ and / /'")
+"""   for line in differing
+"""     let lfe=fnamemodify(split(line, ' ')[0], ":e")
+"""     let rfe=fnamemodify(split(line, ' ')[1], ":e")
+"""     " echo lfe " " rfe
+"""     if lfe!="zip"&&rfe!="zip"
+"""       echo line
+"""       call add(g:filepairs, split(line, ' '))
+"""     endif
+"""   endfor
+"""   " 2. Files that exist only on the RIGHT → create empty counterpart on LEFT
+"""   let only_right = systemlist(
+"""         \ "diff -rq " . shellescape(g:left) . " " . shellescape(g:right) .
+"""         \ " | grep '^Only in " . escape(g:right, '/\') . "'")
+"""   for line in only_right
+"""     " Example line: Only in /path/to/right/subdir: filename.ext
+"""     let m = matchlist(line, '^Only in \(.*\): \(.*\)$')
+"""     if empty(m) | continue | endif
+"""     let right_dir  = m[1]
+"""     let filename   = m[2]
+"""     let right_file = right_dir . '/' . filename
+"""     " Calculate relative path under g:right
+"""     let rel = substitute(right_dir, '^' . escape(g:right, '/\') . '/\?', '', '')
+"""     let left_file = g:left . (empty(rel) ? '' : '/' . rel) . '/' . filename
+"""     " Create directory structure + empty file on left
+"""     call mkdir(fnamemodify(left_file, ':h'), 'p')
+"""     call writefile([], left_file)          " create empty file
+"""     call add(g:filepairs, [left_file, right_file])
+"""     echo "Created missing file on left: " . left_file
+"""   endfor
+"""   " Start with the first pair
+"""   call DirDiffNext()
+""" endfunction
+""" " === Open a pair (your original logic, slightly cleaned) ===
+""" function! DirDiffOpen(left, right)
+"""   DiffOff
+"""   set autoread
+"""   let save_win = win_getid()
+"""   " Left window
+"""   if !empty(a:left)
+"""     execute 'e!' fnameescape(a:left)
+"""   endif
+"""   call cursor(1, 1)
+"""   " Right window
+"""   execute 'wincmd l'
+"""   if !empty(a:right)
+"""     execute 'e!' fnameescape(a:right)
+"""   endif
+"""   call cursor(1, 1)
+"""   call win_gotoid(save_win)
+"""   call DiffWithNeighbor('l')
+"""   set noautoread
+""" endfunction
+""" " === Go to next pair ===
+""" function! DirDiffNext()
+"""   if empty(g:filepairs)
+"""     echo "DirDiff: done"
+"""     return
+"""   endif
+"""   let pair = remove(g:filepairs, 0)
+"""   let left  = pair[0]
+"""   let right = pair[1]
+"""   call DirDiffOpen(left, right)
+"""   " echo "Remaining: " . len(g:filepairs)
+""" endfunction
+""" " Optional: previous (if you keep a history)
+""" " let g:filepairs_history = []
+""" " … you can add DirDiffPrev later if needed
+exec 'source '.g:vim_configuration_src.'/dirdiff.vim'
 
 let g:vim_advantages_got_sourced='true'
 

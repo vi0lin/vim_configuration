@@ -1408,5 +1408,9 @@ NewMap -no -n ,,R :silent windo \| if filereadable(expand("%")) \| :silent e! % 
 
 " NewMap -no -n - :Yazi<cr>
 " NewMap -no -n _ :YaziWorkingDirectory<cr>
+"
+NewMap -no -n <C-Enter> :call DirDiff()<cr>
+NewMap -no -n <C-Down> :call DirDiffNext()<cr>
+NewMap -no -n <C-Up> :call DirDiffPrev()<cr>
 
 endif

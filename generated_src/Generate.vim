@@ -1238,3 +1238,6 @@ nnoremap ,re :call SetMode(",re", "Normal") \| :Rel<cr>
 vnoremap ,re :call SetMode(",re", "Visual") \| '<,'>:Rel<cr>
 nnoremap ,,r :call SetMode(",,r", "Normal") \| :e! %<CR>
 nnoremap ,,R :call SetMode(",,R", "Normal") \| :silent windo \| if filereadable(expand("%")) \| :silent e! % \| fi \| :norm G \| :redraw!<CR>
+nnoremap <C-Enter> :call SetMode("\<C-Enter\>", "Normal") \| :call DirDiff()<cr>
+nnoremap <C-Down> :call SetMode("\<C-Down\>", "Normal") \| :call DirDiffNext()<cr>
+nnoremap <C-Up> :call SetMode("\<C-Up\>", "Normal") \| :call DirDiffPrev()<cr>
