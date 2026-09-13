@@ -1241,3 +1241,5 @@ nnoremap ,,R :call SetMode(",,R", "Normal") \| :silent windo \| if filereadable(
 nnoremap <C-Enter> :call SetMode("\<C-Enter\>", "Normal") \| :call DirDiff()<cr>
 nnoremap <C-Down> :call SetMode("\<C-Down\>", "Normal") \| :call DirDiffNext()<cr>
 nnoremap <C-Up> :call SetMode("\<C-Up\>", "Normal") \| :call DirDiffPrev()<cr>
+nnoremap ,<C-Enter> :call SetMode(",\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/c/bookmarks", "/home/user/FTP/Downloads/code-files")<cr>
+nnoremap ,,<C-Enter> :call SetMode(",,\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files2")<cr>

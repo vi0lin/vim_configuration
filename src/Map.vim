@@ -1412,5 +1412,7 @@ NewMap -no -n ,,R :silent windo \| if filereadable(expand("%")) \| :silent e! % 
 NewMap -no -n <C-Enter> :call DirDiff()<cr>
 NewMap -no -n <C-Down> :call DirDiffNext()<cr>
 NewMap -no -n <C-Up> :call DirDiffPrev()<cr>
+NewMap -no -n ,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/c/bookmarks", "/home/user/FTP/Downloads/code-files")<cr>
+NewMap -no -n ,,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files2")<cr>
 
 endif
