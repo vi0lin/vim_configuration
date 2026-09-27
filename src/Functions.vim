@@ -3486,11 +3486,42 @@ let s:git_saved_maps = {}
 " disabled the git keys (F10, C-F11, ...) stop working. Temporary mappings
 " give both: these keys steer the popup, every other key works as usual,
 " and a further git key simply replaces the popup.]
+" [Only keys that are NOT editing keys: h j k l, w/b/e, v/V/<C-v>, i and
+"  everything else keep working on your buffer -- and doing any of that
+"  CLOSES the popup (see s:GitPopupWatch), so it never stays floating over
+"  the text you went on editing. Scroll with PageUp/PageDown or the mouse
+"  wheel; the popup also has a scrollbar.]
 let s:git_popup_keys = {
       \ '<CR>': 'close', '<Esc>': 'close', 'q': 'close',
-      \ 'j': 'j', '<Down>': 'j', 'k': 'k', '<Up>': 'k',
-      \ '<C-d>': 'half-down', '<C-u>': 'half-up',
-      \ '<PageDown>': 'page-down', '<PageUp>': 'page-up', 'G': 'bottom', 'gg': 'top' }
+      \ '<PageDown>': 'page-down', '<PageUp>': 'page-up' }
+
+" Close the popup as soon as you go on working in the buffer: any cursor
+" movement, Visual mode, Insert mode, or a switch of window/buffer/tab.
+" Installed a moment AFTER the popup appears (timer), so the git command
+" that opened it -- and a chain like <F12> with its prompt -- does not
+" close it itself.
+function! s:GitPopupWatch(id) abort
+  if !s:git_popup | return | endif
+  augroup GitPopupWatch
+    autocmd!
+    autocmd CursorMoved,CursorMovedI,InsertEnter,TextChanged * call GitPopupAutoClose()
+    autocmd BufEnter,WinEnter,TabEnter * call GitPopupAutoClose()
+    autocmd ModeChanged *:[vV\x16i]* call GitPopupAutoClose()
+  augroup END
+endfunction
+
+" not while a chain (F12: add, prompt, commit, pull, push) is still running
+function! GitPopupAutoClose() abort
+  if !s:git_batch
+    call GitPopupClose()
+  endif
+endfunction
+
+function! s:GitPopupUnwatch() abort
+  augroup GitPopupWatch
+    autocmd!
+  augroup END
+endfunction
 
 function! GitPopupKey(action) abort
   if a:action ==# 'close'
@@ -3526,6 +3557,7 @@ function! s:GitPopupMapsOff() abort
 endfunction
 
 function! GitPopupClose() abort
+  call s:GitPopupUnwatch()
   call s:GitPopupMapsOff()
   " id first taken out of s:git_popup: popup_close() runs the popup's
   " callback at once, which must not treat the closing popup as current
@@ -3545,8 +3577,22 @@ function! GitPopupClosed(id, result) abort
 endfunction
 
 " Show {lines} in the git popup ({append}: add to what is shown).
+" Tabs -> spaces, column-correct (git status indents with a Tab)
+function! s:GitExpandTabs(line) abort
+  let out = ''
+  for ch in split(a:line, '\zs')
+    if ch ==# "\t"
+      let out .= repeat(' ', 8 - strdisplaywidth(out) % 8)
+    else
+      let out .= ch
+    endif
+  endfor
+  return out
+endfunction
+
 function! GitPopup(title, lines, append = 0, filetype = 'git') abort
-  let s:git_lines = a:append && s:git_popup ? s:git_lines + a:lines : a:lines
+  let lines = map(copy(a:lines), {_, l -> stridx(l, "\t") >= 0 ? s:GitExpandTabs(l) : l})
+  let s:git_lines = a:append && s:git_popup ? s:git_lines + lines : lines
   call GitPopupClose()
   let width  = max([60, min([&columns - 6, 120])])
   let height = max([5, min([&lines - 6, len(s:git_lines) + 1])])
@@ -3557,7 +3603,10 @@ function! GitPopup(title, lines, append = 0, filetype = 'git') abort
         \ scrollbar: 1, wrap: 0, highlight: 'Pmenu', zindex: 210,
         \ callback: function('GitPopupClosed') })
   call setbufvar(winbufnr(s:git_popup), '&filetype', a:filetype)
+  " [global 'list' with empty 'listchars' showed every Tab as ^I]
+  call setwinvar(s:git_popup, '&list', 0)
   call s:GitPopupMapsOn()
+  call timer_start(0, function('s:GitPopupWatch'))
   if a:append
     call GitPopupKey('bottom')
   endif
@@ -4090,6 +4139,12 @@ set timeout timeoutlen=700
 "  That is the "slow with terminals open" feeling. 10 ms is plenty: a real
 "  key code arrives in well under 1 ms even over ssh.]
 set ttimeoutlen=10
+" SCHWARZE ZEILEN BEIM NEUZEICHNEN VERMEIDEN.
+" [Vim loescht Zeilen sonst mit "background colour erase": der Terminal
+"  fuellt sie mit SEINER Hintergrundfarbe, nicht mit der von Vim -- unter
+"  Windows Terminal, tmux und WSL bleiben dann schwarze Zeilen oder
+"  Streifen stehen. Ohne t_ut malt Vim jede Zeile selbst voll aus.]
+set t_ut=
 set laststatus=2
 " set guioptions+=m  "menu bar
 " set guioptions+=T  "toolbar
