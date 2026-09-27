@@ -428,7 +428,6 @@ NewMap -no -n ,,<F4> :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.
 NewMap -no -n <C-S-F9> :call PreviewBuffer()<cr>
 " map <M-F12> :call Info()<cr>
 " ToggleWrap keeps ,,,w -- <C-F2> now toggles the current project folder in/out of .unreleased/.projects
-NewMap -no -n <C-F2> :ProjectToggle<cr>
 NewMap -no -n ,,,w :call ToggleWrap()<cr>
 NewMap -no -n ,in :call Intend()<cr>
 NewMap -no -n ,,,<space> :IntelligentSelecting<cr>
@@ -1211,6 +1210,7 @@ NewMap -no ,<F1> :call GitAddRepo()<cr>
 NewMap -no ,,,,,<F1> :call GitInitRepository()<cr>
 NewMap -no ,,,,,,<F1> :call GitInitRepositoryBare()<cr>
 
+" WORK HERE
 NewMap -no <F2> :call SelectRemote(1)<cr>
 NewMap -no <S-F2> :call SelectRemote(-1)<cr>
 NewMap -no ,<F2> :call GitRenameRemote()<cr>
@@ -1405,6 +1405,7 @@ NewMap -no -n -v <C-S-F2> :Projects()<cr>
 NewMap -n -no <Tab> :call TProject(1)<cr>
 NewMap -n -no <S-Tab> :call TProject(-1)<cr>
 
+NewMap -no -n ,<F2> :ProjectToggle<cr>
 NewMap -no -n <F2>     :call Projects()<cr>
 NewMap -no -n <S-F2>      :call ProjectCycleBufferNext()<cr>
 NewMap -no -n <C-S-F2>    :call ProjectCycleBufferPrev()<cr>

@@ -61,19 +61,20 @@ function! s:Cycle(step, all) abort
           \ : 'no project has an open buffer right now')
   endif
   if n == 1
-    return s:Select(projects[0], 1, 1)
+    return s:Select(projects[0], 1, 1, projects, a:all ? 'all projects' : 'open projects')
   endif
 
   let current = s:ProjectOf(expand('%:p'))
   let idx = index(projects, current)
   let idx = idx >= 0 ? idx : (a:step > 0 ? -1 : 0)
   let idx = (idx + a:step + n) % n
-  call s:Select(projects[idx], idx + 1, n)
+  call s:Select(projects[idx], idx + 1, n, projects, a:all ? 'all projects' : 'open projects')
 endfunction
 
 " Switch to {dir}'s most recently used open buffer, or open its root
 " directory if it has none open yet.
-function! s:Select(dir, pos, total) abort
+function! s:Select(dir, pos, total, projects = [], title = 'projects') abort
+  let projects = a:projects
   let target = s:MostRecentBuffer(a:dir)
   if target > 0
     execute 'silent buffer' target
@@ -83,6 +84,10 @@ function! s:Select(dir, pos, total) abort
     execute 'silent edit' fnameescape(a:dir)
     call s:Echo(printf('[%d/%d] %s (no open buffer, opened the directory)',
           \ a:pos, a:total, fnamemodify(a:dir, ':t')))
+  endif
+  if exists('*XbmCyclePopup') && !empty(projects)
+    call XbmCyclePopup(a:title,
+          \ map(copy(projects), 'fnamemodify(v:val, ":~")'), a:pos - 1)
   endif
 endfunction
 

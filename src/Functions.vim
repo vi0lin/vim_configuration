@@ -3492,7 +3492,7 @@ let s:git_saved_maps = {}
 "  the text you went on editing. Scroll with PageUp/PageDown or the mouse
 "  wheel; the popup also has a scrollbar.]
 let s:git_popup_keys = {
-      \ '<CR>': 'close', '<Esc>': 'close', 'q': 'close',
+      \ '<CR>': 'close', '<Esc>': 'close', 'q': 'close', '<C-c>': 'close',
       \ '<PageDown>': 'page-down', '<PageUp>': 'page-up' }
 
 " Close the popup as soon as you go on working in the buffer: any cursor
@@ -3597,7 +3597,7 @@ function! GitPopup(title, lines, append = 0, filetype = 'git') abort
   let width  = max([60, min([&columns - 6, 120])])
   let height = max([5, min([&lines - 6, len(s:git_lines) + 1])])
   let s:git_popup = popup_create(s:git_lines, #{
-        \ title: ' ' . a:title . '   (Enter/Esc/q schliesst, j k G scrollt) ', pos: 'center',
+        \ title: ' ' . a:title . '   (Enter/Esc/q/C-c schliesst, PageUp/PageDown scrollt) ', pos: 'center',
         \ minwidth: width, maxwidth: width, minheight: 5, maxheight: height,
         \ border: [1, 1, 1, 1], borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
         \ scrollbar: 1, wrap: 0, highlight: 'Pmenu', zindex: 210,
@@ -3627,6 +3627,7 @@ function! GitRun(args, filetype = '') abort
     execute '!git --no-pager ' . a:args
     let out += ['', '(wiederholt mit :! -- Ergebnis siehe oben)']
     let rc = v:shell_error
+    redraw!
   endif
   let lines = ['$ git ' . a:args] + (empty(out) ? ['(keine Ausgabe)'] : out)
   if rc | let lines += ['', '[Rueckgabewert ' . rc . ']'] | endif
@@ -3670,34 +3671,20 @@ if !exists('g:github_ghp') | let g:github_ghp='{ghp_TOKEN}' | endif
 function! Github(...)
   let args=join(a:000, ' ')
   Pull
-  let $github_user=g:github_user
-  let $github_email=g:github_email
-  let $github_pat=g:github_pat
-  let $gitRemote=w:gitRemote
-  let $gitBranch=w:gitBranch
-  let $args=args
-  !github_feed() {
-  \ username=$1;
-  \ email=$2;
-  \ pat=$3;
-  \ git config --global user.name "$1";
-  \ git config --global user.email "$2";
-  \ git config --global credential.helper cache;
-  \ echo "protocol=https" > /tmp/git-credentials;
-  \ echo "host=github.com" >> /tmp/git-credentials;
-  \ echo "username=$username" >> /tmp/git-credentials;
-  \ echo "email=$email" >> /tmp/git-credentials;
-  \ echo "password=$pat" >> /tmp/git-credentials;
-  \ git credential approve < /tmp/git-credentials;
-  \ };
-  \ github_unfeed() {
-  \   rm /tmp/git-credentials;
-  \ };
-  \ git config '--global' core.autocrlf false;
-  \ github_feed $github_user $github_email $github_pat;
-  \ git $args;
-  \ github_unfeed;
-  \ git config '--global' '--unset-all' core.autocrlf;
+  " [Was one big  :!github_feed() {...}; git $args  shell block: its output
+  "  appeared outside the popup, on the terminal's other screen, and the
+  "  editor needed a manual redraw afterwards. Same steps, no shell: the
+  "  credentials go to  git credential approve  on stdin (no /tmp file),
+  "  the command itself runs through GitRun() -> popup.]
+  call system('git config --global user.name ' . shellescape(g:github_user))
+  call system('git config --global user.email ' . shellescape(g:github_email))
+  call system('git config --global credential.helper cache')
+  call system('git config --global core.autocrlf false')
+  call system('git credential approve', join(['protocol=https', 'host=github.com',
+        \ 'username=' . g:github_user, 'password=' . g:github_pat, ''], "\n"))
+  let rc = GitRun(args)
+  call system('git config --global --unset-all core.autocrlf')
+  return rc
 endfunction
 command! -range -nargs=* Github <line1>,<line2>:call Github(<q-args>)
 command! -range -nargs=0 GithubPush <line1>,<line2>:call Github('push '..w:gitRemote..' '..w:gitBranch)

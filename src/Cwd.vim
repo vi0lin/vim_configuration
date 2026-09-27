@@ -165,47 +165,27 @@ endfunction
 " endfunction
 
 function! GitInfo(...)
-  " Use GetOpts
-  let stash=0
-  if len(a:000) > 0 && a:000[0]=="--stash"
-    let stash=1
-  endif
-  echo w:git
-  echo "\n"
-  " echo w:gitRemoteList
-  echo "Remotes:"
-  for x in systemlist('git remote -v')
-    echo x
-  endfor
-  " echo w:gitBranchList
-  echo "\n"
-  echo "Local Branches:"
-  for x in systemlist('git branch --list')
-    echo x
-  endfor
-  echo "\n"
-  echo "Remote Branches:"
-  for x in systemlist('git branch -r')
-    echo x
-  endfor
-  echo "\n"
-  echo "Modified Files:"
-  call DebugCommand(systemlist('git diff --name-only'))
-  echo "\n"
-  echo "Git Log:"
-  call DebugCommand(systemlist("git log --oneline | head -n 4"), "\n")
-  echo "\n"
-  echo "Stashes:"
-  let stashes=systemlist("git stash list")
-  call DebugCommand(stashes, "\n")
+  " [Was a series of :echo lines -- more than a screen of them, so Vim
+  "  asked to press Enter and then had to repaint. Now the git popup.]
+  let stash = len(a:000) > 0 && a:000[0] ==# '--stash'
+  let git = 'git --no-pager '
+  let lines = [get(w:, 'git', ''), '']
+  let lines += ['Remotes:'] + systemlist(git . 'remote -v') + ['']
+  let lines += ['Local Branches:'] + systemlist(git . 'branch --list') + ['']
+  let lines += ['Remote Branches:'] + systemlist(git . 'branch -r') + ['']
+  let lines += ['Modified Files:'] + systemlist(git . 'diff --name-only') + ['']
+  let lines += ['Git Log:'] + systemlist(git . 'log --oneline -n 4') + ['']
+  let stashes = systemlist(git . 'stash list')
+  let lines += ['Stashes:'] + stashes
   if stash
     for x in stashes
-      let s=substitute(x, ":.*$", "", "")
-      let diff=systemlist("git stash show -p "..s)
-      for x in diff
-        echo x
-      endfor
+      let lines += ['', '--- ' . x] + systemlist(git . 'stash show -p ' . shellescape(substitute(x, ':.*$', '', '')))
     endfor
+  endif
+  if exists('*GitPopup')
+    call GitPopup('git info', lines, 0, stash ? 'diff' : 'git')
+  else
+    echo join(lines, "\n")
   endif
 endfunction
 

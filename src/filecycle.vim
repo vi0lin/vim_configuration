@@ -63,9 +63,35 @@ function! s:Cycle(step) abort
     endif
     execute 'silent edit' fnameescape(path)
     call s:Echo(printf('[%d/%d] %s', idx + 1, n, file))
+    call XbmCyclePopup(fnamemodify(dir, ':~'), files, idx)
     return
   endfor
   call s:Warn('no file opened (every file in ' . dir . ' was skipped)')
+endfunction
+
+" THE LIST AROUND THE CURRENT ENTRY, IN A POPUP -- so you can see what
+" lies ahead of and behind you. Uses the git popup (Functions.vim): closes
+" by itself as soon as you go on editing, Enter/Esc/q/<C-c> close it too.
+" Shared with projectcycle.vim. {idx} is 0-based.
+function! XbmCyclePopup(title, entries, idx, ...) abort
+  let n = len(a:entries)
+  if !exists('*GitPopup') || n == 0
+    return
+  endif
+  let radius = a:0 ? a:1 : 12
+  let from = max([0, a:idx - radius])
+  let to = min([n - 1, a:idx + radius])
+  let lines = []
+  if from > 0
+    call add(lines, printf('    ... %d davor', from))
+  endif
+  for i in range(from, to)
+    call add(lines, (i == a:idx ? '  > ' : '    ') . a:entries[i])
+  endfor
+  if to < n - 1
+    call add(lines, printf('    ... %d danach', n - 1 - to))
+  endif
+  call GitPopup(printf('%s  [%d/%d]', a:title, a:idx + 1, n), lines, 0, '')
 endfunction
 
 function! s:CurrentDir() abort
