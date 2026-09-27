@@ -1128,8 +1128,9 @@ nnoremap <Left> :call SetMode("\<Left\>", "Normal") \| :cclose<cr>
 nnoremap <Right> :call SetMode("\<Right\>", "Normal") \| :call COpen()<cr>
 nnoremap <Up> :call SetMode("\<Up\>", "Normal") \| :cprev<cr>
 nnoremap <Down> :call SetMode("\<Down\>", "Normal") \| :cnext<cr>
-nnoremap <F9> :call SetMode("\<F9\>", "Normal") \| :Pull<cr>
-nnoremap <C-F9> :call SetMode("\<C-F9\>", "Normal") \| :GitFetch<cr>
+nnoremap <F9> :call SetMode("\<F9\>", "Normal") \| :call GitInfo()<cr>
+nnoremap <S-F9> :call SetMode("\<S-F9\>", "Normal") \| :GitFetch<cr>
+nnoremap <C-F9> :call SetMode("\<C-F9\>", "Normal") \| :Pull<cr>
 nnoremap <F10> :call SetMode("\<F10\>", "Normal") \| :Status<cr>
 nnoremap <C-F10> :call SetMode("\<C-F10\>", "Normal") \| :GitDiff --all<cr>
 nnoremap <C-S-F10> :call SetMode("\<C-S-F10\>", "Normal") \| :GitDiff --all --cached<cr>
@@ -1143,7 +1144,6 @@ nnoremap ,qca :call SetMode(",qca", "Normal") \| :!git rebase --abort<cr>
 nnoremap ,<F12> :call SetMode(",\<F12\>", "Normal") \| :StashPush<cr>
 nnoremap ,,<F12> :call SetMode(",,\<F12\>", "Normal") \| :StashPop<cr>
 nnoremap ,,,,,<F1> :call SetMode(",,,,,\<F1\>", "Normal") \| :call SelectFunctionBlock()<cr>
-nnoremap <F1> :call SetMode("\<F1\>", "Normal") \| :call GitInfo()<cr>
 nnoremap <S-F1> :call SetMode("\<S-F1\>", "Normal") \| :call GitInfo('--stash')<cr>
 nnoremap <C-S-F1> :call SetMode("\<C-S-F1\>", "Normal") \| :call GitStashDrop()<cr>
 nnoremap ,,,,<F3> :call SetMode(",,,,\<F3\>", "Normal") \| :call GitDeleteLastUnpushedCommit()<cr>

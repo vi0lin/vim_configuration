@@ -1170,8 +1170,10 @@ nnoremap <C-i> <C-i>
 """ NewMap -no -n ,,<F12> :call ClearUnreachableFavorites()<cr>
 " :call MakeDirCurrentCWD(bufnr())<cr>
 "
-NewMap -no -n <F9> :Pull<cr>
-NewMap -no -n <C-F9> :GitFetch<cr>
+"
+NewMap -no <F9> :call GitInfo()<cr>
+NewMap -no -n <S-F9> :GitFetch<cr>
+NewMap -no -n <C-F9> :Pull<cr>
 
 NewMap -no -n <F10> :Status<cr>
 NewMap -no -n <C-F10> :GitDiff --all<cr>
@@ -1199,7 +1201,6 @@ endfunction
 command! -range -nargs=* SelectFunctionBlock call SelectFunctionBlock(<f-args>)
 NewMap -no ,,,,,<F1> :call SelectFunctionBlock()<cr>
 
-NewMap -no <F1> :call GitInfo()<cr>
 NewMap -no <S-F1> :call GitInfo('--stash')<cr>
 NewMap -no <C-S-F1> :call GitStashDrop()<cr>
 NewMap -no ,,,,<F3> :call GitDeleteLastUnpushedCommit()<cr>
