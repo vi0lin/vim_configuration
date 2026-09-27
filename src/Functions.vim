@@ -3195,25 +3195,25 @@ endfunction
 
 function! GitAmend(para)
   let p=join(a:para, ' ')
-  exec '!clear && git rebase '..p..' --amend'
+  exec '!git --no-pager rebase '..p..' --amend'
 endfunction
 command! -range -nargs=* Amend <line1>,<line2>:call GitAmend(<f-args>)
 
 function! GitContinue(para)
   let p=join(a:para, ' ')
-  exec '!clear && git rebase '..p..' --continue'
+  exec '!git --no-pager rebase '..p..' --continue'
 endfunction
 command! -range -nargs=* Continue <line1>,<line2>:call GitContinue(<f-args>)
 
 function! GitSkip(para)
   let p=join(a:para, ' ')
-  exec '!clear && git rebase '..p..' --skip'
+  exec '!git --no-pager rebase '..p..' --skip'
 endfunction
 command! -range -nargs=* Skip <line1>,<line2>:call GitSkip(<f-args>)
 
 function! GitAbort(para)
   let p=join(a:para, ' ')
-  exec '!clear && git rebase '..p..' --abort'
+  exec '!git --no-pager rebase '..p..' --abort'
 endfunction
 command! -range -nargs=* Abort <line1>,<line2>:call GitAbort(<f-args>)
 
@@ -3221,13 +3221,13 @@ function! GitMerge(branch)
   let b=join(a:branch, ' ')
   " !git merge --rebase
   " exec '!clear && git merge '..a:branch..' --no-commit --no-ff'
-  exec '!clear && git merge '..b..' --rebase'
+  exec '!git --no-pager merge '..b..' --rebase'
 endfunction
 command! -range -nargs=* Merge <line1>,<line2>:call GitMerge(<f-args>)
 
 command! -range -nargs=0 GitUnshallow <line1>,<line2>:call GitUnshallow()
 function! GitUnshallow()
-  !clear && git fetch --unshallow github
+  !git --no-pager fetch --unshallow github
 endfunction
 
 function! GitInitRepositoryBare()
@@ -3348,13 +3348,16 @@ function! GitDiff(...)
   " !clear && git diff --text %
   " !clear && git diff --cached --text %
   " let args=join([ cmd.text, cmd.pager, cmd.cached, cmd.file ], ' ')
-  echo cmd
+  " '%' was expanded by :!; systemlist() gets the real name
+  if cmd.file ==# '%'
+    let cmd.file = shellescape(expand('%'))
+  endif
   let x = [ cmd.text, cmd.pager, cmd.cached, cmd.file ]
   let cleaned=filter(x, 'v:val != "^\\s*$"')
   " exec "!clear && git diff "..join(cleaned, ' ')
   " exec "!clear && git diff "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
   " echo "!clear && git diff "..cmd.repo.." "..cmd.post.." "..join(cleaned, ' ')
-  exec "!clear && git diff "..cmd.repo.." "..cmd.post.." "..join(cleaned, ' ')
+  call GitShow('diff', 'diff '..cmd.repo..' '..cmd.post..' '..join(cleaned, ' '))
   " exec "!clear && git diff "..w:gitBranch.." "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
   " let x =<< eval trim EOF
   " !clear && git diff {cmd.text} {cmd.pager} {cmd.cached} {cmd.file}
@@ -3378,20 +3381,20 @@ endfunction
 
 command! -range -nargs=0 GitAdd <line1>,<line2>:call GitAdd()
 function! GitAdd()
-  !clear && git add %
+  !git --no-pager add %
 endfunction
 
 command! -range -nargs=0 GitAddCWD <line1>,<line2>:call GitAddCWD()
 function! GitAddCWD()
   " !clear && git add .
-  !clear && git add -A
+  !git --no-pager add -A
   " || git add -A
 endfunction
 
 command! -range -nargs=0 GitAddRepo <line1>,<line2>:call GitAddRepo()
 function! GitAddRepo()
   " echo '!clear && git add'w:git
-  exec '!clear && git add'w:git
+  exec '!git --no-pager add'w:git
   " || git add -A
 endfunction
 
@@ -3412,7 +3415,7 @@ function! GitCommit(message='')
   " echo msg
   " call input(msg)
   " echo '!clear && git commit -m "'..msg..'"'
-  exec '!clear && git commit -m "'..msg..'"'
+  exec '!git --no-pager commit -m '..shellescape(msg)
 endfunction
 
 command! -range -nargs=? GitCommitRepo <line1>,<line2>:call GitCommitRepo(<args>)
@@ -3428,12 +3431,12 @@ function! GitCommitRepo(message='')
   " echo msg
   " call input(msg)
   " echo '!clear && git commit -m "'..msg..'"'
-  exec '!clear && git commit -m "'..msg..'"'
+  exec '!git --no-pager commit -m '..shellescape(msg)
 endfunction
 
 command! -range -nargs=0 Log <line1>,<line2>:call Log()
 function! Log()
-  exec "!clear && git log"
+  call GitShow('log', 'log --decorate -n 300')
 endfunction
 
 function! GithubPullNoMerge()
@@ -3442,8 +3445,47 @@ endfunction
 
 command! -range -nargs=0 Status <line1>,<line2>:call GitStatus()
 command! -range -nargs=0 GitStatus <line1>,<line2>:call GitStatus()
+" GIT OUTPUT IN A BUFFER -- no pager, no screen switching, no "Press ENTER".
+" [Every git command used to run as  :!clear && git ...  That switches the
+"  terminal to its normal screen, wipes it with clear (Windows Terminal then
+"  also drops the scrollback), lets git start its pager, and after "q" and
+"  Enter Vim repaints everything. Under WSL the pager regularly came back or
+"  got stuck, and after :q the terminal showed an empty screen instead of
+"  the shell history -- clear had erased it. Read-only commands (status,
+"  log, diff) now land in a buffer: "q" closes it, the diff is highlighted.
+"  Commands that may prompt (push, commit hooks) still use :! but without
+"  clear and always with --no-pager.]
+function! GitShow(title, args) abort
+  let out = systemlist('git --no-pager ' . a:args . ' 2>&1')
+  let rc = v:shell_error
+  let name = 'git://' . a:title
+  let bnr = bufnr(name)
+  let winid = bnr > 0 ? bufwinid(bnr) : -1
+  if winid >= 0
+    call win_gotoid(winid)
+  else
+    silent botright 15new
+    if bnr > 0
+      execute 'silent buffer' bnr
+    else
+      execute 'silent file' fnameescape(name)
+    endif
+    setlocal buftype=nofile bufhidden=hide noswapfile nobuflisted nowrap
+    nnoremap <buffer> <silent> q :close<CR>
+  endif
+  setlocal modifiable
+  silent %delete _
+  call setline(1, empty(out) ? ['(keine Ausgabe)'] : out)
+  setlocal nomodifiable nomodified
+  let &l:filetype = a:title =~# 'diff' ? 'diff' : 'git'
+  1
+  if rc
+    echohl WarningMsg | echo 'git ' . a:args . '  ->  Rueckgabewert ' . rc | echohl None
+  endif
+endfunction
+
 function! GitStatus()
-  !clear && git status
+  call GitShow('status', 'status')
 endfunction
 
 function! GithubIntegrateProject(repo)
@@ -3510,7 +3552,7 @@ function! Git(...)
   let args=join(a:000, ' ')
   let $command=args
   " push "..w:gitRemote.." "..w:gitBranch
-  !clear && git $command
+  !git --no-pager $command
 endfunction
 command! -range -nargs=* Git <line1>,<line2>:call Git(<q-args>)
 command! -range -nargs=0 GitPush <line1>,<line2>:call Git('push '..w:gitRemote..' '..w:gitBranch)
@@ -7929,7 +7971,7 @@ function! ToggleLineState()
 endfunction
 
 function! StashAndFree(file)
-  !clear && git stash save "my saved stash"
+  !git --no-pager stash save "my saved stash"
   exec "!git checkout ".a:file
   !git stash list
   !git stash pop
@@ -8625,7 +8667,8 @@ function! TabNew()
 endfunction
 
 function! VimLeave()
-  redraw!
+  " [redraw! removed: repainting the whole screen a moment before Vim hands
+  "  the terminal back only leaves stripes on some terminals.]
 endfunction
 
 function! FocusLost()
