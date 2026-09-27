@@ -2300,7 +2300,7 @@ fun! CloseOther()
     " endif
     let b=winbufnr(id)
     execute id.'wincmd q'
-    execute b.'bd'
+    execute b.'bd!'      " ! -- a terminal buffer would otherwise refuse (E948)
   endfor
 endf
 " map <F12> :call CloseOther()<cr>
@@ -2341,7 +2341,7 @@ function! DeleteFile()
   if sure == "yes"
     redraw!
     call delete(file)
-    bd
+    bd!
   endif
 endfunction
 
@@ -2887,7 +2887,10 @@ function! GitStashPushAutoStash(...)
   let g:lastStash=message
   " Add Stash UUID Functionality
   " Add UUID
-  let x = systemlist("git stash push -m "..message)
+  let x = systemlist("git --no-pager stash push -m "..shellescape(message))
+  if v:shell_error && exists('*GitPopup')
+    call GitPopup('git stash push', ['$ git stash push -m ' . message] + x, s:git_batch)
+  endif
   if !empty(expand('%'))
     e %
   endif
@@ -2907,7 +2910,10 @@ function! GitStashPopAutoStash(...)
   for stash in filter(copy(stashes),'v:val=~".*On.*stash-\\d\\{10}"')
     let name=substitute(stash,':.*',"","")
     " echo "git stash pop "..name
-    let x = systemlist("git stash pop "..name)
+    let x = systemlist("git --no-pager stash pop "..shellescape(name))
+    if v:shell_error && exists('*GitPopup')
+      call GitPopup('git stash pop', ['$ git stash pop ' . name] + x, s:git_batch)
+    endif
     """ Debug
     """ for line in x
     """   echo line
@@ -2924,19 +2930,31 @@ command! -range -nargs=0 GitStashPopAutoStash <line1>,<line2>:call GitStashPopAu
 
 function! GitStashPush()
   " Todo Add Message Argument
+  " the action and the stash list that remains, in one popup
+  call GitBatch(1)
   call GitRun('stash push')
+  call GitRun('stash list')
+  call GitBatch(0)
 endfunction
 command! -range -nargs=0 GitStashPush <line1>,<line2>:call GitStashPush()
 
 function! GitStashPop()
   " Todo Add Message Argument
+  " the action and the stash list that remains, in one popup
+  call GitBatch(1)
   call GitRun('stash pop')
+  call GitRun('stash list')
+  call GitBatch(0)
 endfunction
 command! -range -nargs=0 GitStashPop <line1>,<line2>:call GitStashPop()
 
 function! GitStashDrop()
   " Todo Add Message Argument
+  " the action and the stash list that remains, in one popup
+  call GitBatch(1)
   call GitRun('stash drop')
+  call GitRun('stash list')
+  call GitBatch(0)
 endfunction
 command! -range -nargs=0 GitStashDrop <line1>,<line2>:call GitStashDrop()
 
@@ -3500,8 +3518,15 @@ let s:git_popup_keys = {
 " Installed a moment AFTER the popup appears (timer), so the git command
 " that opened it -- and a chain like <F12> with its prompt -- does not
 " close it itself.
+let s:git_running = 0
 function! s:GitPopupWatch(id) abort
   if !s:git_popup | return | endif
+  if s:git_running
+    " a git command is still streaming (its wait loop lets timers run):
+    " try again shortly, otherwise its own redraws would close the popup
+    call timer_start(50, function('s:GitPopupWatch'))
+    return
+  endif
   augroup GitPopupWatch
     autocmd!
     autocmd CursorMoved,CursorMovedI,InsertEnter,TextChanged * call GitPopupAutoClose()
@@ -3612,27 +3637,72 @@ function! GitPopup(title, lines, append = 0, filetype = 'git') abort
   endif
 endfunction
 
-" Run  git {args}  without a pager and show its output in the popup.
-" Returns git's exit code.
+" Lines arriving from a running git command: appended to the popup at
+" once, popup grows with them and stays scrolled to the newest line.
+function! s:GitPopupAppend(lines) abort
+  if !s:git_popup | return | endif
+  let s:git_lines += a:lines
+  let height = max([5, min([&lines - 6, len(s:git_lines) + 1])])
+  call popup_setoptions(s:git_popup, {'minheight': min([5, height]), 'maxheight': height})
+  call popup_settext(s:git_popup, s:git_lines)
+  let pos = popup_getpos(s:git_popup)
+  call popup_setoptions(s:git_popup, {'firstline': max([1, len(s:git_lines) - pos.core_height + 1])})
+  redraw
+endfunction
+
+" Run  git {args}  without a pager and show its output in the popup --
+" LIVE: every line appears as soon as git prints it, so you can follow a
+" long pull/push or a chain like <F12> step by step. Returns the exit code.
+" [The command runs as a job; this function waits for it, processing its
+"  output while waiting, so callers keep working exactly as with a plain
+"  system() call. <C-c> stops the running git command.]
 function! GitRun(args, filetype = '') abort
   let ft = !empty(a:filetype) ? a:filetype : (a:args =~# '^\s*diff' ? 'diff' : 'git')
-  " no prompts: a hidden question would hang systemlist() forever
-  let env = 'GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND=' . shellescape('ssh -o BatchMode=yes') . ' '
-  let out = systemlist(env . 'git --no-pager ' . a:args . ' 2>&1')
-  let rc = v:shell_error
+  let title = 'git ' . matchstr(a:args, '^\s*\zs\S\+')
+  call GitPopup(title, ['$ git ' . a:args], s:git_batch, ft)
+  let ctx = {'out': [], 'done': 0, 'rc': -1}
+  let ctx.job = job_start(['/bin/sh', '-c', 'git --no-pager ' . a:args . ' 2>&1'], {
+        \ 'out_mode': 'nl', 'err_mode': 'nl',
+        \ 'out_cb': {ch, line -> [add(ctx.out, line), s:GitPopupAppend([line])]},
+        \ 'err_cb': {ch, line -> [add(ctx.out, line), s:GitPopupAppend([line])]},
+        \ 'exit_cb': {j, status -> extend(ctx, {'done': 1, 'rc': status})},
+        \ 'env': {'GIT_TERMINAL_PROMPT': '0', 'GIT_SSH_COMMAND': 'ssh -o BatchMode=yes'} })
+  if job_status(ctx.job) !=# 'run' && !ctx.done
+    call s:GitPopupAppend(['(git liess sich nicht starten)'])
+    return 1
+  endif
+  let s:git_running += 1
+  try
+    " job_status as well: a helper that git leaves running in the background
+    " (git-credential-cache--daemon) keeps the output pipe open after git
+    " itself has exited -- the exit callback would then wait for that pipe
+    while !ctx.done && job_status(ctx.job) ==# 'run'
+      sleep 20m
+    endwhile
+  catch /^Vim:Interrupt$/
+    call job_stop(ctx.job)
+    call s:GitPopupAppend(['', '(abgebrochen mit <C-c>)'])
+    return 130
+  finally
+    let s:git_running -= 1
+  endtry
+  " callbacks that are still queued after the exit
+  sleep 10m
+  let rc = ctx.done ? ctx.rc : job_info(ctx.job).exitval
+  let out = ctx.out
   let needs_prompt = rc != 0 && join(out, "\n") =~? 'terminal prompts disabled\|could not read Username\|Permission denied\|passphrase\|Host key verification\|Authentication failed'
   if needs_prompt
     " repeat interactively so the question can be answered
     call GitPopupClose()
     execute '!git --no-pager ' . a:args
-    let out += ['', '(wiederholt mit :! -- Ergebnis siehe oben)']
     let rc = v:shell_error
     redraw!
+    call GitPopup(title, ['$ git ' . a:args] + out + ['', '(wiederholt mit :! -- Ergebnis siehe oben)'], s:git_batch, ft)
   endif
-  let lines = ['$ git ' . a:args] + (empty(out) ? ['(keine Ausgabe)'] : out)
-  if rc | let lines += ['', '[Rueckgabewert ' . rc . ']'] | endif
-  if s:git_batch | let lines += [''] | endif
-  call GitPopup('git ' . matchstr(a:args, '^\s*\zs\S\+'), lines, s:git_batch, ft)
+  let tail = empty(out) ? ['(keine Ausgabe)'] : []
+  if rc | let tail += ['', '[Rueckgabewert ' . rc . ']'] | endif
+  if s:git_batch | let tail += [''] | endif
+  if !empty(tail) | call s:GitPopupAppend(tail) | endif
   return rc
 endfunction
 
@@ -3680,7 +3750,10 @@ function! Github(...)
   call system('git config --global user.email ' . shellescape(g:github_email))
   call system('git config --global credential.helper cache')
   call system('git config --global core.autocrlf false')
-  call system('git credential approve', join(['protocol=https', 'host=github.com',
+  " >/dev/null: the cache helper forks git-credential-cache--daemon, which
+  " inherits the pipe of system() and keeps it open for its whole timeout
+  " (15 min) -- <F12> therefore stood still BEFORE the push even started.
+  call system('git credential approve >/dev/null 2>&1', join(['protocol=https', 'host=github.com',
         \ 'username=' . g:github_user, 'password=' . g:github_pat, ''], "\n"))
   let rc = GitRun(args)
   call system('git config --global --unset-all core.autocrlf')
@@ -5432,12 +5505,14 @@ function! TermPopup(title, termbuf, callback, outfile)
   function! OnStdout(channel, msg)
   endfunction
   function! OnError(...)
-    call popup_close(g:pnr) closure
-    exec "bd "..a:termbuf
+    " [Was: popup_close + :bd of the terminal buffer -- while its job still
+    "  ran: "E948: Job still running". err_cb fires for ANY stderr line,
+    "  e.g. bash's "warning: setlocale" on WSL. That is not an error of the
+    "  popup, so nothing to close here; the popup ends when fzf exits.]
   endfunction
   function! OnExitTerm(bufname, job, code) closure
     call popup_close(g:pnr)
-    exec "bd "..a:termbuf
+    silent! exec "bwipeout! "..a:termbuf
   endfunction
   function! s:TermClose(job, status) abort
   endfunction
@@ -5446,6 +5521,7 @@ function! TermPopup(title, termbuf, callback, outfile)
     \ 'err_cb': 'OnError',
     \ 'term_name': 'Find',
     \ 'term_finish': 'close',
+    \ 'term_kill': 'term',
     \ 'exit_cb': function('s:TermClose'),
     \ }
   function! MyFilter(winid, key)
@@ -5520,12 +5596,14 @@ function! Popup(title, register, list, callback, outfile)
   function! OnStdout(channel, msg)
   endfunction
   function! OnError(...)
-    call popup_close(g:pnr)
-    exec "bd "..g:tnr
+    " [Was: popup_close + :bd of the terminal buffer -- while its job still
+    "  ran: "E948: Job still running". err_cb fires for ANY stderr line,
+    "  e.g. bash's "warning: setlocale" on WSL. That is not an error of the
+    "  popup, so nothing to close here; the popup ends when fzf exits.]
   endfunction
   function! OnExitTerm(bufname, job, code)
     call popup_close(g:pnr)
-    exec "bd "..g:tnr
+    silent! exec "bwipeout! "..g:tnr
   endfunction
   function! s:FzfClose(job, status) abort
     " execute 'bwipeout! '.bufnr('Find')
@@ -5538,6 +5616,7 @@ function! Popup(title, register, list, callback, outfile)
         \ 'err_cb': 'OnError',
         \ 'term_name': 'Find',
         \ 'term_finish': 'close',
+        \ 'term_kill': 'term',
         \ 'exit_cb': function('s:FzfClose'),
         \ }
         " \ 'exit_cb': {job, status -> OpenFile_callback(a:outfile)},
@@ -6191,7 +6270,10 @@ function! Open(direction, type="buffer", mode="copy", file="")
     let pre=""
   endif
   if terminal
-    let arg = "terminal"
+    " ++kill=term: a terminal buffer may be deleted, unloaded or quit like
+    " any other buffer -- Vim then ends the shell instead of refusing with
+    " "E948: Job still running (add ! to end the job)".
+    let arg = "terminal ++kill=term"
     let file=g:term
     " let post="setlocal nobuflisted buftype=nofile | setlocal nobuflisted"
   elseif buffer && exists("file") && file != ""
@@ -9198,6 +9280,7 @@ function! Buildstring_Popup(title, paths, callback, type="file", maxdepth=10, re
         \ 'err_cb': 'OnError',
         \ 'term_name': 'Find',
         \ 'term_finish': 'close',
+        \ 'term_kill': 'term',
         \ 'exit_cb': function('s:FzfClose'),
         \ }
   let tnr=term_start(cmd, opts)
@@ -9244,6 +9327,7 @@ function! Execution_Popup(title, list, callback)
         \ 'err_cb': 'OnError',
         \ 'term_name': 'Find',
         \ 'term_finish': 'close',
+        \ 'term_kill': 'term',
         \ }
   function! MyFilter(wnid, key)
     if a:key=='q'
