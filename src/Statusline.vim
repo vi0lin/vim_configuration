@@ -238,8 +238,13 @@ function! Statusline()
   let fmt = '%{%StatuslineRender()%}'
   if &statusline !=# fmt
     let &statusline = fmt
+    redrawstatus!
+  else
+    " [Was always redrawstatus! -- on EVERY BufEnter every window's status
+    "  line was re-evaluated (all the terminal windows included), although
+    "  only the entered window changed. Vim already redraws that one.]
+    redrawstatus
   endif
-  redrawstatus!
 endfunction
 
 augroup StatuslineHighlights

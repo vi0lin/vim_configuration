@@ -3934,8 +3934,14 @@ set backspace=2
 set virtualedit=all
 set virtualedit=block
 set tags=./tags;,tags
-set timeout timeoutlen=700 ttimeoutlen=0
-set ttimeoutlen=700
+set timeout timeoutlen=700
+" ttimeoutlen: how long Vim waits after <Esc> to see whether more bytes of a
+" key code follow (arrow keys, Alt-keys are "Esc + something").
+" [Was 700 ms -- so EVERY <Esc> stood still for 0.7 s before Vim accepted it:
+"  leaving insert mode, and above all the tnoremap <Esc> in terminal windows.
+"  That is the "slow with terminals open" feeling. 10 ms is plenty: a real
+"  key code arrives in well under 1 ms even over ssh.]
+set ttimeoutlen=10
 set laststatus=2
 " set guioptions+=m  "menu bar
 " set guioptions+=T  "toolbar
@@ -8937,26 +8943,46 @@ function! Vim(args)
 endfunction
 
 " Customizable FZF Integration
+" Names that are never listed -- and, unlike before, never even ENTERED.
+if !exists('g:fzf_prune_dirs')
+  let g:fzf_prune_dirs = ['.git', '.git.off', 'node_modules', '__pycache__', '.cache', 'builds']
+endif
+
+" The command that feeds the file/folder popups.
+" [Before: one  find <path> -maxdepth 10 -type f -not -path '*/.git/*'  per
+"  project, run one after the other. "-not -path" only FILTERS the output --
+"  find still walks all the way through every .git/, node_modules/ and
+"  build folder first. With hundreds of projects in g:projects (git repos,
+"  submodules, builds/...) that is millions of stat() calls, and on /mnt/c
+"  under WSL each one is slow: the popup filled for minutes.
+"  Now: ONE invocation for all paths, and the noise folders are pruned, i.e.
+"  never entered. Files: 'rg --files' when available (parallel, honours
+"  .gitignore), else find with -prune. Folders: fd when available, else
+"  find with -prune.]
 function! BuildString(options, paths)
-  let fzf="fzf --multi -i --no-sort --tiebreak=length,begin,index"
   let fzf="fzf --multi -i --tiebreak=begin,length"
-  let m = a:paths
-  let len=len(m)-1
-  let string=""
-  let prefix='bash -c " ( '
-  if g:outfile!=""
-    let suffix=' ) | '.fzf.' > '.g:outfile.'"'
+  let maxdepth = matchstr(a:options, '-maxdepth \zs\d\+')
+  let type = matchstr(a:options, '-type \zs[fd]')
+  let paths = join(map(copy(a:paths), 'shellescape(v:val)'), ' ')
+  let lister = ''
+  if type ==# 'f' && executable('rg')
+    let lister = 'rg --files --hidden --no-messages'
+          \ . (empty(maxdepth) ? '' : ' --max-depth ' . maxdepth)
+          \ . join(map(copy(g:fzf_prune_dirs), '" -g " . shellescape("!" . v:val)'), '')
+          \ . ' -- ' . paths
+  elseif executable('fd')
+    let lister = 'fd -t ' . type . ' -H --no-ignore'
+          \ . (empty(maxdepth) ? '' : ' --max-depth ' . maxdepth)
+          \ . join(map(copy(g:fzf_prune_dirs), '" -E " . shellescape(v:val)'), '')
+          \ . ' . ' . paths
   else
-    let suffix=' ) | '.fzf.' > "'
+    let prune = join(map(copy(g:fzf_prune_dirs), '"-name " . shellescape(v:val)'), ' -o ')
+    let lister = 'find ' . paths
+          \ . (empty(maxdepth) ? '' : ' -maxdepth ' . maxdepth)
+          \ . ' \( ' . prune . ' \) -prune -o -type ' . (empty(type) ? 'f' : type) . ' -print'
   endif
-  for x in range(0, len)
-    let string=string.."find ".m[x]." ".a:options." -not -path '*/.git/*' -not -path '*/.git.off/*' 2>/dev/null "
-    if x < len
-      let string=string.."; "
-    endif
-  endfor
-  let string=prefix..string..suffix
-  return string
+  let lister .= ' 2>/dev/null'
+  return 'bash -c ' . shellescape(lister . ' | ' . fzf . (empty(g:outfile) ? '' : ' > ' . shellescape(g:outfile)))
 endfunction
 
 function! Buildstring_Popup(title, paths, callback, type="file", maxdepth=10, register="")
