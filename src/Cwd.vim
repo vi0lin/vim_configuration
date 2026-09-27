@@ -709,7 +709,10 @@ function! CD(path)
     call execute(get(g:, 'cd_command', 'cd')..' '..fnameescape(dir))
   endif
   let w:cwd=getcwd()
-  call UpdateGit()
+  " cheap, cached variant - CD() runs on every buffer/window switch.
+  " Explicit git commands (branch/remote switching) still call the full
+  " UpdateGit() themselves.
+  call UpdateGitFast()
   let $folderrepo=Folder_Repo(0, 0)
 endfunction
 
@@ -723,9 +726,15 @@ endfunction
 
 function! MakeDirCurrentCWD(bufnr)
   if !exists('g:temporaryfix')
-    let [n, y, x, n, n]=getcurpos()
     let p1=expand("%:p:h")
     let p2=expand('%:p')
+    " Runs for BufNew, BufAdd, BufReadPost, BufFilePost AND via the BufEnter
+    " timer - several times for a single file. Nothing to do when the window
+    " is already in this directory on this file.
+    if get(w:, 'cwd', '') ==# p1 && getcwd() ==# p1 && get(w:, 'pointer', '') ==# p2
+      return
+    endif
+    let [n, y, x, n, n]=getcurpos()
     if isdirectory(p1)
       call CD(p1)
     endif
@@ -824,7 +833,11 @@ function! UpdateGit()
   call ProjectPathCacheClear()
   let cwd=CWD()
   let w:git=FindGit(cwd)
+  let s:git_root_cache[cwd] = w:git
   let info=GitRepoInfo(w:git)
+  if type(w:git) == v:t_string
+    let s:git_info_cache[w:git] = {'key': s:GitInfoKey(w:git), 'info': info}
+  endif
   let w:gitBranch=info.branch
   let w:gitBranchList=info.branches
   let w:gitBranch_index=index(w:gitBranchList, w:gitBranch)
@@ -839,6 +852,87 @@ function! UpdateGit()
   endif
   let w:gitRemoteUrl=get(info.urls, w:gitRemote, '')
   call UpdateGit_OnSave()
+endfunction
+
+let s:git_root_cache = get(s:, 'git_root_cache', {})
+let s:git_info_cache = get(s:, 'git_info_cache', {})
+let s:git_diff_time = get(s:, 'git_diff_time', {})
+
+" Minimum seconds between two background 'git diff --stat' runs for the same
+" repository when just switching buffers/windows (saving always refreshes).
+if !exists('g:git_diff_min_interval')
+  let g:git_diff_min_interval = 5
+endif
+" Skip submodules in 'git diff --stat': with large submodules that command
+" is by far the most expensive part of keeping the statusline up to date.
+if !exists('g:git_diff_ignore_submodules')
+  let g:git_diff_ignore_submodules = 1
+endif
+
+" Cheap fingerprint of everything GitRepoInfo() reads: file times only.
+function! s:GitInfoKey(root)
+  let [gitdir, common] = GitDirs(a:root)
+  if gitdir ==# ''
+    return ''
+  endif
+  return join([getftime(gitdir..'/HEAD'), getftime(common..'/packed-refs'),
+        \ getftime(common..'/refs/heads'), getftime(common..'/config')], ',')
+endfunction
+
+" Same result as UpdateGit(), for the hot path (every buffer/window switch):
+" the repository root is cached per directory, the branch/remote info is
+" only re-read when .git/HEAD, refs or config changed, 'git diff --stat' is
+" throttled, and only this window's statusline is redrawn - and only when
+" something it shows actually changed.
+function! UpdateGitFast()
+  let cwd = CWD()
+  if has_key(s:git_root_cache, cwd)
+    let root = s:git_root_cache[cwd]
+    if type(root) == v:t_string && !IsGitDir(root)
+      let root = FindGit(cwd)
+      let s:git_root_cache[cwd] = root
+    endif
+  else
+    let root = FindGit(cwd)
+    let s:git_root_cache[cwd] = root
+  endif
+  let before = [get(w:, 'git', ''), get(w:, 'gitBranch', ''), get(w:, 'gitDiff', '')]
+  let w:git = root
+  if type(root) == v:t_string
+    let key = s:GitInfoKey(root)
+    let cached = get(s:git_info_cache, root, {})
+    if get(cached, 'key', '') !=# key
+      let cached = {'key': key, 'info': GitRepoInfo(root)}
+      let s:git_info_cache[root] = cached
+    endif
+    let info = cached.info
+  else
+    let info = GitRepoInfo(root)
+  endif
+  let w:gitBranch=info.branch
+  let w:gitBranchList=info.branches
+  let w:gitBranch_index=index(w:gitBranchList, w:gitBranch)
+  if !exists("w:gitRemote_index")
+    let w:gitRemote_index=0
+  endif
+  let w:gitRemoteList=info.remotes
+  if len(info.remotes)>0
+    let w:gitRemote=info.remotes[w:gitRemote_index < len(info.remotes) ? w:gitRemote_index : 0]
+  else
+    let w:gitRemote=-1
+  endif
+  let w:gitRemoteUrl=get(info.urls, w:gitRemote, '')
+  if type(root) == v:t_string
+    let w:gitDiff = get(s:git_diff_cache, root, get(w:, 'gitDiff', ''))
+    if localtime() - get(s:git_diff_time, root, 0) >= g:git_diff_min_interval
+      call GitDiffAsync(root)
+    endif
+  else
+    let w:gitDiff = ''
+  endif
+  if [get(w:, 'git', ''), get(w:, 'gitBranch', ''), get(w:, 'gitDiff', '')] !=# before
+    redrawstatus
+  endif
 endfunction
 
 function! UpdateGit_OnSave()
@@ -884,7 +978,9 @@ function! FindRemoteUrl(path)
 endfunction
 
 function! FindDiff(path)
-  return GitDiffSummary(systemlist('git -C '..shellescape(a:path)..' diff --stat 2>&1'))
+  let s:git_diff_time[a:path] = localtime()
+  return GitDiffSummary(systemlist('git -C '..shellescape(a:path)..' diff --stat'
+        \ ..(g:git_diff_ignore_submodules ? ' --ignore-submodules' : '')..' 2>&1'))
 endfunction
 
 function! GitDiffSummary(lines)
@@ -985,8 +1081,13 @@ function! GitDiffAsync(root)
     let running.again = 1
     return
   endif
+  let s:git_diff_time[a:root] = localtime()
   let ctx = {'root': a:root, 'lines': [], 'again': 0}
-  let ctx.job = job_start(['git', '-C', a:root, 'diff', '--stat'], {
+  let args = ['git', '-C', a:root, 'diff', '--stat']
+  if g:git_diff_ignore_submodules
+    call add(args, '--ignore-submodules')
+  endif
+  let ctx.job = job_start(args, {
         \ 'in_io': 'null', 'err_io': 'null',
         \ 'out_cb': function('s:GitDiffOut', [ctx]),
         \ 'close_cb': function('s:GitDiffDone', [ctx])})
@@ -1007,13 +1108,19 @@ function! s:GitDiffDone(ctx, channel)
 endfunction
 
 function! s:GitDiffApply(root)
+  let changed = 0
   for win in getwininfo()
     let wgit = get(win.variables, 'git', -1)
     if type(wgit) == v:t_string && wgit ==# a:root
-      call setwinvar(win.winnr, 'gitDiff', s:git_diff_cache[a:root])
+          \ && get(win.variables, 'gitDiff', '') !=# s:git_diff_cache[a:root]
+      " settabwinvar: getwininfo() also lists windows of other tab pages
+      call settabwinvar(win.tabnr, win.winnr, 'gitDiff', s:git_diff_cache[a:root])
+      let changed = 1
     endif
   endfor
-  redrawstatus!
+  if changed
+    redrawstatus!
+  endif
 endfunction
 
 " ---------------- project helpers (always terminate) ----------------

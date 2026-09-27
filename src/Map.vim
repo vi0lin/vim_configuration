@@ -655,16 +655,6 @@ NewMap -no -n ,,,,,,g :call AgIn(Folder_Repo(v:count, 5))<cr>
 
 NewMap -no -n ,vcd :call CD(VimConfiguration())<cr>
 
-NewMap -no <C-p> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
-NewMap -no ,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
-NewMap -no ,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
-NewMap -no ,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
-NewMap -no ,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
-NewMap -no ,,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
-NewMap -no -n ,p :call Projects()<cr>
-NewMap -no -n ,,p :call FilesInProjects()<cr>
-" NewMap -no -n ,,p :call FilesInProjects()<cr>
-NewMap -no <C-S-p> :call Projects()<cr>
 NewMap -no -n <A-p> :call ToggleThroughOpenedProjects()<cr>
 NewMap -no -n <A-S-p> :call ToggleThroughOpenedProjects(-1)<cr>
 NewMap -no -n <A-[> :call ToggleThroughCurrentProjectOpenedBuffers()<cr>
@@ -808,9 +798,6 @@ NewMap -n -no <C-.> :call CD(WFileNext())<cr>
 
 NewMap -n -no ,<Tab> :JumpProjectIn<cr>
 NewMap -n -no <localleader><Tab> :JumpProjectIn<cr>
-
-NewMap -n -no <Tab> :call TProject(1)<cr>
-NewMap -n -no <S-Tab> :call TProject(-1)<cr>
 
 " C - u
 NewMap -v -no <F14> :call VS()<cr>
@@ -1247,36 +1234,6 @@ NewMap -v -no i <C-c>i
 "  C - c
 NewMap -no -v <C-c> :call CommandInfo()<cr>
 
-NewMap -no -n ,dt :diffthis<cr>
-NewMap -no -n ,do :diffoff<cr>
-NewMap -no -n -v <F3> :diffthis<cr>
-NewMap -no -n -v <S-F3> :diffoff<cr>
-NewMap -no -n -v <S-F3> :call WinSwap_Prep() \| :windo diffthis \| :call WinSwap_Back()<cr>
-NewMap -no -n -v <C-F3> :call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
-NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
-
-NewMap -no -n dv :DiffOff<cr>
-NewMap -no -n dt :diffthis<cr>
-NewMap -no -n dj :norm ]c<cr>
-NewMap -no -n dk :norm [c<cr>
-NewMap -no -n do :norm! do]c<cr>
-NewMap -no -n dO :call DoAll()<cr>
-NewMap -no -n dp :norm! dp]c<cr>
-NewMap -no -n dP :call DpAll()<cr>
-" NewMap -no -n dP :norm! dp]c<cr>
-NewMap -no -n ,do :norm! do<cr>
-NewMap -no -n ,dp :norm! dp<cr>
-NewMap -no -n dh :call DiffWithNeighbor('h')<cr>
-NewMap -no -n dl :call DiffWithNeighbor('l')<cr>
-NewMap -no -n ,oh :call OpenFileHereAndInNeighborV2('h')<cr>
-NewMap -no -n ,ol :call OpenFileHereAndInNeighborV2('l')<cr>
-
-
-NewMap -no -n ,ol :call OpenFileHereAndInNeighborV2('l')<cr>
-
-NewMap -n -no ,dd :call DirDiff()<cr>
-NewMap -no -n ,dn :call DirDiffNext()<cr>
-
 NewMap -no -n -v <C-S-.> :@:<cr>
 
 
@@ -1391,12 +1348,12 @@ NewMap -no -n <S-F4> :call SelectExecutionWindow(-1)<cr>
 " map <F3> exec ""
 
 
-NewMap -no -n <F2> :F  
-NewMap -no -v <F2> :F<cr>
-NewMap -no -n <C-F2> :IF  
-NewMap -no -v <C-F2> :IF<cr>
-NewMap -no -n -v <C-S-F2> :CDo<cr>
-NewMap -no -n -v <C-S-M-F2> :CFDo<cr>
+NewMap -no -n <F3> :F  
+NewMap -no -v <F3> :F<cr>
+NewMap -no -n <C-F3> :IF  
+NewMap -no -v <C-F3> :IF<cr>
+NewMap -no -n -v <C-S-F3> :CDo<cr>
+NewMap -no -n -v <C-S-M-F3> :CFDo<cr>
 
 NewMap -no -v -n <C-]> :OR 1<CR>
 NewMap -no -v -n <C-\> :OR -1<CR>
@@ -1412,7 +1369,64 @@ NewMap -no -n ,,R :silent windo \| if filereadable(expand("%")) \| :silent e! % 
 NewMap -no -n <C-Enter> :call DirDiff()<cr>
 NewMap -no -n <C-Down> :call DirDiffNext()<cr>
 NewMap -no -n <C-Up> :call DirDiffPrev()<cr>
+
+" NewMap -no -n -v <F3> :diffthis<cr>
+" NewMap -no -n -v <S-F3> :diffoff<cr>
+" NewMap -no -n -v <S-F3> :call WinSwap_Prep() \| :windo diffthis \| :call WinSwap_Back()<cr>
+" NewMap -no -n -v <C-F3> :call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
+" NewMap -no -n -v <C-S-F3> :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
+NewMap -no -n ,dt :diffthis<cr>
+NewMap -no -n ,do :diffoff<cr>
+NewMap -no -n dv :DiffOff<cr>
+NewMap -no -n dt :diffthis<cr>
+NewMap -no -n dj :norm ]c<cr>
+NewMap -no -n dk :norm [c<cr>
+NewMap -no -n do :norm! do]c<cr>
+NewMap -no -n dO :call DoAll()<cr>
+NewMap -no -n dp :norm! dp]c<cr>
+NewMap -no -n dP :call DpAll()<cr>
+" NewMap -no -n dP :norm! dp]c<cr>
+NewMap -no -n ,do :norm! do<cr>
+NewMap -no -n ,dp :norm! dp<cr>
+NewMap -no -n dh :call DiffWithNeighbor('h')<cr>
+NewMap -no -n dl :call DiffWithNeighbor('l')<cr>
+NewMap -no -n ,oh :call OpenFileHereAndInNeighborV2('h')<cr>
+NewMap -no -n ,ol :call OpenFileHereAndInNeighborV2('l')<cr>
+NewMap -no -n ,ol :call OpenFileHereAndInNeighborV2('l')<cr>
+NewMap -n -no ,dd :call DirDiff()<cr>
+NewMap -no -n ,dn :call DirDiffNext()<cr>
+
+NewMap -no -n -v <F2> :Projects()<cr>
+NewMap -no -n -v <S-F2> :Projects()<cr>
+NewMap -no -n -v <C-S-F2> :Projects()<cr>
+
+NewMap -n -no <Tab> :call TProject(1)<cr>
+NewMap -n -no <S-Tab> :call TProject(-1)<cr>
+
+NewMap -no -n <F2>     :call Projects()<cr>
+NewMap -no -n <S-F2>      :call ProjectCycleBufferNext()<cr>
+NewMap -no -n <C-S-F2>    :call ProjectCycleBufferPrev()<cr>
+NewMap -no -n <S-F12>    :call ProjectCycleAllNext()<cr>
+NewMap -no -n <C-S-F12>  :call ProjectCycleAllPrev()<cr>
+NewMap -no -n <A-F2>    :call FilesInProjects()<cr>
+" NewMap -no -n ,,p :call FilesInProjects()<cr>
+
+NewMap -no <C-Space> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
+NewMap -no ,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
+NewMap -no ,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
+NewMap -no ,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
+NewMap -no ,,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
+NewMap -no ,,,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
+
+NewMap -no <C-p> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
+NewMap -no ,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
+NewMap -no ,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
+NewMap -no ,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
+NewMap -no ,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
+NewMap -no ,,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
+
 NewMap -no -n ,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/c/bookmarks", "/home/user/FTP/Downloads/code-files")<cr>
-NewMap -no -n ,,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files2")<cr>
+NewMap -no -n ,,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files")<cr>
+NewMap -no -n ,,,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/git_server", "/home/user/FTP/Downloads/code-files")<cr>
 
 endif

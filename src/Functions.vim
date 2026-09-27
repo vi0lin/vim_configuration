@@ -667,9 +667,9 @@ function OpenUnreleased(file)
   endif
 endfunction
 
-function! Refresh(name, functionname)
-  exec 'let g:'..a:name..'='a:functionname
-endfunction
+" function! Refresh(name, functionname)
+"   exec 'let g:'..a:name..'='a:functionname
+" endfunction
 
 function! UnreleasedVariable(name)
   exec 'let g:'..a:name..'=ReadUnreleased("'..a:name..'")'
@@ -679,15 +679,15 @@ function! ReadUnreleased(file)
   return Read(g:unreleased..'/.'..a:file)
 endfunction
 
-function! GetFavoriteFolders()
-  call UnreleasedVariable('favoritefolders')
-  return g:favoritefolders
-endfunction
+" function! GetFavoriteFolders()
+"   call UnreleasedVariable('favoritefolders')
+"   return g:favoritefolders
+" endfunction
 
-function! GetFavoriteFolders_Recursively()
-  call UnreleasedVariable('favoritefolders_recursively')
-  return g:favoritefolders_recursively
-endfunction
+" function! GetFavoriteFolders_Recursively()
+"   call UnreleasedVariable('favoritefolders_recursively')
+"   return g:favoritefolders_recursively
+" endfunction
 
 function! SaveFavoriteFolders_Glob()
   let test=[
@@ -703,46 +703,46 @@ function! GetFavoriteFolders_Glob()
   let g:favoritefolders_glob=ReadUnreleased("favoritefolders_glob.unreleased")
 endfunction
 
-function! GetFavoriteFolders_Files()
-  let x = []
-  for path in g:favoritefolders
-    let dirs=filter(globpath(path, "*", 0, 1), 'filereadable(v:val)')
-    call extend(x, dirs)
-  endfor
-  call WriteUnreleased(x, 'favoritefolders_files')
-  call UnreleasedVariable('favoritefolders_files')
-  return g:favoritefolders_files
-endfunction
+" function! GetFavoriteFolders_Files()
+"   let x = []
+"   for path in g:favoritefolders
+"     let dirs=filter(globpath(path, "*", 0, 1), 'filereadable(v:val)')
+"     call extend(x, dirs)
+"   endfor
+"   call WriteUnreleased(x, 'favoritefolders_files')
+"   call UnreleasedVariable('favoritefolders_files')
+"   return g:favoritefolders_files
+" endfunction
 
-function! GetPathsOfFavorites()
-  let x=[]
-  for f in g:favorites
-    if isdirectory(f) && indexof(x, f)==-1
-      call add(x, f)
-    endif
-  endfor
-  return x
-endfunction
+" function! GetPathsOfFavorites()
+"   let x=[]
+"   for f in g:favorites
+"     if isdirectory(f) && indexof(x, f)==-1
+"       call add(x, f)
+"     endif
+"   endfor
+"   return x
+" endfunction
 
-function! GetFavoriteFolders_Files_Recursively()
-  let x = []
-  for path in g:favoritefolders
-    let dirs=filter(globpath(path, "**", 0, 1), 'filereadable(v:val)')
-    call extend(x, dirs)
-  endfor
-  call WriteUnreleased(x, 'favoritefolders_files_recursively')
-  call UnreleasedVariable('favoritefolders_files_recursively')
-  return g:favoritefolders_files_recursively
-endfunction
+" function! GetFavoriteFolders_Files_Recursively()
+"   let x = []
+"   for path in g:favoritefolders
+"     let dirs=filter(globpath(path, "**", 0, 1), 'filereadable(v:val)')
+"     call extend(x, dirs)
+"   endfor
+"   call WriteUnreleased(x, 'favoritefolders_files_recursively')
+"   call UnreleasedVariable('favoritefolders_files_recursively')
+"   return g:favoritefolders_files_recursively
+" endfunction
 
-function! GetGitprojects(file=g:unreleased..'/.gitprojects')
-  if !filereadable(a:file)
-    call UpdateGitProjects()
-  endif
-  " Add Updating Logic When New Projects Were Visited Or Removed
-  let g:gitprojects=Read(a:file)
-  return g:gitprojects
-endfunction
+" function! GetGitprojects(file=g:unreleased..'/.gitprojects')
+"   if !filereadable(a:file)
+"     call UpdateGitProjects()
+"   endif
+"   " Add Updating Logic When New Projects Were Visited Or Removed
+"   let g:gitprojects=Read(a:file)
+"   return g:gitprojects
+" endfunction
 
 if 0
   function FN
@@ -789,22 +789,22 @@ function FN(...)
 endfunction
 " call FN()
 
-function! GetProjects()
-  call Refresh('multiprojectholder', 'GetMultiprojectHolder()')
-  call Refresh('multiprojectholder_projects', 'GetMultiprojectHolder_Projects()')
-  call Refresh('projectholder', 'GetProjectHolder()')
-  call Refresh('gitprojects', 'GetGitprojects()')
-  call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
-  call Refresh('favoritefolders_files_recursively', 'GetFavoriteFolders_Files_Recursively()')
-  call Refresh('pathsoffavorites', 'GetPathsOfFavorites()')
-  return MergeUniq(g:gitprojects, g:favoritefolders_files, g:multiprojectholder_projects, g:projectholder_projects, g:pathsoffavorites)
-endfunction
+" function! GetProjects()
+"   call Refresh('multiprojectholder', 'GetMultiprojectHolder()')
+"   call Refresh('multiprojectholder_projects', 'GetMultiprojectHolder_Projects()')
+"   call Refresh('projectholder', 'GetProjectHolder()')
+"   call Refresh('gitprojects', 'GetGitprojects()')
+"   call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
+"   call Refresh('favoritefolders_files_recursively', 'GetFavoriteFolders_Files_Recursively()')
+"   call Refresh('pathsoffavorites', 'GetPathsOfFavorites()')
+"   return MergeUniq(g:gitprojects, g:favoritefolders_files, g:multiprojectholder_projects, g:projectholder_projects, g:pathsoffavorites)
+" endfunction
 
-function! UpdateProjects()
-  call UpdateGitProjects()
-  call Refresh('projects', 'GetProjects()')
-endfunction
-command! -range -nargs=0 UpdateProjects :call UpdateProjects()
+" function! UpdateProjects()
+"   call UpdateGitProjects()
+"   call Refresh('projects', 'GetProjects()')
+" endfunction
+" command! -range -nargs=0 UpdateProjects :call UpdateProjects()
 
 function! GetFoldersFolders(name)
   call UnreleasedVariable(a:name)
@@ -822,13 +822,13 @@ function! GetProjectFolders()
   return x
 endfunction
 
-function! UpdateGitProjects(file=g:unreleased..'/.gitprojects')
-  let gitprojects=systemlist("find "..g:UpdateGitProjectsPath.." -name .git -type d 2>/dev/null | sed 's|/.git||'")
-  " echo gitprojects
-  return Write(gitprojects, a:file)
-  echo "Done"
-endfunction
-command! -range -nargs=0 UpdateGitProjects :call UpdateGitProjects()
+" function! UpdateGitProjects(file=g:unreleased..'/.gitprojects')
+"   let gitprojects=systemlist("find "..g:UpdateGitProjectsPath.." -name .git -type d 2>/dev/null | sed 's|/.git||'")
+"   " echo gitprojects
+"   return Write(gitprojects, a:file)
+"   echo "Done"
+" endfunction
+" command! -range -nargs=0 UpdateGitProjects :call UpdateGitProjects()
 
 function! Read(file)
   if CreateFileAndPathIfNotExists(a:file)
@@ -879,49 +879,49 @@ function! ReadSession()
   " endif
 endfunction
 command! -range -nargs=0 ReadSession :call ReadSession()
-command! -range -nargs=0 Projekt :call SetUnset('projekt', expand("%:p"))
-command! -range -nargs=0 MultiprojectHolder :call SetUnset('multiprojectholder', expand("%:p"))
-command! -range -nargs=0 FavoriteFolder :call SetUnset('favoritefolders', expand("%:p"))
-command! -range -nargs=0 FavoriteFolderRecursively :call SetUnset('favoritefolders_recursively', expand("%:p"))
-command! -range -nargs=0 ProjectHolder :call SetUnset('projectholder', expand("%:p"))
+" command! -range -nargs=0 Projekt :call SetUnset('projekt', expand("%:p"))
+" command! -range -nargs=0 MultiprojectHolder :call SetUnset('multiprojectholder', expand("%:p"))
+" command! -range -nargs=0 FavoriteFolder :call SetUnset('favoritefolders', expand("%:p"))
+" command! -range -nargs=0 FavoriteFolderRecursively :call SetUnset('favoritefolders_recursively', expand("%:p"))
+" command! -range -nargs=0 ProjectHolder :call SetUnset('projectholder', expand("%:p"))
 
-function! GetProjectHolder()
-  call UnreleasedVariable('projectholder')
-  call GetProjectHolder_Projects()
-  return g:projectholder
-endfunction
+" function! GetProjectHolder()
+"   call UnreleasedVariable('projectholder')
+"   call GetProjectHolder_Projects()
+"   return g:projectholder
+" endfunction
 
-function! GetProjectHolder_Projects()
-  let p=[]
-  for path in g:projectholder
-    let dirs=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
-    call extend(p, dirs)
-  endfor
-  " call ForceSet('projectholder_projects', p)
-  call WriteUnreleased(p, 'projectholder_projects')
-  return g:projectholder_projects
-endfunction
+" function! GetProjectHolder_Projects()
+"   let p=[]
+"   for path in g:projectholder
+"     let dirs=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
+"     call extend(p, dirs)
+"   endfor
+"   " call ForceSet('projectholder_projects', p)
+"   call WriteUnreleased(p, 'projectholder_projects')
+"   return g:projectholder_projects
+" endfunction
 
-function! GetMultiprojectHolder()
-  call UnreleasedVariable('multiprojectholder')
-  " call GetMultiprojectHolder_Projects()
-  return g:multiprojectholder
-endfunction
+" function! GetMultiprojectHolder()
+"   call UnreleasedVariable('multiprojectholder')
+"   " call GetMultiprojectHolder_Projects()
+"   return g:multiprojectholder
+" endfunction
 
-function! GetMultiprojectHolder_Projects()
-  let p=[]
-  for path in g:multiprojectholder
-    let subpaths=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
-    for path2 in subpaths
-       let pp=filter(globpath(path2, "*", 0, 1), 'isdirectory(v:val)')
-      call extend(p, pp)
-    endfor
-  endfor
-  " call ForceSet('projectholder_projects', p)
-  call WriteUnreleased(p, 'multiprojectholder_projects')
-  call UnreleasedVariable('multiprojectholder_projects')
-  return g:multiprojectholder_projects
-endfunction
+" function! GetMultiprojectHolder_Projects()
+"   let p=[]
+"   for path in g:multiprojectholder
+"     let subpaths=filter(globpath(path, "*", 0, 1), 'isdirectory(v:val)')
+"     for path2 in subpaths
+"        let pp=filter(globpath(path2, "*", 0, 1), 'isdirectory(v:val)')
+"       call extend(p, pp)
+"     endfor
+"   endfor
+"   " call ForceSet('projectholder_projects', p)
+"   call WriteUnreleased(p, 'multiprojectholder_projects')
+"   call UnreleasedVariable('multiprojectholder_projects')
+"   return g:multiprojectholder_projects
+" endfunction
 
 function EchoP()
   echo "g:projectholder"
@@ -946,37 +946,37 @@ function! EnsureArr(value)
   return x
 endfunction
 
-function! SetUnset(name, value)
-  " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
-  exec "call UnreleasedVariable('"..a:name.."')"
-  let x = EnsureArr(a:value)
-  for y in x
-    exec "let index=index(g:"..a:name..", '"..y.."')"
-    if index>=0
-      exec "call remove(g:"..a:name..", index)"
-      exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
-    else
-      exec "call add(g:"..a:name..", '"..y.."')"
-      exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
-    endif
-  endfor
-  " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
-  exec "call UnreleasedVariable('"..a:name.."')"
-endfunction
+" function! SetUnset(name, value)
+"   " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+"   exec "call UnreleasedVariable('"..a:name.."')"
+"   let x = EnsureArr(a:value)
+"   for y in x
+"     exec "let index=index(g:"..a:name..", '"..y.."')"
+"     if index>=0
+"       exec "call remove(g:"..a:name..", index)"
+"       exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
+"     else
+"       exec "call add(g:"..a:name..", '"..y.."')"
+"       exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
+"     endif
+"   endfor
+"   " exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+"   exec "call UnreleasedVariable('"..a:name.."')"
+" endfunction
 
-function! ForceSet(name, value)
-  exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
-  let x=[]
-  call extend(x, a:value)
-  for y in x
-    exec "let index=index(g:"..a:name..", '"..y.."')"
-    if index==-1
-      exec "call add(g:"..a:name..", '"..y.."')"
-    endif
-  endfor
-  exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
-  call UnreleasedVariable(a:name)
-endfunction
+" function! ForceSet(name, value)
+"   exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
+"   let x=[]
+"   call extend(x, a:value)
+"   for y in x
+"     exec "let index=index(g:"..a:name..", '"..y.."')"
+"     if index==-1
+"       exec "call add(g:"..a:name..", '"..y.."')"
+"     endif
+"   endfor
+"   exec "call WriteUnreleased(g:"..a:name..", '"..a:name.."')"
+"   call UnreleasedVariable(a:name)
+" endfunction
 
 function! ForceUnset(name, value)
   exec "let g:"..a:name.."=ReadUnreleased('"..a:name.."')"
@@ -3239,7 +3239,7 @@ endfunction
 function! Install()
   SystemctlReload
   let $service_file=expand('%')
-  echo $service_file
+  " echo $service_file
   !install_service() {
   \ sudo ln -s -t /etc/systemd/system `realpath $1`;
   \ };
@@ -5005,29 +5005,29 @@ function! Merge(...)
 endfunction
 
 " Caution, [[], [], []]
-function! MergeUniq(...)
-  let l= []
-  for m in a:000
-    call extend(l, m)
-  endfor
-  let ff={}
-  for x in l
-    let ff[x]=x
-  endfor
-  let f = []
-  for k in keys(ff)
-    call add(f, ff[k])
-  endfor
-  return f
-  " call map(copy(f), {k,v -> extend(out, [{v: v})})
-  " return reduce(f, {acc, val, idx -> extend(acc, {val: idx})}, {})
-endfunction
+" function! MergeUniq(...)
+"   let l= []
+"   for m in a:000
+"     call extend(l, m)
+"   endfor
+"   let ff={}
+"   for x in l
+"     let ff[x]=x
+"   endfor
+"   let f = []
+"   for k in keys(ff)
+"     call add(f, ff[k])
+"   endfor
+"   return f
+"   " call map(copy(f), {k,v -> extend(out, [{v: v})})
+"   " return reduce(f, {acc, val, idx -> extend(acc, {val: idx})}, {})
+" endfunction
 
-function! Projects()
-  call Refresh('projects', 'GetProjects()')
-  call OpenFilePopup("Projects", g:projects)
-endfunction
-command! -range -nargs=0 Projects :call Projects()
+" function! Projects()
+"   call Refresh('projects', 'GetProjects()')
+"   call OpenFilePopup("Projects", g:projects)
+" endfunction
+" command! -range -nargs=0 Projects :call Projects()
 
 function! ToggleThroughOpenedProjects(n=1)
   echo "Implement Toggle Project " .. a:n
@@ -5052,17 +5052,17 @@ function! TProject(a)
   echo UniqueProjects()
 endfunction
 
-" fzf buildstring find in projects
-" why file exists 3 times in the list?
-function! FilesInProjects()
-  let allfiles=[]
-  " for p in g:projects
-  "   call extend(allfiles, [globpath(p, "**")])
-  " endfor
-  " call Refresh('projects', 'GetProjects()')
-  " call OpenFilePopup("Files In Projects", allfiles)
-  call Popup_FZFBuildString("Files In Projects", g:projects)
-endfunction
+"" fzf buildstring find in projects
+"" why file exists 3 times in the list?
+" function! FilesInProjects()
+"   let allfiles=[]
+"   " for p in g:projects
+"   "   call extend(allfiles, [globpath(p, "**")])
+"   " endfor
+"   " call Refresh('projects', 'GetProjects()')
+"   " call OpenFilePopup("Files In Projects", allfiles)
+"   call Popup_FZFBuildString("Files In Projects", g:projects)
+" endfunction
 
 " function! PopupList(listname)
 "   let title=toupper(a:listname[0])+""+a:listname[1:]
@@ -5070,20 +5070,20 @@ endfunction
 "   call OpenFilePopup(title, list)
 " endfunction
 
-function! Favorites()
-  call Refresh('favorites', 'ReadUnreleased("favorites")')
-  call Refresh('favoritefolders', 'GetFavoriteFolders()')
-  call Refresh('favoritefolders_recursively', 'GetFavoriteFolders_Recursively()')
-  call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
-  call Refresh('favoritefolders_files_recursively', 'GetFavoriteFolders_Files_Recursively()')
-  call Refresh('favoritefolders_glob', 'GetFavoriteFolders_Glob()')
-  let f=[]
-  call extend(f, g:favorites)
-  call extend(f, g:favoritefolders_files)
-  call extend(f, g:favoritefolders_files_recursively)
-  call OpenFilePopup("Favorites", f)
-endfunction
-command! -range -nargs=0 Favorites :call Favorites()
+" function! Favorites()
+"   call Refresh('favorites', 'ReadUnreleased("favorites")')
+"   call Refresh('favoritefolders', 'GetFavoriteFolders()')
+"   call Refresh('favoritefolders_recursively', 'GetFavoriteFolders_Recursively()')
+"   call Refresh('favoritefolders_files', 'GetFavoriteFolders_Files()')
+"   call Refresh('favoritefolders_files_recursively', 'GetFavoriteFolders_Files_Recursively()')
+"   call Refresh('favoritefolders_glob', 'GetFavoriteFolders_Glob()')
+"   let f=[]
+"   call extend(f, g:favorites)
+"   call extend(f, g:favoritefolders_files)
+"   call extend(f, g:favoritefolders_files_recursively)
+"   call OpenFilePopup("Favorites", f)
+" endfunction
+" command! -range -nargs=0 Favorites :call Favorites()
 
 function! OpenFilePopup(title, list)
   function! OpenFile_callback(file)
@@ -8506,7 +8506,10 @@ function! BufferSetup()
     elseif !has_key(g:buffer_vars, bufname())
         let g:buffer_vars[bufname()]={}
     endif
-    let b:isGitRepo=system("echo -n `git rev-parse --is-inside-work-tree 2>/dev/null || echo -n false`")
+    " was: system("git rev-parse --is-inside-work-tree") - a shell plus a
+    " git process for every new buffer/terminal. Same answer, no process:
+    let b:isGitRepo = type(FindGit(getcwd())) == v:t_string ? 'true' : 'false'
+    " let b:isGitRepo=system("echo -n `git rev-parse --is-inside-work-tree 2>/dev/null || echo -n false`")
     " let b:lastMasterBranch=system("if $isGitRepo; then echo -n `git log master --oneline | head -n 0 | awk '{print $1}'`; else echo -n '...'; fi")
     " let w:gitBranch=system("if $isGitRepo; then echo -n `git rev-parse --abbrev-ref HEAD`; else echo -n 'not a git repo'; fi")
     " let b:commitstatus=system("echo -n 'got commited (to be done)'")
@@ -9985,6 +9988,10 @@ augroup END
 """ " let g:filepairs_history = []
 """ " … you can add DirDiffPrev later if needed
 exec 'source '.g:vim_configuration_src.'/dirdiff.vim'
+exec 'source '.g:vim_configuration_src.'/filecycle.vim'
+exec 'source '.g:vim_configuration_src.'/projectcycle.vim'
+exec 'source '.g:vim_configuration_src.'/projects.vim'
+exec 'source '.g:vim_configuration_src.'/qfsearch.vim'
 
 let g:vim_advantages_got_sourced='true'
 

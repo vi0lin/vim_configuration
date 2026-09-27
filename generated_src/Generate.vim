@@ -931,15 +931,6 @@ nnoremap ,,,,g :call SetMode(",,,,g", "Normal") \| :call AgIn(Folder_Repo(v:coun
 nnoremap ,,,,,g :call SetMode(",,,,,g", "Normal") \| :call AgIn(Folder_Repo(v:count, 4))<cr>
 nnoremap ,,,,,,g :call SetMode(",,,,,,g", "Normal") \| :call AgIn(Folder_Repo(v:count, 5))<cr>
 nnoremap ,vcd :call SetMode(",vcd", "Normal") \| :call CD(VimConfiguration())<cr>
-nnoremap <C-p> :call SetMode("\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
-nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
-nnoremap ,,<C-p> :call SetMode(",,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
-nnoremap ,,,<C-p> :call SetMode(",,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
-nnoremap ,,,,<C-p> :call SetMode(",,,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
-nnoremap ,,,,,<C-p> :call SetMode(",,,,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
-nnoremap ,p :call SetMode(",p", "Normal") \| :call Projects()<cr>
-nnoremap ,,p :call SetMode(",,p", "Normal") \| :call FilesInProjects()<cr>
-nnoremap <C-S-p> :call SetMode("\<C-S-p\>", "Normal") \| :call Projects()<cr>
 nnoremap <A-p> :call SetMode("\<A-p\>", "Normal") \| :call ToggleThroughOpenedProjects()<cr>
 nnoremap <A-S-p> :call SetMode("\<A-S-p\>", "Normal") \| :call ToggleThroughOpenedProjects(-1)<cr>
 nnoremap <A-[> :call SetMode("\<A-[\>", "Normal") \| :call ToggleThroughCurrentProjectOpenedBuffers()<cr>
@@ -1047,8 +1038,6 @@ nnoremap <C-,> :call SetMode("\<C-,\>", "Normal") \| :call CD(WFilePrev())<cr>
 nnoremap <C-.> :call SetMode("\<C-.\>", "Normal") \| :call CD(WFileNext())<cr>
 nnoremap ,<Tab> :call SetMode(",\<Tab\>", "Normal") \| :JumpProjectIn<cr>
 nnoremap <localleader><Tab> :call SetMode("\<localleader\>\<Tab\>", "Normal") \| :JumpProjectIn<cr>
-nnoremap <Tab> :call SetMode("\<Tab\>", "Normal") \| :call TProject(1)<cr>
-nnoremap <S-Tab> :call SetMode("\<S-Tab\>", "Normal") \| :call TProject(-1)<cr>
 vnoremap <F14> :call SetMode("\<F14\>", "Visual") \| '<,'>:call VS()<cr>
 nnoremap <F13> :call SetMode("\<F13\>", "Normal") \| :call VS()<cr>
 inoremap <F13> <C-\><C-n>:call SetMode("\<F13\>", "Insert") \| :call VS()<cr>
@@ -1177,18 +1166,43 @@ nnoremap <C-F4> :call SetMode("\<C-F4\>", "Normal") \| :call GitStashPop()<cr>
 tnoremap <C-v> <C-\><C-n>
 vnoremap i :call SetMode("i", "Visual") \| '<,'><C-c>i
 vnoremap <C-c> :call SetMode("\<C-c\>", "Visual") \| '<,'>:call CommandInfo()<cr>
+nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
+vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('h')<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('j')<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('k')<cr>
+nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('l')<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('h', 1)<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('j', 1)<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('k', 1)<cr>
+nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('l', 1)<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('h')<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('j')<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('k')<cr>
+nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('l')<cr>
+nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call SelectExecutionWindow(1)<cr>
+nnoremap <S-F4> :call SetMode("\<S-F4\>", "Normal") \| :call SelectExecutionWindow(-1)<cr>
+nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :F 
+vnoremap <F3> :call SetMode("\<F3\>", "Visual") \| '<,'>:F<cr>
+nnoremap <C-F3> :call SetMode("\<C-F3\>", "Normal") \| :IF 
+vnoremap <C-F3> :call SetMode("\<C-F3\>", "Visual") \| '<,'>:IF<cr>
+nnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Normal") \| :CDo<cr>
+vnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Visual") \| '<,'>:CDo<cr>
+nnoremap <C-S-M-F3> :call SetMode("\<C-S-M-F3\>", "Normal") \| :CFDo<cr>
+vnoremap <C-S-M-F3> :call SetMode("\<C-S-M-F3\>", "Visual") \| '<,'>:CFDo<cr>
+nnoremap <C-]> :call SetMode("\<C-]\>", "Normal") \| :OR 1<CR>
+vnoremap <C-]> :call SetMode("\<C-]\>", "Visual") \| '<,'>:OR 1<CR>
+nnoremap <C-\> :call SetMode("\<C-\\>", "Normal") \| :OR -1<CR>
+vnoremap <C-\> :call SetMode("\<C-\\>", "Visual") \| '<,'>:OR -1<CR>
+nnoremap ,re :call SetMode(",re", "Normal") \| :Rel<cr>
+vnoremap ,re :call SetMode(",re", "Visual") \| '<,'>:Rel<cr>
+nnoremap ,,r :call SetMode(",,r", "Normal") \| :e! %<CR>
+nnoremap ,,R :call SetMode(",,R", "Normal") \| :silent windo \| if filereadable(expand("%")) \| :silent e! % \| fi \| :norm G \| :redraw!<CR>
+nnoremap <C-Enter> :call SetMode("\<C-Enter\>", "Normal") \| :call DirDiff()<cr>
+nnoremap <C-Down> :call SetMode("\<C-Down\>", "Normal") \| :call DirDiffNext()<cr>
+nnoremap <C-Up> :call SetMode("\<C-Up\>", "Normal") \| :call DirDiffPrev()<cr>
 nnoremap ,dt :call SetMode(",dt", "Normal") \| :diffthis<cr>
 nnoremap ,do :call SetMode(",do", "Normal") \| :diffoff<cr>
-nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :diffthis<cr>
-vnoremap <F3> :call SetMode("\<F3\>", "Visual") \| '<,'>:diffthis<cr>
-nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :diffoff<cr>
-vnoremap <S-F3> :call SetMode("\<S-F3\>", "Visual") \| '<,'>:diffoff<cr>
-nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :call WinSwap_Prep() \| :windo diffthis \| :call WinSwap_Back()<cr>
-vnoremap <S-F3> :call SetMode("\<S-F3\>", "Visual") \| '<,'>:call WinSwap_Prep() \| :windo diffthis \| :call WinSwap_Back()<cr>
-nnoremap <C-F3> :call SetMode("\<C-F3\>", "Normal") \| :call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
-vnoremap <C-F3> :call SetMode("\<C-F3\>", "Visual") \| '<,'>:call WinSwap_Prep() \| :windo diffoff \| :call WinSwap_Back()<cr>
-nnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Normal") \| :call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
-vnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Visual") \| '<,'>:call BufPrep() \| :call DiffOff() \| :call BufBack()<cr>
 nnoremap dv :call SetMode("dv", "Normal") \| :DiffOff<cr>
 nnoremap dt :call SetMode("dt", "Normal") \| :diffthis<cr>
 nnoremap dj :call SetMode("dj", "Normal") \| :norm ]c<cr>
@@ -1206,40 +1220,32 @@ nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighborV2
 nnoremap ,ol :call SetMode(",ol", "Normal") \| :call OpenFileHereAndInNeighborV2('l')<cr>
 nnoremap ,dd :call SetMode(",dd", "Normal") \| :call DirDiff()<cr>
 nnoremap ,dn :call SetMode(",dn", "Normal") \| :call DirDiffNext()<cr>
-nnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Normal") \| :@:<cr>
-vnoremap <C-S-.> :call SetMode("\<C-S-.\>", "Visual") \| '<,'>:@:<cr>
-nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('h')<cr>
-nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('j')<cr>
-nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('k')<cr>
-nnoremap  :call SetMode("", "Normal") \| :call ResizeBorder('l')<cr>
-nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('h', 1)<cr>
-nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('j', 1)<cr>
-nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('k', 1)<cr>
-nnoremap <S-> :call SetMode("\<S-\>", "Normal") \| :call SetBorder('l', 1)<cr>
-nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('h')<cr>
-nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('j')<cr>
-nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('k')<cr>
-nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('l')<cr>
-nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call SelectExecutionWindow(1)<cr>
-nnoremap <S-F4> :call SetMode("\<S-F4\>", "Normal") \| :call SelectExecutionWindow(-1)<cr>
-nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :F 
-vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:F<cr>
-nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :IF 
-vnoremap <C-F2> :call SetMode("\<C-F2\>", "Visual") \| '<,'>:IF<cr>
-nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :CDo<cr>
-vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:CDo<cr>
-nnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Normal") \| :CFDo<cr>
-vnoremap <C-S-M-F2> :call SetMode("\<C-S-M-F2\>", "Visual") \| '<,'>:CFDo<cr>
-nnoremap <C-]> :call SetMode("\<C-]\>", "Normal") \| :OR 1<CR>
-vnoremap <C-]> :call SetMode("\<C-]\>", "Visual") \| '<,'>:OR 1<CR>
-nnoremap <C-\> :call SetMode("\<C-\\>", "Normal") \| :OR -1<CR>
-vnoremap <C-\> :call SetMode("\<C-\\>", "Visual") \| '<,'>:OR -1<CR>
-nnoremap ,re :call SetMode(",re", "Normal") \| :Rel<cr>
-vnoremap ,re :call SetMode(",re", "Visual") \| '<,'>:Rel<cr>
-nnoremap ,,r :call SetMode(",,r", "Normal") \| :e! %<CR>
-nnoremap ,,R :call SetMode(",,R", "Normal") \| :silent windo \| if filereadable(expand("%")) \| :silent e! % \| fi \| :norm G \| :redraw!<CR>
-nnoremap <C-Enter> :call SetMode("\<C-Enter\>", "Normal") \| :call DirDiff()<cr>
-nnoremap <C-Down> :call SetMode("\<C-Down\>", "Normal") \| :call DirDiffNext()<cr>
-nnoremap <C-Up> :call SetMode("\<C-Up\>", "Normal") \| :call DirDiffPrev()<cr>
+nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :Projects()<cr>
+vnoremap <F2> :call SetMode("\<F2\>", "Visual") \| '<,'>:Projects()<cr>
+nnoremap <S-F2> :call SetMode("\<S-F2\>", "Normal") \| :Projects()<cr>
+vnoremap <S-F2> :call SetMode("\<S-F2\>", "Visual") \| '<,'>:Projects()<cr>
+nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \| :Projects()<cr>
+vnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Visual") \| '<,'>:Projects()<cr>
+nnoremap <Tab> :call SetMode("\<Tab\>", "Normal") \| :call TProject(1)<cr>
+nnoremap <S-Tab> :call SetMode("\<S-Tab\>", "Normal") \| :call TProject(-1)<cr>
+nnoremap <F2> :call SetMode("\<F2\>", "Normal") \|     :call Projects()<cr>
+nnoremap <S-F2> :call SetMode("\<S-F2\>", "Normal") \|      :call ProjectCycleBufferNext()<cr>
+nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \|    :call ProjectCycleBufferPrev()<cr>
+nnoremap <S-F12> :call SetMode("\<S-F12\>", "Normal") \|    :call ProjectCycleAllNext()<cr>
+nnoremap <C-S-F12> :call SetMode("\<C-S-F12\>", "Normal") \|  :call ProjectCycleAllPrev()<cr>
+nnoremap <A-F2> :call SetMode("\<A-F2\>", "Normal") \|    :call FilesInProjects()<cr>
+nnoremap <C-Space> :call SetMode("\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
+nnoremap ,<C-Space> :call SetMode(",\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
+nnoremap ,,<C-Space> :call SetMode(",,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
+nnoremap ,,,<C-Space> :call SetMode(",,,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
+nnoremap ,,,,<C-Space> :call SetMode(",,,,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
+nnoremap ,,,,,<C-Space> :call SetMode(",,,,,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
+nnoremap <C-p> :call SetMode("\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
+nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
+nnoremap ,,<C-p> :call SetMode(",,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
+nnoremap ,,,<C-p> :call SetMode(",,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
+nnoremap ,,,,<C-p> :call SetMode(",,,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
+nnoremap ,,,,,<C-p> :call SetMode(",,,,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
 nnoremap ,<C-Enter> :call SetMode(",\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/c/bookmarks", "/home/user/FTP/Downloads/code-files")<cr>
-nnoremap ,,<C-Enter> :call SetMode(",,\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files2")<cr>
+nnoremap ,,<C-Enter> :call SetMode(",,\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files")<cr>
+nnoremap ,,,<C-Enter> :call SetMode(",,,\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/git_server", "/home/user/FTP/Downloads/code-files")<cr>
