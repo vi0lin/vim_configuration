@@ -1077,13 +1077,8 @@ function! SmartFold()
 endfunction
 
 function! GitRebase()
-  !git pull --rebase
-  " check all conflicts
-  " git add src/Functions.vim
-  !git rebase --continue "satisfied
-  !git rebase --skip     "überspringen
-  !git rebase --abort    "abbruch
-  !git rebase --amend    "ändern
+  call GitRun('pull --rebase')
+  " danach je nach Lage:  rebase --continue / --skip / --abort / --amend
 endfunction
 
 function! GitRenameRemote(...)
@@ -1092,7 +1087,7 @@ function! GitRenameRemote(...)
   else
     let newname=input("Rename [".w:gitRemote."]: ")
   endif
-  exec "!git remote rename "..w:gitRemote.." "..newname
+  call GitRun("remote rename "..shellescape(w:gitRemote).." "..shellescape(newname))
   " let w:gitRemote=newname
   call UpdateGit()
   " windo "call Statusline()"
@@ -1105,7 +1100,7 @@ function! GitSetRemote(...)
   else
     let newurl=input("Set "..w:gitRemote.." [".w:gitRemoteUrl."]: ")
   endif
-  exec "!git remote set-url "..w:gitRemote.." "..newurl
+  call GitRun("remote set-url "..shellescape(w:gitRemote).." "..shellescape(newurl))
   call UpdateGit()
   call Statusline()
 endfunction
@@ -1116,7 +1111,7 @@ function! GitRenameBranch(...)
   else
     let newname=input("Rename [".w:gitBranch."]: ")
   endif
-  exec "!git branch -m "..w:gitBranch.." "..newname
+  call GitRun("branch -m "..shellescape(w:gitBranch).." "..shellescape(newname))
   let w:gitBranch=newname
   " windo "call Statusline()"
   call UpdateGit()
@@ -1131,7 +1126,7 @@ function! GitRemoteAdd(...)
   else
     let newname=input("Remote Add: ")
   endif
-  exec "!git remote add "..newname
+  call GitRun("remote add "..newname)
   call UpdateGit()
 endfunction
 command! -range -nargs=* GitRemoteAdd <line1>,<line2>:call GitRemoteAdd(<f-args>)
@@ -1142,7 +1137,7 @@ function! GitNewBranch(...)
   else
     let newname=input("New: ")
   endif
-  exec "!git branch -m "..w:gitBranch.." "..newname
+  call GitRun("branch -m "..shellescape(w:gitBranch).." "..shellescape(newname))
   call UpdateGit()
 endfunction
 
@@ -2929,19 +2924,19 @@ command! -range -nargs=0 GitStashPopAutoStash <line1>,<line2>:call GitStashPopAu
 
 function! GitStashPush()
   " Todo Add Message Argument
-  !git stash push
+  call GitRun('stash push')
 endfunction
 command! -range -nargs=0 GitStashPush <line1>,<line2>:call GitStashPush()
 
 function! GitStashPop()
   " Todo Add Message Argument
-  !git stash pop
+  call GitRun('stash pop')
 endfunction
 command! -range -nargs=0 GitStashPop <line1>,<line2>:call GitStashPop()
 
 function! GitStashDrop()
   " Todo Add Message Argument
-  !git stash drop
+  call GitRun('stash drop')
 endfunction
 command! -range -nargs=0 GitStashDrop <line1>,<line2>:call GitStashDrop()
 
@@ -2953,6 +2948,7 @@ endfunction
 
 command! -range -nargs=? Push <line1>,<line2>:call Push(<q-args>)
 function! Push(commitmessage='')
+  call GitBatch(1)
   GitStatus
   GitAdd
   GitStatus
@@ -2960,10 +2956,16 @@ function! Push(commitmessage='')
   " call input("Procceed? [<CR> Yes] [<C-c> Cancel]")
   call GitCommit(a:commitmessage)
   DecidePush
+  call GitBatch(0)
 endfunction
 
 command! -range -nargs=* DecidePush <line1>,<line2>:call DecidePush(<q-args>)
 function! DecidePush(...)
+  if type(get(w:, 'gitRemote', -1)) != v:t_string || get(w:, 'gitRemote', '') ==# ''
+    call GitPopup('git push', ['kein Remote eingerichtet -- nichts zu pushen',
+          \ '(z.B.  ,,<F12>  GitRemoteAdd, oder:  git remote add origin <url>)'], s:git_batch)
+    return
+  endif
   if IsGithubPush()
     call Github('push '..w:gitRemote..' '..w:gitBranch)
   else
@@ -3045,19 +3047,17 @@ endfunction
 command! -range -nargs=* Pull <line1>,<line2>:call Pull(<q-args>)
 function! Pull(...)
   let args=join(a:000, ' ')
-  if args==''
+  if args=='' && (type(get(w:, 'gitRemote', -1)) != v:t_string || get(w:, 'gitRemote', '') ==# '')
+    return      " kein Remote: nichts zu holen
+  elseif args==''
     let pull_args=w:gitRemote.." "..w:gitBranch
   else
     let pull_args=join(a:000, ' ')
   endif
   " Todo GetOpts
   " GitStatus
-  let pull_command="git pull "..pull_args.." --rebase"
   GitStashPushAutoStash
-  let out=systemlist(pull_command)
-  for o in out
-    echo o
-  endfor
+  call GitRun('pull '..pull_args..' --rebase')
   GitStashPopAutoStash
 endfunction
 
@@ -3085,19 +3085,17 @@ function! Stash(commitmessage='')
     endif
     let i += 1
   endwhile
-  !git stash
+  call GitRun('stash')
 endfunction
 
 command! -range -nargs=? StashPush <line1>,<line2>:call StashPush(<q-args>)
 function! StashPush(commitmessage='')
-  " GitStatus
-  !git stash push
+  call GitRun('stash push')
 endfunction
 
 command! -range -nargs=? StashPop <line1>,<line2>:call StashPop(<q-args>)
 function! StashPop(commitmessage='')
-  " GitStatus
-  !git stash pop
+  call GitRun('stash pop')
 endfunction
 
 command! -range -nargs=? PushRepo <line1>,<line2>:call PushRepo(<args>)
@@ -3109,8 +3107,13 @@ function! PushRepo(commitmessage='')
 endfunction
 
 function! Fetch_Last_Git_Message()
-  if exists("b:isGitRepo") && b:isGitRepo=='true'
-    let g:lastcommitmessage=systemlist('git log -1 --pretty=%B | head -n 1')[0]
+  " [was: only if b:isGitRepo=='true' -- that is not set for every buffer,
+  "  so g:lastcommitmessage stayed unset, the question was skipped and
+  "  <F12> committed with an EMPTY message]
+  " (also called while this file loads -- FindGit comes later, from Cwd.vim)
+  if exists('*FindGit') && type(FindGit(getcwd())) == v:t_string
+    let out = systemlist('git --no-pager log -1 --pretty=%B 2>/dev/null')
+    let g:lastcommitmessage = empty(out) ? '' : out[0]
   endif
 endfunction
 
@@ -3127,13 +3130,13 @@ if !exists("g:lastmessage")
 endif
 
 function! UpdateLastCommitMessageWhenChanged(commitmessage='')
-  if exists('g:lastcommitmessage')
-    let message = input("Commit with Message: ['".g:lastcommitmessage."']  ")
-    if message != ''
-      let g:lastcommitmessage = message
-    endif
-  else
-    echo "g:lastcommitmessage does not exists"
+  let last = get(g:, 'lastcommitmessage', '')
+  call inputsave()
+  let message = input("Commit with Message: ['" . last . "']  ")
+  call inputrestore()
+  redraw
+  if message != ''
+    let g:lastcommitmessage = message
   endif
 endfunction
 
@@ -3149,11 +3152,12 @@ endfunction
 
 command! -range -nargs=* PushCWD <line1>,<line2>:call PushCWD(<q-args>)
 function! PushCWD(commitmessage='')
-  " GitStatus
+  call GitBatch(1)
   GitAddCWD
   call GitCommit(a:commitmessage)
   " GitStatus
   DecidePush
+  call GitBatch(0)
 endfunction
 
 function! GetOptExample(...) abort
@@ -3195,25 +3199,25 @@ endfunction
 
 function! GitAmend(para)
   let p=join(a:para, ' ')
-  exec '!git --no-pager rebase '..p..' --amend'
+  call GitRun('rebase '..p..' --amend')
 endfunction
 command! -range -nargs=* Amend <line1>,<line2>:call GitAmend(<f-args>)
 
 function! GitContinue(para)
   let p=join(a:para, ' ')
-  exec '!git --no-pager rebase '..p..' --continue'
+  call GitRun('rebase '..p..' --continue')
 endfunction
 command! -range -nargs=* Continue <line1>,<line2>:call GitContinue(<f-args>)
 
 function! GitSkip(para)
   let p=join(a:para, ' ')
-  exec '!git --no-pager rebase '..p..' --skip'
+  call GitRun('rebase '..p..' --skip')
 endfunction
 command! -range -nargs=* Skip <line1>,<line2>:call GitSkip(<f-args>)
 
 function! GitAbort(para)
   let p=join(a:para, ' ')
-  exec '!git --no-pager rebase '..p..' --abort'
+  call GitRun('rebase '..p..' --abort')
 endfunction
 command! -range -nargs=* Abort <line1>,<line2>:call GitAbort(<f-args>)
 
@@ -3221,19 +3225,21 @@ function! GitMerge(branch)
   let b=join(a:branch, ' ')
   " !git merge --rebase
   " exec '!clear && git merge '..a:branch..' --no-commit --no-ff'
-  exec '!git --no-pager merge '..b..' --rebase'
+  call GitRun('merge '..b..' --rebase')
 endfunction
 command! -range -nargs=* Merge <line1>,<line2>:call GitMerge(<f-args>)
 
 command! -range -nargs=0 GitUnshallow <line1>,<line2>:call GitUnshallow()
 function! GitUnshallow()
-  !git --no-pager fetch --unshallow github
+  call GitRun('fetch --unshallow github')
 endfunction
 
 function! GitInitRepositoryBare()
-  !git init --bare
-  !git config --file config http.receivepack true
-  !git symbolic-ref HEAD refs/heads/main
+  call GitBatch(1)
+  call GitRun('init --bare')
+  call GitRun('config --file config http.receivepack true')
+  call GitRun('symbolic-ref HEAD refs/heads/main')
+  call GitBatch(0)
 endfunction
 
 function! Install()
@@ -3357,7 +3363,7 @@ function! GitDiff(...)
   " exec "!clear && git diff "..join(cleaned, ' ')
   " exec "!clear && git diff "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
   " echo "!clear && git diff "..cmd.repo.." "..cmd.post.." "..join(cleaned, ' ')
-  call GitShow('diff', 'diff '..cmd.repo..' '..cmd.post..' '..join(cleaned, ' '))
+  call GitRun('diff '..cmd.repo..' '..cmd.post..' '..join(cleaned, ' '))
   " exec "!clear && git diff "..w:gitBranch.." "..w:gitRemote.."/"..w:gitBranch.." "..join(cleaned, ' ')
   " let x =<< eval trim EOF
   " !clear && git diff {cmd.text} {cmd.pager} {cmd.cached} {cmd.file}
@@ -3381,26 +3387,26 @@ endfunction
 
 command! -range -nargs=0 GitAdd <line1>,<line2>:call GitAdd()
 function! GitAdd()
-  !git --no-pager add %
+  call GitRun('add ' . shellescape(expand('%')))
 endfunction
 
 command! -range -nargs=0 GitAddCWD <line1>,<line2>:call GitAddCWD()
 function! GitAddCWD()
   " !clear && git add .
-  !git --no-pager add -A
+  call GitRun('add -A')
   " || git add -A
 endfunction
 
 command! -range -nargs=0 GitAddRepo <line1>,<line2>:call GitAddRepo()
 function! GitAddRepo()
   " echo '!clear && git add'w:git
-  exec '!git --no-pager add'w:git
+  call GitRun('add ' . shellescape(w:git))
   " || git add -A
 endfunction
 
 command! -range -nargs=0 GitRemoveCached <line1>,<line2>:call GitRemovemCached()
 function! GitRemoveCached()
-  !git rm -r --cached .
+  call GitRun('rm -r --cached .')
 endfunction
 
 command! -range -nargs=? GitCommit <line1>,<line2>:call GitCommit(<args>)
@@ -3408,14 +3414,18 @@ function! GitCommit(message='')
   call GitMessage(a:message)
   let msg=''
   if a:message==''
-    let msg=g:lastcommitmessage
+    let msg=get(g:, 'lastcommitmessage', '')
   else
     let msg=a:message
+  endif
+  if msg ==# ''
+    call GitPopup('git commit', ['keine Commit-Nachricht -- nichts uebernommen'], s:git_batch)
+    return
   endif
   " echo msg
   " call input(msg)
   " echo '!clear && git commit -m "'..msg..'"'
-  exec '!git --no-pager commit -m '..shellescape(msg)
+  call GitRun('commit -m '..shellescape(msg))
 endfunction
 
 command! -range -nargs=? GitCommitRepo <line1>,<line2>:call GitCommitRepo(<args>)
@@ -3424,68 +3434,165 @@ function! GitCommitRepo(message='')
   call GitMessage(a:message)
   let msg=''
   if a:message==''
-    let msg=g:lastcommitmessage
+    let msg=get(g:, 'lastcommitmessage', '')
   else
     let msg=a:message
+  endif
+  if msg ==# ''
+    call GitPopup('git commit', ['keine Commit-Nachricht -- nichts uebernommen'], s:git_batch)
+    return
   endif
   " echo msg
   " call input(msg)
   " echo '!clear && git commit -m "'..msg..'"'
-  exec '!git --no-pager commit -m '..shellescape(msg)
+  call GitRun('commit -m '..shellescape(msg))
 endfunction
 
 command! -range -nargs=0 Log <line1>,<line2>:call Log()
 function! Log()
-  call GitShow('log', 'log --decorate -n 300')
+  call GitRun('log --decorate -n 300')
 endfunction
 
 function! GithubPullNoMerge()
-  !git pull github main --no-rebase
+  call GitRun('pull github main --no-rebase')
 endfunction
 
 command! -range -nargs=0 Status <line1>,<line2>:call GitStatus()
 command! -range -nargs=0 GitStatus <line1>,<line2>:call GitStatus()
-" GIT OUTPUT IN A BUFFER -- no pager, no screen switching, no "Press ENTER".
+" GIT OUTPUT IN A SCROLLABLE POPUP.
 " [Every git command used to run as  :!clear && git ...  That switches the
 "  terminal to its normal screen, wipes it with clear (Windows Terminal then
 "  also drops the scrollback), lets git start its pager, and after "q" and
 "  Enter Vim repaints everything. Under WSL the pager regularly came back or
-"  got stuck, and after :q the terminal showed an empty screen instead of
-"  the shell history -- clear had erased it. Read-only commands (status,
-"  log, diff) now land in a buffer: "q" closes it, the diff is highlighted.
-"  Commands that may prompt (push, commit hooks) still use :! but without
-"  clear and always with --no-pager.]
-function! GitShow(title, args) abort
-  let out = systemlist('git --no-pager ' . a:args . ' 2>&1')
-  let rc = v:shell_error
-  let name = 'git://' . a:title
-  let bnr = bufnr(name)
-  let winid = bnr > 0 ? bufwinid(bnr) : -1
-  if winid >= 0
-    call win_gotoid(winid)
-  else
-    silent botright 15new
-    if bnr > 0
-      execute 'silent buffer' bnr
-    else
-      execute 'silent file' fnameescape(name)
-    endif
-    setlocal buftype=nofile bufhidden=hide noswapfile nobuflisted nowrap
-    nnoremap <buffer> <silent> q :close<CR>
+"  got stuck, and after :q the terminal showed an empty screen -- clear had
+"  erased it. Now every git command runs without a pager and its output
+"  appears in ONE popup:
+"    <CR> <Esc> q   close it          j k <Up> <Down> <C-d> <C-u> g G  scroll
+"    a further git key (F10, C-F11, ...) replaces the popup with the new
+"    output; a chain like <F12> (add + commit + push) collects all its steps
+"    in the same popup.
+"  Commands that would have to ask something (password, ssh passphrase) are
+"  run non-interactively first; if git reports that it needed a prompt, the
+"  same command is repeated with :! so you can answer it.]
+let s:git_popup = 0
+let s:git_lines = []
+let s:git_batch = 0
+let s:git_saved_maps = {}
+
+" Keys that steer the popup while it is open. They are installed as
+" TEMPORARY normal-mode mappings and restored on close. [A popup filter
+" would not do: with key mappings enabled the filter never sees <CR>
+" (your <C-m> mapping -- that IS Enter -- fires first), with mappings
+" disabled the git keys (F10, C-F11, ...) stop working. Temporary mappings
+" give both: these keys steer the popup, every other key works as usual,
+" and a further git key simply replaces the popup.]
+let s:git_popup_keys = {
+      \ '<CR>': 'close', '<Esc>': 'close', 'q': 'close',
+      \ 'j': 'j', '<Down>': 'j', 'k': 'k', '<Up>': 'k',
+      \ '<C-d>': 'half-down', '<C-u>': 'half-up',
+      \ '<PageDown>': 'page-down', '<PageUp>': 'page-up', 'G': 'bottom', 'gg': 'top' }
+
+function! GitPopupKey(action) abort
+  if a:action ==# 'close'
+    return GitPopupClose()
   endif
-  setlocal modifiable
-  silent %delete _
-  call setline(1, empty(out) ? ['(keine Ausgabe)'] : out)
-  setlocal nomodifiable nomodified
-  let &l:filetype = a:title =~# 'diff' ? 'diff' : 'git'
-  1
-  if rc
-    echohl WarningMsg | echo 'git ' . a:args . '  ->  Rueckgabewert ' . rc | echohl None
+  if !s:git_popup | return | endif
+  let pos = popup_getpos(s:git_popup)
+  let page = max([1, pos.core_height])
+  let step = {'j': 1, 'k': -1, 'half-down': page / 2, 'half-up': -(page / 2),
+        \ 'page-down': page, 'page-up': -page,
+        \ 'top': -len(s:git_lines), 'bottom': len(s:git_lines)}[a:action]
+  let first = max([1, min([pos.firstline + step, len(s:git_lines) - page + 1])])
+  call popup_setoptions(s:git_popup, {'firstline': first})
+endfunction
+
+function! s:GitPopupMapsOn() abort
+  if !empty(s:git_saved_maps) | return | endif
+  for [key, action] in items(s:git_popup_keys)
+    let s:git_saved_maps[key] = maparg(key, 'n', 0, 1)
+    execute 'nnoremap <silent> ' . key . ' :<C-u>call GitPopupKey(' . string(action) . ')<CR>'
+  endfor
+endfunction
+
+function! s:GitPopupMapsOff() abort
+  for [key, saved] in items(s:git_saved_maps)
+    if empty(saved)
+      silent! execute 'nunmap ' . key
+    else
+      call mapset('n', 0, saved)
+    endif
+  endfor
+  let s:git_saved_maps = {}
+endfunction
+
+function! GitPopupClose() abort
+  call s:GitPopupMapsOff()
+  " id first taken out of s:git_popup: popup_close() runs the popup's
+  " callback at once, which must not treat the closing popup as current
+  let id = s:git_popup
+  let s:git_popup = 0
+  if id && !empty(popup_getpos(id))
+    call popup_close(id)
   endif
 endfunction
 
+" popup closed by other means (e.g. popup_clear): clean up only if it is
+" the one currently shown
+function! GitPopupClosed(id, result) abort
+  if a:id == s:git_popup
+    call GitPopupClose()
+  endif
+endfunction
+
+" Show {lines} in the git popup ({append}: add to what is shown).
+function! GitPopup(title, lines, append = 0, filetype = 'git') abort
+  let s:git_lines = a:append && s:git_popup ? s:git_lines + a:lines : a:lines
+  call GitPopupClose()
+  let width  = max([60, min([&columns - 6, 120])])
+  let height = max([5, min([&lines - 6, len(s:git_lines) + 1])])
+  let s:git_popup = popup_create(s:git_lines, #{
+        \ title: ' ' . a:title . '   (Enter/Esc/q schliesst, j k G scrollt) ', pos: 'center',
+        \ minwidth: width, maxwidth: width, minheight: 5, maxheight: height,
+        \ border: [1, 1, 1, 1], borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+        \ scrollbar: 1, wrap: 0, highlight: 'Pmenu', zindex: 210,
+        \ callback: function('GitPopupClosed') })
+  call setbufvar(winbufnr(s:git_popup), '&filetype', a:filetype)
+  call s:GitPopupMapsOn()
+  if a:append
+    call GitPopupKey('bottom')
+  endif
+endfunction
+
+" Run  git {args}  without a pager and show its output in the popup.
+" Returns git's exit code.
+function! GitRun(args, filetype = '') abort
+  let ft = !empty(a:filetype) ? a:filetype : (a:args =~# '^\s*diff' ? 'diff' : 'git')
+  " no prompts: a hidden question would hang systemlist() forever
+  let env = 'GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND=' . shellescape('ssh -o BatchMode=yes') . ' '
+  let out = systemlist(env . 'git --no-pager ' . a:args . ' 2>&1')
+  let rc = v:shell_error
+  let needs_prompt = rc != 0 && join(out, "\n") =~? 'terminal prompts disabled\|could not read Username\|Permission denied\|passphrase\|Host key verification\|Authentication failed'
+  if needs_prompt
+    " repeat interactively so the question can be answered
+    call GitPopupClose()
+    execute '!git --no-pager ' . a:args
+    let out += ['', '(wiederholt mit :! -- Ergebnis siehe oben)']
+    let rc = v:shell_error
+  endif
+  let lines = ['$ git ' . a:args] + (empty(out) ? ['(keine Ausgabe)'] : out)
+  if rc | let lines += ['', '[Rueckgabewert ' . rc . ']'] | endif
+  if s:git_batch | let lines += [''] | endif
+  call GitPopup('git ' . matchstr(a:args, '^\s*\zs\S\+'), lines, s:git_batch, ft)
+  return rc
+endfunction
+
+" Several git commands in ONE popup: GitBatch(1) ... GitBatch(0)
+function! GitBatch(on) abort
+  let s:git_batch = a:on
+endfunction
+
 function! GitStatus()
-  call GitShow('status', 'status')
+  call GitRun('status')
 endfunction
 
 function! GithubIntegrateProject(repo)
@@ -3550,9 +3657,8 @@ function! Git(...)
   " todo: select remote branch, when selected branch was not found or local and remote branch are different ...
   Pull
   let args=join(a:000, ' ')
-  let $command=args
   " push "..w:gitRemote.." "..w:gitBranch
-  !git --no-pager $command
+  call GitRun(args)
 endfunction
 command! -range -nargs=* Git <line1>,<line2>:call Git(<q-args>)
 command! -range -nargs=0 GitPush <line1>,<line2>:call Git('push '..w:gitRemote..' '..w:gitBranch)
@@ -7971,13 +8077,13 @@ function! ToggleLineState()
 endfunction
 
 function! StashAndFree(file)
-  !git --no-pager stash save "my saved stash"
-  exec "!git checkout ".a:file
-  !git stash list
-  !git stash pop
-  !git stash push -p
-  !git stash apply
-  !git stash branch add-sidebar
+  call GitRun('stash save "my saved stash"')
+  call GitRun('checkout ' . shellescape(a:file))
+  call GitRun('stash list')
+  call GitRun('stash pop')
+  call GitRun('stash push -p')
+  call GitRun('stash apply')
+  call GitRun('stash branch add-sidebar')
 endfunction
 
 function! SwitchHeaderCode()
@@ -9181,7 +9287,7 @@ endfunction
 command! -bar -range -nargs=0 PlugUpdate call PlugUpdate()
 
 function Update()
-  exec "!git -C "..g:vim_configuration_path.." pull"
+  call GitRun('-C '..shellescape(g:vim_configuration_path)..' pull')
 endfunction
 command! -bar -range -nargs=0 Update call Update()
 
