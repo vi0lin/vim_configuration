@@ -427,7 +427,8 @@ NewMap -no -n <m-;> :call ToggleOverviewRight()<cr>
 NewMap -no -n ,,<F4> :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.bashrc; git_selector "TEST"
 NewMap -no -n <C-S-F9> :call PreviewBuffer()<cr>
 " map <M-F12> :call Info()<cr>
-NewMap -no -n <C-F2> :call ToggleWrap()<cr>
+" ToggleWrap keeps ,,,w -- <C-F2> now toggles the current project folder in/out of .unreleased/.projects
+NewMap -no -n <C-F2> :ProjectToggle<cr>
 NewMap -no -n ,,,w :call ToggleWrap()<cr>
 NewMap -no -n ,in :call Intend()<cr>
 NewMap -no -n ,,,<space> :IntelligentSelecting<cr>

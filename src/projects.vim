@@ -130,6 +130,11 @@ endfunction
 
 function! s:LoadList(name) abort
   if !has_key(s:lists, a:name)
+    " one-time migration: the list used to be called "projekt"
+    if a:name ==# 'projects' && !filereadable(s:ListFile('projects'))
+          \ && filereadable(s:ListFile('projekt'))
+      call Write(Read(s:ListFile('projekt')), s:ListFile('projects'))
+    endif
     let s:lists[a:name] = Read(s:ListFile(a:name))
   endif
   return s:lists[a:name]
@@ -202,7 +207,66 @@ function! Refresh(name, functionname) abort
   exec 'let g:' . a:name . ' = ' . a:functionname
 endfunction
 
-command! -range -nargs=0 Projekt call SetUnset('projekt', expand('%:p'))
+" ---------------------------------------------------------------------------
+" .unreleased/.projects -- folders YOU declare to be projects.
+"
+" They show up first in the <F2> popup (Projects()) and in g:projects, no
+" matter whether they are git repositories, live inside a project holder,
+" or nothing of the sort. <C-F2> toggles the folder of what you are working
+" on in and out of that file.
+"
+" WHICH FOLDER? The one that matters for a project, not blindly cwd or the
+" file's own folder:
+"   - a file inside a git repository  -> the repository root
+"   - any other file                  -> the folder of that file
+"   - a directory buffer (netrw)      -> that directory
+"   - a terminal, an empty buffer     -> the working directory (cwd)
+"   :ProjectToggle %      the file's OWN folder, even inside a git repo
+"   :ProjectToggle .      the working directory, exactly
+"   :ProjectToggle <dir>  any folder
+" The chosen path is always shown, so you see what was toggled.
+" ---------------------------------------------------------------------------
+command! -nargs=? -complete=dir ProjectToggle call ProjectToggle(<q-args>)
+command! -range -nargs=0 Projekt call ProjectToggle('')
+
+function! ProjectToggle(arg) abort
+  let dir = s:ProjectFolderFor(a:arg)
+  if empty(dir) || !isdirectory(dir)
+    echohl WarningMsg | echo 'ProjectToggle: no folder found' . (empty(a:arg) ? '' : ' for ' . a:arg) | echohl None
+    return
+  endif
+  let dir = s:NormalizePath(dir)
+  let was_in = index(s:LoadList('projects'), dir) >= 0
+  call SetUnset('projects', dir)
+  let n = len(s:LoadList('projects'))
+  echo (was_in ? 'removed from .projects:  ' : 'added to .projects:  ') . dir . '   (' . n . ' in .projects)'
+endfunction
+
+function! s:ProjectFolderFor(arg) abort
+  if a:arg ==# '.'
+    return getcwd()
+  elseif a:arg ==# '%'
+    return expand('%:p:h')
+  elseif !empty(a:arg)
+    " a file (also what "%" arrives as after Vim expanded it) -> its folder
+    let p = fnamemodify(expand(a:arg), ':p')
+    return filereadable(p) && !isdirectory(p) ? fnamemodify(p, ':h') : p
+  endif
+  let name = expand('%:p')
+  if isdirectory(name)                          " directory buffer (netrw)
+    return name
+  endif
+  if &buftype !=# '' || empty(name)             " terminal, quickfix, [No Name]
+    return getcwd()
+  endif
+  if exists('*FindGit')                         " file inside a git repo
+    let root = FindGit(fnamemodify(name, ':h'))
+    if type(root) == v:t_string && !empty(root)
+      return root
+    endif
+  endif
+  return fnamemodify(name, ':h')
+endfunction
 command! -range -nargs=0 MultiprojectHolder call SetUnset('multiprojectholder', expand('%:p'))
 command! -range -nargs=0 FavoriteFolder call SetUnset('favoritefolders', expand('%:p'))
 command! -range -nargs=0 FavoriteFolderRecursively call SetUnset('favoritefolders_recursively', expand('%:p'))
@@ -327,14 +391,20 @@ endfunction
 " -----------------------------------------------------------------------
 " Putting it all together
 
+" Order of first appearance is kept, so whatever comes first in GetProjects()
+" (the hand-picked .projects folders) is first in the <F2> popup too.
 function! MergeUniq(...) abort
   let seen = {}
+  let out = []
   for list in a:000
     for x in list
-      let seen[x] = 1
+      if !has_key(seen, x)
+        let seen[x] = 1
+        call add(out, x)
+      endif
     endfor
   endfor
-  return keys(seen)
+  return out
 endfunction
 
 " The full project list: every git project found under
@@ -350,6 +420,7 @@ function! GetProjects() abort
   " filtered for directories - but it only ever lists files, so it always
   " contributed nothing while costing a full recursive scan. Dropped.)
   let g:projects = MergeUniq(
+        \ s:NormalizedDirs('projects'),
         \ GetGitprojects(),
         \ GetProjectHolder_Projects(),
         \ GetMultiprojectHolder_Projects(),

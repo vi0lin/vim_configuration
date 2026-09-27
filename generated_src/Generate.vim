@@ -815,7 +815,7 @@ nnoremap ,,fv :call SetMode(",,fv", "Normal") \| :LayoutVim<cr>
 nnoremap <m-;> :call SetMode("\<m-;\>", "Normal") \| :call ToggleOverviewRight()<cr>
 nnoremap ,,<F4> :call SetMode(",,\<F4\>", "Normal") \| :redraw \\| let c=input("Test: ")<cr>!source ".$workdir."/.bashrc; git_selector "TEST"
 nnoremap <C-S-F9> :call SetMode("\<C-S-F9\>", "Normal") \| :call PreviewBuffer()<cr>
-nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :call ToggleWrap()<cr>
+nnoremap <C-F2> :call SetMode("\<C-F2\>", "Normal") \| :ProjectToggle<cr>
 nnoremap ,,,w :call SetMode(",,,w", "Normal") \| :call ToggleWrap()<cr>
 nnoremap ,in :call SetMode(",in", "Normal") \| :call Intend()<cr>
 nnoremap ,,,<space> :call SetMode(",,,\<space\>", "Normal") \| :IntelligentSelecting<cr>
