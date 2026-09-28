@@ -334,7 +334,8 @@ function! GitRemote_Statusline(num=-1)
       return ''
     endif
     " r-->remote
-    return ('  {r:'..GitRemote()..'}')[:num]..post..' '
+    " return ('  {r:'..GitRemote()..'}')[:num]..post..' '
+    return ('  '..GitRemote())[:num]..post..' '
   else
     return ''
   endif

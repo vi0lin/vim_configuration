@@ -905,12 +905,6 @@ vnoremap ,ir :call SetMode(",ir", "Visual") \| '<,'>:call RUST('', 'exec_input_v
 nnoremap <space>p :call SetMode("\<space\>p", "Normal") \| :CopyFileNameToClipboard<cr>
 nnoremap <space>P :call SetMode("\<space\>P", "Normal") \| :CopyWholePathToClipboard<cr>
 nnoremap <space>r :call SetMode("\<space\>r", "Normal") \| :InsertReceiver<cr>
-nnoremap <C-Space> :call SetMode("\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 0))<cr>
-nnoremap ,<C-Space> :call SetMode(",\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 1))<cr>
-nnoremap ,,<C-Space> :call SetMode(",,\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 2))<cr>
-nnoremap ,,,<C-Space> :call SetMode(",,,\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 3))<cr>
-nnoremap ,,,,<C-Space> :call SetMode(",,,,\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 4))<cr>
-nnoremap ,,,,,<C-Space> :call SetMode(",,,,,\<C-Space\>", "Normal") \| :call Files(Folder_Up(v:count, 5))<cr>
 nnoremap ,<Space> :call SetMode(",\<Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
 nnoremap ,,<Space> :call SetMode(",,\<Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
 nnoremap ,,,<Space> :call SetMode(",,,\<Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
@@ -1151,15 +1145,15 @@ nnoremap ,,<F1> :call SetMode(",,\<F1\>", "Normal") \| :call GitCommitRepo(input
 nnoremap ,<F1> :call SetMode(",\<F1\>", "Normal") \| :call GitAddRepo()<cr>
 nnoremap ,,,,,<F1> :call SetMode(",,,,,\<F1\>", "Normal") \| :call GitInitRepository()<cr>
 nnoremap ,,,,,,<F1> :call SetMode(",,,,,,\<F1\>", "Normal") \| :call GitInitRepositoryBare()<cr>
-nnoremap <F2> :call SetMode("\<F2\>", "Normal") \| :call SelectRemote(1)<cr>
-nnoremap <S-F2> :call SetMode("\<S-F2\>", "Normal") \| :call SelectRemote(-1)<cr>
-nnoremap ,<F2> :call SetMode(",\<F2\>", "Normal") \| :call GitRenameRemote()<cr>
-nnoremap ,,<F2> :call SetMode(",,\<F2\>", "Normal") \| :call GitRemoteAdd()<cr>
-nnoremap ,,,<F2> :call SetMode(",,,\<F2\>", "Normal") \| :call GitSetRemote()<cr>
-nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :call SelectBranch(1)<cr>
-nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :call SelectBranch(-1)<cr>
-nnoremap ,<F3> :call SetMode(",\<F3\>", "Normal") \| :call GitRenameBranch()<cr>
-nnoremap ,,<F3> :call SetMode(",,\<F3\>", "Normal") \| :call GitNewBranch()<cr>
+nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :call SelectRemote(1)<cr>
+nnoremap <S-F3> :call SetMode("\<S-F3\>", "Normal") \| :call SelectRemote(-1)<cr>
+nnoremap ,<F3> :call SetMode(",\<F3\>", "Normal") \| :call GitRenameRemote()<cr>
+nnoremap ,,<F3> :call SetMode(",,\<F3\>", "Normal") \| :call GitRemoteAdd()<cr>
+nnoremap ,,,<F3> :call SetMode(",,,\<F3\>", "Normal") \| :call GitSetRemote()<cr>
+nnoremap <C-F3> :call SetMode("\<C-F3\>", "Normal") \| :call SelectBranch(1)<cr>
+nnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Normal") \| :call SelectBranch(-1)<cr>
+nnoremap ,<C-F3> :call SetMode(",\<C-F3\>", "Normal") \| :call GitRenameBranch()<cr>
+nnoremap ,,<C-F3> :call SetMode(",,\<C-F3\>", "Normal") \| :call GitNewBranch()<cr>
 nnoremap <S-F4> :call SetMode("\<S-F4\>", "Normal") \| :call GitStashPush()<cr>
 nnoremap <C-F4> :call SetMode("\<C-F4\>", "Normal") \| :call GitStashPop()<cr>
 tnoremap <C-v> <C-\><C-n>
@@ -1181,14 +1175,14 @@ nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('k')<
 nnoremap <C-> :call SetMode("\<C-\>", "Normal") \| :call SmartWincmd('l')<cr>
 nnoremap <F4> :call SetMode("\<F4\>", "Normal") \| :call SelectExecutionWindow(1)<cr>
 nnoremap <S-F4> :call SetMode("\<S-F4\>", "Normal") \| :call SelectExecutionWindow(-1)<cr>
-nnoremap <F3> :call SetMode("\<F3\>", "Normal") \| :F 
-vnoremap <F3> :call SetMode("\<F3\>", "Visual") \| '<,'>:F<cr>
-nnoremap <C-F3> :call SetMode("\<C-F3\>", "Normal") \| :IF 
-vnoremap <C-F3> :call SetMode("\<C-F3\>", "Visual") \| '<,'>:IF<cr>
-nnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Normal") \| :CDo<cr>
-vnoremap <C-S-F3> :call SetMode("\<C-S-F3\>", "Visual") \| '<,'>:CDo<cr>
-nnoremap <C-S-M-F3> :call SetMode("\<C-S-M-F3\>", "Normal") \| :CFDo<cr>
-vnoremap <C-S-M-F3> :call SetMode("\<C-S-M-F3\>", "Visual") \| '<,'>:CFDo<cr>
+nnoremap <S-Space> :call SetMode("\<S-Space\>", "Normal") \| :F 
+vnoremap <S-Space> :call SetMode("\<S-Space\>", "Visual") \| '<,'>:F<cr>
+nnoremap <C-Space> :call SetMode("\<C-Space\>", "Normal") \| :IF 
+vnoremap <C-Space> :call SetMode("\<C-Space\>", "Visual") \| '<,'>:IF<cr>
+nnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Normal") \| :CDo<cr>
+vnoremap <C-S-Space> :call SetMode("\<C-S-Space\>", "Visual") \| '<,'>:CDo<cr>
+nnoremap <C-S-M-Space> :call SetMode("\<C-S-M-Space\>", "Normal") \| :CFDo<cr>
+vnoremap <C-S-M-Space> :call SetMode("\<C-S-M-Space\>", "Visual") \| '<,'>:CFDo<cr>
 nnoremap <C-]> :call SetMode("\<C-]\>", "Normal") \| :OR 1<CR>
 vnoremap <C-]> :call SetMode("\<C-]\>", "Visual") \| '<,'>:OR 1<CR>
 nnoremap <C-\> :call SetMode("\<C-\\>", "Normal") \| :OR -1<CR>
@@ -1234,18 +1228,10 @@ nnoremap <C-S-F2> :call SetMode("\<C-S-F2\>", "Normal") \|    :call ProjectCycle
 nnoremap <S-F12> :call SetMode("\<S-F12\>", "Normal") \|    :call ProjectCycleAllNext()<cr>
 nnoremap <C-S-F12> :call SetMode("\<C-S-F12\>", "Normal") \|  :call ProjectCycleAllPrev()<cr>
 nnoremap <A-F2> :call SetMode("\<A-F2\>", "Normal") \|    :call FilesInProjects()<cr>
-nnoremap <C-Space> :call SetMode("\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
-nnoremap ,<C-Space> :call SetMode(",\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
-nnoremap ,,<C-Space> :call SetMode(",,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
-nnoremap ,,,<C-Space> :call SetMode(",,,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
-nnoremap ,,,,<C-Space> :call SetMode(",,,,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
-nnoremap ,,,,,<C-Space> :call SetMode(",,,,,\<C-Space\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
 nnoremap <C-p> :call SetMode("\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
 nnoremap ,<C-p> :call SetMode(",\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
 nnoremap ,,<C-p> :call SetMode(",,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
 nnoremap ,,,<C-p> :call SetMode(",,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
 nnoremap ,,,,<C-p> :call SetMode(",,,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
 nnoremap ,,,,,<C-p> :call SetMode(",,,,,\<C-p\>", "Normal") \| :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
-nnoremap ,<C-Enter> :call SetMode(",\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/c/bookmarks", "/home/user/FTP/Downloads/code-files")<cr>
-nnoremap ,,<C-Enter> :call SetMode(",,\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files")<cr>
-nnoremap ,,,<C-Enter> :call SetMode(",,,\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/git_server", "/home/user/FTP/Downloads/code-files")<cr>
+nnoremap <C-Enter> :call SetMode("\<C-Enter\>", "Normal") \| :call DirDiffFilter("right", "different") \| :call DirDiff(ProjectPath(), "/home/user/FTP/Downloads/code-files")<cr>

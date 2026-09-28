@@ -627,12 +627,12 @@ NewMap -n -no <space>r :InsertReceiver<cr>
 "" nnoremap <C-A-->            :FindInFileFZFSystem<cr>
 "" " nnoremap <C-S-p>            :FindInFileFZFRepo<cr>
 
-NewMap -no -n <C-Space> :call Files(Folder_Up(v:count, 0))<cr>
-NewMap -no -n ,<C-Space> :call Files(Folder_Up(v:count, 1))<cr>
-NewMap -no -n ,,<C-Space> :call Files(Folder_Up(v:count, 2))<cr>
-NewMap -no -n ,,,<C-Space> :call Files(Folder_Up(v:count, 3))<cr>
-NewMap -no -n ,,,,<C-Space> :call Files(Folder_Up(v:count, 4))<cr>
-NewMap -no -n ,,,,,<C-Space> :call Files(Folder_Up(v:count, 5))<cr>
+" NewMap -no -n <C-Space> :call Files(Folder_Up(v:count, 0))<cr>
+" NewMap -no -n ,<C-Space> :call Files(Folder_Up(v:count, 1))<cr>
+" NewMap -no -n ,,<C-Space> :call Files(Folder_Up(v:count, 2))<cr>
+" NewMap -no -n ,,,<C-Space> :call Files(Folder_Up(v:count, 3))<cr>
+" NewMap -no -n ,,,,<C-Space> :call Files(Folder_Up(v:count, 4))<cr>
+" NewMap -no -n ,,,,,<C-Space> :call Files(Folder_Up(v:count, 5))<cr>
 NewMap -no -n ,<Space> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
 NewMap -no -n ,,<Space> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
 NewMap -no -n ,,,<Space> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
@@ -1211,16 +1211,16 @@ NewMap -no ,,,,,<F1> :call GitInitRepository()<cr>
 NewMap -no ,,,,,,<F1> :call GitInitRepositoryBare()<cr>
 
 " WORK HERE
-NewMap -no <F2> :call SelectRemote(1)<cr>
-NewMap -no <S-F2> :call SelectRemote(-1)<cr>
-NewMap -no ,<F2> :call GitRenameRemote()<cr>
-NewMap -no ,,<F2> :call GitRemoteAdd()<cr>
-NewMap -no ,,,<F2> :call GitSetRemote()<cr>
+NewMap -no <F3> :call SelectRemote(1)<cr>
+NewMap -no <S-F3> :call SelectRemote(-1)<cr>
+NewMap -no ,<F3> :call GitRenameRemote()<cr>
+NewMap -no ,,<F3> :call GitRemoteAdd()<cr>
+NewMap -no ,,,<F3> :call GitSetRemote()<cr>
 
-NewMap -no <F3> :call SelectBranch(1)<cr>
-NewMap -no <S-F3> :call SelectBranch(-1)<cr>
-NewMap -no ,<F3> :call GitRenameBranch()<cr>
-NewMap -no ,,<F3> :call GitNewBranch()<cr>
+NewMap -no <C-F3> :call SelectBranch(1)<cr>
+NewMap -no <C-S-F3> :call SelectBranch(-1)<cr>
+NewMap -no ,<C-F3> :call GitRenameBranch()<cr>
+NewMap -no ,,<C-F3> :call GitNewBranch()<cr>
 
 NewMap -no <S-F4> :call GitStashPush()<cr>
 NewMap -no <C-F4> :call GitStashPop()<cr>
@@ -1350,12 +1350,12 @@ NewMap -no -n <S-F4> :call SelectExecutionWindow(-1)<cr>
 " map <F3> exec ""
 
 
-NewMap -no -n <F3> :F  
-NewMap -no -v <F3> :F<cr>
-NewMap -no -n <C-F3> :IF  
-NewMap -no -v <C-F3> :IF<cr>
-NewMap -no -n -v <C-S-F3> :CDo<cr>
-NewMap -no -n -v <C-S-M-F3> :CFDo<cr>
+NewMap -no -n <S-Space> :F  
+NewMap -no -v <S-Space> :F<cr>
+NewMap -no -n <C-Space> :IF  
+NewMap -no -v <C-Space> :IF<cr>
+NewMap -no -n -v <C-S-Space> :CDo<cr>
+NewMap -no -n -v <C-S-M-Space> :CFDo<cr>
 
 NewMap -no -v -n <C-]> :OR 1<CR>
 NewMap -no -v -n <C-\> :OR -1<CR>
@@ -1414,12 +1414,12 @@ NewMap -no -n <C-S-F12>  :call ProjectCycleAllPrev()<cr>
 NewMap -no -n <A-F2>    :call FilesInProjects()<cr>
 " NewMap -no -n ,,p :call FilesInProjects()<cr>
 
-NewMap -no <C-Space> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
-NewMap -no ,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
-NewMap -no ,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
-NewMap -no ,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
-NewMap -no ,,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
-NewMap -no ,,,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
+" NewMap -no <C-Space> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
+" NewMap -no ,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
+" NewMap -no ,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 2))<cr>
+" NewMap -no ,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
+" NewMap -no ,,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
+" NewMap -no ,,,,,<C-Space> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
 
 NewMap -no <C-p> :call Files(Folder_Repo_Or_Project(v:count, 0))<cr>
 NewMap -no ,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 1))<cr>
@@ -1428,8 +1428,6 @@ NewMap -no ,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 3))<cr>
 NewMap -no ,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 4))<cr>
 NewMap -no ,,,,,<C-p> :call Files(Folder_Repo_Or_Project(v:count, 5))<cr>
 
-NewMap -no -n ,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/c/bookmarks", "/home/user/FTP/Downloads/code-files")<cr>
-NewMap -no -n ,,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/.vim/plugged/vim_configuration", "/home/user/FTP/Downloads/code-files")<cr>
-NewMap -no -n ,,,<C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff("/home/user/MRTN/m/git_server", "/home/user/FTP/Downloads/code-files")<cr>
+NewMap -no -n <C-Enter> :call DirDiffFilter("right", "different") \| :call DirDiff(ProjectPath(), "/home/user/FTP/Downloads/code-files")<cr>
 
 endif
